@@ -1,0 +1,58 @@
+[
+  {
+    "key": "polkadot",
+    "name": "Polkadot",
+    "ws": "wss://rpc.polkadot.io",
+    "specVersion": 1015000,
+    "paraId": null,
+    "genesisHash": "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+  },
+  {
+    "key": "kusama",
+    "name": "Kusama",
+    "ws": "wss://kusama-rpc.polkadot.io",
+    "specVersion": 9430,
+    "paraId": null,
+    "genesisHash": "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+  },
+  {
+    "key": "acala",
+    "name": "Acala",
+    "ws": "wss://acala-rpc-0.aca-api.network",
+    "specVersion": 2260,
+    "paraId": 2000,
+    "genesisHash": "0xfc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c"
+  },
+  {
+    "key": "astar",
+    "name": "Astar",
+    "ws": "wss://rpc.astar.network",
+    "specVersion": 143,
+    "paraId": 2006,
+    "genesisHash": "0x9eb76c5184c4ab8679d2d5d819fdf90b9c001403e9e17da2e14b6d8aec4029c6"
+  },
+  {
+    "key": "moonbeam",
+    "name": "Moonbeam",
+    "ws": "wss://wss.api.moonbeam.network",
+    "specVersion": 3100,
+    "paraId": 2004,
+    "genesisHash": "0xfe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d"
+  },
+  {
+    "key": "bifrost",
+    "name": "Bifrost",
+    "ws": "wss://hk.p.bifrost-rpc.liebi.com/ws",
+    "specVersion": 993,
+    "paraId": 2030,
+    "genesisHash": "0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed"
+  },
+  {
+    "key": "hydration",
+    "name": "Hydration",
+    "ws": "wss://rpc.hydradx.cloud",
+    "specVersion": 267,
+    "paraId": 2034,
+    "genesisHash": "0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d"
+  }
+]
