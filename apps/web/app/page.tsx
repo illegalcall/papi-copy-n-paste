@@ -21,6 +21,7 @@ export default function Page() {
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [isRunning, setIsRunning] = useState(false)
   const [canRun, setCanRun] = useState(false)
+  const [activeTab, setActiveTab] = useState<"code" | "console">("code")
   
   const { status: chainStatus, api } = useClient(selectedChain)
 
@@ -84,8 +85,9 @@ export default function Page() {
 
   const handleRunClick = () => {
     if (!selectedCall || !code) return
-    
+
     setIsRunning(true)
+    setActiveTab("console") // Switch to console tab when running
     simulateTransactionExecution(selectedCall, formData, selectedChain, setConsoleOutput, setIsRunning)
   }
 
@@ -144,6 +146,7 @@ export default function Page() {
             code={code}
             consoleOutput={consoleOutput}
             onClearConsole={handleClearConsole}
+            activeTab={activeTab}
           />
         </div>
 
@@ -166,6 +169,7 @@ export default function Page() {
               code={code}
               consoleOutput={consoleOutput}
               onClearConsole={handleClearConsole}
+              activeTab={activeTab}
             />
           </div>
         </div>
@@ -223,6 +227,7 @@ function simulateTransactionExecution(
     `> ✓ Transaction signed`,
     `> Submitting to network...`,
     `> ✓ Transaction hash: ${txHash}`,
+    `⚠️  WARNING: This is a demo simulation with fake transaction data`,
     `> ✓ Included in block #${21000000 + Math.floor(Math.random() * 1000000)}`,
     ``,
     `🔗 View on Explorer: https://${chainKey}.subscan.io/extrinsic/${txHash}`,
