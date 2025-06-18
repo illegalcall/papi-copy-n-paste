@@ -6,6 +6,7 @@ import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMe
 import { Moon, Sun, Github, BookOpen } from "lucide-react"
 import { useTheme } from "next-themes"
 import { chains } from "@workspace/core"
+import Image from "next/image"
 
 interface HeaderProps {
   selectedChain: string
@@ -14,22 +15,45 @@ interface HeaderProps {
 
 export function Header({ selectedChain, onChainChange }: HeaderProps) {
   const { theme, setTheme } = useTheme()
+  const currentChain = chains.find(chain => chain.key === selectedChain)
 
   return (
     <header className="flex justify-between items-center px-6 h-12 border-b bg-background">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-16">
         <div className="font-bold text-lg">
           Copy‑n‑Paste PAPI
         </div>
-        
+
         <Select value={selectedChain} onValueChange={onChainChange}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Select chain" />
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Select chain">
+              {currentChain && (
+                <div className="flex items-center gap-2">
+                  <Image
+                    src={currentChain.icon}
+                    alt={`${currentChain.name} icon`}
+                    width={16}
+                    height={16}
+                    className="rounded-full"
+                  />
+                  <span>{currentChain.name}</span>
+                </div>
+              )}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {chains.map((chain) => (
               <SelectItem key={chain.key} value={chain.key}>
-                {chain.name}
+                <div className="flex items-center gap-2">
+                  <Image
+                    src={chain.icon}
+                    alt={`${chain.name} icon`}
+                    width={16}
+                    height={16}
+                    className="rounded-full"
+                  />
+                  <span>{chain.name}</span>
+                </div>
               </SelectItem>
             ))}
           </SelectContent>

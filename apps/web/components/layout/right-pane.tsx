@@ -43,7 +43,7 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
             href={part}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-300 underline transition-colors break-all"
+            className="text-blue-400 hover:text-blue-300 underline transition-colors break-all inline-block max-w-full"
             title={part} // Show full URL on hover
           >
             {part}
@@ -81,7 +81,7 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <ScrollArea className="h-[calc(100vh-12rem)]">
+              <ScrollArea className="h-[calc(100vh-36rem)]">
                 <div className="p-4 bg-muted rounded-md">
                   <SyntaxHighlighter 
                     code={code}
@@ -114,13 +114,13 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <ScrollArea className="h-[calc(100vh-12rem)]">
-                <div className="p-4 font-mono text-xs space-y-1">
+              <ScrollArea className="h-[calc(100vh-20rem)]">
+                <div className="p-4 pr-6 font-mono text-xs space-y-1">
                   {consoleOutput.length === 0 ? (
                     <div className="text-muted-foreground">No output yet...</div>
                   ) : (
                     consoleOutput.map((line, index) => (
-                      <div key={index} className="break-words">
+                      <div key={index} className="break-words whitespace-pre-wrap leading-relaxed">
                         {renderConsoleLine(line)}
                       </div>
                     ))
