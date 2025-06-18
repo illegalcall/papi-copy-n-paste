@@ -51,8 +51,17 @@ export function CallForm({ pallet, call, onFormChange, onValidChange }: CallForm
 
   useEffect(() => {
     onFormChange(watchedValues)
-    onValidChange(form.formState.isValid)
-  }, [watchedValues, form.formState.isValid, onFormChange, onValidChange])
+    // Validation logic:
+    // - If call has no parameters, disable run button (no input = can't run)
+    // - If call has parameters, check if user has modified any values from defaults
+    const hasUserInput = call.args.length > 0 && call.args.some(arg => {
+      const currentValue = watchedValues[arg.name]
+      const defaultValue = defaultValues[arg.name]
+      return currentValue !== defaultValue
+    })
+    const isValid = hasUserInput && form.formState.isValid
+    onValidChange(isValid)
+  }, [watchedValues, form.formState.isValid, onFormChange, onValidChange, call.args, defaultValues])
 
   const renderField = (arg: { name: string; type: string }) => {
     const fieldType = parseType(arg.type)

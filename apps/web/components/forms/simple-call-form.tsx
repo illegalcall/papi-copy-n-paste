@@ -18,6 +18,7 @@ interface SimpleCallFormProps {
 
 export function SimpleCallForm({ pallet, call, onFormChange, onValidChange }: SimpleCallFormProps) {
   const [formData, setFormData] = useState<Record<string, any>>({})
+  const [initialValues, setInitialValues] = useState<Record<string, any>>({})
 
   // Initialize form data when call changes
   useEffect(() => {
@@ -26,19 +27,23 @@ export function SimpleCallForm({ pallet, call, onFormChange, onValidChange }: Si
       initialData[arg.name] = getDefaultValue(arg.type)
     })
     setFormData(initialData)
+    setInitialValues(initialData)
   }, [call])
 
   // Notify parent of changes
   useEffect(() => {
     onFormChange(formData)
-    
-    // Simple validation - check if all required fields have values
-    const isValid = call.args.every(arg => {
-      const value = formData[arg.name]
-      return value !== undefined && value !== '' && value !== null
+
+    // Validation logic:
+    // - If call has no parameters, disable run button (no input = can't run)
+    // - If call has parameters, check if user has modified any values from defaults
+    const hasUserInput = call.args.length > 0 && call.args.some(arg => {
+      const currentValue = formData[arg.name]
+      const initialValue = initialValues[arg.name]
+      return currentValue !== initialValue
     })
-    onValidChange(isValid)
-  }, [formData, call.args, onFormChange, onValidChange])
+    onValidChange(hasUserInput)
+  }, [formData, initialValues, call.args, onFormChange, onValidChange])
 
   const handleFieldChange = (fieldName: string, value: any) => {
     setFormData(prev => ({
