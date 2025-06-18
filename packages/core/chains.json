@@ -5,7 +5,8 @@
     "ws": "wss://rpc.polkadot.io",
     "specVersion": 1015000,
     "paraId": null,
-    "genesisHash": "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
+    "genesisHash": "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+    "chainSpecPath": "polkadot-api/chains/polkadot"
   },
   {
     "key": "kusama",

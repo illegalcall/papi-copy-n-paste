@@ -1,3 +1,5 @@
 export * from './client'
 export * from './metadata'
+export * from './transactions'
+export * from './signing'
 export { default as chains } from './chains.json'

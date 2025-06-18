@@ -8,7 +8,7 @@ import { RightPane } from "@/components/layout/right-pane"
 import { Sheet, SheetContent } from "@workspace/ui/components/sheet"
 import { Button } from "@workspace/ui/components/button"
 import { Menu } from "lucide-react"
-import { useClient, fetchMetadata, buildPalletTree, PalletCall, PalletInfo } from "@workspace/core"
+import { useClient, fetchMetadata, buildPalletTree, PalletCall, PalletInfo, executeTransactionWithSteps, type TransactionStep } from "@workspace/core"
 
 export default function Page() {
   const [selectedChain, setSelectedChain] = useState("polkadot")
@@ -83,12 +83,15 @@ export default function Page() {
     setCanRun(isValid)
   }, [])
 
-  const handleRunClick = () => {
-    if (!selectedCall || !code) return
+  const handleRunClick = async () => {
+    if (!selectedCall || !code || !api) return
 
     setIsRunning(true)
     setActiveTab("console") // Switch to console tab when running
-    simulateTransactionExecution(selectedCall, formData, selectedChain, setConsoleOutput, setIsRunning)
+    setConsoleOutput([]) // Clear previous output
+
+    // Execute real transaction
+    await executeRealTransaction(selectedCall, formData, selectedChain, api, setConsoleOutput, setIsRunning)
   }
 
   const handleAbortClick = () => {
@@ -207,6 +210,48 @@ export default function Page() {
   )
 }
 
+async function executeRealTransaction(
+  selectedCall: { pallet: string; call: PalletCall },
+  formData: Record<string, any>,
+  chainKey: string,
+  client: any,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
+  setIsRunning: React.Dispatch<React.SetStateAction<boolean>>
+) {
+  try {
+    // Execute the transaction using our new transaction system
+    const result = await executeTransactionWithSteps(
+      selectedCall,
+      formData,
+      {
+        signer: "//Alice" as const,
+        chainKey,
+        client
+      },
+      (step: TransactionStep) => {
+        // Add each step to console output as it happens
+        setConsoleOutput(prev => [...prev, step.message])
+      }
+    )
+
+    // Add transaction details
+    const details = formatTransactionDetails(selectedCall, formData)
+    setConsoleOutput(prev => [...prev, details])
+
+    if (result.success) {
+      setConsoleOutput(prev => [...prev, `✅ Transaction completed successfully!`])
+    } else {
+      setConsoleOutput(prev => [...prev, `❌ Transaction failed: ${result.error}`])
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    setConsoleOutput(prev => [...prev, `❌ Execution error: ${errorMessage}`])
+  } finally {
+    setIsRunning(false)
+  }
+}
+
+// Keep the old simulation function for reference (will be removed later)
 function simulateTransactionExecution(
   selectedCall: { pallet: string; call: PalletCall },
   formData: Record<string, any>,

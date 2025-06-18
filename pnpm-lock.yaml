@@ -93,6 +93,18 @@ importers:
 
   packages/core:
     dependencies:
+      '@polkadot-api/metadata-builders':
+        specifier: ^0.12.2
+        version: 0.12.2
+      '@polkadot-api/substrate-bindings':
+        specifier: ^0.14.0
+        version: 0.14.0
+      '@polkadot-labs/hdkd':
+        specifier: ^0.0.6
+        version: 0.0.6
+      '@polkadot-labs/hdkd-helpers':
+        specifier: ^0.0.6
+        version: 0.0.6
       polkadot-api:
         specifier: ^1.14.1
         version: 1.14.1(jiti@2.4.2)(postcss@8.5.3)(rxjs@7.8.2)
@@ -690,6 +702,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@noble/curves@1.9.2':
+    resolution: {integrity: sha512-HxngEd2XUcg9xi20JkwlLCtYwfoFw4JGkuZpT+WlsPD4gB/cxkvTD8fSsoAnphGZhFdZYKeQIPCuFlWPm1uE0g==}
+    engines: {node: ^14.21.3 || >=16}
+
   '@noble/hashes@1.8.0':
     resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
     engines: {node: ^14.21.3 || >=16}
@@ -784,6 +800,15 @@ packages:
 
   '@polkadot-api/ws-provider@0.4.0':
     resolution: {integrity: sha512-ZurjUHHAlQ1Ux8HiZz7mtkg1qjq6LmqxcHljcZxne0U7foCZrXdWHsohwlV8kUQUir5kXuDsNvdZN/MFCUMaVw==}
+
+  '@polkadot-labs/hdkd-helpers@0.0.6':
+    resolution: {integrity: sha512-Gbyf1+aQERjOVWmfCEbnuW0VYvv3pFfjBJOISeGmmAiC6tlH9zCUht/STCCEduyA6ShnjSFXELBX2H1A2D72Sw==}
+
+  '@polkadot-labs/hdkd@0.0.6':
+    resolution: {integrity: sha512-PSakvU3q89Dx0QunlGDGKKxevpGK+gZQhErugSngj8SQmPZNy45z353x2SmiJjgfCQifRBP2YX8xzASRCnx7FA==}
+
+  '@polkadot-labs/schnorrkel-wasm@0.0.5':
+    resolution: {integrity: sha512-oUKF4Qu+V1bPxEjq3kmzI3FZrMIr1kK/4cxntoHSBDTZn/Ymab9LXVhRNrbVend5JrwDANePcYqbK5Fdn9NGhQ==}
 
   '@radix-ui/number@1.1.1':
     resolution: {integrity: sha512-MkKCwxlXTgz6CFoJx3pCwn07GKp36+aZyu/u2Ln2VrA5DcdyCZkASEDBTd8x5whTQQL5CiYf4prXKLcgQdv29g==}
@@ -4062,6 +4087,10 @@ snapshots:
   '@next/swc-win32-x64-msvc@15.2.3':
     optional: true
 
+  '@noble/curves@1.9.2':
+    dependencies:
+      '@noble/hashes': 1.8.0
+
   '@noble/hashes@1.8.0': {}
 
   '@nodelib/fs.scandir@2.1.5':
@@ -4234,6 +4263,21 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+
+  '@polkadot-labs/hdkd-helpers@0.0.6':
+    dependencies:
+      '@noble/curves': 1.9.2
+      '@noble/hashes': 1.8.0
+      '@polkadot-labs/schnorrkel-wasm': 0.0.5
+      '@scure/base': 1.2.6
+      scale-ts: 1.6.1
+
+  '@polkadot-labs/hdkd@0.0.6':
+    dependencies:
+      '@polkadot-labs/hdkd-helpers': 0.0.6
+      '@polkadot-labs/schnorrkel-wasm': 0.0.5
+
+  '@polkadot-labs/schnorrkel-wasm@0.0.5': {}
 
   '@radix-ui/number@1.1.1': {}
 
