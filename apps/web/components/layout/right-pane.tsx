@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
@@ -11,9 +12,19 @@ interface RightPaneProps {
   code: string
   consoleOutput: string[]
   onClearConsole?: () => void
+  activeTab?: "code" | "console"
 }
 
-export function RightPane({ code, consoleOutput, onClearConsole }: RightPaneProps) {
+export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: RightPaneProps) {
+  const [currentTab, setCurrentTab] = useState<"code" | "console">("code")
+
+  // Update current tab when activeTab prop changes
+  useEffect(() => {
+    if (activeTab) {
+      setCurrentTab(activeTab)
+    }
+  }, [activeTab])
+
   const handleCopyCode = () => {
     navigator.clipboard.writeText(code)
     // TODO: Show toast
@@ -45,7 +56,7 @@ export function RightPane({ code, consoleOutput, onClearConsole }: RightPaneProp
 
   return (
     <div className="flex-1 border-l bg-muted/30 flex flex-col">
-      <Tabs defaultValue="code" className="flex-1 flex flex-col">
+      <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as "code" | "console")} className="flex-1 flex flex-col">
         <div className="p-4 border-b">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="code">Code</TabsTrigger>
