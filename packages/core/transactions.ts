@@ -1,5 +1,6 @@
 import { PalletCall } from './metadata'
 import { createTestAccountSigner, validateSigner, formatSignerInfo, type TestAccount } from './signing'
+import { getExplorerLinks, getExplorerName, hasExplorer } from './explorer'
 
 export interface TransactionResult {
   success: boolean
@@ -270,9 +271,15 @@ export class TransactionExecutor {
         (step: string, type?: string) => this.addStep(step, type as any)
       )
 
-      // Add explorer link
-      const explorerUrl = `https://polkadot.subscan.io/extrinsic/${result.txHash}`
-      this.addStep(`🔗 View on Explorer: ${explorerUrl}`)
+      // Add chain-specific explorer link
+      if (hasExplorer(this.options.chainKey)) {
+        const explorerLinks = getExplorerLinks(this.options.chainKey)
+        const explorerName = getExplorerName(this.options.chainKey)
+        if (explorerLinks && result.txHash) {
+          const explorerUrl = explorerLinks.transaction(result.txHash)
+          this.addStep(`🔗 View on ${explorerName}: ${explorerUrl}`)
+        }
+      }
 
       // Show transaction details
       this.addStep(`🔗 From: ${transaction.signer.name} (${transaction.signer.address})`)
@@ -375,7 +382,10 @@ export class TransactionExecutor {
     // Simple hash generation for demo (in real implementation, use proper hashing)
     let hash = 0
     for (let i = 0; i < payload.length; i++) {
-      hash = ((hash << 5) - hash + payload[i]) & 0xffffffff
+      const byte = payload[i]
+      if (byte !== undefined) {
+        hash = ((hash << 5) - hash + byte) & 0xffffffff
+      }
     }
     return '0x' + Math.abs(hash).toString(16).padStart(8, '0')
   }
@@ -400,9 +410,16 @@ export class TransactionExecutor {
       const inclusionBlock = currentBlockNumber + 1
       this.addStep(`> ✓ Included in block #${inclusionBlock}`, 'success')
 
-      // Add realistic explorer links
+      // Add chain-specific explorer links
       this.addStep(``)
-      this.addStep(`🔗 View on Explorer: https://${this.options.chainKey}.subscan.io/extrinsic/${txHash}`)
+      if (hasExplorer(this.options.chainKey)) {
+        const explorerLinks = getExplorerLinks(this.options.chainKey)
+        const explorerName = getExplorerName(this.options.chainKey)
+        if (explorerLinks) {
+          const explorerUrl = explorerLinks.transaction(txHash)
+          this.addStep(`🔗 View on ${explorerName}: ${explorerUrl}`)
+        }
+      }
       this.addStep(`🔗 From: ${this.options.signer} (5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY)`)
 
       this.addStep(``)

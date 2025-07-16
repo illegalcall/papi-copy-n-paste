@@ -6,7 +6,11 @@
     "specVersion": 1015000,
     "paraId": null,
     "genesisHash": "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
-    "chainSpecPath": "polkadot-api/chains/polkadot"
+    "chainSpecPath": "polkadot-api/chains/polkadot",
+    "icon": "/icons/polkadot.svg",
+    "color": "#E6007A",
+    "explorerUrl": "https://polkadot.subscan.io",
+    "explorerName": "Subscan"
   },
   {
     "key": "kusama",
@@ -14,7 +18,11 @@
     "ws": "wss://kusama-rpc.polkadot.io",
     "specVersion": 9430,
     "paraId": null,
-    "genesisHash": "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe"
+    "genesisHash": "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+    "icon": "/icons/kusama.svg",
+    "color": "#000000",
+    "explorerUrl": "https://kusama.subscan.io",
+    "explorerName": "Subscan"
   },
   {
     "key": "acala",
@@ -22,7 +30,11 @@
     "ws": "wss://acala-rpc-0.aca-api.network",
     "specVersion": 2260,
     "paraId": 2000,
-    "genesisHash": "0xfc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c"
+    "genesisHash": "0xfc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c",
+    "icon": "/icons/acala.svg",
+    "color": "#FF4C4C",
+    "explorerUrl": "https://acala.subscan.io",
+    "explorerName": "Subscan"
   },
   {
     "key": "astar",
@@ -30,7 +42,11 @@
     "ws": "wss://rpc.astar.network",
     "specVersion": 143,
     "paraId": 2006,
-    "genesisHash": "0x9eb76c5184c4ab8679d2d5d819fdf90b9c001403e9e17da2e14b6d8aec4029c6"
+    "genesisHash": "0x9eb76c5184c4ab8679d2d5d819fdf90b9c001403e9e17da2e14b6d8aec4029c6",
+    "icon": "/icons/astar.svg",
+    "color": "#0070F3",
+    "explorerUrl": "https://astar.subscan.io",
+    "explorerName": "Subscan"
   },
   {
     "key": "moonbeam",
@@ -38,7 +54,11 @@
     "ws": "wss://wss.api.moonbeam.network",
     "specVersion": 3100,
     "paraId": 2004,
-    "genesisHash": "0xfe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d"
+    "genesisHash": "0xfe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d",
+    "icon": "/icons/moonbeam.svg",
+    "color": "#53CBC9",
+    "explorerUrl": "https://moonbeam.subscan.io",
+    "explorerName": "Subscan"
   },
   {
     "key": "bifrost",
@@ -46,7 +66,11 @@
     "ws": "wss://hk.p.bifrost-rpc.liebi.com/ws",
     "specVersion": 993,
     "paraId": 2030,
-    "genesisHash": "0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed"
+    "genesisHash": "0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed",
+    "icon": "/icons/bifrost.svg",
+    "color": "#5A67D8",
+    "explorerUrl": "https://bifrost.subscan.io",
+    "explorerName": "Subscan"
   },
   {
     "key": "hydration",
@@ -54,6 +78,10 @@
     "ws": "wss://rpc.hydradx.cloud",
     "specVersion": 267,
     "paraId": 2034,
-    "genesisHash": "0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d"
+    "genesisHash": "0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d",
+    "icon": "/icons/hydration.svg",
+    "color": "#00D4AA",
+    "explorerUrl": "https://hydration.subscan.io",
+    "explorerName": "Subscan"
   }
 ]

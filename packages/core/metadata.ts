@@ -34,6 +34,43 @@ const METADATA_CACHE_VERSION = '1.0.0' // Increment when cache format changes
 const DEFAULT_CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours
 const MAX_CACHE_SIZE = 10 // Maximum number of chains to cache
 
+// Retry utility for unstable connections
+async function fetchWithRetry<T>(
+  fn: () => Promise<T>,
+  maxRetries: number,
+  timeoutMs: number
+): Promise<T> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Attempt ${attempt}/${maxRetries} to fetch metadata...`)
+
+      // Create a timeout promise
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error(`Timeout after ${timeoutMs}ms`)), timeoutMs)
+      })
+
+      // Race between the actual request and timeout
+      const result = await Promise.race([fn(), timeoutPromise])
+      console.log(`✓ Metadata fetch succeeded on attempt ${attempt}`)
+      return result
+
+    } catch (error) {
+      console.warn(`Attempt ${attempt} failed:`, error instanceof Error ? error.message : 'Unknown error')
+
+      if (attempt === maxRetries) {
+        throw error
+      }
+
+      // Wait before retry (exponential backoff)
+      const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000)
+      console.log(`Waiting ${delay}ms before retry...`)
+      await new Promise(resolve => setTimeout(resolve, delay))
+    }
+  }
+
+  throw new Error('All retry attempts failed')
+}
+
 interface CachedMetadata {
   version: string
   chains: {
@@ -67,32 +104,39 @@ export async function fetchMetadata(chainKey: string, client: any): Promise<Chai
     // Check if this is our mock client
     if (client.mockClient) {
       console.log('Mock client detected, returning mock metadata')
-      return createMockMetadata(chainKey)
+      return createEnhancedMockMetadata(chainKey)
     }
 
-    // Use PAPI client's _request method to get raw metadata via JSON-RPC
-    let rawMetadata;
+    // Use PAPI client's _request method to get raw metadata via JSON-RPC with retry logic
+    let rawMetadata: any;
 
     try {
       console.log('Fetching raw metadata via state_getMetadata...')
-      rawMetadata = await client._request('state_getMetadata', [])
-      console.log('Raw metadata received:', rawMetadata)
+      rawMetadata = await fetchWithRetry(
+        () => client._request('state_getMetadata', []),
+        3, // max retries
+        5000 // timeout per attempt
+      )
+      console.log('Raw metadata received:', rawMetadata ? 'Success' : 'Failed')
     } catch (error) {
-      console.error('Failed to fetch raw metadata:', error)
-      console.log('Falling back to mock metadata')
-      return createMockMetadata(chainKey)
+      console.error('Failed to fetch raw metadata after retries:', error)
+      console.log('Falling back to enhanced mock metadata for', chainKey)
+      return createEnhancedMockMetadata(chainKey)
     }
 
     if (!rawMetadata) {
       console.warn('No raw metadata returned')
-      return createMockMetadata(chainKey)
+      return createEnhancedMockMetadata(chainKey)
     }
 
+    // Ensure rawMetadata is a string
+    const rawMetadataString = typeof rawMetadata === 'string' ? rawMetadata : JSON.stringify(rawMetadata)
+
     // Parse the raw metadata
-    const chainMetadata = await parseRawMetadata(rawMetadata, chainKey)
+    const chainMetadata = await parseRawMetadata(rawMetadataString, chainKey)
 
     // Generate hash for cache validation
-    const rawMetadataHash = simpleHash(rawMetadata)
+    const rawMetadataHash = simpleHash(rawMetadataString)
 
     // Cache the result with hash for validation
     setCachedMetadata(chainKey, chainMetadata, rawMetadataHash)
@@ -101,14 +145,175 @@ export async function fetchMetadata(chainKey: string, client: any): Promise<Chai
   } catch (error) {
     console.error('Error fetching metadata:', error)
     // Return mock metadata so the app still works
-    return createMockMetadata(chainKey)
+    return createEnhancedMockMetadata(chainKey)
   }
 }
 
-function createMockMetadata(chainKey: string): ChainMetadata {
-  console.log('Creating mock metadata for:', chainKey)
-  
-  const mockPallets: PalletInfo[] = [
+function createEnhancedMockMetadata(chainKey: string): ChainMetadata {
+  console.log('Creating enhanced mock metadata for:', chainKey)
+
+  // Chain-specific enhanced metadata
+  const chainSpecificPallets = getChainSpecificPallets(chainKey)
+
+  return {
+    pallets: chainSpecificPallets,
+    chainHash: getChainHash(chainKey),
+    specVersion: getChainSpecVersion(chainKey)
+  }
+}
+
+function getChainSpecificPallets(chainKey: string): PalletInfo[] {
+  const basePallets = getBasePallets()
+
+  switch (chainKey) {
+    case 'acala':
+      return [
+        ...basePallets,
+        {
+          name: 'Tokens',
+          calls: [
+            {
+              name: 'transfer',
+              args: [
+                { name: 'dest', type: 'MultiAddress' },
+                { name: 'currency_id', type: 'CurrencyId' },
+                { name: 'amount', type: 'Compact<u128>' }
+              ],
+              docs: ['Transfer tokens to another account.']
+            }
+          ],
+          storage: [
+            {
+              name: 'Accounts',
+              type: 'TokenAccountData',
+              docs: ['Token account information.']
+            }
+          ],
+          events: [
+            {
+              name: 'Transfer',
+              args: [
+                { name: 'currency_id', type: 'CurrencyId' },
+                { name: 'from', type: 'AccountId' },
+                { name: 'to', type: 'AccountId' },
+                { name: 'amount', type: 'u128' }
+              ],
+              docs: ['Token transfer occurred.']
+            }
+          ]
+        },
+        {
+          name: 'DEX',
+          calls: [
+            {
+              name: 'swap_with_exact_supply',
+              args: [
+                { name: 'path', type: 'Vec<CurrencyId>' },
+                { name: 'supply_amount', type: 'Compact<u128>' },
+                { name: 'min_target_amount', type: 'Compact<u128>' }
+              ],
+              docs: ['Swap tokens with exact supply amount.']
+            }
+          ],
+          storage: [
+            {
+              name: 'LiquidityPool',
+              type: 'PoolInfo',
+              docs: ['Liquidity pool information.']
+            }
+          ],
+          events: [
+            {
+              name: 'Swap',
+              args: [
+                { name: 'trader', type: 'AccountId' },
+                { name: 'path', type: 'Vec<CurrencyId>' },
+                { name: 'supply_amount', type: 'u128' },
+                { name: 'target_amount', type: 'u128' }
+              ],
+              docs: ['Token swap occurred.']
+            }
+          ]
+        }
+      ]
+
+    case 'astar':
+      return [
+        ...basePallets,
+        {
+          name: 'DappsStaking',
+          calls: [
+            {
+              name: 'bond_and_stake',
+              args: [
+                { name: 'contract_id', type: 'SmartContract' },
+                { name: 'value', type: 'Compact<u128>' }
+              ],
+              docs: ['Bond and stake on a dApp.']
+            }
+          ],
+          storage: [
+            {
+              name: 'Ledger',
+              type: 'AccountLedger',
+              docs: ['Staking ledger information.']
+            }
+          ],
+          events: [
+            {
+              name: 'BondAndStake',
+              args: [
+                { name: 'account', type: 'AccountId' },
+                { name: 'smart_contract', type: 'SmartContract' },
+                { name: 'amount', type: 'u128' }
+              ],
+              docs: ['Bond and stake event.']
+            }
+          ]
+        }
+      ]
+
+    case 'moonbeam':
+      return [
+        ...basePallets,
+        {
+          name: 'EthereumXcm',
+          calls: [
+            {
+              name: 'transact',
+              args: [
+                { name: 'xcm_transaction', type: 'XcmTransaction' }
+              ],
+              docs: ['Execute Ethereum transaction via XCM.']
+            }
+          ],
+          storage: [
+            {
+              name: 'Nonce',
+              type: 'u256',
+              docs: ['Ethereum transaction nonce.']
+            }
+          ],
+          events: [
+            {
+              name: 'TransactedViaXcm',
+              args: [
+                { name: 'account', type: 'AccountId' },
+                { name: 'transaction', type: 'XcmTransaction' }
+              ],
+              docs: ['Ethereum transaction executed via XCM.']
+            }
+          ]
+        }
+      ]
+
+    default:
+      return basePallets
+  }
+}
+
+function getBasePallets(): PalletInfo[] {
+  return [
     {
       name: 'System',
       calls: [
@@ -191,12 +396,6 @@ function createMockMetadata(chainKey: string): ChainMetadata {
       events: []
     }
   ]
-
-  return {
-    pallets: mockPallets,
-    chainHash: '0x' + '0'.repeat(64),
-    specVersion: 1000
-  }
 }
 
 async function parseRawMetadata(rawMetadata: string, chainKey: string): Promise<ChainMetadata> {
@@ -411,179 +610,7 @@ function formatStorageType(storageType: any): string {
   return 'Unknown'
 }
 
-function createEnhancedMockMetadata(chainKey: string): ChainMetadata {
-  console.log('Creating enhanced mock metadata for:', chainKey)
 
-  // This is a more comprehensive mock that includes more realistic Polkadot pallets
-  const enhancedPallets: PalletInfo[] = [
-    {
-      name: 'System',
-      calls: [
-        {
-          name: 'remark',
-          args: [{ name: 'remark', type: 'Bytes' }],
-          docs: ['Make some on-chain remark.']
-        },
-        {
-          name: 'set_heap_pages',
-          args: [{ name: 'pages', type: 'u64' }],
-          docs: ['Set the number of pages in the WebAssembly environment heap.']
-        },
-        {
-          name: 'set_code',
-          args: [{ name: 'code', type: 'Bytes' }],
-          docs: ['Set the new runtime code.']
-        }
-      ],
-      storage: [
-        {
-          name: 'Account',
-          type: 'AccountInfo',
-          docs: ['The full account information for a particular account ID.']
-        },
-        {
-          name: 'BlockHash',
-          type: 'Hash',
-          docs: ['Map of block numbers to block hashes.']
-        }
-      ],
-      events: [
-        {
-          name: 'ExtrinsicSuccess',
-          args: [{ name: 'dispatch_info', type: 'DispatchInfo' }],
-          docs: ['An extrinsic completed successfully.']
-        },
-        {
-          name: 'ExtrinsicFailed',
-          args: [
-            { name: 'dispatch_error', type: 'DispatchError' },
-            { name: 'dispatch_info', type: 'DispatchInfo' }
-          ],
-          docs: ['An extrinsic failed.']
-        }
-      ]
-    },
-    {
-      name: 'Balances',
-      calls: [
-        {
-          name: 'transfer_allow_death',
-          args: [
-            { name: 'dest', type: 'MultiAddress' },
-            { name: 'value', type: 'Compact<u128>' }
-          ],
-          docs: ['Transfer some liquid free balance to another account.']
-        },
-        {
-          name: 'transfer_keep_alive',
-          args: [
-            { name: 'dest', type: 'MultiAddress' },
-            { name: 'value', type: 'Compact<u128>' }
-          ],
-          docs: ['Same as the transfer call, but with a check that the transfer will not kill the origin account.']
-        },
-        {
-          name: 'transfer_all',
-          args: [
-            { name: 'dest', type: 'MultiAddress' },
-            { name: 'keep_alive', type: 'bool' }
-          ],
-          docs: ['Transfer the entire transferable balance from the caller account.']
-        }
-      ],
-      storage: [
-        {
-          name: 'TotalIssuance',
-          type: 'u128',
-          docs: ['The total units issued in the system.']
-        },
-        {
-          name: 'Account',
-          type: 'AccountData',
-          docs: ['The Balances pallet example of storing the balance of an account.']
-        }
-      ],
-      events: [
-        {
-          name: 'Transfer',
-          args: [
-            { name: 'from', type: 'AccountId32' },
-            { name: 'to', type: 'AccountId32' },
-            { name: 'amount', type: 'u128' }
-          ],
-          docs: ['Transfer succeeded.']
-        },
-        {
-          name: 'BalanceSet',
-          args: [
-            { name: 'who', type: 'AccountId32' },
-            { name: 'free', type: 'u128' }
-          ],
-          docs: ['A balance was set by root.']
-        }
-      ]
-    },
-    {
-      name: 'Staking',
-      calls: [
-        {
-          name: 'bond',
-          args: [
-            { name: 'value', type: 'Compact<u128>' },
-            { name: 'payee', type: 'RewardDestination' }
-          ],
-          docs: ['Take the origin account as a stash and lock up value of its balance.']
-        },
-        {
-          name: 'nominate',
-          args: [{ name: 'targets', type: 'Vec<MultiAddress>' }],
-          docs: ['Declare the desire to nominate targets for the origin controller.']
-        }
-      ],
-      storage: [
-        {
-          name: 'Bonded',
-          type: 'Option<AccountId32>',
-          docs: ['Map from all locked "stash" accounts to the controller account.']
-        }
-      ],
-      events: [
-        {
-          name: 'Bonded',
-          args: [
-            { name: 'stash', type: 'AccountId32' },
-            { name: 'amount', type: 'u128' }
-          ],
-          docs: ['An account has been bonded.']
-        }
-      ]
-    },
-    {
-      name: 'Timestamp',
-      calls: [
-        {
-          name: 'set',
-          args: [{ name: 'now', type: 'Compact<u64>' }],
-          docs: ['Set the current time.']
-        }
-      ],
-      storage: [
-        {
-          name: 'Now',
-          type: 'u64',
-          docs: ['Current time for the current block.']
-        }
-      ],
-      events: []
-    }
-  ]
-
-  return {
-    pallets: enhancedPallets,
-    chainHash: chainKey === 'polkadot' ? '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3' : '0x' + '0'.repeat(64),
-    specVersion: chainKey === 'polkadot' ? 1015000 : 1000
-  }
-}
 
 function parseMetadata(metadata: any, chainKey: string): ChainMetadata {
   // If it's already our mock metadata format, return it directly
@@ -730,7 +757,10 @@ function setCachedMetadata(chainKey: string, metadata: ChainMetadata, rawMetadat
     if (chainKeys.length >= MAX_CACHE_SIZE && !data.chains[chainKey]) {
       // Remove oldest entry
       const oldestChain = chainKeys.reduce((oldest, current) => {
-        return data.chains[current].timestamp < data.chains[oldest].timestamp ? current : oldest
+        const currentEntry = data.chains[current]
+        const oldestEntry = data.chains[oldest]
+        if (!currentEntry || !oldestEntry) return oldest
+        return currentEntry.timestamp < oldestEntry.timestamp ? current : oldest
       })
       console.log(`Evicting oldest cache entry: ${oldestChain}`)
       delete data.chains[oldestChain]
@@ -835,4 +865,31 @@ export function buildPalletTree(metadata: ChainMetadata | null): PalletInfo[] {
   if (!metadata) return []
 
   return metadata.pallets.sort((a, b) => a.name.localeCompare(b.name))
+}
+
+// Helper functions for enhanced mock metadata
+function getChainHash(chainKey: string): string {
+  const chainHashes: Record<string, string> = {
+    'polkadot': '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3',
+    'kusama': '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe',
+    'acala': '0xfc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c',
+    'astar': '0x9eb76c5184c4ab8679d2d5d819fdf90b9c001403e9e17da2e14b6d8aec4029c6',
+    'moonbeam': '0xfe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d',
+    'bifrost': '0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed',
+    'hydration': '0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d'
+  }
+  return chainHashes[chainKey] || '0x' + '0'.repeat(64)
+}
+
+function getChainSpecVersion(chainKey: string): number {
+  const specVersions: Record<string, number> = {
+    'polkadot': 1015000,
+    'kusama': 9430,
+    'acala': 2260,
+    'astar': 143,
+    'moonbeam': 3100,
+    'bifrost': 993,
+    'hydration': 267
+  }
+  return specVersions[chainKey] || 1000
 }

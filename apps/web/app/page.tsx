@@ -8,7 +8,7 @@ import { RightPane } from "@/components/layout/right-pane"
 import { Sheet, SheetContent } from "@workspace/ui/components/sheet"
 import { Button } from "@workspace/ui/components/button"
 import { Menu } from "lucide-react"
-import { useClient, fetchMetadata, buildPalletTree, PalletCall, PalletInfo, executeTransactionWithSteps, type TransactionStep } from "@workspace/core"
+import { useClient, fetchMetadata, buildPalletTree, PalletCall, PalletInfo, executeTransactionWithSteps, type TransactionStep, getExplorerLinks, getExplorerName, hasExplorer } from "@workspace/core"
 
 export default function Page() {
   const [selectedChain, setSelectedChain] = useState("polkadot")
@@ -275,7 +275,9 @@ function simulateTransactionExecution(
     `⚠️  WARNING: This is a demo simulation with fake transaction data`,
     `> ✓ Included in block #${21000000 + Math.floor(Math.random() * 1000000)}`,
     ``,
-    `🔗 View on Explorer: https://${chainKey}.subscan.io/extrinsic/${txHash}`,
+    hasExplorer(chainKey) ?
+      `🔗 View on ${getExplorerName(chainKey)}: ${getExplorerLinks(chainKey)?.transaction(txHash)}` :
+      `🔗 Explorer not available for ${chainKey}`,
     `🔗 From: //Alice (5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY)`,
     formatTransactionDetails(selectedCall, formData),
     ``,

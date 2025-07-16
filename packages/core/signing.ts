@@ -52,7 +52,7 @@ export function createTestAccountSigner(account: TestAccount): SignerInfo {
     )
 
     console.log('polkadotSigner keys:', Object.keys(polkadotSigner))
-    console.log('polkadotSigner.sign type:', typeof polkadotSigner.sign)
+    console.log('polkadotSigner.signTx type:', typeof polkadotSigner.signTx)
     console.log('polkadotSigner.publicKey type:', typeof polkadotSigner.publicKey)
 
     // Generate a readable address (this is a simplified version)
