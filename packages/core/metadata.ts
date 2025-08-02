@@ -46,7 +46,7 @@ async function fetchWithRetry<T>(
 
       // Create abort controller for better cleanup
       const abortController = new AbortController()
-      let timeoutHandle: NodeJS.Timeout
+      let timeoutHandle: NodeJS.Timeout | undefined
 
       // Create a timeout promise with cleanup
       const timeoutPromise = new Promise<never>((_, reject) => {
@@ -60,11 +60,11 @@ async function fetchWithRetry<T>(
       try {
         // Race between the actual request and timeout
         const result = await Promise.race([fn(), timeoutPromise])
-        clearTimeout(timeoutHandle)
+        if (timeoutHandle) clearTimeout(timeoutHandle)
         console.log(`✅ Metadata fetch succeeded on attempt ${attempt}`)
         return result
       } catch (raceError) {
-        clearTimeout(timeoutHandle)
+        if (timeoutHandle) clearTimeout(timeoutHandle)
         throw raceError
       }
 

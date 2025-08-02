@@ -8,7 +8,7 @@ import { RightPane } from "@/components/layout/right-pane"
 import { Sheet, SheetContent } from "@workspace/ui/components/sheet"
 import { Button } from "@workspace/ui/components/button"
 import { Menu } from "lucide-react"
-import { useClient, fetchMetadata, buildPalletTree, PalletCall, PalletInfo, executeTransactionWithSteps, type TransactionStep, getExplorerLinks, getExplorerName, hasExplorer } from "@workspace/core"
+import { useClient, fetchMetadata, buildPalletTree, PalletCall, PalletInfo, executeTransactionWithSteps, type TransactionStep } from "@workspace/core"
 
 export default function Page() {
   const [selectedChain, setSelectedChain] = useState("polkadot")
@@ -298,50 +298,7 @@ async function executeRealTransaction(
   }
 }
 
-// Keep the old simulation function for reference (will be removed later)
-function simulateTransactionExecution(
-  selectedCall: { pallet: string; call: PalletCall },
-  formData: Record<string, any>,
-  chainKey: string,
-  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
-  setIsRunning: React.Dispatch<React.SetStateAction<boolean>>
-) {
-  // Generate a complete transaction hash
-  const txHash = `0x${Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`
-  
-  const steps = [
-    `> Running ${selectedCall.pallet}.${selectedCall.call.name}...`,
-    `> Connecting to ${chainKey} via smoldot light client...`,
-    `> ✓ Connected to chain (block #${21000000 + Math.floor(Math.random() * 1000000)})`,
-    `> Building transaction: ${selectedCall.pallet}.${selectedCall.call.name}`,
-    `> Arguments: ${JSON.stringify(formData, null, 2).split('\n').join('\n>   ')}`,
-    `> Signing with //Alice (5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY)`,
-    `> ✓ Transaction signed`,
-    `> Submitting to network...`,
-    `> ✓ Transaction hash: ${txHash}`,
-    `⚠️  WARNING: This is a demo simulation with fake transaction data`,
-    `> ✓ Included in block #${21000000 + Math.floor(Math.random() * 1000000)}`,
-    ``,
-    hasExplorer(chainKey) ?
-      `🔗 View on ${getExplorerName(chainKey)}: ${getExplorerLinks(chainKey)?.transaction(txHash)}` :
-      `🔗 Explorer not available for ${chainKey}`,
-    `🔗 From: //Alice (5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY)`,
-    formatTransactionDetails(selectedCall, formData),
-    ``,
-    `✅ Transaction executed successfully!`
-  ]
-
-  let stepIndex = 0
-  const interval = setInterval(() => {
-    if (stepIndex < steps.length) {
-      setConsoleOutput(prev => [...prev, steps[stepIndex] || ''])
-      stepIndex++
-    } else {
-      clearInterval(interval)
-      setIsRunning(false)
-    }
-  }, 300) // Show each step every 300ms
-}
+// simulateTransactionExecution function removed as it's no longer used
 
 function formatTransactionDetails(selectedCall: { pallet: string; call: PalletCall }, formData: Record<string, any>): string {
   if (selectedCall.pallet === 'Balances' && selectedCall.call.name.includes('transfer')) {
