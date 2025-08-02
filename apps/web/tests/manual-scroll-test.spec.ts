@@ -27,7 +27,11 @@ test('manual scroll test with generated content', async ({ page }) => {
 '  // Create PAPI client\n' +
 '  const client = createClient(getSmProvider(chain))\n' +
 '  \n' +
-'  // Build the call\n' +
+'  // Get typed API (PAPI v1.14+ pattern)\n' +
+'  // const typedApi = client.getTypedApi(polkadot)\n' +
+'  // const call = typedApi.tx.Balances.transfer_allow_death({\n' +
+'  \n' +
+'  // For now, using deprecated pattern (will be removed):\n' +
 '  const call = client.tx.Balances.transfer_allow_death({\n' +
 '    dest: "//Alice",\n' +
 '    value: ""\n' +

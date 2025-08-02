@@ -211,7 +211,7 @@ export class TransactionExecutor {
               
               // 3. Sign and submit (currently throws - need proper descriptors)
               stepCallback('> Signing transaction with typed API...', 'info')
-              const result = await tx.signAndSubmit(signer)
+              const result: any = await tx.signAndSubmit(signer)
               
               stepCallback(`> Transaction submitted: ${result.txHash}`, 'success')
               return result

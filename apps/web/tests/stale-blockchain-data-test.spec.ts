@@ -14,7 +14,7 @@ test.describe('Stale Blockchain Data Detection', () => {
       // Capture blockchain data from console
       if (text.includes('REAL DATA: Best block #')) {
         const match = text.match(/Best block #(\d+)/)
-        if (match) {
+        if (match && match[1]) {
           blockchainData.blockNumber = parseInt(match[1])
           console.log(`📊 Detected block number: ${blockchainData.blockNumber}`)
         }
@@ -30,7 +30,7 @@ test.describe('Stale Blockchain Data Detection', () => {
       
       if (text.includes('Chain lag detected:') || text.includes('blocks behind')) {
         const match = text.match(/(\d+)\s+blocks?\s+behind/)
-        if (match) {
+        if (match && match[1]) {
           blockchainData.chainLag = parseInt(match[1])
           console.log(`⚠️  Detected chain lag: ${blockchainData.chainLag} blocks`)
         }
