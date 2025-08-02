@@ -1,6 +1,7 @@
 import { PalletCall } from './metadata'
 import { createTestAccountSigner, validateSigner, formatSignerInfo, type TestAccount } from './signing'
 import { getExplorerLinks, getExplorerName, hasExplorer } from './explorer'
+import { getChainInfo, detectSyncStatus, getStaleDataWarning, type ChainInfo, type SyncStatus } from './sync-status'
 
 export interface TransactionResult {
   success: boolean
@@ -58,33 +59,60 @@ export class TransactionExecutor {
         throw new Error('No client available for transaction execution')
       }
 
-      // Get REAL blockchain data to prove integration
-      this.addStep('> Getting REAL blockchain information...')
+      // Get blockchain data and check sync status
+      this.addStep('> Getting blockchain information...')
       const finalizedBlock = await this.options.client.getFinalizedBlock()
       const blockNumber = finalizedBlock.number
       const blockHash = finalizedBlock.hash
 
-      // Get additional real blockchain data using correct PAPI methods
+      // Get additional blockchain data using correct PAPI methods
       const bestBlocks = await this.options.client.getBestBlocks()
       const bestBlockNumber = bestBlocks[0].number // First element is the best block
 
-      // Show REAL blockchain data as proof of integration
-      this.addStep(`> ✅ REAL DATA: Finalized block #${blockNumber}`, 'success')
-      this.addStep(`> ✅ REAL DATA: Finalized hash: ${blockHash}`, 'success')
-      this.addStep(`> ✅ REAL DATA: Best block #${bestBlockNumber}`, 'success')
-      this.addStep(`> ✅ REAL DATA: Chain lag: ${bestBlockNumber - blockNumber} blocks`, 'success')
+      // Get connection type from client state
+      const connectionType = this.options.client.connectionType || 'unknown'
+      
+      // Detect sync status
+      const syncStatus = detectSyncStatus(this.options.chainKey, bestBlockNumber)
+      const warning = getStaleDataWarning(syncStatus, this.options.chainKey)
 
-      // Verify this is live data by showing timestamp
+      // Show blockchain data with proper sync status indicators
+      if (syncStatus.isSyncing) {
+        this.addStep(`> 🔄 SYNCING: Finalized block #${blockNumber}`, 'warning')
+        this.addStep(`> 🔄 SYNCING: Best block #${bestBlockNumber}`, 'warning')
+        this.addStep(`> 🔄 SYNCING: Chain lag: ${bestBlockNumber - blockNumber} blocks`, 'warning')
+        if (syncStatus.blocksBehind) {
+          this.addStep(`> ⚠️  Light client is ${syncStatus.blocksBehind.toLocaleString()} blocks behind`, 'warning')
+          this.addStep(`> ⚠️  Data is approximately ${syncStatus.estimatedAge}`, 'warning')
+          this.addStep(`> 🔄 Sync progress: ${syncStatus.syncPercentage}%`, 'warning')
+        }
+      } else {
+        this.addStep(`> ✅ LIVE DATA: Finalized block #${blockNumber}`, 'success')
+        this.addStep(`> ✅ LIVE DATA: Best block #${bestBlockNumber}`, 'success')
+        this.addStep(`> ✅ LIVE DATA: Chain lag: ${bestBlockNumber - blockNumber} blocks`, 'success')
+      }
+
+      // Show finalized hash
+      this.addStep(`> ✅ Finalized hash: ${blockHash}`, 'success')
+      
+      // Show timestamp with connection context
       const now = new Date().toISOString()
-      this.addStep(`> ✅ REAL DATA: Fetched at ${now}`, 'success')
+      const dataLabel = connectionType === 'smoldot' ? 'LIGHT CLIENT DATA' : 'REAL-TIME DATA'
+      this.addStep(`> ✅ ${dataLabel}: Fetched at ${now}`, 'success')
+      
+      // Add warning if data is stale
+      if (warning) {
+        this.addStep(`> ${warning}`, 'warning')
+      }
 
-      // Get REAL chain spec data to prove integration
+      // Get chain spec data with connection context
       try {
         const chainSpecData = await this.options.client.getChainSpecData()
-
-        this.addStep(`> ✅ REAL DATA: Chain name: ${chainSpecData.name}`, 'success')
-        this.addStep(`> ✅ REAL DATA: Chain ID: ${chainSpecData.id}`, 'success')
-        this.addStep(`> ✅ REAL DATA: Genesis hash: ${chainSpecData.genesisHash.slice(0, 10)}...`, 'success')
+        
+        const dataPrefix = connectionType === 'smoldot' ? 'CHAIN INFO' : 'LIVE CHAIN'
+        this.addStep(`> ✅ ${dataPrefix}: Chain name: ${chainSpecData.name}`, 'success')
+        this.addStep(`> ✅ ${dataPrefix}: Chain ID: ${chainSpecData.id}`, 'success')
+        this.addStep(`> ✅ ${dataPrefix}: Genesis hash: ${chainSpecData.genesisHash.slice(0, 10)}...`, 'success')
       } catch (error) {
         this.addStep(`> ⚠️ Could not fetch chain spec data: ${error instanceof Error ? error.message : 'Unknown error'}`, 'warning')
       }
