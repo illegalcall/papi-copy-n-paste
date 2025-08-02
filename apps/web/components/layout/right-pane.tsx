@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
-import { ScrollArea } from "@workspace/ui/components/scroll-area"
 import { Copy, Terminal, Trash2 } from "lucide-react"
 import { SyntaxHighlighter } from "@/components/code/syntax-highlighter"
 
@@ -55,8 +54,8 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
   }
 
   return (
-    <div className="flex-1 border-l bg-muted/30 flex flex-col">
-      <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as "code" | "console")} className="flex-1 flex flex-col">
+    <div className="flex-1 border-l bg-muted/30 flex flex-col min-h-0 max-h-full overflow-hidden">
+      <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as "code" | "console")} className="flex-1 flex flex-col min-h-0 max-h-full">
         <div className="p-4 border-b">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="code">Code</TabsTrigger>
@@ -64,8 +63,8 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
           </TabsList>
         </div>
         
-        <TabsContent value="code" className="flex-1 p-4 m-0">
-          <Card className="h-full">
+        <TabsContent value="code" className="flex-1 p-4 m-0 h-0 max-h-full overflow-hidden">
+          <Card className="h-full flex flex-col max-h-full">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm">Generated Code</CardTitle>
@@ -80,22 +79,20 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[calc(100vh-36rem)]">
-                <div className="p-4 bg-muted rounded-md">
-                  <SyntaxHighlighter 
-                    code={code}
-                    language="typescript"
-                    className="text-xs"
-                  />
-                </div>
-              </ScrollArea>
+            <CardContent className="p-0 flex-1 flex flex-col">
+              <div className="overflow-auto p-4 bg-muted rounded-md h-[calc(100vh-20rem)]">
+                <SyntaxHighlighter 
+                  code={code}
+                  language="typescript"
+                  className="text-xs"
+                />
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="console" className="flex-1 p-4 m-0">
-          <Card className="h-full">
+        <TabsContent value="console" className="flex-1 p-4 m-0 h-0 max-h-full overflow-hidden">
+          <Card className="h-full flex flex-col max-h-full">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm flex items-center gap-2">
@@ -113,20 +110,18 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[calc(100vh-20rem)]">
-                <div className="p-4 pr-6 font-mono text-xs space-y-1">
-                  {consoleOutput.length === 0 ? (
-                    <div className="text-muted-foreground">No output yet...</div>
-                  ) : (
-                    consoleOutput.map((line, index) => (
-                      <div key={index} className="break-words whitespace-pre-wrap leading-relaxed">
-                        {renderConsoleLine(line)}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </ScrollArea>
+            <CardContent className="p-0 flex-1 flex flex-col">
+              <div className="overflow-auto p-4 pr-6 font-mono text-xs space-y-1 h-[calc(100vh-20rem)]">
+                {consoleOutput.length === 0 ? (
+                  <div className="text-muted-foreground">No output yet...</div>
+                ) : (
+                  consoleOutput.map((line, index) => (
+                    <div key={index} className="break-words whitespace-pre-wrap leading-relaxed">
+                      {renderConsoleLine(line)}
+                    </div>
+                  ))
+                )}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

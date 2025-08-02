@@ -34,7 +34,7 @@ const METADATA_CACHE_VERSION = '1.0.0' // Increment when cache format changes
 const DEFAULT_CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours
 const MAX_CACHE_SIZE = 10 // Maximum number of chains to cache
 
-// Retry utility for unstable connections
+// Enhanced retry utility with better timeout handling
 async function fetchWithRetry<T>(
   fn: () => Promise<T>,
   maxRetries: number,
@@ -42,28 +42,46 @@ async function fetchWithRetry<T>(
 ): Promise<T> {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`Attempt ${attempt}/${maxRetries} to fetch metadata...`)
+      console.log(`Attempt ${attempt}/${maxRetries} to fetch metadata (${timeoutMs}ms timeout)...`)
 
-      // Create a timeout promise
+      // Create abort controller for better cleanup
+      const abortController = new AbortController()
+      let timeoutHandle: NodeJS.Timeout
+
+      // Create a timeout promise with cleanup
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error(`Timeout after ${timeoutMs}ms`)), timeoutMs)
+        timeoutHandle = setTimeout(() => {
+          console.warn(`⏰ Metadata fetch timeout after ${timeoutMs}ms on attempt ${attempt}`)
+          abortController.abort()
+          reject(new Error(`Timeout after ${timeoutMs}ms`))
+        }, timeoutMs)
       })
 
-      // Race between the actual request and timeout
-      const result = await Promise.race([fn(), timeoutPromise])
-      console.log(`✓ Metadata fetch succeeded on attempt ${attempt}`)
-      return result
+      try {
+        // Race between the actual request and timeout
+        const result = await Promise.race([fn(), timeoutPromise])
+        clearTimeout(timeoutHandle)
+        console.log(`✅ Metadata fetch succeeded on attempt ${attempt}`)
+        return result
+      } catch (raceError) {
+        clearTimeout(timeoutHandle)
+        throw raceError
+      }
 
     } catch (error) {
-      console.warn(`Attempt ${attempt} failed:`, error instanceof Error ? error.message : 'Unknown error')
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+      console.warn(`❌ Attempt ${attempt}/${maxRetries} failed:`, errorMsg)
 
       if (attempt === maxRetries) {
+        console.error(`💥 All ${maxRetries} attempts failed, throwing error`)
         throw error
       }
 
-      // Wait before retry (exponential backoff)
-      const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000)
-      console.log(`Waiting ${delay}ms before retry...`)
+      // Wait before retry (exponential backoff with jitter)
+      const baseDelay = Math.min(1000 * Math.pow(2, attempt - 1), 5000)
+      const jitter = Math.random() * 1000 // Add some randomness
+      const delay = Math.floor(baseDelay + jitter)
+      console.log(`⏳ Waiting ${delay}ms before retry...`)
       await new Promise(resolve => setTimeout(resolve, delay))
     }
   }
@@ -86,20 +104,12 @@ interface CachedMetadata {
 
 export async function fetchMetadata(chainKey: string, client: any): Promise<ChainMetadata | null> {
   try {
-    console.log('Fetching metadata for:', chainKey, 'with client:', client)
-
-    // Check cache first (we'll validate spec version later)
-    const cached = getCachedMetadata(chainKey)
-    if (cached) {
-      return cached
-    }
+    console.log('Fetching metadata for:', chainKey, 'with client:', !!client)
 
     if (!client) {
       console.warn('No client available for metadata fetch')
       return null
     }
-
-    console.log('Client object keys:', Object.keys(client))
 
     // Check if this is our mock client
     if (client.mockClient) {
@@ -107,20 +117,51 @@ export async function fetchMetadata(chainKey: string, client: any): Promise<Chai
       return createEnhancedMockMetadata(chainKey)
     }
 
-    // Use PAPI client's _request method to get raw metadata via JSON-RPC with retry logic
+    // Enhanced client readiness check
+    if (!client._request) {
+      console.warn('Client is not ready for metadata fetch (missing _request method)')
+      return null
+    }
+
+    // Check cache first for faster loading
+    const cached = getCachedMetadata(chainKey)
+    if (cached) {
+      console.log(`Using cached metadata for ${chainKey}`)
+      return cached
+    }
+
+    console.log('Client object keys:', Object.keys(client))
+
+    // Use PAPI client's _request method to get raw metadata via JSON-RPC with enhanced retry logic
     let rawMetadata: any;
 
+    // For faster initial loading, use shorter timeouts and quicker fallback  
+    const isPolkadotInitial = chainKey === 'polkadot'
+    const quickTimeout = isPolkadotInitial ? 5000 : 8000 // 5s for Polkadot, 8s for others
+    
     try {
-      console.log('Fetching raw metadata via state_getMetadata...')
+      console.log(`🔄 Fetching raw metadata via state_getMetadata (${quickTimeout}ms timeout)...`)
+      
+      // Single attempt with quick timeout for better UX
       rawMetadata = await fetchWithRetry(
-        () => client._request('state_getMetadata', []),
-        3, // max retries
-        5000 // timeout per attempt
+        () => {
+          console.log('🚀 Executing state_getMetadata request...')
+          return client._request('state_getMetadata', [])
+        },
+        1, // Single attempt
+        quickTimeout
       )
-      console.log('Raw metadata received:', rawMetadata ? 'Success' : 'Failed')
+      console.log('✅ Raw metadata received successfully!')
     } catch (error) {
-      console.error('Failed to fetch raw metadata after retries:', error)
-      console.log('Falling back to enhanced mock metadata for', chainKey)
+      console.warn(`⚠️ Metadata fetch failed for ${chainKey}:`, error instanceof Error ? error.message : 'Unknown error')
+      
+      // For Polkadot, provide specific guidance about the known issue
+      if (isPolkadotInitial) {
+        console.log('📝 Polkadot initial connection issue detected - this is a known limitation')
+        // Don't retry for Polkadot - fall back immediately
+      }
+      
+      console.log(`🔄 Using enhanced mock metadata for ${chainKey} to maintain functionality`)
       return createEnhancedMockMetadata(chainKey)
     }
 
@@ -141,10 +182,12 @@ export async function fetchMetadata(chainKey: string, client: any): Promise<Chai
     // Cache the result with hash for validation
     setCachedMetadata(chainKey, chainMetadata, rawMetadataHash)
 
+    console.log(`✅ Successfully fetched and cached metadata for ${chainKey} with ${chainMetadata.pallets.length} pallets`)
     return chainMetadata
   } catch (error) {
-    console.error('Error fetching metadata:', error)
+    console.error(`❌ Error fetching metadata for ${chainKey}:`, error)
     // Return mock metadata so the app still works
+    console.log(`🆘 Returning enhanced mock metadata for ${chainKey}`)
     return createEnhancedMockMetadata(chainKey)
   }
 }
