@@ -39,9 +39,6 @@ importers:
       '@playwright/test':
         specifier: ^1.55.0
         version: 1.55.0
-      '@polkadot-api/descriptors':
-        specifier: file:.papi/descriptors
-        version: file:apps/web/.papi/descriptors(polkadot-api@1.14.1(jiti@2.4.2)(postcss@8.5.3)(rxjs@7.8.2))
       '@polkadot-api/smoldot':
         specifier: ^0.3.10
         version: 0.3.10
@@ -753,11 +750,6 @@ packages:
 
   '@polkadot-api/descriptors@file:.papi/descriptors':
     resolution: {directory: .papi/descriptors, type: directory}
-    peerDependencies:
-      polkadot-api: '>=1.11.2'
-
-  '@polkadot-api/descriptors@file:apps/web/.papi/descriptors':
-    resolution: {directory: apps/web/.papi/descriptors, type: directory}
     peerDependencies:
       polkadot-api: '>=1.11.2'
 
@@ -4204,10 +4196,6 @@ snapshots:
       '@polkadot-api/utils': 0.2.0
 
   '@polkadot-api/descriptors@file:.papi/descriptors(polkadot-api@1.14.1(jiti@2.4.2)(postcss@8.5.3)(rxjs@7.8.2))':
-    dependencies:
-      polkadot-api: 1.14.1(jiti@2.4.2)(postcss@8.5.3)(rxjs@7.8.2)
-
-  '@polkadot-api/descriptors@file:apps/web/.papi/descriptors(polkadot-api@1.14.1(jiti@2.4.2)(postcss@8.5.3)(rxjs@7.8.2))':
     dependencies:
       polkadot-api: 1.14.1(jiti@2.4.2)(postcss@8.5.3)(rxjs@7.8.2)
 
