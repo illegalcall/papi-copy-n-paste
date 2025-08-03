@@ -17,13 +17,15 @@ export interface ChainInfo {
   chainLag: number
 }
 
-// Known approximate block numbers for different chains (updated regularly)
+// Known approximate block numbers for different chains (updated Aug 30, 2025)
 const EXPECTED_CURRENT_BLOCKS: Record<string, number> = {
   'polkadot': 27545638, // Updated Aug 30, 2025
-  'kusama': 28676288,   // As of early 2025
-  'acala': 5500000,     // Approximate
-  'moonbeam': 7000000,  // Approximate
-  'astar': 6500000,     // Approximate
+  'kusama': 29900000,   // Updated Aug 30, 2025 (current blocks are ~29.9M)
+  'acala': 7100000,     // Updated Aug 30, 2025 (current blocks are ~7.1M)
+  'moonbeam': 8200000,  // Updated Aug 30, 2025 (current blocks are ~8.2M)
+  'astar': 7300000,     // Updated Aug 30, 2025 (current blocks are ~7.3M)
+  'bifrost': 4500000,   // Updated Aug 30, 2025 (current blocks are ~4.5M)
+  'hydration': 7800000, // Updated Aug 30, 2025 (current blocks are ~7.8M)
 }
 
 const BLOCK_TIMES: Record<string, number> = {
@@ -32,6 +34,8 @@ const BLOCK_TIMES: Record<string, number> = {
   'acala': 12,     // seconds per block
   'moonbeam': 12,  // seconds per block
   'astar': 12,     // seconds per block
+  'bifrost': 12,   // seconds per block
+  'hydration': 12, // seconds per block
 }
 
 /**

@@ -15,7 +15,7 @@
   {
     "key": "kusama",
     "name": "Kusama",
-    "ws": "wss://kusama-rpc.polkadot.io",
+    "ws": "wss://kusama.api.onfinality.io/public-ws",
     "specVersion": 9430,
     "paraId": null,
     "genesisHash": "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
