@@ -152,7 +152,7 @@ export class TransactionExecutor {
       
       // Get typed API for this chain
       const chainKey = this.options.chainKey || 'polkadot'
-      const typedApi = getTypedApiForChain(client, chainKey)
+      const typedApi = await getTypedApiForChain(client, chainKey)
 
       if (pallet === 'Balances' && callName === 'transfer_allow_death') {
         this.addStep(`> Creating balance transfer transaction using getTypedApi()...`)
