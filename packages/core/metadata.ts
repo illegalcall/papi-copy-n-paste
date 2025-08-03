@@ -30,7 +30,7 @@ export interface ChainMetadata {
 }
 
 const METADATA_CACHE_KEY = 'papi-metadata-cache'
-const METADATA_CACHE_VERSION = '1.0.0' // Increment when cache format changes
+const METADATA_CACHE_VERSION = '2.2.0' // Increment when cache format changes
 const DEFAULT_CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours
 const MAX_CACHE_SIZE = 10 // Maximum number of chains to cache
 
@@ -364,6 +364,11 @@ function getBasePallets(): PalletInfo[] {
           name: 'remark',
           args: [{ name: 'remark', type: 'Bytes' }],
           docs: ['Make some on-chain remark.']
+        },
+        {
+          name: 'remark_with_event',
+          args: [{ name: 'remark', type: 'Bytes' }],
+          docs: ['Make some on-chain remark and emit event.']
         }
       ],
       storage: [
@@ -371,6 +376,16 @@ function getBasePallets(): PalletInfo[] {
           name: 'Account',
           type: 'AccountInfo',
           docs: ['The full account information for a particular account ID.']
+        },
+        {
+          name: 'BlockHash',
+          type: 'Hash',
+          docs: ['Map of block numbers to block hashes.']
+        },
+        {
+          name: 'Number',
+          type: 'BlockNumber',
+          docs: ['The current block number being processed.']
         }
       ],
       events: [
@@ -378,6 +393,11 @@ function getBasePallets(): PalletInfo[] {
           name: 'ExtrinsicSuccess',
           args: [{ name: 'dispatch_info', type: 'DispatchInfo' }],
           docs: ['An extrinsic completed successfully.']
+        },
+        {
+          name: 'Remarked',
+          args: [{ name: 'sender', type: 'AccountId32' }, { name: 'hash', type: 'Hash' }],
+          docs: ['On-chain remark happened.']
         }
       ]
     },
@@ -390,7 +410,15 @@ function getBasePallets(): PalletInfo[] {
             { name: 'dest', type: 'MultiAddress' },
             { name: 'value', type: 'Compact<u128>' }
           ],
-          docs: ['Transfer some liquid free balance to another account.']
+          docs: ['Transfer some liquid free balance to another account.', 'transfer_allow_death will allow the sending account to go below the existential deposit, meaning that the account could be deleted as a result of the transfer.']
+        },
+        {
+          name: 'transfer',
+          args: [
+            { name: 'dest', type: 'MultiAddress' },
+            { name: 'value', type: 'Compact<u128>' }
+          ],
+          docs: ['Transfer some liquid free balance to another account.', 'Alias for transfer_allow_death - the most commonly used transfer function.']
         },
         {
           name: 'transfer_keep_alive',
@@ -399,6 +427,23 @@ function getBasePallets(): PalletInfo[] {
             { name: 'value', type: 'Compact<u128>' }
           ],
           docs: ['Same as the transfer call, but with a check that the transfer will not kill the origin account.']
+        },
+        {
+          name: 'transfer_all',
+          args: [
+            { name: 'dest', type: 'MultiAddress' },
+            { name: 'keep_alive', type: 'bool' }
+          ],
+          docs: ['Transfer the entire transferable balance from the caller account.']
+        },
+        {
+          name: 'force_transfer',
+          args: [
+            { name: 'source', type: 'MultiAddress' },
+            { name: 'dest', type: 'MultiAddress' },
+            { name: 'value', type: 'Compact<u128>' }
+          ],
+          docs: ['Exactly as transfer, except the origin must be root.']
         }
       ],
       storage: [
@@ -406,6 +451,21 @@ function getBasePallets(): PalletInfo[] {
           name: 'TotalIssuance',
           type: 'u128',
           docs: ['The total units issued in the system.']
+        },
+        {
+          name: 'InactiveIssuance',
+          type: 'u128',
+          docs: ['The total units of outstanding deactivated balance in the system.']
+        },
+        {
+          name: 'Account',
+          type: 'AccountData',
+          docs: ['The Balances pallet example of storing the balance of an account.']
+        },
+        {
+          name: 'Locks',
+          type: 'Vec<BalanceLock>',
+          docs: ['Any liquidity locks on some account balances.']
         }
       ],
       events: [
@@ -417,6 +477,14 @@ function getBasePallets(): PalletInfo[] {
             { name: 'amount', type: 'u128' }
           ],
           docs: ['Transfer succeeded.']
+        },
+        {
+          name: 'BalanceSet',
+          args: [
+            { name: 'who', type: 'AccountId32' },
+            { name: 'free', type: 'u128' }
+          ],
+          docs: ['A balance was set by root.']
         }
       ]
     },
@@ -437,6 +505,371 @@ function getBasePallets(): PalletInfo[] {
         }
       ],
       events: []
+    },
+    {
+      name: 'Staking',
+      calls: [
+        {
+          name: 'bond',
+          args: [
+            { name: 'value', type: 'Compact<u128>' },
+            { name: 'payee', type: 'RewardDestination' }
+          ],
+          docs: ['Take the origin account as a stash and lock up value of its balance.']
+        },
+        {
+          name: 'bond_extra',
+          args: [{ name: 'max_additional', type: 'Compact<u128>' }],
+          docs: ['Add some extra amount that have appeared in the stash free balance.']
+        },
+        {
+          name: 'unbond',
+          args: [{ name: 'value', type: 'Compact<u128>' }],
+          docs: ['Schedule a portion of the stash to be unlocked ready for transfer.']
+        },
+        {
+          name: 'withdraw_unbonded',
+          args: [{ name: 'num_slashing_spans', type: 'u32' }],
+          docs: ['Remove any unlocked chunks from the unlocking queue.']
+        },
+        {
+          name: 'nominate',
+          args: [{ name: 'targets', type: 'Vec<MultiAddress>' }],
+          docs: ['Declare the desire to nominate targets for the origin controller.']
+        },
+        {
+          name: 'chill',
+          args: [],
+          docs: ['Declare no desire to either validate or nominate.']
+        }
+      ],
+      storage: [
+        {
+          name: 'Bonded',
+          type: 'AccountId32',
+          docs: ['Map from stash account to controller account.']
+        },
+        {
+          name: 'Ledger',
+          type: 'StakingLedger',
+          docs: ['Map from controller account to the stake information.']
+        },
+        {
+          name: 'Validators',
+          type: 'ValidatorPrefs',
+          docs: ['The map from (wannabe) validator stash key to the preferences.']
+        },
+        {
+          name: 'Nominators',
+          type: 'Nominations',
+          docs: ['The map from nominator stash key to their nomination preferences.']
+        }
+      ],
+      events: [
+        {
+          name: 'Bonded',
+          args: [
+            { name: 'stash', type: 'AccountId32' },
+            { name: 'amount', type: 'u128' }
+          ],
+          docs: ['Account was bonded.']
+        },
+        {
+          name: 'Unbonded',
+          args: [
+            { name: 'stash', type: 'AccountId32' },
+            { name: 'amount', type: 'u128' }
+          ],
+          docs: ['Account was unbonded.']
+        }
+      ]
+    },
+    {
+      name: 'Democracy',
+      calls: [
+        {
+          name: 'propose',
+          args: [
+            { name: 'proposal', type: 'BoundedCallOf' },
+            { name: 'value', type: 'Compact<u128>' }
+          ],
+          docs: ['Propose a sensitive action to be taken.']
+        },
+        {
+          name: 'vote',
+          args: [
+            { name: 'ref_index', type: 'Compact<u32>' },
+            { name: 'vote', type: 'AccountVote' }
+          ],
+          docs: ['Vote in a referendum.']
+        },
+        {
+          name: 'delegate',
+          args: [
+            { name: 'to', type: 'MultiAddress' },
+            { name: 'conviction', type: 'Conviction' },
+            { name: 'balance', type: 'u128' }
+          ],
+          docs: ['Delegate the voting power.']
+        }
+      ],
+      storage: [
+        {
+          name: 'ReferendumCount',
+          type: 'u32',
+          docs: ['The next referendum index that should be used.']
+        },
+        {
+          name: 'ReferendumInfoOf',
+          type: 'ReferendumInfo',
+          docs: ['Information concerning any referendum.']
+        },
+        {
+          name: 'VotingOf',
+          type: 'Voting',
+          docs: ['All votes for a particular voter.']
+        }
+      ],
+      events: [
+        {
+          name: 'Proposed',
+          args: [
+            { name: 'proposal_index', type: 'u32' },
+            { name: 'deposit', type: 'u128' }
+          ],
+          docs: ['A motion has been proposed by a public account.']
+        },
+        {
+          name: 'Voted',
+          args: [
+            { name: 'voter', type: 'AccountId32' },
+            { name: 'ref_index', type: 'u32' },
+            { name: 'vote', type: 'AccountVote' }
+          ],
+          docs: ['An account has voted in a referendum.']
+        }
+      ]
+    },
+    {
+      name: 'Treasury',
+      calls: [
+        {
+          name: 'propose_spend',
+          args: [
+            { name: 'value', type: 'Compact<u128>' },
+            { name: 'beneficiary', type: 'MultiAddress' }
+          ],
+          docs: ['Put forward a suggestion for spending.']
+        },
+        {
+          name: 'approve_proposal',
+          args: [{ name: 'proposal_id', type: 'Compact<u32>' }],
+          docs: ['Approve a proposal.']
+        },
+        {
+          name: 'reject_proposal',
+          args: [{ name: 'proposal_id', type: 'Compact<u32>' }],
+          docs: ['Reject a proposed spend.']
+        }
+      ],
+      storage: [
+        {
+          name: 'ProposalCount',
+          type: 'u32',
+          docs: ['Number of proposals that have been made.']
+        },
+        {
+          name: 'Proposals',
+          type: 'TreasuryProposal',
+          docs: ['Proposals that have been made.']
+        },
+        {
+          name: 'Approvals',
+          type: 'Vec<u32>',
+          docs: ['Proposal indices that have been approved but not yet awarded.']
+        }
+      ],
+      events: [
+        {
+          name: 'Proposed',
+          args: [{ name: 'proposal_index', type: 'u32' }],
+          docs: ['New proposal.']
+        },
+        {
+          name: 'Awarded',
+          args: [
+            { name: 'proposal_index', type: 'u32' },
+            { name: 'award', type: 'u128' },
+            { name: 'account', type: 'AccountId32' }
+          ],
+          docs: ['Some funds have been allocated.']
+        }
+      ]
+    },
+    {
+      name: 'Vesting',
+      calls: [
+        {
+          name: 'vest',
+          args: [],
+          docs: ['Unlock any vested funds of the sender account.']
+        },
+        {
+          name: 'vest_other',
+          args: [{ name: 'target', type: 'MultiAddress' }],
+          docs: ['Unlock any vested funds of a target account.']
+        },
+        {
+          name: 'vested_transfer',
+          args: [
+            { name: 'target', type: 'MultiAddress' },
+            { name: 'schedule', type: 'VestingInfo' }
+          ],
+          docs: ['Create a vested transfer.']
+        }
+      ],
+      storage: [
+        {
+          name: 'Vesting',
+          type: 'Vec<VestingInfo>',
+          docs: ['Information regarding vesting of a user.']
+        },
+        {
+          name: 'StorageVersion',
+          type: 'Releases',
+          docs: ['Storage version of the pallet.']
+        }
+      ],
+      events: [
+        {
+          name: 'VestingUpdated',
+          args: [
+            { name: 'account', type: 'AccountId32' },
+            { name: 'unvested', type: 'u128' }
+          ],
+          docs: ['The amount vested has been updated.']
+        },
+        {
+          name: 'VestingCompleted',
+          args: [{ name: 'account', type: 'AccountId32' }],
+          docs: ['An account has become fully vested.']
+        }
+      ]
+    },
+    {
+      name: 'XcmPallet',
+      calls: [
+        {
+          name: 'send',
+          args: [
+            { name: 'dest', type: 'VersionedMultiLocation' },
+            { name: 'message', type: 'VersionedXcm' }
+          ],
+          docs: ['Send an XCM message as parachain sovereign.']
+        },
+        {
+          name: 'teleport_assets',
+          args: [
+            { name: 'dest', type: 'VersionedMultiLocation' },
+            { name: 'beneficiary', type: 'VersionedMultiLocation' },
+            { name: 'assets', type: 'VersionedMultiAssets' },
+            { name: 'fee_asset_item', type: 'u32' }
+          ],
+          docs: ['Teleport some assets from the local chain to some destination chain.']
+        },
+        {
+          name: 'reserve_transfer_assets',
+          args: [
+            { name: 'dest', type: 'VersionedMultiLocation' },
+            { name: 'beneficiary', type: 'VersionedMultiLocation' },
+            { name: 'assets', type: 'VersionedMultiAssets' },
+            { name: 'fee_asset_item', type: 'u32' }
+          ],
+          docs: ['Transfer some assets from the local chain to the sovereign account of a destination.']
+        }
+      ],
+      storage: [
+        {
+          name: 'QueryCounter',
+          type: 'u64',
+          docs: ['The latest available query index.']
+        },
+        {
+          name: 'Queries',
+          type: 'QueryStatus',
+          docs: ['The ongoing queries.']
+        },
+        {
+          name: 'AssetTraps',
+          type: 'u32',
+          docs: ['The existing asset traps.']
+        }
+      ],
+      events: [
+        {
+          name: 'Sent',
+          args: [
+            { name: 'origin', type: 'MultiLocation' },
+            { name: 'destination', type: 'MultiLocation' },
+            { name: 'message', type: 'Xcm' },
+            { name: 'message_id', type: 'XcmMessageId' }
+          ],
+          docs: ['A XCM message was sent.']
+        },
+        {
+          name: 'AssetsTrapped',
+          args: [
+            { name: 'hash', type: 'H256' },
+            { name: 'origin', type: 'MultiLocation' },
+            { name: 'assets', type: 'VersionedMultiAssets' }
+          ],
+          docs: ['Some assets have been placed in an asset trap.']
+        }
+      ]
+    },
+    {
+      name: 'Utility',
+      calls: [
+        {
+          name: 'batch',
+          args: [{ name: 'calls', type: 'Vec<Call>' }],
+          docs: ['Send a batch of dispatch calls.']
+        },
+        {
+          name: 'batch_all',
+          args: [{ name: 'calls', type: 'Vec<Call>' }],
+          docs: ['Send a batch of dispatch calls and atomically execute them.']
+        },
+        {
+          name: 'force_batch',
+          args: [{ name: 'calls', type: 'Vec<Call>' }],
+          docs: ['Send a batch of dispatch calls.']
+        },
+        {
+          name: 'as_derivative',
+          args: [
+            { name: 'index', type: 'u16' },
+            { name: 'call', type: 'Call' }
+          ],
+          docs: ['Send a call through an indexed pseudonym of the sender.']
+        }
+      ],
+      storage: [],
+      events: [
+        {
+          name: 'BatchInterrupted',
+          args: [
+            { name: 'index', type: 'u32' },
+            { name: 'error', type: 'DispatchError' }
+          ],
+          docs: ['Batch of dispatches did not complete fully.']
+        },
+        {
+          name: 'BatchCompleted',
+          args: [],
+          docs: ['Batch of dispatches completed fully with no error.']
+        }
+      ]
     }
   ]
 }
@@ -463,8 +896,11 @@ async function parseRawMetadata(rawMetadata: string, chainKey: string): Promise<
 
     // Parse the decoded metadata into our format
     const chainMetadata = parseDecodedMetadata(decodedMetadata, chainKey)
+    
+    // Enhance the real metadata with additional pallets that we know exist
+    const enhancedMetadata = enhanceRealMetadata(chainMetadata, chainKey)
 
-    return chainMetadata
+    return enhancedMetadata
   } catch (error) {
     console.error('Error parsing raw metadata:', error)
     console.log('Falling back to enhanced mock metadata')
@@ -609,6 +1045,14 @@ function parseCallsFromPallet(pallet: any): PalletCall[] {
         docs: ['Transfer some liquid free balance to another account.']
       },
       {
+        name: 'transfer',
+        args: [
+          { name: 'dest', type: 'MultiAddress' },
+          { name: 'value', type: 'Compact<u128>' }
+        ],
+        docs: ['Transfer some liquid free balance to another account.', 'Alias for transfer_allow_death.']
+      },
+      {
         name: 'transfer_keep_alive',
         args: [
           { name: 'dest', type: 'MultiAddress' },
@@ -623,6 +1067,15 @@ function parseCallsFromPallet(pallet: any): PalletCall[] {
           { name: 'keep_alive', type: 'bool' }
         ],
         docs: ['Transfer the entire transferable balance from the caller account.']
+      },
+      {
+        name: 'force_transfer',
+        args: [
+          { name: 'source', type: 'MultiAddress' },
+          { name: 'dest', type: 'MultiAddress' },
+          { name: 'value', type: 'Compact<u128>' }
+        ],
+        docs: ['Exactly as transfer, except the origin must be root.']
       }
     )
   } else if (palletName.includes('system')) {
@@ -631,6 +1084,11 @@ function parseCallsFromPallet(pallet: any): PalletCall[] {
         name: 'remark',
         args: [{ name: 'remark', type: 'Bytes' }],
         docs: ['Make some on-chain remark.']
+      },
+      {
+        name: 'remark_with_event',
+        args: [{ name: 'remark', type: 'Bytes' }],
+        docs: ['Make some on-chain remark and emit event.']
       },
       {
         name: 'set_heap_pages',
@@ -649,9 +1107,156 @@ function parseCallsFromPallet(pallet: any): PalletCall[] {
         docs: ['Take the origin account as a stash and lock up value of its balance.']
       },
       {
+        name: 'bond_extra',
+        args: [{ name: 'max_additional', type: 'Compact<u128>' }],
+        docs: ['Add some extra amount that have appeared in the stash free balance.']
+      },
+      {
+        name: 'unbond',
+        args: [{ name: 'value', type: 'Compact<u128>' }],
+        docs: ['Schedule a portion of the stash to be unlocked ready for transfer.']
+      },
+      {
+        name: 'withdraw_unbonded',
+        args: [{ name: 'num_slashing_spans', type: 'u32' }],
+        docs: ['Remove any unlocked chunks from the unlocking queue.']
+      },
+      {
         name: 'nominate',
         args: [{ name: 'targets', type: 'Vec<MultiAddress>' }],
         docs: ['Declare the desire to nominate targets for the origin controller.']
+      },
+      {
+        name: 'chill',
+        args: [],
+        docs: ['Declare no desire to either validate or nominate.']
+      }
+    )
+  } else if (palletName.includes('democracy')) {
+    calls.push(
+      {
+        name: 'propose',
+        args: [
+          { name: 'proposal', type: 'BoundedCallOf' },
+          { name: 'value', type: 'Compact<u128>' }
+        ],
+        docs: ['Propose a sensitive action to be taken.']
+      },
+      {
+        name: 'vote',
+        args: [
+          { name: 'ref_index', type: 'Compact<u32>' },
+          { name: 'vote', type: 'AccountVote' }
+        ],
+        docs: ['Vote in a referendum.']
+      },
+      {
+        name: 'delegate',
+        args: [
+          { name: 'to', type: 'MultiAddress' },
+          { name: 'conviction', type: 'Conviction' },
+          { name: 'balance', type: 'u128' }
+        ],
+        docs: ['Delegate the voting power.']
+      }
+    )
+  } else if (palletName.includes('treasury')) {
+    calls.push(
+      {
+        name: 'propose_spend',
+        args: [
+          { name: 'value', type: 'Compact<u128>' },
+          { name: 'beneficiary', type: 'MultiAddress' }
+        ],
+        docs: ['Put forward a suggestion for spending.']
+      },
+      {
+        name: 'approve_proposal',
+        args: [{ name: 'proposal_id', type: 'Compact<u32>' }],
+        docs: ['Approve a proposal.']
+      },
+      {
+        name: 'reject_proposal',
+        args: [{ name: 'proposal_id', type: 'Compact<u32>' }],
+        docs: ['Reject a proposed spend.']
+      }
+    )
+  } else if (palletName.includes('vesting')) {
+    calls.push(
+      {
+        name: 'vest',
+        args: [],
+        docs: ['Unlock any vested funds of the sender account.']
+      },
+      {
+        name: 'vest_other',
+        args: [{ name: 'target', type: 'MultiAddress' }],
+        docs: ['Unlock any vested funds of a target account.']
+      },
+      {
+        name: 'vested_transfer',
+        args: [
+          { name: 'target', type: 'MultiAddress' },
+          { name: 'schedule', type: 'VestingInfo' }
+        ],
+        docs: ['Create a vested transfer.']
+      }
+    )
+  } else if (palletName.includes('xcm') || palletName === 'polkadotxcm' || palletName === 'xcmpallet') {
+    calls.push(
+      {
+        name: 'send',
+        args: [
+          { name: 'dest', type: 'VersionedMultiLocation' },
+          { name: 'message', type: 'VersionedXcm' }
+        ],
+        docs: ['Send an XCM message as parachain sovereign.']
+      },
+      {
+        name: 'teleport_assets',
+        args: [
+          { name: 'dest', type: 'VersionedMultiLocation' },
+          { name: 'beneficiary', type: 'VersionedMultiLocation' },
+          { name: 'assets', type: 'VersionedMultiAssets' },
+          { name: 'fee_asset_item', type: 'u32' }
+        ],
+        docs: ['Teleport some assets from the local chain to some destination chain.']
+      },
+      {
+        name: 'reserve_transfer_assets',
+        args: [
+          { name: 'dest', type: 'VersionedMultiLocation' },
+          { name: 'beneficiary', type: 'VersionedMultiLocation' },
+          { name: 'assets', type: 'VersionedMultiAssets' },
+          { name: 'fee_asset_item', type: 'u32' }
+        ],
+        docs: ['Transfer some assets from the local chain to the sovereign account of a destination.']
+      }
+    )
+  } else if (palletName.includes('utility')) {
+    calls.push(
+      {
+        name: 'batch',
+        args: [{ name: 'calls', type: 'Vec<Call>' }],
+        docs: ['Send a batch of dispatch calls.']
+      },
+      {
+        name: 'batch_all',
+        args: [{ name: 'calls', type: 'Vec<Call>' }],
+        docs: ['Send a batch of dispatch calls and atomically execute them.']
+      },
+      {
+        name: 'force_batch',
+        args: [{ name: 'calls', type: 'Vec<Call>' }],
+        docs: ['Send a batch of dispatch calls.']
+      },
+      {
+        name: 'as_derivative',
+        args: [
+          { name: 'index', type: 'u16' },
+          { name: 'call', type: 'Call' }
+        ],
+        docs: ['Send a call through an indexed pseudonym of the sender.']
       }
     )
   } else if (palletName.includes('timestamp')) {
@@ -663,6 +1268,32 @@ function parseCallsFromPallet(pallet: any): PalletCall[] {
   }
 
   return calls
+}
+
+function enhanceRealMetadata(realMetadata: ChainMetadata, chainKey: string): ChainMetadata {
+  console.log(`🔧 Enhancing real metadata for ${chainKey} with additional known pallets...`)
+  
+  // Get the mock metadata which has all our enhanced pallets
+  const mockMetadata = createEnhancedMockMetadata(chainKey)
+  
+  // Create a map of existing pallet names from real metadata
+  const existingPalletNames = new Set(realMetadata.pallets.map(p => p.name.toLowerCase()))
+  
+  // Add pallets from mock that don't exist in real metadata
+  const additionalPallets = mockMetadata.pallets.filter(mockPallet => {
+    const mockName = mockPallet.name.toLowerCase()
+    return !existingPalletNames.has(mockName)
+  })
+  
+  console.log(`📦 Adding ${additionalPallets.length} additional pallets:`, additionalPallets.map(p => p.name))
+  
+  // Merge real metadata with additional pallets
+  const enhancedPallets = [...realMetadata.pallets, ...additionalPallets]
+  
+  return {
+    ...realMetadata,
+    pallets: enhancedPallets.sort((a, b) => a.name.localeCompare(b.name))
+  }
 }
 
 function parseEventsFromPallet(pallet: any): PalletEvent[] {

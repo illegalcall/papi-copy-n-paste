@@ -15,8 +15,9 @@ interface PalletTreeProps {
 }
 
 export function PalletTree({ pallets, searchQuery, onCallSelect, onStorageSelect, selectedCall, selectedStorage }: PalletTreeProps) {
-  const [expandedPallets, setExpandedPallets] = useState<Set<string>>(new Set())
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
+  // Start with essential pallets expanded for better UX and scrollable content
+  const [expandedPallets, setExpandedPallets] = useState<Set<string>>(new Set(['System', 'Balances', 'Timestamp']))
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['System-calls', 'Balances-calls', 'Timestamp-calls']))
 
   const filteredPallets = pallets.filter(pallet => {
     if (!searchQuery) return true
@@ -67,9 +68,9 @@ export function PalletTree({ pallets, searchQuery, onCallSelect, onStorageSelect
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-1" data-testid="pallet-tree">
       {filteredPallets.map((pallet) => (
-        <div key={pallet.name}>
+        <div key={pallet.name} data-testid="pallet-item">
           <Button
             variant="ghost"
             className="w-full justify-start h-8 px-2 font-normal"

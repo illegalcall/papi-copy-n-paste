@@ -1,6 +1,6 @@
 "use client"
 
-import { ScrollArea } from "@workspace/ui/components/scroll-area"
+// import { ScrollArea } from "@workspace/ui/components/scroll-area" // Replaced with native CSS scrolling
 import { Input } from "@workspace/ui/components/input"
 import { Search } from "lucide-react"
 import { useState } from "react"
@@ -23,8 +23,8 @@ export function LeftPane({ isOpen, onClose, pallets, onCallSelect, onStorageSele
   const [searchQuery, setSearchQuery] = useState("")
 
   return (
-    <div className="w-64 bg-muted/40 border-r flex flex-col">
-      <div className="p-4 border-b">
+    <div className="w-full h-full bg-muted/40 border-r flex flex-col">
+      <div className="p-4 border-b shrink-0">
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -36,7 +36,8 @@ export function LeftPane({ isOpen, onClose, pallets, onCallSelect, onStorageSele
         </div>
       </div>
       
-      <ScrollArea className="flex-1">
+      {/* Scrollable content area - uses native CSS scrolling with overscroll containment */}
+      <div className="flex-1 min-h-0 max-h-[calc(100vh-120px)] overflow-y-auto overscroll-contain">
         <div className="p-4">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center space-y-2 py-8">
@@ -73,7 +74,7 @@ export function LeftPane({ isOpen, onClose, pallets, onCallSelect, onStorageSele
             />
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   )
 }
