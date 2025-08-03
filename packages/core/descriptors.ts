@@ -15,24 +15,30 @@
  */
 
 // Import real generated descriptors with fallback for development
-let polkadot: any, kusama: any, moonbeam: any, bifrost: any, astar: any;
+let polkadot: any = {}, kusama: any = {}, moonbeam: any = {}, bifrost: any = {}, astar: any = {};
 
-try {
-  const descriptors = require("@polkadot-api/descriptors");
-  polkadot = descriptors.polkadot;
-  kusama = descriptors.kusama;
-  moonbeam = descriptors.moonbeam;
-  bifrost = descriptors.bifrost;
-  astar = descriptors.astar;
-} catch (error) {
-  // During development or if descriptors not generated yet, use empty objects
-  console.warn("PAPI descriptors not found. Run 'papi generate' to generate them.");
-  polkadot = {};
-  kusama = {};
-  moonbeam = {};
-  bifrost = {};
-  astar = {};
-}
+// Try to import descriptors using dynamic import (works in both Node.js and browser)
+const loadDescriptors = async () => {
+  try {
+    const descriptors = await import("@polkadot-api/descriptors");
+    polkadot = descriptors.polkadot || {};
+    kusama = descriptors.kusama || {};
+    moonbeam = descriptors.moonbeam || {};
+    bifrost = descriptors.bifrost || {};
+    astar = descriptors.astar || {};
+  } catch (error) {
+    // During development or if descriptors not generated yet, use empty objects
+    console.warn("PAPI descriptors not found. Run 'papi generate' to generate them.");
+    polkadot = {};
+    kusama = {};
+    moonbeam = {};
+    bifrost = {};
+    astar = {};
+  }
+};
+
+// Load descriptors immediately
+loadDescriptors();
 
 // Type-safe mapping of chain keys to descriptors
 const CHAIN_DESCRIPTORS = {
