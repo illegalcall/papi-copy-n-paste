@@ -187,7 +187,7 @@ export class TransactionExecutor {
           args,
           mock: false, // This now uses the real PAPI pattern
 
-          // Real PAPI transaction - everything is real except the final signing/submission
+          // Real PAPI transaction - now with actual signing and submission
           signAndSubmit: async (signer: any, stepCallback: (step: string, type?: string) => void) => {
             try {
               // This is the real PAPI v1.14+ way to create transactions:
@@ -211,16 +211,30 @@ export class TransactionExecutor {
               stepCallback('> ✓ Real transaction object created successfully', 'success')
               stepCallback(`> Transaction details: ${safeStringify(tx.decodedCall)}`, 'info')
               
-              // 3. Stop here - don't actually sign or submit (safety mode)
-              stepCallback('> Stopping before signing/submission for safety', 'info')
+              // 3. Actually sign the transaction (safe for test accounts like //Alice, //Bob)
+              stepCallback('> Signing transaction with test account...', 'info')
+              const signedTx = await tx.sign(signer)
+              stepCallback('> ✓ Transaction signed successfully', 'success')
               
-              // Return simulated result showing what would have happened
+              // 4. Submit the transaction to the network
+              stepCallback('> Submitting transaction to Polkadot network...', 'info')
+              const result = await signedTx.submit()
+              stepCallback('> ✓ Transaction submitted successfully', 'success')
+              
+              // 5. Wait for finalization
+              stepCallback('> Waiting for transaction finalization...', 'info')
+              const finalized = await result.finalized()
+              stepCallback('> ✓ Transaction finalized on chain', 'success')
+              
+              // Return real result
               return {
-                txHash: '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
-                blockHash: '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
-                mock: true,
+                txHash: result.txHash,
+                blockHash: finalized.blockHash,
+                mock: false, // This is now a real transaction
                 success: true,
-                note: 'Real transaction created but signing/submission simulated for safety'
+                finalized: true,
+                events: finalized.events,
+                note: 'Real transaction signed and submitted successfully'
               }
               
             } catch (error) {
