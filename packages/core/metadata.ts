@@ -30,7 +30,7 @@ export interface ChainMetadata {
 }
 
 const METADATA_CACHE_KEY = 'papi-metadata-cache'
-const METADATA_CACHE_VERSION = '2.2.0' // Increment when cache format changes
+const METADATA_CACHE_VERSION = '2.5.0' // Increment when cache format changes
 const DEFAULT_CACHE_TTL = 24 * 60 * 60 * 1000 // 24 hours
 const MAX_CACHE_SIZE = 10 // Maximum number of chains to cache
 
@@ -986,12 +986,11 @@ function parseDecodedMetadata(decodedMetadata: any, chainKey: string): ChainMeta
         events: []
       }
 
-      // Parse calls
-      if (pallet.calls?.type !== undefined) {
-        // In real metadata, calls are referenced by type index
-        // For now, we'll create some basic calls based on common patterns
-        palletInfo.calls = parseCallsFromPallet(pallet)
-      }
+      // Parse calls - always try to parse calls for every pallet
+      // In real metadata, calls might be referenced by type index or be undefined
+      // For now, we'll create some basic calls based on common patterns
+      palletInfo.calls = parseCallsFromPallet(pallet)
+      console.log(`📋 Final result for ${pallet.name}: ${palletInfo.calls.length} calls`)
 
       // Parse storage
       if (pallet.storage?.items) {
@@ -1033,8 +1032,9 @@ function parseCallsFromPallet(pallet: any): PalletCall[] {
 
   // Add some common calls based on pallet name
   const palletName = pallet.name?.toLowerCase() || ''
+  console.log(`🔍 Parsing calls for pallet: "${pallet.name}" (normalized: "${palletName}")`)
 
-  if (palletName.includes('balance')) {
+  if (palletName.includes('balance') || palletName === 'balances') {
     calls.push(
       {
         name: 'transfer_allow_death',
@@ -1267,6 +1267,85 @@ function parseCallsFromPallet(pallet: any): PalletCall[] {
     })
   }
 
+  // Add catch-all cases for common pallets that might not match above patterns
+  if (calls.length === 0) {
+    // Check for specific pallet names that might not match the includes() patterns
+    const exactName = palletName.toLowerCase()
+    
+    if (exactName === 'transactionpayment' || exactName === 'transaction-payment') {
+      calls.push({
+        name: 'set_next_fee_multiplier',
+        args: [{ name: 'new', type: 'Multiplier' }],
+        docs: ['Set the next fee multiplier.']
+      })
+    } else if (exactName === 'treasury') {
+      calls.push(
+        {
+          name: 'propose_spend',
+          args: [
+            { name: 'value', type: 'Compact<u128>' },
+            { name: 'beneficiary', type: 'MultiAddress' }
+          ],
+          docs: ['Put forward a suggestion for spending.']
+        },
+        {
+          name: 'reject_proposal',
+          args: [{ name: 'proposal_id', type: 'Compact<u32>' }],
+          docs: ['Reject a proposed spend.']
+        }
+      )
+    } else if (exactName === 'balances') {
+      calls.push(
+        {
+          name: 'transfer_allow_death',
+          args: [
+            { name: 'dest', type: 'MultiAddress' },
+            { name: 'value', type: 'Compact<u128>' }
+          ],
+          docs: ['Transfer some liquid free balance to another account.']
+        },
+        {
+          name: 'transfer',
+          args: [
+            { name: 'dest', type: 'MultiAddress' },
+            { name: 'value', type: 'Compact<u128>' }
+          ],
+          docs: ['Transfer some liquid free balance to another account.']
+        },
+        {
+          name: 'transfer_keep_alive',
+          args: [
+            { name: 'dest', type: 'MultiAddress' },
+            { name: 'value', type: 'Compact<u128>' }
+          ],
+          docs: ['Same as transfer call, but with a check that the transfer will not kill the origin account.']
+        }
+      )
+    } else if (exactName === 'vesting') {
+      calls.push(
+        {
+          name: 'vest',
+          args: [],
+          docs: ['Unlock any vested funds of the sender account.']
+        },
+        {
+          name: 'vest_other',
+          args: [{ name: 'target', type: 'MultiAddress' }],
+          docs: ['Unlock any vested funds of a target account.']
+        }
+      )
+    } else {
+      // Generic fallback for any pallet without specific calls
+      console.log(`⚠️ No specific calls defined for pallet "${pallet.name}", adding generic calls`)
+      calls.push({
+        name: 'placeholder_call',
+        args: [],
+        docs: [`Generic call for ${pallet.name} pallet. Specific calls need to be implemented.`]
+      })
+    }
+  }
+
+  console.log(`✅ Added ${calls.length} calls for pallet "${pallet.name}"`)
   return calls
 }
 
@@ -1301,7 +1380,7 @@ function parseEventsFromPallet(pallet: any): PalletEvent[] {
   const events: PalletEvent[] = []
   const palletName = pallet.name?.toLowerCase() || ''
 
-  if (palletName.includes('balance')) {
+  if (palletName.includes('balance') || palletName === 'balances') {
     events.push({
       name: 'Transfer',
       args: [
