@@ -147,15 +147,28 @@ export class TransactionExecutor {
     try {
       this.addStep(`> Building ${pallet}.${callName} transaction...`)
 
-      // Import the typed API helper
+      // Import the typed API helper - now synchronous
       const { getTypedApiForChain } = await import('./descriptors')
       
-      // Get typed API for this chain
+      // Get typed API for this chain - now synchronous
       const chainKey = this.options.chainKey || 'polkadot'
-      const typedApi = await getTypedApiForChain(client, chainKey)
+      
+      let typedApi
+      try {
+        typedApi = getTypedApiForChain(client, chainKey)
+      } catch (descriptorError) {
+        this.addStep(`> ❌ Failed to load descriptors: ${descriptorError instanceof Error ? descriptorError.message : 'Unknown error'}`, 'error')
+        throw new Error(`Cannot create transaction: ${descriptorError instanceof Error ? descriptorError.message : 'Descriptor loading failed'}`)
+      }
 
-      if (pallet === 'Balances' && callName === 'transfer_allow_death') {
+      if (pallet === 'Balances' && (callName === 'transfer_allow_death' || callName === 'transfer_keep_alive')) {
         this.addStep(`> Creating balance transfer transaction using getTypedApi()...`)
+
+        // Validate that we have the Balances pallet and the specific method in the typedApi
+        const transferMethod = typedApi.tx?.Balances?.[callName]
+        if (!transferMethod) {
+          throw new Error(`Balances.${callName} not found in chain descriptors. The descriptors may be incomplete or outdated.`)
+        }
 
         // Now using proper PAPI v1.14+ pattern
         const transaction = {
@@ -164,41 +177,50 @@ export class TransactionExecutor {
           args,
           mock: false, // This now uses the real PAPI pattern
 
-          // Simulated PAPI transaction using getTypedApi() pattern
+          // Real PAPI transaction - everything is real except the final signing/submission
           signAndSubmit: async (signer: any, stepCallback: (step: string, type?: string) => void) => {
             try {
-              // This is the proper PAPI v1.14+ way to create transactions:
+              // This is the real PAPI v1.14+ way to create transactions:
               // 1. Get typed API (already done above)
-              // 2. Create transaction using typed API
-              const tx = typedApi.tx.Balances.transfer_allow_death({
+              // 2. Create transaction using real typed API
+              
+              // Validate and convert the amount
+              let amount: bigint
+              try {
+                amount = BigInt(args.value)
+              } catch (error) {
+                throw new Error(`Invalid amount value: ${args.value}. Must be a valid number.`)
+              }
+
+              stepCallback('> Creating real PAPI transaction with typed API...', 'info')
+              const tx = typedApi.tx.Balances[callName]({
                 dest: args.dest, // Already in proper format from form
-                value: BigInt(args.value)
+                value: amount
               })
               
-              // 3. Simulate signing and submission (safety mode)
-              stepCallback('> Simulating transaction signing with typed API...', 'info')
+              stepCallback('> ✓ Real transaction object created successfully', 'success')
+              stepCallback(`> Transaction details: ${JSON.stringify(tx.decodedCall, null, 2)}`, 'info')
               
-              // Return simulated result
+              // 3. Stop here - don't actually sign or submit (safety mode)
+              stepCallback('> Stopping before signing/submission for safety', 'info')
+              
+              // Return simulated result showing what would have happened
               return {
-                txHash: '0x1234567890abcdef... (SIMULATED)',
-                blockHash: '0xabcdef1234567890... (SIMULATED)',
+                txHash: '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+                blockHash: '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
                 mock: true,
-                note: 'This is a simulated result - no real transaction was submitted'
+                success: true,
+                note: 'Real transaction created but signing/submission simulated for safety'
               }
               
             } catch (error) {
-              stepCallback('> Simulation requires proper chain descriptors', 'warning')
-              return {
-                txHash: '0x1234567890abcdef... (SIMULATED)',
-                blockHash: '0xabcdef1234567890... (SIMULATED)',
-                mock: true,
-                note: 'This is a simulated result - no real transaction was submitted'
-              }
+              stepCallback(`> ❌ Error creating real transaction: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
+              throw error
             }
           }
         }
 
-        this.addStep(`> ✓ PAPI-style transaction created for ${pallet}.${callName}`, 'success')
+        this.addStep(`> ✓ Real PAPI transaction created for ${pallet}.${callName}`, 'success')
         return transaction
       }
 

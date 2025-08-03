@@ -14,36 +14,11 @@
  * 
  */
 
-// Import real generated descriptors with fallback for development
-let polkadot: any = {}, kusama: any = {}, moonbeam: any = {}, bifrost: any = {}, astar: any = {};
-let descriptorsLoaded = false;
-
-// Try to import descriptors using dynamic import (works in both Node.js and browser)
-const loadDescriptors = async () => {
-  if (descriptorsLoaded) return;
-  
-  try {
-    const descriptors = await import("@polkadot-api/descriptors");
-    polkadot = descriptors.polkadot || {};
-    kusama = descriptors.kusama || {};
-    moonbeam = descriptors.moonbeam || {};
-    bifrost = descriptors.bifrost || {};
-    astar = descriptors.astar || {};
-    descriptorsLoaded = true;
-  } catch (error) {
-    // During development or if descriptors not generated yet, use empty objects
-    console.warn("PAPI descriptors not found. Run 'papi generate' to generate them.");
-    polkadot = {};
-    kusama = {};
-    moonbeam = {};
-    bifrost = {};
-    astar = {};
-    descriptorsLoaded = true;
-  }
-};
+// Import real generated descriptors following PAPI documentation pattern
+import { polkadot, kusama, moonbeam, bifrost, astar } from "@polkadot-api/descriptors"
 
 // Type-safe mapping of chain keys to descriptors
-const CHAIN_DESCRIPTORS = {
+const CHAIN_DESCRIPTORS: Record<string, any> = {
   polkadot,
   kusama, 
   moonbeam,
@@ -61,10 +36,7 @@ type SupportedChainKey = keyof typeof CHAIN_DESCRIPTORS
  * @param chainKey - The chain identifier
  * @returns The chain descriptor for use with PAPI v1.14+ getTypedApi()
  */
-export async function getDescriptorForChain(chainKey: string) {
-  // Ensure descriptors are loaded before returning
-  await loadDescriptors();
-  
+export function getDescriptorForChain(chainKey: string): any {
   const key = chainKey as SupportedChainKey
   if (key in CHAIN_DESCRIPTORS) {
     return CHAIN_DESCRIPTORS[key]
@@ -81,8 +53,8 @@ export async function getDescriptorForChain(chainKey: string) {
  * @param chainKey - The chain identifier  
  * @returns Typed API with all chain-specific types and methods
  */
-export async function getTypedApiForChain(client: any, chainKey: string) {
-  const descriptor = await getDescriptorForChain(chainKey)
+export function getTypedApiForChain(client: any, chainKey: string): any {
+  const descriptor = getDescriptorForChain(chainKey)
   return client.getTypedApi(descriptor)
 }
 
