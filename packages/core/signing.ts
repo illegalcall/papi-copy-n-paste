@@ -4,7 +4,6 @@ import {
   entropyToMiniSecret,
   mnemonicToEntropy,
 } from "@polkadot-labs/hdkd-helpers"
-import { getPolkadotSigner } from "polkadot-api/signer"
 
 export interface SignerInfo {
   name: string
@@ -44,16 +43,35 @@ export function createTestAccountSigner(account: TestAccount): SignerInfo {
     console.log('hdkdKeyPair keys:', Object.keys(hdkdKeyPair))
     console.log('hdkdKeyPair.sign type:', typeof hdkdKeyPair.sign)
 
-    // Create the Polkadot signer
-    const polkadotSigner = getPolkadotSigner(
-      hdkdKeyPair.publicKey,
-      "Sr25519",
-      (input: Uint8Array) => hdkdKeyPair.sign(input),
-    )
+    // Create a PAPI-compatible signer object
+    const papiSigner = {
+      publicKey: hdkdKeyPair.publicKey,
+      // PAPI v1.14+ expects a signer with these methods
+      sign: async (payload: Uint8Array) => {
+        return hdkdKeyPair.sign(payload)
+      },
+      // For PAPI transactions, we need to provide the raw signing function
+      signTx: async (tx: any) => {
+        // PAPI expects the signer to handle the transaction signing
+        // The transaction object should have the encoded call data
+        if (tx && tx.encodedCall) {
+          const signature = hdkdKeyPair.sign(tx.encodedCall)
+          return {
+            signature,
+            publicKey: hdkdKeyPair.publicKey
+          }
+        } else {
+          throw new Error('Transaction object missing encodedCall data')
+        }
+      },
+      signBytes: async (bytes: Uint8Array) => {
+        return hdkdKeyPair.sign(bytes)
+      }
+    }
 
-    console.log('polkadotSigner keys:', Object.keys(polkadotSigner))
-    console.log('polkadotSigner.signTx type:', typeof polkadotSigner.signTx)
-    console.log('polkadotSigner.publicKey type:', typeof polkadotSigner.publicKey)
+    console.log('papiSigner keys:', Object.keys(papiSigner))
+    console.log('papiSigner.signTx type:', typeof papiSigner.signTx)
+    console.log('papiSigner.publicKey type:', typeof papiSigner.publicKey)
 
     // Generate a readable address (this is a simplified version)
     // In a real implementation, you'd use proper SS58 encoding
@@ -64,7 +82,7 @@ export function createTestAccountSigner(account: TestAccount): SignerInfo {
     return {
       name: account,
       address,
-      signer: polkadotSigner
+      signer: papiSigner
     }
   } catch (error) {
     console.error(`Failed to create signer for ${account}:`, error)

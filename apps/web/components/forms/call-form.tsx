@@ -229,8 +229,10 @@ function mapTypeToZodSchema(type: string): { zodType: z.ZodTypeAny; defaultValue
       return { zodType: z.number().min(0), defaultValue: 0 }
     
     case 'string':
-    case 'accountid':
       return { zodType: z.string().min(1), defaultValue: '' }
+    
+    case 'accountid':
+      return { zodType: z.string().min(1), defaultValue: '//Bob' }
     
     case 'enum':
       return { 
