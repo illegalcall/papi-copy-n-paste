@@ -7,7 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@workspace/ui/components/checkbox"
 import { Badge } from "@workspace/ui/components/badge"
 import { Label } from "@workspace/ui/components/label"
+// import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@workspace/ui/components/tooltip"
 import { PalletCall } from "@workspace/core"
+import { HelpCircle, Info } from "lucide-react"
 
 interface SimpleCallFormProps {
   pallet: string
@@ -55,15 +57,31 @@ export function SimpleCallForm({ pallet, call, onFormChange, onValidChange }: Si
   const renderField = (arg: { name: string; type: string }) => {
     const fieldType = parseSimpleType(arg.type)
     const value = formData[arg.name] || ''
+    const paramInfo = getParameterEducation(arg.name, arg.type)
 
     return (
       <div key={arg.name} className="space-y-2">
         <Label className="flex items-center gap-2">
-          {arg.name}
-          <Badge variant="outline" className="text-xs">
-            {arg.type}
-          </Badge>
+          <div className="flex items-center gap-1">
+            {arg.name}
+            <div 
+              className="cursor-help" 
+              title={`${paramInfo.description}${paramInfo.tipForBeginners ? ' - ' + paramInfo.tipForBeginners : ''}`}
+            >
+              <HelpCircle className="h-3 w-3 text-muted-foreground" />
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
+            <Badge variant="outline" className="text-xs">
+              {arg.type}
+            </Badge>
+          </div>
         </Label>
+        
+        {/* Parameter help text */}
+        <div className="text-xs text-muted-foreground">
+          {paramInfo.description}
+        </div>
         
         {fieldType === 'bool' && (
           <div className="flex items-center space-x-2">
@@ -76,35 +94,68 @@ export function SimpleCallForm({ pallet, call, onFormChange, onValidChange }: Si
         )}
         
         {fieldType === 'number' && (
-          <Input
-            type="number"
-            value={value}
-            onChange={(e) => handleFieldChange(arg.name, Number(e.target.value) || 0)}
-            placeholder={`Enter ${arg.name}`}
-          />
+          <div className="space-y-1">
+            <Input
+              type="number"
+              value={value}
+              onChange={(e) => handleFieldChange(arg.name, Number(e.target.value) || 0)}
+              placeholder={`Enter ${arg.name}${paramInfo.examples[0] ? ` (e.g., ${paramInfo.examples[0]})` : ''}`}
+            />
+            {arg.name === 'value' || arg.name === 'amount' ? (
+              <p className="text-xs text-muted-foreground">
+                💡 Value in planck units. 1 DOT = 10,000,000,000 planck
+                {value > 0 && ` (≈ ${(Number(value) / 10000000000).toFixed(4)} DOT)`}
+              </p>
+            ) : null}
+          </div>
         )}
         
         {fieldType === 'account' && (
-          <Select value={value} onValueChange={(val) => handleFieldChange(arg.name, val)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select account" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="//Alice">Alice (//Alice)</SelectItem>
-              <SelectItem value="//Bob">Bob (//Bob)</SelectItem>
-              <SelectItem value="//Charlie">Charlie (//Charlie)</SelectItem>
-              <SelectItem value="//Dave">Dave (//Dave)</SelectItem>
-              <SelectItem value="//Eve">Eve (//Eve)</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="space-y-1">
+            <Select value={value} onValueChange={(val) => handleFieldChange(arg.name, val)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select test account" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="//Alice">Alice (5GrwvaEF...)</SelectItem>
+                <SelectItem value="//Bob">Bob (5FHneW46...)</SelectItem>
+                <SelectItem value="//Charlie">Charlie (5FLSigC9...)</SelectItem>
+                <SelectItem value="//Dave">Dave (5DAAnrj7...)</SelectItem>
+                <SelectItem value="//Eve">Eve (5HGjWAeF...)</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              💡 Test accounts for development. Use real addresses in production.
+            </p>
+          </div>
         )}
         
         {fieldType === 'string' && (
-          <Input
-            value={value}
-            onChange={(e) => handleFieldChange(arg.name, e.target.value)}
-            placeholder={`Enter ${arg.name}`}
-          />
+          <div className="space-y-1">
+            <Input
+              value={value}
+              onChange={(e) => handleFieldChange(arg.name, e.target.value)}
+              placeholder={`Enter ${arg.name}${paramInfo.examples[0] ? ` (e.g., ${paramInfo.examples[0]})` : ''}`}
+            />
+            {arg.name === 'remark' && (
+              <p className="text-xs text-muted-foreground">
+                💡 Text stored permanently on-chain. Keep it concise to save fees.
+              </p>
+            )}
+          </div>
+        )}
+        
+        {/* Common mistakes warning */}
+        {paramInfo.commonMistakes.length > 0 && value && (
+          <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded border-l-2 border-amber-200">
+            <div className="flex items-start gap-1">
+              <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Watch out for:</p>
+                <p>{paramInfo.commonMistakes[0]}</p>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     )
@@ -151,3 +202,54 @@ function getDefaultValue(type: string): any {
     default: return ''
   }
 }
+
+function getParameterEducation(paramName: string, paramType: string) {
+  const paramEducation: Record<string, {
+    description: string
+    examples: string[]
+    commonMistakes: string[]
+    tipForBeginners?: string
+  }> = {
+    dest: {
+      description: 'Destination account address - where you want to send tokens',
+      examples: ['//Alice', '//Bob', '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'],
+      commonMistakes: ['Using invalid address format', 'Sending to wrong address'],
+      tipForBeginners: 'Always verify the destination address before sending!'
+    },
+    value: {
+      description: 'Amount in planck units (10^10 planck = 1 DOT)',
+      examples: ['10000000000', '5000000000', '100000000000'],
+      commonMistakes: ['Using wrong decimal places', 'Sending more than balance'],
+      tipForBeginners: 'DOT has 10 decimal places. 1 DOT = 10,000,000,000 planck'
+    },
+    amount: {
+      description: 'Quantity for the operation in planck units',
+      examples: ['10000000000', '5000000000'],
+      commonMistakes: ['Wrong units', 'Amount exceeds balance'],
+      tipForBeginners: 'Check minimum requirements for this operation'
+    },
+    who: {
+      description: 'Target account to perform the action on',
+      examples: ['//Alice', '//Bob'],
+      commonMistakes: ['No permission to act on account', 'Account doesn\'t exist']
+    },
+    target: {
+      description: 'Target account, value, or object for the operation',
+      examples: ['//Validator', 'targetAddress'],
+      commonMistakes: ['Target doesn\'t exist', 'No permission']
+    },
+    remark: {
+      description: 'Text data to store permanently on the blockchain',
+      examples: ['"Hello World"', '"Transaction memo"'],
+      commonMistakes: ['Storing sensitive data', 'Too much text (expensive)'],
+      tipForBeginners: 'Keep it short - you pay for storage!'
+    }
+  }
+
+  return paramEducation[paramName] || {
+    description: `Parameter of type ${paramType}`,
+    examples: [],
+    commonMistakes: ['Incorrect parameter format']
+  }
+}
+

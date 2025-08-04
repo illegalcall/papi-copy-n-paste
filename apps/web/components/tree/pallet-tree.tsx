@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronRight, ChevronDown, Package, Zap, Database, Calendar, Badge } from "lucide-react"
+import { ChevronRight, ChevronDown, Package, Zap, Database, Calendar } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
+import { Badge } from "@workspace/ui/components/badge"
 import { PalletInfo, PalletCall } from "@workspace/core"
 
 interface PalletTreeProps {
@@ -18,6 +19,7 @@ export function PalletTree({ pallets, searchQuery, onCallSelect, onStorageSelect
   // Start with essential pallets expanded for better UX and scrollable content
   const [expandedPallets, setExpandedPallets] = useState<Set<string>>(new Set(['System', 'Balances', 'Timestamp']))
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['System-calls', 'Balances-calls', 'Timestamp-calls']))
+
 
   const filteredPallets = pallets.filter(pallet => {
     if (!searchQuery) return true
@@ -88,7 +90,7 @@ export function PalletTree({ pallets, searchQuery, onCallSelect, onStorageSelect
             </span>
           </Button>
 
-          {expandedPallets.has(pallet.name) && (
+            {expandedPallets.has(pallet.name) && (
             <div className="ml-4 space-y-1">
               {/* Calls Section */}
               {pallet.calls.length > 0 && (

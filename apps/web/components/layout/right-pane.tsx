@@ -34,47 +34,58 @@ export function RightPane({
   }, [activeTab])
 
   const getSetupCommands = (chainKey: string): { commands: string[], description: string } => {
-    const chainConfigs: Record<string, { wsUrl: string; description: string }> = {
+    const chainConfigs: Record<string, { wellKnown?: string; wsUrl?: string; description: string; keyName: string }> = {
       polkadot: {
-        wsUrl: "wss://rpc.polkadot.io",
-        description: "Polkadot mainnet"
+        wellKnown: "polkadot",
+        description: "Polkadot mainnet",
+        keyName: "dot"
       },
       kusama: {
-        wsUrl: "wss://kusama-rpc.polkadot.io",
-        description: "Kusama network"
+        wellKnown: "ksmcc3",
+        description: "Kusama network",
+        keyName: "kusama"
       },
       moonbeam: {
-        wsUrl: "wss://wss.api.moonbeam.network",
-        description: "Moonbeam parachain"
+        wellKnown: "moonbeam",
+        description: "Moonbeam parachain",
+        keyName: "moonbeam"
       },
       bifrost: {
         wsUrl: "wss://hk.p.bifrost-rpc.liebi.com/ws",
-        description: "Bifrost parachain"
+        description: "Bifrost parachain",
+        keyName: "bifrost"
       },
       astar: {
-        wsUrl: "wss://rpc.astar.network",
-        description: "Astar parachain"
+        wellKnown: "astar",
+        description: "Astar parachain",
+        keyName: "astar"
       },
       acala: {
-        wsUrl: "wss://acala-rpc.dwellir.com",
-        description: "Acala parachain"
+        wellKnown: "acala",
+        description: "Acala parachain",
+        keyName: "acala"
       },
       hydration: {
         wsUrl: "wss://rpc.hydration.cloud",
-        description: "Hydration parachain"
+        description: "Hydration parachain",
+        keyName: "hydration"
       }
     }
     
     const config = chainConfigs[chainKey] || chainConfigs.polkadot
     
+    const addCommand = config?.wellKnown 
+      ? `papi add ${config.keyName} -n ${config.wellKnown}`
+      : `papi add ${config.keyName} --wsUrl ${config.wsUrl!}`
+    
     return {
       commands: [
         "npm install -g polkadot-api",
-        `papi add ${chainKey} --wsUrl ${config!.wsUrl}`,
+        addCommand,
         "papi generate",
         "npm install"
       ],
-      description: config!.description
+      description: config.description
     }
   }
 
@@ -85,6 +96,16 @@ export function RightPane({
     } catch (err) {
       console.error('Failed to copy code:', err)
       // Fallback: show toast anyway to indicate attempt was made
+      setShowToast(true)
+    }
+  }
+
+  const handleCopyCommand = async (command: string) => {
+    try {
+      await navigator.clipboard.writeText(command)
+      setShowToast(true)
+    } catch (err) {
+      console.error('Failed to copy command:', err)
       setShowToast(true)
     }
   }
@@ -141,11 +162,19 @@ export function RightPane({
                     Run these commands in your project to use the generated code:
                   </div>
                   
-                  <div className="space-y-2">
+                  <div className="bg-muted/50 border rounded-lg p-4 space-y-2">
                     {getSetupCommands(selectedChain).commands.map((command, index) => (
-                      <div key={index} className="font-mono text-sm bg-muted p-3 rounded-md flex items-center gap-2">
-                        <span className="text-muted-foreground select-none">$</span>
-                        <span className="text-foreground">{command}</span>
+                      <div key={index} className="group flex items-center gap-2 hover:bg-muted/70 p-2 rounded-md transition-colors">
+                        <span className="text-muted-foreground select-none font-mono text-xs">$</span>
+                        <span className="font-mono text-sm text-foreground flex-1">{command}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
+                          onClick={() => handleCopyCommand(command)}
+                        >
+                          <Copy className="w-3 h-3" />
+                        </Button>
                       </div>
                     ))}
                   </div>

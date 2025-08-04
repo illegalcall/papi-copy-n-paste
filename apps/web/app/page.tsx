@@ -233,6 +233,8 @@ export default function Page() {
     setConsoleOutput([])
   }
 
+
+
   return (
     <div className="h-screen flex flex-col">
       <Header 
@@ -253,7 +255,7 @@ export default function Page() {
         </div>
 
         {/* Desktop layout */}
-        <div className="hidden lg:grid lg:grid-cols-[320px_400px_1fr] flex-1 overflow-hidden">
+        <div className="hidden lg:grid flex-1 overflow-hidden lg:grid-cols-[320px_400px_1fr]">
           <LeftPane 
             isOpen={true} 
             onClose={() => {}} 
@@ -625,12 +627,94 @@ queryStorage().catch(console.error)`
 }
 
 function generateCodeSnippet(chainKey: string, pallet: string, call: PalletCall, formData: Record<string, any>): string {
+  // Use educational template based on user preference or default to beginner
+  const template = getCodeTemplate()
+  
+  if (template === 'beginner') {
+    return generateBeginnerCodeSnippet(chainKey, pallet, call, formData)
+  } else if (template === 'intermediate') {
+    return generateIntermediateCodeSnippet(chainKey, pallet, call, formData)
+  } else {
+    return generateProductionCodeSnippet(chainKey, pallet, call, formData)
+  }
+}
+
+function getCodeTemplate(): 'beginner' | 'intermediate' | 'production' {
+  // For now, default to beginner to match our learning-first approach
+  // This could be user configurable in the future
+  return 'beginner'
+}
+
+function generateBeginnerCodeSnippet(chainKey: string, pallet: string, call: PalletCall, formData: Record<string, any>): string {
   const args = call.args.map(arg => {
     const value = formData[arg.name] || ''
+    const paramDescription = getParameterDescription(arg.name, arg.type)
     
     // Handle MultiAddress types properly for dest/target fields
     if (arg.name === 'dest' || arg.name === 'target' || arg.type.includes('MultiAddress')) {
-      // If it's a named account like //Alice, //Bob, convert to proper SS58 address
+      if (typeof value === 'string' && value.startsWith('//')) {
+        const accountMap: Record<string, string> = {
+          '//Alice': '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
+          '//Bob': '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
+          '//Charlie': '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
+        }
+        const address = accountMap[value] || accountMap['//Alice']
+        return `    ${arg.name}: MultiAddress.Id("${address}"), // ${value} - ${paramDescription}`
+      }
+      else if (typeof value === 'string' && value.length > 40) {
+        return `    ${arg.name}: MultiAddress.Id("${value}") // ${paramDescription}`
+      }
+      else {
+        return `    ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY") // //Alice - ${paramDescription}`
+      }
+    }
+    
+    // Handle BigInt values properly
+    if (arg.type.includes('u128') || arg.type.includes('u64') || arg.name === 'value' || arg.name === 'amount') {
+      const numValue = typeof value === 'string' ? value : String(value || '0')
+      const dotValue = parseFloat(numValue) / Math.pow(10, 10) // Convert planck to DOT
+      return `    ${arg.name}: ${numValue}n, // ${dotValue} DOT - ${paramDescription}`
+    }
+    
+    return `    ${arg.name}: ${JSON.stringify(value)}, // ${paramDescription}`
+  }).join('\n')
+
+  const descriptorImport = getDescriptorImport(chainKey)
+  const descriptorName = getDescriptorName(chainKey)
+  const { imports, connection, cleanup } = getChainConnection(chainKey)
+
+  return `import { createClient } from "polkadot-api"
+${imports}
+${descriptorImport}
+
+async function main() {
+${connection}
+  const typedApi = client.getTypedApi(${descriptorName})
+  
+  const call = typedApi.tx.${pallet}.${call.name}({
+${args || '    // No parameters needed'}
+  })
+  
+  // Preview the call
+  console.log("Transaction preview:", JSON.stringify(call.decodedCall, (_key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  ))
+  
+  // To submit the transaction:
+  // const signer = yourWallet // Replace with your actual wallet/signer
+  // const hash = await call.signAndSubmit(signer)
+  // console.log("Transaction submitted:", hash)
+  ${cleanup || ''}
+}
+
+main().catch(console.error)`
+}
+
+function generateIntermediateCodeSnippet(chainKey: string, pallet: string, call: PalletCall, formData: Record<string, any>): string {
+  const args = call.args.map(arg => {
+    const value = formData[arg.name] || ''
+    
+    if (arg.name === 'dest' || arg.name === 'target' || arg.type.includes('MultiAddress')) {
       if (typeof value === 'string' && value.startsWith('//')) {
         const accountMap: Record<string, string> = {
           '//Alice': '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
@@ -640,23 +724,16 @@ function generateCodeSnippet(chainKey: string, pallet: string, call: PalletCall,
         const address = accountMap[value] || accountMap['//Alice']
         return `  ${arg.name}: MultiAddress.Id("${address}"), // ${value}`
       }
-      // If it's already a valid SS58 address, use it directly
       else if (typeof value === 'string' && value.length > 40) {
         return `  ${arg.name}: MultiAddress.Id("${value}")`
       }
-      // Default to Alice for empty values
       else {
         return `  ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY") // //Alice`
       }
     }
     
-    // Handle BigInt values properly
     if (arg.type.includes('u128') || arg.type.includes('u64') || arg.name === 'value' || arg.name === 'amount') {
       const numValue = typeof value === 'string' ? value : String(value || '0')
-      // Add 'n' suffix for BigInt if it's a large number
-      if (numValue && !numValue.includes('n') && (parseInt(numValue) > Number.MAX_SAFE_INTEGER || numValue.length > 10)) {
-        return `  ${arg.name}: ${numValue}n`
-      }
       return `  ${arg.name}: ${numValue}n`
     }
     
@@ -671,30 +748,102 @@ function generateCodeSnippet(chainKey: string, pallet: string, call: PalletCall,
 ${imports}
 ${descriptorImport}
 
-async function main() {
+async function ${pallet.toLowerCase()}Transaction() {
 ${connection}
   const typedApi = client.getTypedApi(${descriptorName})
   
+  // Create ${pallet}.${call.name} transaction
   const call = typedApi.tx.${pallet}.${call.name}({${args ? '\n' + args + '\n' : ''}})
   
-  // For testing purposes, just create the call (don't actually submit)
   console.log("Call created:", JSON.stringify(call.decodedCall, (_key, value) =>
     typeof value === 'bigint' ? value.toString() : value
-  ));
+  ))
   
-  // To actually submit, you would need a proper signer:
-  // const hash = await call.signAndSubmit(yourSigner)
-  // console.log("Transaction hash:", hash)${cleanup || ''}
+  // Submit with proper signer
+  // const hash = await call.signAndSubmit(signer)
+  // return hash${cleanup || ''}
 }
 
-main().catch(console.error)`
+${pallet.toLowerCase()}Transaction().catch(console.error)`
+}
+
+function generateProductionCodeSnippet(chainKey: string, pallet: string, call: PalletCall, formData: Record<string, any>): string {
+  const args = call.args.map(arg => {
+    const value = formData[arg.name] || ''
+    
+    if (arg.name === 'dest' || arg.name === 'target' || arg.type.includes('MultiAddress')) {
+      if (typeof value === 'string' && value.startsWith('//')) {
+        const accountMap: Record<string, string> = {
+          '//Alice': '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
+          '//Bob': '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
+          '//Charlie': '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
+        }
+        const address = accountMap[value] || accountMap['//Alice']
+        return `  ${arg.name}: MultiAddress.Id("${address}")`
+      }
+      else if (typeof value === 'string' && value.length > 40) {
+        return `  ${arg.name}: MultiAddress.Id("${value}")`
+      }
+      else {
+        return `  ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`
+      }
+    }
+    
+    if (arg.type.includes('u128') || arg.type.includes('u64') || arg.name === 'value' || arg.name === 'amount') {
+      const numValue = typeof value === 'string' ? value : String(value || '0')
+      return `  ${arg.name}: ${numValue}n`
+    }
+    
+    return `  ${arg.name}: ${JSON.stringify(value)}`
+  }).join(',\n')
+
+  const descriptorImport = getDescriptorImport(chainKey)
+  const descriptorName = getDescriptorName(chainKey)
+  const { imports, connection, cleanup } = getChainConnection(chainKey)
+
+  return `import { createClient } from "polkadot-api"
+${imports}
+${descriptorImport}
+
+export async function execute${pallet}${call.name}(signer: any) {
+  try {
+${connection}
+    const typedApi = client.getTypedApi(${descriptorName})
+    
+    const call = typedApi.tx.${pallet}.${call.name}({${args ? '\n' + args + '\n' : ''}})
+    const hash = await call.signAndSubmit(signer)
+    
+    return { success: true, hash }
+  } catch (error) {
+    return { success: false, error: error.message }
+  }${cleanup || ''}
+}
+`
+}
+
+function getParameterDescription(paramName: string, paramType: string): string {
+  const descriptions: Record<string, string> = {
+    dest: 'destination account address',
+    value: 'amount in planck units (10^10 planck = 1 DOT)',
+    who: 'target account to perform action on',
+    amount: 'quantity for the operation',
+    target: 'target account or value',
+    index: 'position or identifier',
+    id: 'unique identifier',
+    owner: 'account that owns the resource',
+    beneficiary: 'account that receives benefits',
+    validator: 'validator account for staking',
+    nominator: 'nominator account for staking',
+    remark: 'text data to store on-chain'
+  }
+  
+  return descriptions[paramName] || `parameter of type ${paramType}`
 }
 
 function generateMultiMethodCode(
   chainKey: string, 
   methodQueue: Array<{ pallet: string; call: PalletCall; formData: Record<string, any>; id: string }>
 ): string {
-  const setupCommands = getSetupCommands(chainKey)
   const descriptorImport = getDescriptorImport(chainKey)
   const descriptorName = getDescriptorName(chainKey)
   const { imports, connection, cleanup } = getChainConnection(chainKey)
@@ -747,10 +896,7 @@ function generateMultiMethodCode(
   }`
   }).join('\n')
 
-  return `// SETUP REQUIRED: Run these commands in your project:
-${setupCommands}
-
-import { createClient } from "polkadot-api"
+  return `import { createClient } from "polkadot-api"
 ${imports}
 ${descriptorImport}
 
