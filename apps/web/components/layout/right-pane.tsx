@@ -115,6 +115,34 @@ export function RightPane({
   }
 
   const renderConsoleLine = (line: string) => {
+    // Check if line contains transaction hex
+    const txHexMatch = line.match(/> 🔗 Transaction hex: (0x[a-fA-F0-9]+)/)
+    if (txHexMatch && txHexMatch[1]) {
+      const fullHex = txHexMatch[1]
+      const trimmedHex = fullHex.length > 20 ? `${fullHex.slice(0, 10)}...${fullHex.slice(-10)}` : fullHex
+      
+      return (
+        <div className="flex items-center gap-2 group">
+          <span className="text-green-400">🔗 Transaction hex:</span>
+          <code className="text-yellow-400 font-mono text-xs bg-muted/50 px-2 py-1 rounded">
+            {trimmedHex}
+          </code>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
+            onClick={() => {
+              navigator.clipboard.writeText(fullHex)
+              setShowToast(true)
+            }}
+            title="Copy full transaction hex"
+          >
+            <Copy className="w-3 h-3" />
+          </Button>
+        </div>
+      )
+    }
+    
     // Check if line contains a URL (starting with http)
     const urlRegex = /(https?:\/\/[^\s]+)/g
     const parts = line.split(urlRegex)
