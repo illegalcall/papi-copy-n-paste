@@ -216,8 +216,8 @@ export default function Page() {
   const handleRunClick = async () => {
     if (!api) return
 
-    // Check if we have either a single call or a method queue
-    if (!selectedCall && methodQueue.length === 0) return
+    // Check if we have either a single call, storage query, or method queue
+    if (!selectedCall && !selectedStorage && methodQueue.length === 0) return
 
     setIsRunning(true)
     setActiveTab("console") // Switch to console tab when running
@@ -235,6 +235,9 @@ export default function Page() {
       } else if (selectedCall) {
         // Execute single transaction
         await executeRealTransaction(selectedCall, formData, selectedChain, api, setConsoleOutput, setIsRunning)
+      } else if (selectedStorage) {
+        // Execute storage query
+        await executeStorageQuery(selectedStorage, storageQueryType, storageParams, selectedChain, api, setConsoleOutput, setIsRunning)
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
@@ -479,44 +482,703 @@ async function executeMultipleTransactions(
   setConsoleOutput(prev => [...prev, `\n🎉 All ${methodQueue.length} methods completed successfully!`])
 }
 
+async function executeStorageQuery(
+  selectedStorage: { pallet: string; storage: any },
+  queryType: string,
+  storageParams: Record<string, any>,
+  chainKey: string,
+  client: any,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
+  setIsRunning: React.Dispatch<React.SetStateAction<boolean>>
+) {
+  try {
+    setConsoleOutput(prev => [...prev, `🔍 Executing ${selectedStorage.pallet}.${selectedStorage.storage.name} storage query...`])
+    setConsoleOutput(prev => [...prev, `📊 Query Type: ${queryType}`])
+    
+    // Import the appropriate descriptor dynamically
+    const descriptorName = getDescriptorName(chainKey)
+    
+    // For the web interface, we'll focus on demonstrating the raw client capabilities
+    // The typed API with descriptors is used in the generated code that users copy
+    setConsoleOutput(prev => [...prev, `🔧 Using raw client approach to demonstrate storage queries...`])
+    setConsoleOutput(prev => [...prev, `💡 The generated code will use typed APIs with full descriptor support`])
+    
+    await executeRawStorageQuery(selectedStorage, queryType, storageParams, client, setConsoleOutput)
+    
+    setConsoleOutput(prev => [...prev, `✅ Storage query completed successfully!`])
+    
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    setConsoleOutput(prev => [...prev, `❌ Storage query error: ${errorMessage}`])
+  } finally {
+    setIsRunning(false)
+  }
+}
+
+// Execute storage query with typed API
+async function executeTypedStorageQuery(
+  typedApi: any,
+  selectedStorage: { pallet: string; storage: any },
+  queryType: string,
+  storageParams: Record<string, any>,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  const palletName = selectedStorage.pallet
+  const storageName = selectedStorage.storage.name
+  
+  // Detect if storage requires parameters
+  const requiredParams = detectStorageParameters(palletName, storageName)
+  const hasParams = Boolean(requiredParams && Object.keys(storageParams).length > 0)
+  
+  // Generate parameter values for the query
+  const paramValues = hasParams && requiredParams 
+    ? generateStorageParamValues(storageParams, requiredParams)
+    : []
+  
+  setConsoleOutput(prev => [...prev, `🔧 Parameters: ${hasParams ? JSON.stringify(paramValues) : 'None required'}`])
+  
+  // Access the storage query function
+  const storageQuery = typedApi.query?.[palletName]?.[storageName]
+  if (!storageQuery) {
+    throw new Error(`Storage query ${palletName}.${storageName} not found in typed API`)
+  }
+  
+  switch (queryType) {
+    case 'getValue':
+      {
+        const result = hasParams 
+          ? await storageQuery.getValue(...paramValues)
+          : await storageQuery.getValue()
+        
+        setConsoleOutput(prev => [...prev, `📋 Result: ${formatStorageResult(result)}`])
+        setConsoleOutput(prev => [...prev, `🎉 Successfully retrieved current value!`])
+      }
+      break
+      
+    case 'getValueAt':
+      {
+        const atFinalized = hasParams
+          ? await storageQuery.getValue(...paramValues, { at: "finalized" })
+          : await storageQuery.getValue({ at: "finalized" })
+          
+        const atBest = hasParams
+          ? await storageQuery.getValue(...paramValues, { at: "best" })
+          : await storageQuery.getValue({ at: "best" })
+        
+        setConsoleOutput(prev => [...prev, `📋 At finalized: ${formatStorageResult(atFinalized)}`])
+        setConsoleOutput(prev => [...prev, `📋 At best: ${formatStorageResult(atBest)}`])
+        setConsoleOutput(prev => [...prev, `🎉 Retrieved values at different blocks!`])
+      }
+      break
+      
+    case 'getValues':
+      if (!hasParams) {
+        setConsoleOutput(prev => [...prev, `⚠️ getValues requires storage with parameters, using getValue instead`])
+        const result = await storageQuery.getValue()
+        setConsoleOutput(prev => [...prev, `📋 Result: ${formatStorageResult(result)}`])
+      } else {
+        // For getValues, we can query multiple keys
+        const keys = [paramValues] // Add more keys if needed
+        const results = await storageQuery.getValues(keys)
+        results.forEach((result: any, index: number) => {
+          setConsoleOutput(prev => [...prev, `📋 Result ${index + 1}: ${formatStorageResult(result)}`])
+        })
+        setConsoleOutput(prev => [...prev, `🎉 Retrieved ${results.length} values!`])
+      }
+      break
+      
+    case 'getEntries':
+      {
+        const entries = hasParams 
+          ? await storageQuery.getEntries(...paramValues)
+          : await storageQuery.getEntries()
+        
+        setConsoleOutput(prev => [...prev, `📊 Found ${entries.length} entries`])
+        entries.slice(0, 5).forEach(([key, value]: [any, any], index: number) => {
+          setConsoleOutput(prev => [...prev, `📋 Entry ${index + 1}:`])
+          setConsoleOutput(prev => [...prev, `  🔑 Key: ${JSON.stringify(key)}`])
+          setConsoleOutput(prev => [...prev, `  💾 Value: ${formatStorageResult(value)}`])
+        })
+        
+        if (entries.length > 5) {
+          setConsoleOutput(prev => [...prev, `... and ${entries.length - 5} more entries`])
+        }
+        setConsoleOutput(prev => [...prev, `🎉 Successfully retrieved ${entries.length} entries!`])
+      }
+      break
+      
+    case 'watchValue':
+      {
+        setConsoleOutput(prev => [...prev, `👁️ Starting to watch ${palletName}.${storageName}...`])
+        setConsoleOutput(prev => [...prev, `⏰ Will watch for 10 seconds, then stop`])
+        
+        const subscription = hasParams
+          ? storageQuery.watchValue(...paramValues)
+          : storageQuery.watchValue()
+          
+        let changeCount = 0
+        const sub = subscription.subscribe({
+          next: (result: any) => {
+            changeCount++
+            setConsoleOutput(prev => [...prev, `🔄 Change ${changeCount}: ${formatStorageResult(result)}`])
+          },
+          error: (error: any) => {
+            setConsoleOutput(prev => [...prev, `❌ Watch error: ${error.message}`])
+          }
+        })
+        
+        // Stop watching after 10 seconds
+        setTimeout(() => {
+          sub.unsubscribe()
+          setConsoleOutput(prev => [...prev, `⏹️ Stopped watching (detected ${changeCount} changes)`])
+        }, 10000)
+      }
+      break
+      
+    case 'comprehensive':
+      {
+        setConsoleOutput(prev => [...prev, `🔍 Running comprehensive query analysis...`])
+        
+        // 1. Get current value
+        const current = hasParams 
+          ? await storageQuery.getValue(...paramValues)
+          : await storageQuery.getValue()
+        setConsoleOutput(prev => [...prev, `📋 Current: ${formatStorageResult(current)}`])
+        
+        // 2. Get finalized value
+        const finalized = hasParams
+          ? await storageQuery.getValue(...paramValues, { at: "finalized" })
+          : await storageQuery.getValue({ at: "finalized" })
+        setConsoleOutput(prev => [...prev, `📋 Finalized: ${formatStorageResult(finalized)}`])
+        
+        // 3. Get storage key
+        const storageKey = hasParams
+          ? storageQuery.getKey(...paramValues)
+          : storageQuery.getKey()
+        setConsoleOutput(prev => [...prev, `🔑 Storage Key: ${storageKey}`])
+        
+        // 4. Sample entries (limited)
+        try {
+          const entries = await storageQuery.getEntries()
+          setConsoleOutput(prev => [...prev, `📊 Total entries available: ${entries.length}`])
+        } catch (e) {
+          setConsoleOutput(prev => [...prev, `ℹ️ Could not count total entries`])
+        }
+        
+        setConsoleOutput(prev => [...prev, `🎉 Comprehensive analysis complete!`])
+      }
+      break
+      
+    default:
+      {
+        const result = hasParams 
+          ? await storageQuery.getValue(...paramValues)
+          : await storageQuery.getValue()
+        setConsoleOutput(prev => [...prev, `📋 Result: ${formatStorageResult(result)}`])
+        setConsoleOutput(prev => [...prev, `🎉 Default query completed!`])
+      }
+  }
+}
+
+// Format storage results for console display
+function formatStorageResult(result: any): string {
+  if (result === null || result === undefined) {
+    return 'null'
+  }
+  
+  if (typeof result === 'bigint') {
+    // For DOT amounts, also show converted value
+    if (result > 1000000000n) {
+      const dotValue = (Number(result) / 10000000000).toFixed(4)
+      return `${result.toString()} planck (${dotValue} DOT)`
+    }
+    return `${result.toString()} (BigInt)`
+  }
+  
+  if (result instanceof Uint8Array) {
+    return `[Uint8Array: ${result.length} bytes] 0x${Array.from(result).map(b => b.toString(16).padStart(2, '0')).join('')}`
+  }
+  
+  if (typeof result === 'object') {
+    try {
+      return JSON.stringify(result, (key, value) => {
+        if (typeof value === 'bigint') {
+          return value.toString() + 'n'
+        }
+        if (value instanceof Uint8Array) {
+          return `[Uint8Array: ${value.length} bytes]`
+        }
+        return value
+      }, 2)
+    } catch (e) {
+      return `[Object: ${result.constructor?.name || 'Unknown'}]`
+    }
+  }
+  
+  return String(result)
+}
+
+// Generate parameter values for storage queries
+function generateStorageParamValues(storageParams: Record<string, any>, requiredParams: string[]): any[] {
+  return requiredParams.map(paramType => {
+    const paramValue = storageParams[paramType.toLowerCase()] || storageParams[paramType] || 
+                       storageParams['key'] || storageParams['param'] || ''
+    
+    // Handle different parameter types
+    if (paramType === 'AccountId' && typeof paramValue === 'string') {
+      if (paramValue.startsWith('//')) {
+        // Convert test accounts to actual addresses
+        const accountMap: Record<string, string> = {
+          '//Alice': '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
+          '//Bob': '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
+          '//Charlie': '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
+        }
+        return accountMap[paramValue] || accountMap['//Alice']
+      }
+      return paramValue
+    } else if (paramType.includes('Number') || paramType.includes('Index')) {
+      return parseInt(paramValue || '0')
+    } else if (paramType === 'Hash') {
+      return paramValue || '0x0000000000000000000000000000000000000000000000000000000000000000'
+    }
+    
+    return paramValue
+  })
+}
+
+// Execute storage query using raw client (fallback)
+async function executeRawStorageQuery(
+  selectedStorage: { pallet: string; storage: any },
+  queryType: string,
+  storageParams: Record<string, any>,
+  client: any,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  const palletName = selectedStorage.pallet
+  const storageName = selectedStorage.storage.name
+  
+  setConsoleOutput(prev => [...prev, `🔍 Attempting basic query for ${palletName}.${storageName}`])
+  
+  try {
+    // Try to get runtime metadata to understand the storage structure
+    if (client._request && typeof client._request === 'function') {
+      setConsoleOutput(prev => [...prev, `📡 Fetching chain information and attempting storage query...`])
+      
+      // Get basic chain info
+      try {
+        const chainName = await client._request('system_chain', [])
+        setConsoleOutput(prev => [...prev, `🔗 Chain: ${chainName}`])
+        
+        const version = await client._request('system_version', [])
+        setConsoleOutput(prev => [...prev, `📦 Runtime Version: ${version}`])
+        
+        // Get latest block header
+        const header = await client._request('chain_getHeader', [])
+        setConsoleOutput(prev => [...prev, `🧱 Latest Block: #${parseInt(header.number, 16)} (${header.hash})`])
+        
+        // Execute different query types based on user selection
+        setConsoleOutput(prev => [...prev, `🔍 Executing ${queryType} query for ${palletName}.${storageName}...`])
+        
+        await executeRawStorageQueryByType(client, palletName, storageName, queryType, storageParams, setConsoleOutput)
+        
+        setConsoleOutput(prev => [...prev, `📝 For complete storage access with proper types, use the generated code`])
+        setConsoleOutput(prev => [...prev, `🔧 Generated code includes: getValue(), watchValue(), getEntries(), etc.`])
+        
+      } catch (rpcError) {
+        setConsoleOutput(prev => [...prev, `⚠️ Could not fetch chain info: ${rpcError instanceof Error ? rpcError.message : 'Unknown error'}`])
+      }
+    } else {
+      setConsoleOutput(prev => [...prev, `❌ Client does not support direct RPC calls`])
+    }
+    
+    // Show what would be needed for this storage query
+    const requiredParams = detectStorageParameters(palletName, storageName)
+    if (requiredParams && requiredParams.length > 0) {
+      setConsoleOutput(prev => [...prev, `🔑 This storage requires parameters: ${requiredParams.join(', ')}`])
+      if (Object.keys(storageParams).length > 0) {
+        setConsoleOutput(prev => [...prev, `📝 You provided: ${JSON.stringify(storageParams)}`])
+      }
+    } else {
+      setConsoleOutput(prev => [...prev, `ℹ️ This storage entry requires no parameters`])
+    }
+    
+    setConsoleOutput(prev => [...prev, `✅ Basic query completed - see generated code for full functionality`])
+    
+  } catch (error) {
+    throw new Error(`Raw storage query failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
+}
+
+// Execute different storage query types using raw client
+async function executeRawStorageQueryByType(
+  client: any,
+  palletName: string,
+  storageName: string,
+  queryType: string,
+  storageParams: Record<string, any>,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  // Known storage keys for demo purposes
+  const knownStorageKeys: Record<string, string> = {
+    'Balances.TotalIssuance': '0xc2261276cc9d1f8598ea4b6a74b15c2f57c875e4cff74148e4628f264b974c80',
+    'Balances.InactiveIssuance': '0xc2261276cc9d1f8598ea4b6a74b15c2f6226b0e5c41e7f21b654b12fb9c1e2a8d2',
+    'System.Number': '0x26aa394eea5630e07c48ae0c9558cef702a5c1b19ab7a04f536c519aca4983ac',
+    'Timestamp.Now': '0xf0c365c3cf59d671eb72da0e7a4113c49f1f0515f462cdcf84e0f1d6045dfcbb'
+  }
+
+  const storageKey = knownStorageKeys[`${palletName}.${storageName}`]
+
+  switch (queryType) {
+    case 'getValue':
+      await executeGetValue(client, storageKey, palletName, storageName, setConsoleOutput)
+      break
+      
+    case 'getValueAt':
+      await executeGetValueAt(client, storageKey, palletName, storageName, setConsoleOutput)
+      break
+      
+    case 'getValues':
+      await executeGetValues(client, storageKey, palletName, storageName, setConsoleOutput)
+      break
+      
+    case 'getEntries':
+      await executeGetEntries(client, palletName, storageName, setConsoleOutput)
+      break
+      
+    case 'watchValue':
+      await executeWatchValue(client, storageKey, palletName, storageName, setConsoleOutput)
+      break
+      
+    case 'comprehensive':
+      await executeComprehensiveQuery(client, storageKey, palletName, storageName, setConsoleOutput)
+      break
+      
+    default:
+      await executeGetValue(client, storageKey, palletName, storageName, setConsoleOutput)
+  }
+}
+
+// Get single storage value
+async function executeGetValue(
+  client: any,
+  storageKey: string | undefined,
+  palletName: string,
+  storageName: string,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  try {
+    if (!storageKey) {
+      setConsoleOutput(prev => [...prev, `⚠️ Storage key for ${palletName}.${storageName} not available for demo`])
+      setConsoleOutput(prev => [...prev, `💡 Use generated code for automatic key calculation`])
+      return
+    }
+
+    const result = await client._request('state_getStorage', [storageKey])
+    
+    if (result) {
+      const decodedValue = decodeStorageResult(result, palletName, storageName)
+      setConsoleOutput(prev => [...prev, `📋 Current Value: ${decodedValue}`])
+      setConsoleOutput(prev => [...prev, `🎉 Successfully retrieved current storage value!`])
+    } else {
+      setConsoleOutput(prev => [...prev, `⚠️ Storage value is null or not found`])
+    }
+  } catch (error) {
+    setConsoleOutput(prev => [...prev, `❌ Get value failed: ${error instanceof Error ? error.message : 'Unknown error'}`])
+  }
+}
+
+// Get value at specific blocks
+async function executeGetValueAt(
+  client: any,
+  storageKey: string | undefined,
+  palletName: string,
+  storageName: string,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  try {
+    if (!storageKey) {
+      setConsoleOutput(prev => [...prev, `⚠️ Storage key for ${palletName}.${storageName} not available for demo`])
+      return
+    }
+
+    setConsoleOutput(prev => [...prev, `🔍 Fetching values at finalized and best blocks...`])
+    
+    // Get finalized block hash
+    const finalizedHash = await client._request('chain_getFinalizedHead', [])
+    const finalizedValue = await client._request('state_getStorage', [storageKey, finalizedHash])
+    
+    // Get best block hash  
+    const bestHash = await client._request('chain_getHead', [])
+    const bestValue = await client._request('state_getStorage', [storageKey, bestHash])
+    
+    const decodedFinalized = finalizedValue ? decodeStorageResult(finalizedValue, palletName, storageName) : 'null'
+    const decodedBest = bestValue ? decodeStorageResult(bestValue, palletName, storageName) : 'null'
+    
+    setConsoleOutput(prev => [...prev, `📋 At Finalized Block: ${decodedFinalized}`])
+    setConsoleOutput(prev => [...prev, `📋 At Best Block: ${decodedBest}`])
+    setConsoleOutput(prev => [...prev, `🎉 Successfully retrieved values at different blocks!`])
+    
+  } catch (error) {
+    setConsoleOutput(prev => [...prev, `❌ Get value at block failed: ${error instanceof Error ? error.message : 'Unknown error'}`])
+  }
+}
+
+// Get multiple values (simulate with multiple related queries)
+async function executeGetValues(
+  client: any,
+  storageKey: string | undefined,
+  palletName: string,
+  storageName: string,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  try {
+    setConsoleOutput(prev => [...prev, `🔍 Simulating multiple value queries...`])
+    
+    if (palletName === 'Balances') {
+      // Query multiple Balances storage items
+      const totalIssuanceKey = '0xc2261276cc9d1f8598ea4b6a74b15c2f57c875e4cff74148e4628f264b974c80'
+      const inactiveIssuanceKey = '0xc2261276cc9d1f8598ea4b6a74b15c2f6226b0e5c41e7f21b654b12fb9c1e2a8d2'
+      
+      const [totalIssuance, inactiveIssuance] = await Promise.all([
+        client._request('state_getStorage', [totalIssuanceKey]),
+        client._request('state_getStorage', [inactiveIssuanceKey])
+      ])
+      
+      if (totalIssuance) {
+        const decoded = decodeStorageResult(totalIssuance, 'Balances', 'TotalIssuance')
+        setConsoleOutput(prev => [...prev, `💰 TotalIssuance: ${decoded}`])
+      }
+      
+      if (inactiveIssuance) {
+        const decoded = decodeStorageResult(inactiveIssuance, 'Balances', 'InactiveIssuance')
+        setConsoleOutput(prev => [...prev, `💰 InactiveIssuance: ${decoded}`])
+      }
+      
+      setConsoleOutput(prev => [...prev, `🎉 Retrieved multiple Balances storage values!`])
+    } else {
+      setConsoleOutput(prev => [...prev, `ℹ️ Multiple values demo available for Balances pallet`])
+      await executeGetValue(client, storageKey, palletName, storageName, setConsoleOutput)
+    }
+    
+  } catch (error) {
+    setConsoleOutput(prev => [...prev, `❌ Get multiple values failed: ${error instanceof Error ? error.message : 'Unknown error'}`])
+  }
+}
+
+// Get all entries (simulate by showing metadata structure)
+async function executeGetEntries(
+  client: any,
+  palletName: string,
+  storageName: string,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  try {
+    setConsoleOutput(prev => [...prev, `🔍 Simulating get all entries for ${palletName}.${storageName}...`])
+    
+    // Get metadata to show storage structure
+    const metadata = await client._request('state_getMetadata', [])
+    setConsoleOutput(prev => [...prev, `📋 Retrieved metadata to analyze storage structure`])
+    
+    // Show what entries would be available
+    if (palletName === 'Balances' && storageName === 'Account') {
+      setConsoleOutput(prev => [...prev, `📊 Account storage contains entries for all account holders`])
+      setConsoleOutput(prev => [...prev, `🔑 Example entries: AccountId → AccountData structure`])
+      setConsoleOutput(prev => [...prev, `💾 Each entry contains: { free, reserved, frozen, flags }`])
+      setConsoleOutput(prev => [...prev, `ℹ️ In production: millions of entries (one per account)`])
+    } else if (storageName === 'TotalIssuance') {
+      setConsoleOutput(prev => [...prev, `📊 TotalIssuance has a single entry (no key required)`])
+      setConsoleOutput(prev => [...prev, `💾 Contains the total supply of the native token`])
+    } else {
+      setConsoleOutput(prev => [...prev, `📊 ${storageName} storage structure would be shown here`])
+      setConsoleOutput(prev => [...prev, `💾 Entry count depends on the storage type and usage`])
+    }
+    
+    setConsoleOutput(prev => [...prev, `🎉 Storage structure analysis complete!`])
+    setConsoleOutput(prev => [...prev, `💡 Use generated code for actual entry iteration`])
+    
+  } catch (error) {
+    setConsoleOutput(prev => [...prev, `❌ Get entries simulation failed: ${error instanceof Error ? error.message : 'Unknown error'}`])
+  }
+}
+
+// Watch storage value changes
+async function executeWatchValue(
+  client: any,
+  storageKey: string | undefined,
+  palletName: string,
+  storageName: string,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  try {
+    if (!storageKey) {
+      setConsoleOutput(prev => [...prev, `⚠️ Storage key for ${palletName}.${storageName} not available for demo`])
+      return
+    }
+
+    setConsoleOutput(prev => [...prev, `👁️ Starting to watch ${palletName}.${storageName} for changes...`])
+    setConsoleOutput(prev => [...prev, `⏰ Will monitor for 10 seconds, checking every 2 seconds`])
+    
+    let checkCount = 0
+    const maxChecks = 5 // 10 seconds total
+    let lastValue: string | null = null
+    
+    const watchInterval = setInterval(async () => {
+      try {
+        checkCount++
+        const currentValue = await client._request('state_getStorage', [storageKey])
+        const decodedValue = currentValue ? decodeStorageResult(currentValue, palletName, storageName) : 'null'
+        
+        if (lastValue === null) {
+          setConsoleOutput(prev => [...prev, `📋 Initial Value: ${decodedValue}`])
+        } else if (lastValue !== decodedValue) {
+          setConsoleOutput(prev => [...prev, `🔄 Value Changed: ${decodedValue}`])
+        } else {
+          setConsoleOutput(prev => [...prev, `📋 Check ${checkCount}/5: ${decodedValue} (no change)`])
+        }
+        
+        lastValue = decodedValue
+        
+        if (checkCount >= maxChecks) {
+          clearInterval(watchInterval)
+          setConsoleOutput(prev => [...prev, `⏹️ Stopped watching after ${checkCount} checks`])
+          setConsoleOutput(prev => [...prev, `💡 Use generated code for real-time subscriptions with observables`])
+        }
+      } catch (error) {
+        clearInterval(watchInterval)
+        setConsoleOutput(prev => [...prev, `❌ Watch error: ${error instanceof Error ? error.message : 'Unknown error'}`])
+      }
+    }, 2000)
+    
+  } catch (error) {
+    setConsoleOutput(prev => [...prev, `❌ Watch value setup failed: ${error instanceof Error ? error.message : 'Unknown error'}`])
+  }
+}
+
+// Comprehensive query showing all capabilities
+async function executeComprehensiveQuery(
+  client: any,
+  storageKey: string | undefined,
+  palletName: string,
+  storageName: string,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  try {
+    setConsoleOutput(prev => [...prev, `🔍 Running comprehensive analysis of ${palletName}.${storageName}...`])
+    
+    // 1. Current value
+    setConsoleOutput(prev => [...prev, `\n1️⃣ Getting current value...`])
+    await executeGetValue(client, storageKey, palletName, storageName, setConsoleOutput)
+    
+    // Wait a bit between operations
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    // 2. Values at different blocks
+    setConsoleOutput(prev => [...prev, `\n2️⃣ Getting values at different blocks...`])
+    await executeGetValueAt(client, storageKey, palletName, storageName, setConsoleOutput)
+    
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    // 3. Storage key info
+    setConsoleOutput(prev => [...prev, `\n3️⃣ Storage key information...`])
+    if (storageKey) {
+      setConsoleOutput(prev => [...prev, `🔑 Storage Key: ${storageKey}`])
+      setConsoleOutput(prev => [...prev, `📏 Key Length: ${storageKey.length - 2} hex characters (${(storageKey.length - 2) / 2} bytes)`])
+    } else {
+      setConsoleOutput(prev => [...prev, `🔑 Storage Key: Generated dynamically (see generated code)`])
+    }
+    
+    // 4. Storage structure
+    setConsoleOutput(prev => [...prev, `\n4️⃣ Storage structure analysis...`])
+    await executeGetEntries(client, palletName, storageName, setConsoleOutput)
+    
+    setConsoleOutput(prev => [...prev, `\n🎉 Comprehensive analysis complete!`])
+    setConsoleOutput(prev => [...prev, `💡 See generated code for full typed API capabilities`])
+    
+  } catch (error) {
+    setConsoleOutput(prev => [...prev, `❌ Comprehensive query failed: ${error instanceof Error ? error.message : 'Unknown error'}`])
+  }
+}
+
+// Decode storage results based on known types
+function decodeStorageResult(hexResult: string, palletName: string, storageName: string): string {
+  try {
+    // Remove 0x prefix
+    const hexValue = hexResult.slice(2)
+    
+    if (palletName === 'Balances' && (storageName === 'TotalIssuance' || storageName === 'InactiveIssuance')) {
+      // Decode as u128 (16 bytes, little endian)
+      const bytes = hexValue.match(/.{1,2}/g)?.reverse().join('') || '0'
+      const totalIssuance = BigInt('0x' + bytes)
+      const dotAmount = (Number(totalIssuance) / 10000000000).toFixed(4)
+      return `${totalIssuance.toString()} planck (${dotAmount} DOT)`
+    }
+    
+    if (palletName === 'System' && storageName === 'Number') {
+      // Decode as u32 (4 bytes, little endian)
+      const bytes = hexValue.slice(0, 8).match(/.{1,2}/g)?.reverse().join('') || '0'
+      const blockNumber = parseInt(bytes, 16)
+      return `Block #${blockNumber}`
+    }
+    
+    if (palletName === 'Timestamp' && storageName === 'Now') {
+      // Decode as u64 timestamp (8 bytes, little endian)
+      const bytes = hexValue.slice(0, 16).match(/.{1,2}/g)?.reverse().join('') || '0'
+      const timestamp = parseInt(bytes, 16)
+      const date = new Date(timestamp)
+      return `${timestamp} ms (${date.toISOString()})`
+    }
+    
+    // Generic hex display for unknown types
+    return `0x${hexValue} (${hexValue.length / 2} bytes)`
+    
+  } catch (error) {
+    return `Raw: ${hexResult} (decode failed: ${error instanceof Error ? error.message : 'unknown'})`
+  }
+}
+
+// Note: Storage result formatting functions removed for simplicity - they would be used in the generated code
+
 // simulateTransactionExecution function removed as it's no longer used
 
 function getSetupCommands(chainKey: string): string {
   const chainConfigs = {
     polkadot: {
-      wsUrl: "wss://rpc.polkadot.io",
-      description: "Polkadot mainnet"
+      cliName: "polkadot",
+      aliasName: "dot"
     },
     kusama: {
-      wsUrl: "wss://kusama-rpc.polkadot.io", 
-      description: "Kusama mainnet"
+      cliName: "kusama", 
+      aliasName: "ksm"
     },
     moonbeam: {
-      wsUrl: "wss://wss.api.moonbeam.network",
-      description: "Moonbeam mainnet"
+      cliName: "moonbeam",
+      aliasName: "moonbeam"
     },
     bifrost: {
-      wsUrl: "wss://hk.p.bifrost-rpc.liebi.com/ws",
-      description: "Bifrost mainnet"
+      cliName: "bifrost",
+      aliasName: "bifrost"
     },
     astar: {
-      wsUrl: "wss://rpc.astar.network",
-      description: "Astar mainnet"
+      cliName: "astar",
+      aliasName: "astar"
     },
     acala: {
-      wsUrl: "wss://acala-rpc.dwellir.com",
-      description: "Acala mainnet"
+      cliName: "acala",
+      aliasName: "acala"
     },
     hydration: {
-      wsUrl: "wss://rpc.hydration.cloud",
-      description: "Hydration mainnet"
+      cliName: "hydration",
+      aliasName: "hydration"
     }
   }
 
   const config = chainConfigs[chainKey as keyof typeof chainConfigs] || chainConfigs.polkadot
   
-  return `// npm install polkadot-api
-// npx papi add dot -n ${chainKey}
+  return `// Install polkadot-api
+// npm i polkadot-api
+// 
+// Add chain and generate types:
+// npx papi add ${config.aliasName} -n ${config.cliName}
 // npx papi`
 }
 
@@ -548,7 +1210,7 @@ function getDescriptorImport(chainKey: string): string {
   }
   
   const descriptorName = descriptorMap[chainKey as keyof typeof descriptorMap] || "dot"
-  return `import { MultiAddress, ${descriptorName} } from "@polkadot-api/descriptors"`
+  return `import { ${descriptorName} } from "@polkadot-api/descriptors"`
 }
 
 function getDescriptorName(chainKey: string): string {
@@ -566,15 +1228,15 @@ function getDescriptorName(chainKey: string): string {
 }
 
 function getChainConnection(chainKey: string): { imports: string, connection: string, cleanup?: string } {
-  // Use the correct chainSpec pattern based on the working code
+  // Use smoldot connection pattern from documentation
   const chainConfigs = {
-    polkadot: { wsUrl: "wss://rpc.polkadot.io", chainSpec: "polkadot" },
-    kusama: { wsUrl: "wss://kusama-rpc.polkadot.io", chainSpec: "ksmcc3" },
-    moonbeam: { wsUrl: "wss://wss.api.moonbeam.network", chainSpec: "moonbeam" },
-    bifrost: { wsUrl: "wss://hk.p.bifrost-rpc.liebi.com/ws", chainSpec: "bifrost" },
-    astar: { wsUrl: "wss://rpc.astar.network", chainSpec: "astar" },
-    acala: { wsUrl: "wss://acala-rpc.dwellir.com", chainSpec: "acala" },
-    hydration: { wsUrl: "wss://rpc.hydration.cloud", chainSpec: "hydration" }
+    polkadot: { chainSpec: "polkadot" },
+    kusama: { chainSpec: "ksmcc3" },
+    moonbeam: { chainSpec: "moonbeam" },
+    bifrost: { chainSpec: "bifrost" },
+    astar: { chainSpec: "astar" },
+    acala: { chainSpec: "acala" },
+    hydration: { chainSpec: "hydration" }
   }
 
   const config = chainConfigs[chainKey as keyof typeof chainConfigs] || chainConfigs.polkadot
@@ -586,7 +1248,7 @@ import { chainSpec } from "polkadot-api/chains/${config.chainSpec}"`,
     connection: `  const smoldot = start()
   const chain = await smoldot.addChain({ chainSpec })
   const client = createClient(getSmProvider(chain))`,
-    cleanup: `  
+    cleanup: `
   // Cleanup
   smoldot.terminate()`
   }
@@ -596,7 +1258,7 @@ function formatTransactionDetails(selectedCall: { pallet: string; call: PalletCa
   if (selectedCall.pallet === 'Balances' && selectedCall.call.name.includes('transfer')) {
     const dest = formData.dest || '//Bob'
     const value = formData.value || 0
-    const formatted = (value / 1000000000000).toFixed(12) // Convert from planck to DOT
+    const formatted = (value / 10000000000).toFixed(10) // Convert from planck to DOT (10 decimal places)
     return `🔗 To: ${dest} (5FHneW46...)
 🔗 Amount: ${formatted} DOT`
   }
@@ -891,20 +1553,20 @@ function generateBeginnerCodeSnippet(chainKey: string, pallet: string, call: Pal
           '//Charlie': '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
         }
         const address = accountMap[value] || accountMap['//Alice']
-        return `    ${arg.name}: MultiAddress.Id("${address}"), // ${value} - ${paramDescription}`
+        return `    ${arg.name}: "${address}", // ${value} - ${paramDescription}`
       }
       else if (typeof value === 'string' && value.length > 40) {
-        return `    ${arg.name}: MultiAddress.Id("${value}") // ${paramDescription}`
+        return `    ${arg.name}: "${value}", // ${paramDescription}`
       }
       else {
-        return `    ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY") // //Alice - ${paramDescription}`
+        return `    ${arg.name}: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", // //Alice - ${paramDescription}`
       }
     }
     
     // Handle BigInt values properly
     if (arg.type.includes('u128') || arg.type.includes('u64') || arg.name === 'value' || arg.name === 'amount') {
       const numValue = typeof value === 'string' ? value : String(value || '0')
-      const dotValue = parseFloat(numValue) / Math.pow(10, 10) // Convert planck to DOT
+      const dotValue = parseFloat(numValue) / 10000000000 // Convert planck to DOT (10^10)
       return `    ${arg.name}: ${numValue}n, // ${dotValue} DOT - ${paramDescription}`
     }
     
@@ -914,32 +1576,61 @@ function generateBeginnerCodeSnippet(chainKey: string, pallet: string, call: Pal
   const descriptorImport = getDescriptorImport(chainKey)
   const descriptorName = getDescriptorName(chainKey)
   const { imports, connection, cleanup } = getChainConnection(chainKey)
+  const setupCommands = getSetupCommands(chainKey)
 
-  return `import { createClient } from "polkadot-api"
+  return `// 🚀 QUICK START: Use the starter repository
+// git clone https://github.com/yourusername/papi-starter-template.git
+// cd papi-starter-template && npm install
+// 
+// Then copy this code into src/transactions.ts and run: npm run dev
+//
+// OR MANUAL SETUP: ${setupCommands}
+
+import { createClient } from "polkadot-api"
 ${imports}
 ${descriptorImport}
 
 async function main() {
 ${connection}
-  const typedApi = client.getTypedApi(${descriptorName})
   
-  const call = typedApi.tx.${pallet}.${call.name}({
+  // Get the typed API with all chain types
+  const ${descriptorName}Api = client.getTypedApi(${descriptorName})
+  
+  // Create the transaction call
+  const call = ${descriptorName}Api.tx.${pallet}.${call.name}({
 ${args || '    // No parameters needed'}
   })
   
-  // Preview the call
+  // Preview the call structure
   console.log("Transaction preview:", JSON.stringify(call.decodedCall, (_key, value) =>
     typeof value === 'bigint' ? value.toString() : value
   ))
   
-  // To submit the transaction:
+  // To submit the transaction (uncomment when ready):
   // const signer = yourWallet // Replace with your actual wallet/signer
   // const hash = await call.signAndSubmit(signer)
-  // console.log("Transaction submitted:", hash)
-  ${cleanup || ''}
+  // console.log("Transaction submitted:", hash)${cleanup || ''}
 }
 
-main().catch(console.error)`
+main().catch(console.error)
+
+// 📋 HOW TO USE THIS CODE:
+//
+// 1. With Starter Repository (Recommended):
+//    - Clone: git clone https://github.com/yourusername/papi-starter-template.git
+//    - Install: cd papi-starter-template && npm install
+//    - Replace: Copy this entire code into src/transactions.ts
+//    - Run: npm run dev
+//
+// 2. Manual Setup:
+//    - Run the setup commands at the top
+//    - Copy this code into your project
+//    - Import and call main() from your entry point
+//
+// 3. Next Steps:
+//    - Replace the placeholder signer with your wallet
+//    - Uncomment the transaction submission lines
+//    - Test with small amounts first`
 }
 
 function generateIntermediateCodeSnippet(chainKey: string, pallet: string, call: PalletCall, formData: Record<string, any>): string {

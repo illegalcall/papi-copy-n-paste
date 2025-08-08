@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import { Badge } from "@workspace/ui/components/badge"
@@ -83,12 +83,11 @@ export function StorageForm({
 
   useEffect(() => {
     onParamsChange(localParams)
-  }, [localParams, onParamsChange])
+  }, [localParams]) // Remove onParamsChange from deps to prevent unnecessary re-renders
 
-  const handleParamChange = (paramType: string, value: string) => {
-    const newParams = { ...localParams, [paramType.toLowerCase()]: value }
-    setLocalParams(newParams)
-  }
+  const handleParamChange = useCallback((paramType: string, value: string) => {
+    setLocalParams(prev => ({ ...prev, [paramType.toLowerCase()]: value }))
+  }, [])
 
   const getParameterPlaceholder = (paramType: string) => {
     switch (paramType) {
@@ -175,7 +174,7 @@ export function StorageForm({
 
         {/* Storage Info */}
         <div className="text-xs text-muted-foreground space-y-1">
-          <div><strong>Type:</strong> {storage.type}</div>
+          <div><strong>Type:</strong> {storage.type || 'Unknown'}</div>
           {requiredParams ? (
             <div><strong>Requires Keys:</strong> {requiredParams.join(', ')}</div>
           ) : (
