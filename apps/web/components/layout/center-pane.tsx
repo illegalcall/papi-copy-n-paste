@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@work
 import { Badge } from "@workspace/ui/components/badge"
 import { Play, Square, Plus, X, List } from "lucide-react"
 import { SimpleCallForm } from "@/components/forms/simple-call-form"
+import { StorageForm } from "@/components/forms/storage-form"
 import { PalletCall } from "@workspace/core"
 import { SyntaxHighlighter } from "@/components/code/syntax-highlighter"
 
@@ -28,6 +29,11 @@ interface CenterPaneProps {
   onClearQueue: () => void
   isRunning: boolean
   canRun: boolean
+  // Storage query props
+  storageQueryType?: string
+  storageParams?: Record<string, any>
+  onStorageQueryTypeChange?: (queryType: string) => void
+  onStorageParamsChange?: (params: Record<string, any>) => void
 }
 
 // Enhanced documentation renderer with better formatting and merged code blocks
@@ -287,7 +293,11 @@ export function CenterPane({
   onRemoveFromQueue,
   onClearQueue,
   isRunning,
-  canRun
+  canRun,
+  storageQueryType = 'getValue',
+  storageParams = {},
+  onStorageQueryTypeChange,
+  onStorageParamsChange
 }: CenterPaneProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -371,55 +381,16 @@ export function CenterPane({
           onFormChange={onFormChange}
           onValidChange={onValidChange}
         />
-      ) : selectedStorage ? (
-        <div className="space-y-6">
-          {/* Storage Header */}
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs px-2 py-1">Storage</Badge>
-                <CardTitle className="text-lg font-medium">
-                  {selectedStorage.pallet}.{selectedStorage.storage.name}
-                </CardTitle>
-              </div>
-            </CardHeader>
-          </Card>
-
-          {/* Documentation Section */}
-          {selectedStorage.storage.docs?.length > 0 && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  📖 Documentation
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="max-h-[600px] overflow-y-auto">
-                  {renderDocumentation(selectedStorage.storage.docs)}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-          
-          {/* Success Message */}
-          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-green-100 dark:bg-green-800 rounded-full flex items-center justify-center">
-                  ✅
-                </div>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-green-800 dark:text-green-200">
-                  Storage Query Ready
-                </h4>
-                <p className="text-sm text-green-600 dark:text-green-300">
-                  Storage query code generated! Check the <strong>Code</strong> tab to copy and use it.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+      ) : selectedStorage && onStorageQueryTypeChange && onStorageParamsChange ? (
+        <StorageForm
+          pallet={selectedStorage.pallet}
+          storage={selectedStorage.storage}
+          chainKey={selectedChain}
+          queryType={storageQueryType}
+          storageParams={storageParams}
+          onQueryTypeChange={onStorageQueryTypeChange}
+          onParamsChange={onStorageParamsChange}
+        />
       ) : (
         <Card>
           <CardHeader>
@@ -461,6 +432,19 @@ export function CenterPane({
                 {isRunning ? 'Queue' : 'Add to Queue'}
               </Button>
             </>
+          )}
+          
+          {/* Storage query run */}
+          {selectedStorage && !selectedCall && methodQueue.length === 0 && (
+            <Button 
+              size={isRunning ? "default" : "lg"}
+              disabled={isRunning}
+              onClick={onRunClick}
+              className="min-w-0 flex-shrink"
+            >
+              <Play className="w-4 h-4 mr-2" />
+              {isRunning ? 'Querying...' : 'Run Query'}
+            </Button>
           )}
           
           {/* Multi-method run */}
