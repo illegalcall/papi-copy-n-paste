@@ -114,8 +114,8 @@ export async function fetchMetadata(chainKey: string, client: any): Promise<Chai
 
     // Check if this is our mock client
     if (client.mockClient) {
-      console.log('Mock client detected, returning mock metadata')
-      return createEnhancedMockMetadata(chainKey)
+      console.log('Mock client detected, checking if mock metadata is enabled')
+      return getMockMetadataIfEnabled(chainKey)
     }
 
     // Enhanced client readiness check
@@ -162,13 +162,13 @@ export async function fetchMetadata(chainKey: string, client: any): Promise<Chai
         // Don't retry for Polkadot - fall back immediately
       }
       
-      console.log(`🔄 Using enhanced mock metadata for ${chainKey} to maintain functionality`)
-      return createEnhancedMockMetadata(chainKey)
+      console.log(`🔄 Checking if mock metadata is enabled for ${chainKey}`)
+      return getMockMetadataIfEnabled(chainKey)
     }
 
     if (!rawMetadata) {
       console.warn('No raw metadata returned')
-      return createEnhancedMockMetadata(chainKey)
+      return getMockMetadataIfEnabled(chainKey)
     }
 
     // Ensure rawMetadata is a string
@@ -187,9 +187,52 @@ export async function fetchMetadata(chainKey: string, client: any): Promise<Chai
     return chainMetadata
   } catch (error) {
     console.error(`❌ Error fetching metadata for ${chainKey}:`, error)
-    // Return mock metadata so the app still works
-    console.log(`🆘 Returning enhanced mock metadata for ${chainKey}`)
+    // Check if mock metadata is enabled before returning it
+    console.log(`🆘 Checking if mock metadata is enabled for ${chainKey}`)
+    return getMockMetadataIfEnabled(chainKey)
+  }
+}
+
+// Helper function to check if mock metadata is enabled via environment variable
+function isMockMetadataEnabled(): boolean {
+  // Check environment variable (Next.js public env var)
+  if (typeof process !== 'undefined' && process.env) {
+    const envValue = process.env.NEXT_PUBLIC_ENABLE_MOCK_METADATA
+    if (envValue !== undefined) {
+      return envValue.toLowerCase() === 'true'
+    }
+  }
+  
+  // Check browser environment (in case env var is set via runtime)
+  if (typeof window !== 'undefined' && (window as any).ENV) {
+    const envValue = (window as any).ENV.NEXT_PUBLIC_ENABLE_MOCK_METADATA
+    if (envValue !== undefined) {
+      return envValue.toLowerCase() === 'true'
+    }
+  }
+  
+  // Default to false (mock metadata disabled by default)
+  return false
+}
+
+// Helper function to return mock metadata only if enabled
+function getMockMetadataIfEnabled(chainKey: string): ChainMetadata | null {
+  if (isMockMetadataEnabled()) {
+    console.log(`✅ Mock metadata is enabled, creating enhanced mock for ${chainKey}`)
     return createEnhancedMockMetadata(chainKey)
+  } else {
+    console.log(`❌ Mock metadata is disabled via feature flag for ${chainKey}`)
+    return null
+  }
+}
+
+// Helper function to create empty metadata when mock is disabled
+function createEmptyMetadata(chainKey: string): ChainMetadata {
+  console.log(`📭 Creating empty metadata for ${chainKey} (mock metadata disabled)`)
+  return {
+    pallets: [],
+    chainHash: getChainHash(chainKey),
+    specVersion: getChainSpecVersion(chainKey)
   }
 }
 
@@ -904,9 +947,9 @@ async function parseRawMetadata(rawMetadata: string, chainKey: string): Promise<
     return enhancedMetadata
   } catch (error) {
     console.error('Error parsing raw metadata:', error)
-    console.log('Falling back to enhanced mock metadata')
-    // Fallback to enhanced mock metadata if parsing fails
-    return createEnhancedMockMetadata(chainKey)
+    console.log('Checking if mock metadata fallback is enabled')
+    // Fallback to enhanced mock metadata if parsing fails and it's enabled
+    return getMockMetadataIfEnabled(chainKey) || createEmptyMetadata(chainKey)
   }
 }
 
@@ -970,10 +1013,10 @@ function parseDecodedMetadata(decodedMetadata: any, chainKey: string): ChainMeta
       console.log('Processing metadata v12')
       palletData = metadataVersion.v12.pallets
     } else {
-      console.warn('Unknown metadata version, falling back to enhanced mock')
+      console.warn('Unknown metadata version, checking if mock metadata is enabled')
       console.warn('Available metadata keys:', Object.keys(metadataVersion || {}))
       console.warn('Metadata structure:', JSON.stringify(metadataVersion, null, 2).substring(0, 500))
-      return createEnhancedMockMetadata(chainKey)
+      return getMockMetadataIfEnabled(chainKey) || createEmptyMetadata(chainKey)
     }
 
     console.log(`Found ${palletData.length} pallets in metadata`)
@@ -1022,7 +1065,7 @@ function parseDecodedMetadata(decodedMetadata: any, chainKey: string): ChainMeta
     }
   } catch (error) {
     console.error('Error parsing decoded metadata:', error)
-    return createEnhancedMockMetadata(chainKey)
+    return getMockMetadataIfEnabled(chainKey) || createEmptyMetadata(chainKey)
   }
 }
 

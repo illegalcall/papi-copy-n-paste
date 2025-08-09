@@ -1399,6 +1399,17 @@ function generateStorageQueryByType(queryType: string, pallet: string, storageNa
   const baseQuery = `typedApi.query.${pallet}.${storageName}`
   const params = hasParams ? `(${paramString})` : '()'
   
+  // Add RxJS imports for observable patterns
+  const needsRxJS = ['watchValue', 'watchValueFinalized', 'watchValueBest', 'watchEntries', 'watchEntriesPartial', 
+                     'multiWatch', 'conditionalWatch', 'bufferedWatch', 'errorHandledWatch', 
+                     'distinctWatch', 'throttledWatch', 'comprehensive'].includes(queryType)
+  
+  const rxjsImports = needsRxJS ? `
+  // RxJS imports for observable patterns
+  import { map, filter, catchError, retry, distinctUntilChanged, throttleTime, bufferTime, combineLatest, take } from "rxjs/operators"
+  import { of, throwError } from "rxjs"
+  ` : ''
+  
   switch (queryType) {
     case 'getValue':
       return `  // Get single storage value
@@ -1409,13 +1420,17 @@ function generateStorageQueryByType(queryType: string, pallet: string, storageNa
 
     case 'getValueAt':
       return `  // Get storage value at specific block
-  const result = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "finalized" })
-  console.log("${pallet}.${storageName} at finalized:", JSON.stringify(result, (_key, value) =>
+  const resultFinalized = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "finalized" })
+  const resultBest = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "best" })
+  
+  console.log("${pallet}.${storageName} at finalized:", JSON.stringify(resultFinalized, (_key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  ))
+  console.log("${pallet}.${storageName} at best:", JSON.stringify(resultBest, (_key, value) =>
     typeof value === 'bigint' ? value.toString() : value
   ))
   
-  // You can also query at "best" block or specific block hash:
-  // const atBest = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "best" })
+  // You can also query at specific block hash:
   // const atBlock = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "0x..." })`
 
     case 'getValues':
@@ -1428,93 +1443,362 @@ function generateStorageQueryByType(queryType: string, pallet: string, storageNa
     typeof value === 'bigint' ? value.toString() : value
   ))`
       }
-      return `  // Get multiple storage values with different keys
-  const keys = [
-    ${paramString},
-    // Add more keys here...
-    // "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty", // Bob
-    // "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y"  // Charlie
-  ]
-  
+      return `  // Get multiple values with different keys
+  const keys = [${paramString}, "//Bob", "//Charlie"] // Add more keys as needed
   const results = await ${baseQuery}.getValues(keys)
-  console.log("${pallet}.${storageName} multiple results:")
+  
   results.forEach((result, index) => {
-    console.log(\`Key \${index}:\`, JSON.stringify(result, (_key, value) =>
+    console.log(\`\${keys[index]} result:\`, JSON.stringify(result, (_key, value) =>
       typeof value === 'bigint' ? value.toString() : value
     ))
   })`
 
     case 'getEntries':
-      return `  // Get all storage entries${hasParams ? ' (or entries matching partial keys)' : ''}
+      return `  // Get all storage entries
   const entries = await ${baseQuery}.getEntries()
-  console.log("${pallet}.${storageName} all entries:")
-  entries.forEach(([key, value]) => {
-    console.log("Key:", key)
-    console.log("Value:", JSON.stringify(value, (_key, val) =>
-      typeof val === 'bigint' ? val.toString() : val
-    ))
-    console.log("---")
-  })
   
-  ${hasParams ? `// You can also get entries with partial key matching:
-  // const partialEntries = await ${baseQuery}.getEntries(${paramString})` : ''}`
+  console.log(\`Found \${entries.length} entries in ${pallet}.${storageName}\`)
+  entries.slice(0, 5).forEach(([key, value], index) => {
+    console.log(\`Entry \${index + 1}:\`, {
+      key: JSON.stringify(key),
+      value: JSON.stringify(value, (_key, val) =>
+        typeof val === 'bigint' ? val.toString() : val
+      )
+    })
+  })`
 
     case 'watchValue':
-      return `  // Watch storage value changes (returns Observable)
-  console.log("Watching ${pallet}.${storageName} for changes...")
+      return `${rxjsImports}
+  // Watch storage value changes (Observable)
+  console.log('👁️  Starting to watch ${pallet}.${storageName}...')
   
   const subscription = ${baseQuery}.watchValue${params}.subscribe({
-    next: (result) => {
-      console.log("${pallet}.${storageName} changed:", JSON.stringify(result, (_key, value) =>
+    next: (value) => {
+      console.log(\`[📡 \${new Date().toISOString()}] New value:\`, JSON.stringify(value, (_key, val) =>
+        typeof val === 'bigint' ? val.toString() : val
+      ))
+    },
+    error: (err) => console.error('❌ Watch error:', err),
+    complete: () => console.log('✅ Watch stream completed')
+  })
+  
+  // Cleanup subscription after 15 seconds
+  setTimeout(() => {
+    subscription.unsubscribe()
+    console.log('🔚 Unsubscribed from watch stream')
+  }, 15000)`
+
+    case 'watchValueFinalized':
+      return `${rxjsImports}
+  // Watch storage value changes on finalized blocks only
+  console.log('👁️  Watching ${pallet}.${storageName} on finalized blocks...')
+  
+  const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ', ' : ''}"finalized").subscribe({
+    next: (value) => {
+      console.log(\`[📡 FINALIZED \${new Date().toISOString()}] New value:\`, JSON.stringify(value, (_key, val) =>
+        typeof val === 'bigint' ? val.toString() : val
+      ))
+    },
+    error: (err) => console.error('❌ Finalized watch error:', err)
+  })
+  
+  setTimeout(() => subscription.unsubscribe(), 15000)`
+
+    case 'watchValueBest':
+      return `${rxjsImports}
+  // Watch storage value changes on best (latest) blocks
+  console.log('👁️  Watching ${pallet}.${storageName} on best blocks...')
+  
+  const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ', ' : ''}"best").subscribe({
+    next: (value) => {
+      console.log(\`[📡 BEST \${new Date().toISOString()}] New value:\`, JSON.stringify(value, (_key, val) =>
+        typeof val === 'bigint' ? val.toString() : val
+      ))
+    },
+    error: (err) => console.error('❌ Best block watch error:', err)
+  })
+  
+  setTimeout(() => subscription.unsubscribe(), 15000)`
+
+    case 'watchEntries':
+      return `${rxjsImports}
+  // Watch all storage entries with deltas (changes)
+  console.log('👁️  Watching all entries in ${pallet}.${storageName} with deltas...')
+  
+  const subscription = ${baseQuery}.watchEntries().subscribe({
+    next: ({ block, deltas, entries }) => {
+      console.log(\`[📦 Block #\${block.number}] Entry changes:\`)
+      console.log(\`  • Upserted: \${deltas.upserted?.length || 0} entries\`)
+      console.log(\`  • Deleted: \${deltas.deleted?.length || 0} entries\`)
+      console.log(\`  • Total entries: \${entries.length}\`)
+      
+      // Show first few entries
+      if (entries.length > 0) {
+        entries.slice(0, 3).forEach(([key, value], index) => {
+          console.log(\`    [\${index + 1}] \${JSON.stringify(key)} => \${JSON.stringify(value, (_k, v) => 
+            typeof v === 'bigint' ? v.toString() : v
+          )}\`)
+        })
+      }
+    },
+    error: (err) => console.error('❌ Entries watch error:', err)
+  })
+  
+  setTimeout(() => subscription.unsubscribe(), 20000)`
+
+    case 'multiWatch':
+      return `${rxjsImports}
+  // Combine multiple storage observables
+  console.log('🔗 Combining multiple storage queries...')
+  
+  const combined$ = combineLatest([
+    ${baseQuery}.watchValue${params},
+    typedApi.query.System.Number.watchValue(),
+    typedApi.query.Balances.TotalIssuance.watchValue()
+  ]).pipe(
+    map(([storageValue, blockNumber, totalIssuance]) => ({
+      ${storageName.toLowerCase()}: storageValue,
+      blockNumber,
+      totalIssuance,
+      timestamp: new Date().toISOString()
+    }))
+  )
+  
+  const subscription = combined$.subscribe({
+    next: (combined) => {
+      console.log('🔗 Combined data update:', JSON.stringify(combined, (_key, value) =>
         typeof value === 'bigint' ? value.toString() : value
       ))
     },
-    error: (error) => {
-      console.error("Watch error:", error)
+    error: (err) => console.error('❌ Combined watch error:', err)
+  })
+  
+  setTimeout(() => subscription.unsubscribe(), 20000)`
+
+    case 'conditionalWatch':
+      return `${rxjsImports}
+  // Watch with filtering conditions
+  console.log('🔍 Watching ${pallet}.${storageName} with conditions...')
+  
+  const subscription = ${baseQuery}.watchValue${params}.pipe(
+    filter(value => value != null), // Filter out null values
+    map(value => ({ 
+      value, 
+      timestamp: Date.now(),
+      formatted: JSON.stringify(value, (_k, v) => typeof v === 'bigint' ? v.toString() : v)
+    })),
+    filter(({ value }) => {
+      // Add your custom filtering logic here
+      // Example: only emit if value has changed significantly
+      return true // Customize this condition
+    })
+  ).subscribe({
+    next: (data) => {
+      console.log('🔍 Filtered value update:', data)
     },
-    complete: () => {
-      console.log("Watch complete")
+    error: (err) => console.error('❌ Conditional watch error:', err)
+  })
+  
+  setTimeout(() => subscription.unsubscribe(), 15000)`
+
+    case 'bufferedWatch':
+      return `${rxjsImports}
+  // Buffer updates for performance (collect changes over time)
+  console.log('📦 Buffering ${pallet}.${storageName} updates...')
+  
+  const subscription = ${baseQuery}.watchValue${params}.pipe(
+    bufferTime(3000), // Buffer updates for 3 seconds
+    filter(buffer => buffer.length > 0), // Only emit non-empty buffers
+    map(buffer => ({
+      updates: buffer,
+      count: buffer.length,
+      latest: buffer[buffer.length - 1],
+      timespan: '3 seconds'
+    }))
+  ).subscribe({
+    next: (buffered) => {
+      console.log(\`📦 Buffered \${buffered.count} updates:\`)
+      console.log('Latest value:', JSON.stringify(buffered.latest, (_k, v) => 
+        typeof v === 'bigint' ? v.toString() : v
+      ))
+      console.log('All updates:', buffered.updates.length)
+    },
+    error: (err) => console.error('❌ Buffered watch error:', err)
+  })
+  
+  setTimeout(() => subscription.unsubscribe(), 25000)`
+
+    case 'errorHandledWatch':
+      return `${rxjsImports}
+  // Watch with comprehensive error handling and retry logic
+  console.log('🛡️  Starting resilient watch for ${pallet}.${storageName}...')
+  
+  const subscription = ${baseQuery}.watchValue${params}.pipe(
+    retry(3), // Retry up to 3 times on error
+    catchError(err => {
+      console.error('🚨 Watch failed after retries:', err.message)
+      // Return fallback observable or default value
+      return of(null)
+    }),
+    distinctUntilChanged((prev, curr) => 
+      JSON.stringify(prev) === JSON.stringify(curr)
+    ),
+    map(value => ({
+      value,
+      timestamp: new Date().toISOString(),
+      isValid: value !== null,
+      status: value !== null ? 'success' : 'fallback'
+    }))
+  ).subscribe({
+    next: (data) => {
+      console.log(\`🛡️  [\${data.status.toUpperCase()}] Resilient update:\`, 
+        JSON.stringify(data.value, (_k, v) => typeof v === 'bigint' ? v.toString() : v)
+      )
+    },
+    error: (err) => {
+      // This should rarely happen due to catchError above
+      console.error('❌ Unrecoverable error:', err)
     }
   })
   
-  // Stop watching after 30 seconds (optional)
-  setTimeout(() => {
-    subscription.unsubscribe()
-    console.log("Stopped watching ${pallet}.${storageName}")
-  }, 30000)`
+  setTimeout(() => subscription.unsubscribe(), 20000)`
+
+    case 'distinctWatch':
+      return `${rxjsImports}
+  // Watch with duplicate filtering (only emit when value actually changes)
+  console.log('🔄 Watching ${pallet}.${storageName} for distinct changes...')
+  
+  const subscription = ${baseQuery}.watchValue${params}.pipe(
+    distinctUntilChanged((prev, curr) => {
+      // Custom comparison - you can modify this logic
+      const prevStr = JSON.stringify(prev, (_k, v) => typeof v === 'bigint' ? v.toString() : v)
+      const currStr = JSON.stringify(curr, (_k, v) => typeof v === 'bigint' ? v.toString() : v)
+      return prevStr === currStr
+    }),
+    map(value => ({ 
+      value, 
+      changedAt: new Date().toISOString(),
+      hash: JSON.stringify(value).slice(0, 8) + '...'
+    }))
+  ).subscribe({
+    next: (data) => {
+      console.log(\`🔄 Value changed at \${data.changedAt}:\`, 
+        JSON.stringify(data.value, (_k, v) => typeof v === 'bigint' ? v.toString() : v)
+      )
+    },
+    error: (err) => console.error('❌ Distinct watch error:', err)
+  })
+  
+  setTimeout(() => subscription.unsubscribe(), 15000)`
+
+    case 'throttledWatch':
+      return `${rxjsImports}
+  // Watch with rate limiting (maximum once per second)
+  console.log('⏱️  Watching ${pallet}.${storageName} with throttling...')
+  
+  const subscription = ${baseQuery}.watchValue${params}.pipe(
+    throttleTime(1000), // Maximum one emission per second
+    map(value => ({ 
+      value, 
+      throttledAt: new Date().toISOString(),
+      note: 'Rate limited to 1 update per second'
+    }))
+  ).subscribe({
+    next: (data) => {
+      console.log(\`⏱️  [THROTTLED \${data.throttledAt}] Update:\`, 
+        JSON.stringify(data.value, (_k, v) => typeof v === 'bigint' ? v.toString() : v)
+      )
+    },
+    error: (err) => console.error('❌ Throttled watch error:', err)
+  })
+  
+  setTimeout(() => subscription.unsubscribe(), 15000)`
 
     case 'comprehensive':
-      return `  // Comprehensive storage query example
-  console.log("=== Comprehensive ${pallet}.${storageName} Query ===")
+      return `${rxjsImports}
+  console.log('🎯 === COMPREHENSIVE STORAGE QUERY EXAMPLES ===')
   
-  // 1. Get current value
-  const current = await ${baseQuery}.getValue${params}
-  console.log("Current value:", JSON.stringify(current, (_key, value) =>
-    typeof value === 'bigint' ? value.toString() : value
-  ))
+  // 1. Basic Promise-based queries
+  console.log('\\n📋 1. Basic Promise Queries:')
+  try {
+    const basicValue = await ${baseQuery}.getValue${params}
+    console.log('getValue result:', JSON.stringify(basicValue, (_k, v) => 
+      typeof v === 'bigint' ? v.toString() : v
+    ))
+    
+    const finalizedValue = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "finalized" })
+    console.log('getValue at finalized:', JSON.stringify(finalizedValue, (_k, v) => 
+      typeof v === 'bigint' ? v.toString() : v
+    ))
+  } catch (err) {
+    console.error('Basic query error:', err.message)
+  }
   
-  // 2. Get value at finalized block
-  const finalized = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "finalized" })
-  console.log("Finalized value:", JSON.stringify(finalized, (_key, value) =>
-    typeof value === 'bigint' ? value.toString() : value
-  ))
+  // 2. Observable patterns with error handling
+  console.log('\\n👁️  2. Observable Patterns:')
+  const resilientWatch$ = ${baseQuery}.watchValue${params}.pipe(
+    retry(2),
+    catchError(err => {
+      console.error('Watch failed:', err.message)
+      return of({ error: true, fallback: null })
+    }),
+    distinctUntilChanged(),
+    map(value => ({
+      value,
+      timestamp: new Date().toISOString(),
+      source: 'resilient-watch'
+    }))
+  )
   
-  ${hasParams ? `// 3. Get multiple values (if storage has keys)
-  const multipleKeys = [${paramString}] // Add more keys as needed
-  const multipleResults = await ${baseQuery}.getValues(multipleKeys)
-  console.log("Multiple results:", multipleResults.length)
+  // 3. Multi-storage combination
+  console.log('\\n🔗 3. Combined Storage Queries:')
+  const comprehensive$ = combineLatest([
+    resilientWatch$,
+    typedApi.query.System.Number.watchValue(),
+    typedApi.query.System.Account.watchValue("//Alice").pipe(
+      catchError(() => of({ data: { free: 0n } }))
+    )
+  ]).pipe(
+    map(([storageData, blockNumber, aliceAccount]) => ({
+      ${storageName.toLowerCase()}: storageData,
+      currentBlock: blockNumber,
+      aliceBalance: aliceAccount?.data?.free || 0n,
+      combinedAt: Date.now()
+    })),
+    // Rate limit to avoid spam
+    throttleTime(2000)
+  )
   
-  ` : ''}// ${hasParams ? '4' : '3'}. Get storage key for this query
-  const storageKey = ${baseQuery}.getKey${params}
-  console.log("Storage key:", storageKey)
+  // 4. Subscription with comprehensive logging
+  const subscription = comprehensive$.subscribe({
+    next: (data) => {
+      console.log('🎯 Comprehensive update:', JSON.stringify(data, (_key, value) => {
+        if (typeof value === 'bigint') return value.toString()
+        return value
+      }, 2))
+    },
+    error: (err) => console.error('❌ Comprehensive error:', err),
+    complete: () => console.log('✅ Comprehensive stream completed')
+  })
   
-  // ${hasParams ? '5' : '4'}. Watch for changes (uncomment to enable)
-  // const watcher = ${baseQuery}.watchValue${params}.subscribe(console.log)`
+  // 5. Cleanup and summary
+  setTimeout(() => {
+    subscription.unsubscribe()
+    console.log('\\n🎯 === COMPREHENSIVE EXAMPLE COMPLETED ===')
+    console.log('This example demonstrated:')
+    console.log('  • Basic promise-based queries (getValue, getValue with options)')
+    console.log('  • Observable patterns with error handling and retry logic')
+    console.log('  • Multi-storage combination with combineLatest')
+    console.log('  • Rate limiting and duplicate filtering')
+    console.log('  • Proper subscription cleanup')
+    console.log('\\nFor production use, adapt error handling and cleanup to your needs!')
+  }, 30000)`
 
     default:
-      return `  // Default: Get single storage value
+      return `  // Unknown query type: ${queryType}
+  // Falling back to basic getValue
   const result = await ${baseQuery}.getValue${params}
-  console.log("${pallet}.${storageName}:", JSON.stringify(result, (_key, value) =>
+  console.log("${pallet}.${storageName} result:", JSON.stringify(result, (_key, value) =>
     typeof value === 'bigint' ? value.toString() : value
   ))`
   }
@@ -1578,13 +1862,7 @@ function generateBeginnerCodeSnippet(chainKey: string, pallet: string, call: Pal
   const { imports, connection, cleanup } = getChainConnection(chainKey)
   const setupCommands = getSetupCommands(chainKey)
 
-  return `// 🚀 QUICK START: Use the starter repository
-// git clone https://github.com/yourusername/papi-starter-template.git
-// cd papi-starter-template && npm install
-// 
-// Then copy this code into src/transactions.ts and run: npm run dev
-//
-// OR MANUAL SETUP: ${setupCommands}
+  return `// 🚀 SETUP REQUIRED: ${setupCommands}
 
 import { createClient } from "polkadot-api"
 ${imports}
@@ -1616,18 +1894,12 @@ main().catch(console.error)
 
 // 📋 HOW TO USE THIS CODE:
 //
-// 1. With Starter Repository (Recommended):
-//    - Clone: git clone https://github.com/yourusername/papi-starter-template.git
-//    - Install: cd papi-starter-template && npm install
-//    - Replace: Copy this entire code into src/transactions.ts
-//    - Run: npm run dev
-//
-// 2. Manual Setup:
+// 1. Setup:
 //    - Run the setup commands at the top
 //    - Copy this code into your project
 //    - Import and call main() from your entry point
 //
-// 3. Next Steps:
+// 2. Next Steps:
 //    - Replace the placeholder signer with your wallet
 //    - Uncomment the transaction submission lines
 //    - Test with small amounts first`

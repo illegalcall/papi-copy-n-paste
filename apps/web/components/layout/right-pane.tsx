@@ -306,38 +306,10 @@ export function RightPane({
               {selectedChain ? (
                 <div className="space-y-4">
                   <div className="space-y-4">
-                    {/* Starter Repository Section */}
-                    <div className="bg-blue-50/50 dark:bg-blue-950/30 border border-blue-200/50 dark:border-blue-800/50 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Code className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                        <span className="font-semibold text-blue-800 dark:text-blue-200">Quick Start</span>
-                      </div>
-                      <div className="text-sm text-blue-700 dark:text-blue-300 mb-3">
-                        Use our starter repository to get up and running quickly:
-                      </div>
-                      <div className="bg-white/70 dark:bg-black/30 border rounded-md p-3">
-                        <div className="group flex items-center gap-2 hover:bg-muted/70 p-2 rounded-md transition-colors">
-                          <span className="text-muted-foreground select-none font-mono text-xs">$</span>
-                          <span className="font-mono text-sm text-foreground flex-1">git clone https://github.com/yourusername/papi-starter-template.git</span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
-                            onClick={() => handleCopyCommand("git clone https://github.com/yourusername/papi-starter-template.git")}
-                          >
-                            <Copy className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="text-xs text-blue-600 dark:text-blue-400 mt-2">
-                        💡 Then copy your generated code into the starter project
-                      </div>
-                    </div>
-
-                    {/* Manual Setup Section */}
+                    {/* Setup Commands Section */}
                     <div>
                       <div className="text-sm text-muted-foreground mb-3">
-                        Or run these commands in your existing project:
+                        Run these commands in your project:
                       </div>
                       
                       <div className="bg-muted/50 border rounded-lg p-4 space-y-2">
@@ -365,11 +337,10 @@ export function RightPane({
                   
                   <div className="text-xs text-muted-foreground mt-4 p-3 bg-muted/50 rounded-md space-y-2">
                     <div><strong>Recommended Workflow:</strong></div>
-                    <div>1. Clone the starter repository for instant setup</div>
+                    <div>1. Run the setup commands above in your project</div>
                     <div>2. Configure your transactions using the UI</div>
                     <div>3. Copy the generated code from the Code tab</div>
-                    <div>4. Paste into <code className="text-xs bg-muted px-1 rounded">src/transactions.ts</code> in the starter project</div>
-                    <div>5. Run <code className="text-xs bg-muted px-1 rounded">npm run dev</code> to test!</div>
+                    <div>4. Paste into your project and run it</div>
                   </div>
                 </div>
               ) : (
