@@ -9,7 +9,7 @@ import { Badge } from "@workspace/ui/components/badge"
 import { Label } from "@workspace/ui/components/label"
 // import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@workspace/ui/components/tooltip"
 import { PalletCall } from "@workspace/core"
-import { HelpCircle, Info } from "lucide-react"
+import { HelpCircle, Info, Code2, ChevronDown, ChevronUp } from "lucide-react"
 
 interface SimpleCallFormProps {
   pallet: string
@@ -18,9 +18,155 @@ interface SimpleCallFormProps {
   onValidChange: (isValid: boolean) => void
 }
 
+// Generate expected transaction response structure
+function generateTransactionResponseStructure(pallet: string, callName: string): string {
+  // Get specific response examples based on pallet and call
+  const getTransactionExample = (pallet: string, callName: string): string => {
+    // Common transaction responses based on pallet/call combinations
+    if (pallet === 'Balances' && callName.includes('transfer')) {
+      return `{
+  success: true,
+  txHash: "0x1234567890abcdef...",
+  blockHash: "0xabcdef1234567890...",
+  blockNumber: 12345678,
+  events: [
+    {
+      pallet: "Balances",
+      event: "Transfer",
+      data: {
+        from: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+        to: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
+        amount: 1000000000000n
+      }
+    },
+    {
+      pallet: "System",
+      event: "ExtrinsicSuccess",
+      data: { dispatchInfo: { weight: 195000000, class: "Normal" } }
+    }
+  ],
+  fees: {
+    baseFee: 125000000n,
+    lengthFee: 5000000n,
+    adjustedWeightFee: 1945000n,
+    total: 131945000n
+  }
+}`
+    }
+
+    if (pallet === 'System' && callName === 'remark') {
+      return `{
+  success: true,
+  txHash: "0x9876543210fedcba...",
+  blockHash: "0xfedcba0987654321...",
+  blockNumber: 12345679,
+  events: [
+    {
+      pallet: "System",
+      event: "Remarked",
+      data: {
+        sender: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+        hash: "0x1234567890abcdef..."
+      }
+    },
+    {
+      pallet: "System", 
+      event: "ExtrinsicSuccess",
+      data: { dispatchInfo: { weight: 125000000, class: "Normal" } }
+    }
+  ],
+  fees: {
+    baseFee: 125000000n,
+    lengthFee: 3000000n,
+    adjustedWeightFee: 1250000n,
+    total: 129250000n
+  }
+}`
+    }
+
+    if (pallet === 'Staking') {
+      return `{
+  success: true,
+  txHash: "0xabcd1234efgh5678...",
+  blockHash: "0x5678abcd1234efgh...",
+  blockNumber: 12345680,
+  events: [
+    {
+      pallet: "Staking",
+      event: "${callName === 'bond' ? 'Bonded' : callName === 'unbond' ? 'Unbonded' : 'StakingEvent'}",
+      data: {
+        stash: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+        amount: 10000000000000n
+      }
+    },
+    {
+      pallet: "System",
+      event: "ExtrinsicSuccess", 
+      data: { dispatchInfo: { weight: 500000000, class: "Normal" } }
+    }
+  ],
+  fees: {
+    baseFee: 125000000n,
+    lengthFee: 4000000n,
+    adjustedWeightFee: 5000000n,
+    total: 134000000n
+  }
+}`
+    }
+
+    // Generic transaction response
+    return `{
+  success: true,
+  txHash: "0x1234567890abcdef...",
+  blockHash: "0xabcdef1234567890...",
+  blockNumber: 12345678,
+  events: [
+    {
+      pallet: "${pallet}",
+      event: "OperationCompleted", // Event name varies by operation
+      data: {
+        // Operation-specific data
+      }
+    },
+    {
+      pallet: "System",
+      event: "ExtrinsicSuccess",
+      data: { 
+        dispatchInfo: { 
+          weight: 250000000, 
+          class: "Normal",
+          paysFee: "Yes"
+        } 
+      }
+    }
+  ],
+  fees: {
+    baseFee: 125000000n,      // Base transaction fee
+    lengthFee: 5000000n,      // Fee based on tx size
+    adjustedWeightFee: 2500000n, // Fee based on computational weight
+    total: 132500000n         // Total fees paid
+  }
+}`
+  }
+
+  const example = getTransactionExample(pallet, callName)
+  
+  return `Promise<TransactionResult>\n\n// Example successful response:\n${example}\n\n// Example error response:\n{
+  success: false,
+  error: "InsufficientBalance",
+  txHash: null,
+  events: [],
+  fees: null
+}`
+}
+
 export function SimpleCallForm({ pallet, call, onFormChange, onValidChange }: SimpleCallFormProps) {
   const [formData, setFormData] = useState<Record<string, any>>({})
   const [initialValues, setInitialValues] = useState<Record<string, any>>({})
+  const [showResponseStructure, setShowResponseStructure] = useState(false)
+  
+  // Generate response structure dynamically
+  const responseStructure = generateTransactionResponseStructure(pallet, call.name)
 
   // Initialize form data when call changes
   useEffect(() => {
@@ -164,6 +310,36 @@ export function SimpleCallForm({ pallet, call, onFormChange, onValidChange }: Si
               This call has no parameters
             </div>
           )}
+
+          {/* Transaction Response Structure */}
+          <div className="space-y-2 border-t pt-4">
+            <button
+              type="button"
+              className="flex items-center justify-between w-full p-2 bg-muted/30 rounded-md hover:bg-muted/50 transition-colors"
+              onClick={() => setShowResponseStructure(!showResponseStructure)}
+            >
+              <div className="flex items-center space-x-2">
+                <Code2 className="w-4 h-4" />
+                <span className="text-sm font-medium">Expected Transaction Response</span>
+                <Badge variant="outline" className="text-xs">
+                  Dynamic
+                </Badge>
+              </div>
+              {showResponseStructure ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+            
+            {showResponseStructure && (
+              <div className="bg-muted/20 rounded-md p-3 border border-muted">
+                <pre className="text-xs font-mono text-muted-foreground overflow-x-auto whitespace-pre-wrap">
+                  {responseStructure}
+                </pre>
+                <div className="mt-2 text-xs text-muted-foreground">
+                  <div className="text-blue-600">✨ Generated based on {pallet}.{call.name} transaction type</div>
+                  <div>Includes success/error cases, events, fees, and blockchain data</div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

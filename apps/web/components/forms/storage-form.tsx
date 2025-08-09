@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@work
 import { Badge } from "@workspace/ui/components/badge"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
-import { Database, HelpCircle } from "lucide-react"
+import { Database, HelpCircle, Code2, ChevronDown, ChevronUp } from "lucide-react"
 import { EnhancedQuerySelector } from "./enhanced-query-selector"
 
 interface StorageFormProps {
@@ -97,16 +97,16 @@ function getStorageTypeInfo(chainKey: string, pallet: string, storageName: strin
   
   let result: { returnType: string; paramTypes: string[] }
   
-  // Try to extract from the storage entry if available
-  if (storageEntry) {
-    // Check if the storage entry has type information
-    if (storageEntry.type) {
-      result = parseStorageDescriptorType(storageEntry.type)
-    } else if (storageEntry.signature) {
-      result = parseStorageDescriptorType(storageEntry.signature)
-    } else {
-      // Fallback to simple inference based on common patterns
-      result = inferFromStorageName(pallet, storageName)
+  // Extract from the storage entry - it has a simple 'type' property
+  if (storageEntry && storageEntry.type) {
+    const storageType = storageEntry.type
+    
+    // Determine if this storage requires parameters based on common patterns
+    const paramTypes = determineStorageParameters(pallet, storageName, storageType)
+    
+    result = {
+      returnType: storageType,
+      paramTypes
     }
   } else {
     // Fallback to pattern-based inference
@@ -117,6 +117,60 @@ function getStorageTypeInfo(chainKey: string, pallet: string, storageName: strin
   typeInfoCache.set(cacheKey, result)
   
   return result
+}
+
+// Determine if storage requires parameters based on common patterns
+function determineStorageParameters(pallet: string, storageName: string, storageType: string): string[] {
+  // Common patterns for storage that requires keys
+  const storagePatterns: Record<string, string[]> = {
+    // Account-based storage
+    'Account': ['AccountId'],
+    'Locks': ['AccountId'],
+    'Freezes': ['AccountId'],
+    'Reserves': ['AccountId'],
+    
+    // Block-based storage
+    'BlockHash': ['BlockNumber'],
+    'BlockWeight': ['BlockNumber'],
+    
+    // Staking storage (often requires era and/or validator)
+    'ErasStakers': ['EraIndex', 'AccountId'],
+    'ErasStakersClipped': ['EraIndex', 'AccountId'],
+    'ErasValidatorReward': ['EraIndex'],
+    'ErasRewardPoints': ['EraIndex'],
+    
+    // Democracy/Governance
+    'ReferendumInfoOf': ['ReferendumIndex'],
+    'VotingOf': ['AccountId'],
+    'ProposalOf': ['ProposalIndex'],
+    
+    // Identity
+    'IdentityOf': ['AccountId'],
+    'SuperOf': ['AccountId'],
+    
+    // Assets
+    'Asset': ['AssetId'],
+    'AssetAccount': ['AssetId', 'AccountId']
+  }
+  
+  // Direct match on storage name
+  if (storagePatterns[storageName]) {
+    return storagePatterns[storageName]
+  }
+  
+  // Pattern matching for common suffixes
+  if (storageName.endsWith('Of') && storageName !== 'TotalIssuance') {
+    // Most "...Of" storage entries require a key
+    return ['AccountId']
+  }
+  
+  // Check if the type suggests it needs parameters
+  if (storageType.includes('Map') || storageType.includes('Vec') && storageName.includes('Account')) {
+    return ['AccountId']
+  }
+  
+  // No parameters needed
+  return []
 }
 
 // Simple fallback inference for when no descriptor info is available
@@ -151,6 +205,179 @@ function detectStorageParameters(pallet: string, storageName: string): string[] 
   return getStorageParameters('polkadot', pallet, storageName)
 }
 
+// Generate expected response structure based on storage type and query type
+function generateResponseStructure(
+  returnType: string, 
+  queryType: string, 
+  pallet: string, 
+  storageName: string
+): string {
+  // Get base type examples based on the return type
+  const getTypeExample = (type: string): string => {
+    // Handle Substrate/Polkadot specific types
+    switch (type) {
+      // Primitive numeric types
+      case 'u8':
+      case 'u16':
+      case 'u32':
+        return '12345'
+      case 'u64':
+      case 'u128':
+      case 'BlockNumber':
+        return '1000000000000n'
+      case 'bool':
+      case 'boolean':
+        return 'true'
+      
+      // Hash types
+      case 'Hash':
+      case 'H256':
+        return '"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"'
+      
+      // Account types  
+      case 'AccountId':
+      case 'AccountId32':
+      case 'SS58String':
+        return '"5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"'
+      
+      // Complex account info
+      case 'AccountInfo':
+        return `{
+  nonce: 42,
+  consumers: 0,
+  providers: 1,
+  sufficients: 0,
+  data: {
+    free: 1000000000000n,
+    reserved: 0n,
+    frozen: 0n,
+    flags: 0n
+  }
+}`
+      
+      // Account data (balance info)
+      case 'AccountData':
+        return `{
+  free: 1000000000000n,
+  reserved: 0n,
+  frozen: 0n,
+  flags: 0n
+}`
+      
+      // Vector types
+      case 'Vec<BalanceLock>':
+        return `[
+  {
+    id: "staking",
+    amount: 1000000000000n,
+    reasons: "All"
+  }
+]`
+      
+      // Context-specific examples
+      default:
+        // Try to infer from context
+        if (pallet === 'System' && storageName === 'Number') return '12345678'
+        if (pallet === 'Timestamp' && storageName === 'Now') return '1640995200000'
+        if (pallet === 'Balances' && storageName === 'TotalIssuance') return '21000000000000000000n'
+        if (pallet === 'Balances' && storageName === 'InactiveIssuance') return '500000000000000000n'
+        
+        // Staking-specific types
+        if (pallet === 'Staking' && storageName.includes('Validator')) {
+          return `{
+  commission: {
+    commission: 100000000, // 10%
+    blocked: false
+  },
+  // ... other validator fields
+}`
+        }
+        
+        // Democracy/Governance types
+        if (pallet === 'Democracy' && storageName.includes('Referendum')) {
+          return `{
+  ongoing: {
+    proposal: { /* proposal data */ },
+    threshold: "SuperMajorityApprove", 
+    delay: 28800,
+    tally: {
+      ayes: 1000000000000n,
+      nays: 500000000000n,
+      turnout: 1500000000000n
+    }
+  }
+}`
+        }
+        
+        // Handle Vec types
+        if (type.startsWith('Vec<')) {
+          const innerType = type.slice(4, -1)
+          return `[
+  ${getTypeExample(innerType).split('\n').join('\n  ')},
+  // ... more items
+]`
+        }
+        
+        // Handle Option types
+        if (type.startsWith('Option<')) {
+          const innerType = type.slice(7, -1)
+          return `${getTypeExample(innerType)} // or null`
+        }
+        
+        // Handle Compact types
+        if (type.startsWith('Compact<')) {
+          const innerType = type.slice(8, -1)
+          return getTypeExample(innerType)
+        }
+        
+        // Generic fallback
+        return `{
+  // ${type} structure
+  // Specific fields depend on the runtime definition
+}`
+    }
+  }
+
+  const baseExample = getTypeExample(returnType)
+
+  // Generate response based on query type
+  switch (queryType) {
+    case 'getValue':
+    case 'getValueAt':
+      return `Promise<${returnType}>\n\n// Example response:\n${baseExample}`
+
+    case 'getValues':
+      return `Promise<${returnType}[]>\n\n// Example response:\n[\n  ${baseExample.split('\n').join('\n  ')},\n  ${baseExample.split('\n').join('\n  ')}\n]`
+
+    case 'getEntries':
+      return `Promise<Map<string, ${returnType}>>\n\n// Example response:\nMap {\n  "0x1234..." => ${baseExample.split('\n').join('\n  ')},\n  "0x5678..." => ${baseExample.split('\n').join('\n  ')}\n}`
+
+    case 'watchValue':
+    case 'watchValueFinalized':
+    case 'watchValueBest':
+      return `Observable<${returnType}>\n\n// Stream of values:\n${baseExample}\n// Updates automatically when storage changes`
+
+    case 'watchEntries':
+    case 'watchEntriesPartial':
+      return `Observable<Map<string, ${returnType}>>\n\n// Stream of entry maps:\nMap {\n  "0x1234..." => ${baseExample.split('\n').join('\n  ')}\n}\n// Updates when entries are added/removed/changed`
+
+    case 'multiWatch':
+      return `Observable<Combined>\n\n// Combined observable result:\n{\n  [storageKey]: ${baseExample.split('\n').join('\n  ')},\n  // ... other storage values\n}`
+
+    case 'conditionalWatch':
+      return `Observable<${returnType}>\n\n// Filtered stream:\n${baseExample}\n// Only emits when condition is met`
+
+    case 'throttledWatch':
+      return `Observable<${returnType}>\n\n// Rate-limited stream:\n${baseExample}\n// Throttled to prevent excessive updates`
+
+    case 'comprehensive':
+      return `Multiple Examples\n\n// getValue(): Promise<${returnType}>\n${baseExample}\n\n// watchValue(): Observable<${returnType}>\n// Stream of ${baseExample}\n\n// getEntries(): Promise<Map<string, ${returnType}>>\n// Map of all entries`
+
+    default:
+      return `Promise<${returnType}>\n\n// Example response:\n${baseExample}`
+  }
+}
+
 export function StorageForm({ 
   pallet, 
   storage, 
@@ -161,10 +388,16 @@ export function StorageForm({
   storageParams 
 }: StorageFormProps) {
   const [localParams, setLocalParams] = useState<Record<string, any>>(storageParams)
+  const [showResponseStructure, setShowResponseStructure] = useState(false)
+  
   // Get type information dynamically from storage entry and descriptors
   const typeInfo = getStorageTypeInfo(chainKey, pallet, storage.name, storage)
+  
   const requiredParams = typeInfo.paramTypes.length > 0 ? typeInfo.paramTypes : null
   const actualType = typeInfo.returnType
+  
+  // Generate response structure dynamically
+  const responseStructure = generateResponseStructure(actualType, queryType, pallet, storage.name)
 
   useEffect(() => {
     onParamsChange(localParams)
@@ -246,6 +479,36 @@ export function StorageForm({
             ))}
           </div>
         )}
+
+        {/* Response Structure */}
+        <div className="space-y-2">
+          <button
+            type="button"
+            className="flex items-center justify-between w-full p-2 bg-muted/30 rounded-md hover:bg-muted/50 transition-colors"
+            onClick={() => setShowResponseStructure(!showResponseStructure)}
+          >
+            <div className="flex items-center space-x-2">
+              <Code2 className="w-4 h-4" />
+              <span className="text-sm font-medium">Expected Response Structure</span>
+              <Badge variant="outline" className="text-xs">
+                Dynamic
+              </Badge>
+            </div>
+            {showResponseStructure ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          
+          {showResponseStructure && (
+            <div className="bg-muted/20 rounded-md p-3 border border-muted">
+              <pre className="text-xs font-mono text-muted-foreground overflow-x-auto whitespace-pre-wrap">
+                {responseStructure}
+              </pre>
+              <div className="mt-2 text-xs text-muted-foreground">
+                <div className="text-blue-600">✨ Generated from storage type information and query selection</div>
+                <div>Structure updates automatically when you change query type or storage</div>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Storage Info */}
         <div className="text-xs text-muted-foreground space-y-1">
