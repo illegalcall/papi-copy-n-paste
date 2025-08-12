@@ -1,89 +1,97 @@
 "use client"
 
 import { Button } from "@workspace/ui/components/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
-// Navigation menu imports removed as not currently used
 import { Moon, Sun, Github, BookOpen } from "lucide-react"
 import { useTheme } from "next-themes"
-import { chains } from "@workspace/core"
-import Image from "next/image"
+import { NetworkSelector } from "../network/network-selector"
+import { ProviderSelector } from "../network/provider-selector"
+import { networkConfigs, getDefaultProvider } from "@workspace/core/network-providers"
 
 interface HeaderProps {
   selectedChain: string
-  onChainChange: (chain: string) => void
+  selectedProvider: string
+  onNetworkChange: (chainKey: string, providerId: string) => void
+  isConnecting?: boolean
+  hasError?: boolean
 }
 
-export function Header({ selectedChain, onChainChange }: HeaderProps) {
+export function Header({ 
+  selectedChain, 
+  selectedProvider, 
+  onNetworkChange,
+  isConnecting = false,
+  hasError = false
+}: HeaderProps) {
   const { theme, setTheme } = useTheme()
-  const currentChain = chains.find(chain => chain.key === selectedChain)
+
+  const handleNetworkChange = (chainKey: string) => {
+    // When network changes, auto-select the default provider for that network
+    const network = networkConfigs.find(n => n.chain === chainKey)
+    const defaultProvider = network ? getDefaultProvider(chainKey) : null
+    if (defaultProvider) {
+      onNetworkChange(chainKey, defaultProvider.id)
+    }
+  }
+
+  const handleProviderChange = (providerId: string) => {
+    onNetworkChange(selectedChain, providerId)
+  }
 
   return (
     <header className="flex justify-between items-center px-6 h-12 border-b bg-background">
-      <div className="flex items-center gap-16">
-        <div className="font-bold text-lg">
-          Copy‑n‑Paste PAPI
-        </div>
-
-        <Select value={selectedChain} onValueChange={onChainChange}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Select chain">
-              {currentChain && (
-                <div className="flex items-center gap-2">
-                  <Image
-                    src={currentChain.icon}
-                    alt={`${currentChain.name} icon`}
-                    width={16}
-                    height={16}
-                    className="rounded-full"
-                  />
-                  <span>{currentChain.name}</span>
-                </div>
-              )}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {chains.map((chain) => (
-              <SelectItem key={chain.key} value={chain.key}>
-                <div className="flex items-center gap-2">
-                  <Image
-                    src={chain.icon}
-                    alt={`${chain.name} icon`}
-                    width={16}
-                    height={16}
-                    className="rounded-full"
-                  />
-                  <span>{chain.name}</span>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="font-bold text-lg whitespace-nowrap">
+        Copy‑n‑Paste PAPI
       </div>
 
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-        >
-          <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-        
-        <Button variant="ghost" size="icon" asChild>
-          <a href="https://github.com/polkadot-api/polkadot-api" target="_blank" rel="noopener noreferrer">
-            <Github className="h-4 w-4" />
-            <span className="sr-only">GitHub</span>
-          </a>
-        </Button>
-        
-        <Button variant="ghost" size="icon" asChild>
-          <a href="https://papi.how" target="_blank" rel="noopener noreferrer">
-            <BookOpen className="h-4 w-4" />
-            <span className="sr-only">Documentation</span>
-          </a>
-        </Button>
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground whitespace-nowrap">Network:</span>
+            <NetworkSelector
+              selectedChain={selectedChain}
+              onNetworkChange={handleNetworkChange}
+              disabled={isConnecting}
+            />
+          </div>
+          
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-muted-foreground whitespace-nowrap">Provider:</span>
+            <ProviderSelector
+              selectedChain={selectedChain}
+              selectedProvider={selectedProvider}
+              onProviderChange={handleProviderChange}
+              disabled={isConnecting}
+            />
+          </div>
+        </div>
+
+        <div className="h-4 border-l border-border"></div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+          >
+            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <span className="sr-only">Toggle theme</span>
+          </Button>
+          
+          <Button variant="ghost" size="icon" asChild>
+            <a href="https://github.com/polkadot-api/polkadot-api" target="_blank" rel="noopener noreferrer">
+              <Github className="h-4 w-4" />
+              <span className="sr-only">GitHub</span>
+            </a>
+          </Button>
+          
+          <Button variant="ghost" size="icon" asChild>
+            <a href="https://papi.how" target="_blank" rel="noopener noreferrer">
+              <BookOpen className="h-4 w-4" />
+              <span className="sr-only">Documentation</span>
+            </a>
+          </Button>
+        </div>
       </div>
     </header>
   )

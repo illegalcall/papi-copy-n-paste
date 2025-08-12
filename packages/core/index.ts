@@ -1,4 +1,7 @@
 export * from './client'
+export * from './enhanced-client'
+export * from './network-providers'
+export * from './chopsticks-enhancer'
 export * from './metadata'
 export * from './transactions'
 export * from './signing'

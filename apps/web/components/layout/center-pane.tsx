@@ -20,6 +20,13 @@ interface CenterPaneProps {
     formData: Record<string, any>;
     id: string;
   }>
+  storageQueue: Array<{ 
+    pallet: string; 
+    storage: any; 
+    queryType: string;
+    storageParams: Record<string, any>;
+    id: string;
+  }>
   onFormChange: (formData: Record<string, any>) => void
   onValidChange: (isValid: boolean) => void
   onRunClick: () => void
@@ -27,8 +34,12 @@ interface CenterPaneProps {
   onAddToQueue: () => void
   onRemoveFromQueue: (id: string) => void
   onClearQueue: () => void
+  onAddStorageToQueue: () => void
+  onRemoveStorageFromQueue: (id: string) => void
+  onClearStorageQueue: () => void
   isRunning: boolean
   canRun: boolean
+  canRunStorage: boolean
   // Storage query props
   storageQueryType?: string
   storageParams?: Record<string, any>
@@ -285,6 +296,7 @@ export function CenterPane({
   selectedCall,
   selectedStorage,
   methodQueue,
+  storageQueue,
   onFormChange,
   onValidChange,
   onRunClick,
@@ -292,8 +304,12 @@ export function CenterPane({
   onAddToQueue,
   onRemoveFromQueue,
   onClearQueue,
+  onAddStorageToQueue,
+  onRemoveStorageFromQueue,
+  onClearStorageQueue,
   isRunning,
   canRun,
+  canRunStorage,
   storageQueryType = 'getValue',
   storageParams = {},
   onStorageQueryTypeChange,
@@ -373,6 +389,63 @@ export function CenterPane({
         </Card>
       )}
 
+      {/* Storage Queue Display */}
+      {storageQueue.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <List className="w-5 h-5" />
+                Storage Queue ({storageQueue.length})
+              </CardTitle>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onClearStorageQueue}
+                disabled={isRunning}
+              >
+                Clear All
+              </Button>
+            </div>
+            <CardDescription>
+              Storage queries will be executed sequentially. If any query fails, execution will continue.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {storageQueue.map((query, index) => (
+                <div key={query.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
+                  <div className="flex items-center gap-3">
+                    <Badge variant="outline">{index + 1}</Badge>
+                    <div>
+                      <div className="font-medium">
+                        {query.pallet}.{query.storage.name}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Query Type: {query.queryType}
+                      </div>
+                      {Object.keys(query.storageParams).length > 0 && (
+                        <div className="text-xs text-muted-foreground">
+                          Params: {JSON.stringify(query.storageParams)}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onRemoveStorageFromQueue(query.id)}
+                    disabled={isRunning}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {selectedCall ? (
         <SimpleCallForm
           key={`${selectedCall.pallet}-${selectedCall.call.name}`}
@@ -435,16 +508,28 @@ export function CenterPane({
           )}
           
           {/* Storage query run */}
-          {selectedStorage && !selectedCall && methodQueue.length === 0 && (
-            <Button 
-              size={isRunning ? "default" : "lg"}
-              disabled={isRunning}
-              onClick={onRunClick}
-              className="min-w-0 flex-shrink"
-            >
-              <Play className="w-4 h-4 mr-2" />
-              {isRunning ? 'Querying...' : 'Run Query'}
-            </Button>
+          {selectedStorage && !selectedCall && methodQueue.length === 0 && storageQueue.length === 0 && (
+            <>
+              <Button 
+                size={isRunning ? "default" : "lg"}
+                disabled={isRunning || !canRunStorage}
+                onClick={onRunClick}
+                className="min-w-0 flex-shrink"
+              >
+                <Play className="w-4 h-4 mr-2" />
+                {isRunning ? 'Querying...' : 'Run Query'}
+              </Button>
+              <Button 
+                variant="outline"
+                size={isRunning ? "default" : "lg"}
+                disabled={isRunning || !canRunStorage}
+                onClick={onAddStorageToQueue}
+                className="min-w-0 flex-shrink"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                {isRunning ? 'Queue' : 'Add to Queue'}
+              </Button>
+            </>
           )}
           
           {/* Multi-method run */}
@@ -465,6 +550,33 @@ export function CenterPane({
                   size={isRunning ? "default" : "lg"}
                   disabled={!canRun || isRunning}
                   onClick={onAddToQueue}
+                  className="min-w-0 flex-shrink"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  {isRunning ? 'Add' : 'Add More'}
+                </Button>
+              )}
+            </>
+          )}
+          
+          {/* Multi-storage run */}
+          {storageQueue.length > 0 && (
+            <>
+              <Button 
+                size={isRunning ? "default" : "lg"}
+                disabled={isRunning}
+                onClick={onRunClick}
+                className="min-w-0 flex-shrink"
+              >
+                <Play className="w-4 h-4 mr-2" />
+                {isRunning ? 'Querying...' : `Run Storage Queue (${storageQueue.length})`}
+              </Button>
+              {selectedStorage && (
+                <Button 
+                  variant="outline"
+                  size={isRunning ? "default" : "lg"}
+                  disabled={isRunning || !canRunStorage}
+                  onClick={onAddStorageToQueue}
                   className="min-w-0 flex-shrink"
                 >
                   <Plus className="w-4 h-4 mr-2" />
