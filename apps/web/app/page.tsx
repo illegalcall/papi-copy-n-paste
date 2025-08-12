@@ -160,6 +160,17 @@ export default function Page() {
     clearCode()
   }, [selectedStorage, storageQueryType, storageParams, addToStorageQueue, clearStorageSelection, clearCode])
 
+  // Create wrapped handlers that clear conflicting selections
+  const wrappedHandleCallSelect = useCallback((pallet: string, call: any) => {
+    handleCallSelect(pallet, call)
+    clearStorageSelection() // Clear storage when call is selected
+  }, [handleCallSelect, clearStorageSelection])
+
+  const wrappedHandleStorageSelect = useCallback((pallet: string, storage: any) => {
+    handleStorageSelect(pallet, storage)
+    clearCallSelection() // Clear call when storage is selected
+  }, [handleStorageSelect, clearCallSelection])
+
   // Execution handlers
   const executeCurrentOperation = useCallback(async () => {
     if (!api) return
@@ -234,8 +245,8 @@ export default function Page() {
             pallets={pallets}
             selectedCall={selectedCall ? { pallet: selectedCall.pallet, call: selectedCall.call.name } : undefined}
             selectedStorage={selectedStorage ? { pallet: selectedStorage.pallet, storage: selectedStorage.storage.name } : undefined}
-            onCallSelect={handleCallSelect}
-            onStorageSelect={handleStorageSelect}
+            onCallSelect={wrappedHandleCallSelect}
+            onStorageSelect={wrappedHandleStorageSelect}
             isLoading={isLoadingMetadata}
             error={metadataError}
           />
@@ -251,11 +262,11 @@ export default function Page() {
               selectedCall={selectedCall ? { pallet: selectedCall.pallet, call: selectedCall.call.name } : undefined}
               selectedStorage={selectedStorage ? { pallet: selectedStorage.pallet, storage: selectedStorage.storage.name } : undefined}
               onCallSelect={(pallet, call) => {
-                handleCallSelect(pallet, call)
+                wrappedHandleCallSelect(pallet, call)
                 setLeftPaneOpen(false)
               }}
               onStorageSelect={(pallet, storage) => {
-                handleStorageSelect(pallet, storage)
+                wrappedHandleStorageSelect(pallet, storage)
                 setLeftPaneOpen(false)
               }}
               isLoading={isLoadingMetadata}

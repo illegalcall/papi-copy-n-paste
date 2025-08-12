@@ -598,8 +598,9 @@ export class TransactionExecutor {
       this.addStep(`> Processing transaction with ${formatSignerInfo(transaction.signer)}...`)
 
       // Simulate PAPI's signAndSubmit method with real-time monitoring callback
+      // Since we're using test accounts without real signers, we simulate the signing process
       const result = await transaction.papiTransaction.signAndSubmit(
-        transaction.signer.signer,
+        transaction.signer, // Pass the full signer object for simulation
         (step: string, type?: string) => this.addStep(step, type as any)
       )
 
