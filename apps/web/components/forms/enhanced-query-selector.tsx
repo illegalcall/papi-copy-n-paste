@@ -21,8 +21,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Get single storage value once', 
     useCase: 'Perfect for: One-time checks, transaction validation, balance lookups',
     returnType: 'Promise<T>',
-    performance: '⚡ Fast (~50ms)',
-    icon: '📊'
+    performance: 'Fast (~50ms)',
+    icon: ''
   },
   { 
     value: 'getValueAt', 
@@ -30,8 +30,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Get value at specific block (finalized/best)', 
     useCase: 'Perfect for: Historical data, audit trails, specific block analysis',
     returnType: 'Promise<T>',
-    performance: '⚡ Fast (~80ms)',
-    icon: '🎯'
+    performance: 'Fast (~80ms)',
+    icon: ''
   },
   { 
     value: 'getValues', 
@@ -39,8 +39,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Get multiple values with different keys', 
     useCase: 'Perfect for: Bulk operations, multiple accounts, batch processing',
     returnType: 'Promise<T[]>',
-    performance: '📊 Batch (~100ms)',
-    icon: '📋'
+    performance: 'Batch (~100ms)',
+    icon: ''
   },
   { 
     value: 'getEntries', 
@@ -48,8 +48,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Get all storage entries or partial matches', 
     useCase: 'Perfect for: Data export, analysis tools, complete storage dumps',
     returnType: 'Promise<Map>',
-    performance: '📈 Heavy (500ms+)',
-    icon: '🗃️'
+    performance: 'Heavy (500ms+)',
+    icon: ''
   },
   { 
     value: 'watchValue', 
@@ -57,8 +57,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Monitor value changes in real-time', 
     useCase: 'Perfect for: Dashboards, live displays, real-time balance monitoring',
     returnType: 'Observable<T>',
-    performance: '🔄 Continuous updates',
-    icon: '📡'
+    performance: 'Continuous updates',
+    icon: ''
   },
   { 
     value: 'watchValueFinalized', 
@@ -66,8 +66,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Watch value changes on finalized blocks only', 
     useCase: 'Perfect for: Secure applications, confirmed transactions only',
     returnType: 'Observable<T>',
-    performance: '🔄 Slower but safer',
-    icon: '🔒'
+    performance: 'Slower but safer',
+    icon: ''
   },
   { 
     value: 'watchValueBest', 
@@ -75,8 +75,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Watch value changes on best blocks (faster)', 
     useCase: 'Perfect for: Fast UIs, immediate feedback, pending transactions',
     returnType: 'Observable<T>',
-    performance: '🔄 Fastest updates',
-    icon: '⚡'
+    performance: 'Fastest updates',
+    icon: ''
   },
   { 
     value: 'watchEntries', 
@@ -84,8 +84,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Watch all entries with deltas', 
     useCase: 'Perfect for: Monitoring tools, system analysis, change tracking',
     returnType: 'Observable<Map>',
-    performance: '🔄 Heavy continuous',
-    icon: '🌊'
+    performance: 'Heavy continuous',
+    icon: ''
   },
   { 
     value: 'watchEntriesPartial', 
@@ -93,8 +93,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Watch entries with partial key matching', 
     useCase: 'Perfect for: Filtered monitoring, specific account groups',
     returnType: 'Observable<Map>',
-    performance: '🔄 Moderate load',
-    icon: '🎚️'
+    performance: 'Moderate load',
+    icon: ''
   },
   { 
     value: 'multiWatch', 
@@ -102,8 +102,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Combine multiple storage observables', 
     useCase: 'Perfect for: Complex dashboards, correlated data monitoring',
     returnType: 'Observable<Combined>',
-    performance: '🚀 Advanced patterns',
-    icon: '🔗'
+    performance: 'Advanced patterns',
+    icon: ''
   },
   { 
     value: 'conditionalWatch', 
@@ -111,8 +111,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Watch with filtering and conditions', 
     useCase: 'Perfect for: Conditional logic, filtered updates, smart contracts',
     returnType: 'Observable<T>',
-    performance: '🧠 Intelligent filtering',
-    icon: '🎛️'
+    performance: 'Intelligent filtering',
+    icon: ''
   },
   { 
     value: 'throttledWatch', 
@@ -120,8 +120,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Watch with rate limiting for performance', 
     useCase: 'Perfect for: High-frequency data, performance optimization',
     returnType: 'Observable<T>',
-    performance: '🎯 Rate limited',
-    icon: '⏱️'
+    performance: 'Rate limited',
+    icon: ''
   },
   { 
     value: 'comprehensive', 
@@ -129,8 +129,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     description: 'Complete example with all query types', 
     useCase: 'Perfect for: Learning, reference implementation, full examples',
     returnType: 'Multiple examples',
-    performance: '📚 Educational',
-    icon: '🎓'
+    performance: 'Educational',
+    icon: ''
   }
 ]
 
@@ -179,7 +179,6 @@ export function EnhancedQuerySelector({
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <span className="text-xs">{option.icon}</span>
           <span className="text-xs text-muted-foreground">
             {value === option.value ? '●' : '○'}
           </span>
@@ -220,10 +219,7 @@ export function EnhancedQuerySelector({
         >
           <div className="flex items-center space-x-2">
             {selectedOption && (
-              <>
-                <span>{selectedOption.icon}</span>
-                <span>{selectedOption.label}</span>
-              </>
+              <span>{selectedOption.label}</span>
             )}
           </div>
           {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
