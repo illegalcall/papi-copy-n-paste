@@ -1,41 +1,44 @@
-"use client"
+"use client";
 
-import { Button } from "@workspace/ui/components/button"
-import { Moon, Sun, Github, BookOpen } from "lucide-react"
-import { useTheme } from "next-themes"
-import { NetworkSelector } from "../network/network-selector"
-import { ProviderSelector } from "../network/provider-selector"
-import { networkConfigs, getDefaultProvider } from "@workspace/core/network-providers"
+import { Button } from "@workspace/ui/components/button";
+import { Moon, Sun, Github, BookOpen } from "lucide-react";
+import { useTheme } from "next-themes";
+import { NetworkSelector } from "../network/network-selector";
+import { ProviderSelector } from "../network/provider-selector";
+import {
+  networkConfigs,
+  getDefaultProvider,
+} from "@workspace/core/network-providers";
 
 interface HeaderProps {
-  selectedChain: string
-  selectedProvider: string
-  onNetworkChange: (chainKey: string, providerId: string) => void
-  isConnecting?: boolean
-  hasError?: boolean
+  selectedChain: string;
+  selectedProvider: string;
+  onNetworkChange: (chainKey: string, providerId: string) => void;
+  isConnecting?: boolean;
+  hasError?: boolean;
 }
 
-export function Header({ 
-  selectedChain, 
-  selectedProvider, 
+export function Header({
+  selectedChain,
+  selectedProvider,
   onNetworkChange,
   isConnecting = false,
-  hasError = false
+  hasError = false,
 }: HeaderProps) {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
 
   const handleNetworkChange = (chainKey: string) => {
     // When network changes, auto-select the default provider for that network
-    const network = networkConfigs.find(n => n.chain === chainKey)
-    const defaultProvider = network ? getDefaultProvider(chainKey) : null
+    const network = networkConfigs.find((n) => n.chain === chainKey);
+    const defaultProvider = network ? getDefaultProvider(chainKey) : null;
     if (defaultProvider) {
-      onNetworkChange(chainKey, defaultProvider.id)
+      onNetworkChange(chainKey, defaultProvider.id);
     }
-  }
+  };
 
   const handleProviderChange = (providerId: string) => {
-    onNetworkChange(selectedChain, providerId)
-  }
+    onNetworkChange(selectedChain, providerId);
+  };
 
   return (
     <header className="flex justify-between items-center px-6 h-12 border-b bg-background">
@@ -46,16 +49,20 @@ export function Header({
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
-            <span className="text-xs text-muted-foreground whitespace-nowrap">Network:</span>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">
+              Network:
+            </span>
             <NetworkSelector
               selectedChain={selectedChain}
               onNetworkChange={handleNetworkChange}
               disabled={isConnecting}
             />
           </div>
-          
+
           <div className="flex items-center gap-1">
-            <span className="text-xs text-muted-foreground whitespace-nowrap">Provider:</span>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">
+              Provider:
+            </span>
             <ProviderSelector
               selectedChain={selectedChain}
               selectedProvider={selectedProvider}
@@ -77,16 +84,24 @@ export function Header({
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             <span className="sr-only">Toggle theme</span>
           </Button>
-          
+
           <Button variant="ghost" size="icon" asChild>
-            <a href="https://github.com/polkadot-api/polkadot-api" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://github.com/polkadot-api/polkadot-api"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Github className="h-4 w-4" />
               <span className="sr-only">GitHub</span>
             </a>
           </Button>
-          
+
           <Button variant="ghost" size="icon" asChild>
-            <a href="https://papi.how" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://papi.how"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <BookOpen className="h-4 w-4" />
               <span className="sr-only">Documentation</span>
             </a>
@@ -94,5 +109,5 @@ export function Header({
         </div>
       </div>
     </header>
-  )
+  );
 }

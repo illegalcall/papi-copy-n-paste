@@ -11,6 +11,7 @@ npx create-papi-app my-app
 ## Usage
 
 ### Interactive Mode
+
 Run without arguments for interactive project setup:
 
 ```bash
@@ -18,6 +19,7 @@ npx create-papi-app
 ```
 
 ### Direct Creation
+
 Specify all options directly:
 
 ```bash
@@ -28,7 +30,7 @@ npx create-papi-app my-app --template vite-react --chain polkadot
 
 - **minimal** - Minimal setup for learning and experimentation
 - **vite-react** - React + Vite with modern UI (Recommended)
-- **next-app** - Next.js with App Router  
+- **next-app** - Next.js with App Router
 - **node-cli** - Command-line application with PAPI
 
 ## Options
@@ -63,7 +65,7 @@ npx create-papi-app my-app --yes
 All templates include:
 
 - ✅ **Latest PAPI** - Polkadot API v1.16+ with proper setup
-- ✅ **TypeScript** - Full TypeScript support with proper configurations  
+- ✅ **TypeScript** - Full TypeScript support with proper configurations
 - ✅ **Chain Configuration** - Pre-configured for multiple networks
 - ✅ **PAPI Descriptors** - Automatic descriptor generation
 - ✅ **Example Code** - Working examples and documentation (optional)

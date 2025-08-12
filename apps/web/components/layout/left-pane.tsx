@@ -1,26 +1,35 @@
-"use client"
+"use client";
 
-// import { ScrollArea } from "@workspace/ui/components/scroll-area" // Replaced with native CSS scrolling
-import { Input } from "@workspace/ui/components/input"
-import { Search } from "lucide-react"
-import { useState } from "react"
-import { PalletTree } from "@/components/tree/pallet-tree"
-import { PalletInfo, PalletCall } from "@workspace/core"
+import { Input } from "@workspace/ui/components/input";
+import { Search } from "lucide-react";
+import { useState } from "react";
+import { PalletTree } from "@/components/tree/pallet-tree";
+import { PalletInfo, PalletCall } from "@workspace/core";
 
 interface LeftPaneProps {
-  isOpen: boolean
-  onClose: () => void
-  pallets: PalletInfo[]
-  onCallSelect: (pallet: string, call: PalletCall) => void
-  onStorageSelect: (pallet: string, storage: any) => void
-  selectedCall?: { pallet: string; call: string }
-  selectedStorage?: { pallet: string; storage: string }
-  isLoading?: boolean
-  error?: string | null
+  isOpen: boolean;
+  onClose: () => void;
+  pallets: PalletInfo[];
+  onCallSelect: (pallet: string, call: PalletCall) => void;
+  onStorageSelect: (pallet: string, storage: any) => void;
+  selectedCall?: { pallet: string; call: string };
+  selectedStorage?: { pallet: string; storage: string };
+  isLoading?: boolean;
+  error?: string | null;
 }
 
-export function LeftPane({ isOpen, onClose, pallets, onCallSelect, onStorageSelect, selectedCall, selectedStorage, isLoading = false, error = null }: LeftPaneProps) {
-  const [searchQuery, setSearchQuery] = useState("")
+export function LeftPane({
+  isOpen,
+  onClose,
+  pallets,
+  onCallSelect,
+  onStorageSelect,
+  selectedCall,
+  selectedStorage,
+  isLoading = false,
+  error = null,
+}: LeftPaneProps) {
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <div className="w-full h-full bg-muted/40 border-r flex flex-col">
@@ -35,7 +44,7 @@ export function LeftPane({ isOpen, onClose, pallets, onCallSelect, onStorageSele
           />
         </div>
       </div>
-      
+
       {/* Scrollable content area - uses native CSS scrolling with overscroll containment */}
       <div className="flex-1 min-h-0 max-h-[calc(100vh-120px)] overflow-y-auto overscroll-contain">
         <div className="p-4">
@@ -50,7 +59,7 @@ export function LeftPane({ isOpen, onClose, pallets, onCallSelect, onStorageSele
             <div className="text-sm text-destructive mb-2 p-3 bg-destructive/10 rounded-md">
               <div className="font-medium mb-1">⚠️ Connection Issue</div>
               <div className="text-xs mb-2">{error}</div>
-              {error.includes('Polkadot') && (
+              {error.includes("Polkadot") && (
                 <div className="text-xs text-muted-foreground bg-muted p-2 rounded mt-2">
                   <div className="font-medium mb-1">💡 Quick Fix:</div>
                   <div>1. Switch to Kusama above ↑</div>
@@ -76,5 +85,5 @@ export function LeftPane({ isOpen, onClose, pallets, onCallSelect, onStorageSele
         </div>
       </div>
     </div>
-  )
+  );
 }

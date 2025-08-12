@@ -1,75 +1,78 @@
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { typedApi } from "@/lib/chain"
-import { formatBalance } from "@/lib/chains"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { typedApi } from "@/lib/chain";
+import { formatBalance } from "@/lib/chains";
 
 // Example account addresses for demonstration
 const EXAMPLE_ACCOUNTS = {
   alice: "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
   bob: "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
-  charlie: "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y"
-}
+  charlie: "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
+};
 
 interface AccountInfo {
-  address: string
+  address: string;
   balance: {
-    free: string
-    reserved: string
-    total: string
-  }
-  nonce: string
-  isLoading: boolean
-  error?: string
+    free: string;
+    reserved: string;
+    total: string;
+  };
+  nonce: string;
+  isLoading: boolean;
+  error?: string;
 }
 
 export function AccountExample() {
-  const [accounts, setAccounts] = useState<Record<string, AccountInfo>>({})
+  const [accounts, setAccounts] = useState<Record<string, AccountInfo>>({});
 
   const loadAccountInfo = async (name: string, address: string) => {
     // Set loading state
-    setAccounts(prev => ({
+    setAccounts((prev) => ({
       ...prev,
-      [name]: { 
-        address, 
-        balance: { free: "0", reserved: "0", total: "0" }, 
-        nonce: "0", 
-        isLoading: true 
-      }
-    }))
+      [name]: {
+        address,
+        balance: { free: "0", reserved: "0", total: "0" },
+        nonce: "0",
+        isLoading: true,
+      },
+    }));
 
     try {
       // This is the key PAPI pattern: query chain storage
-      const accountData = await typedApi.query.System.Account.getValue(address)
-      
+      const accountData = await typedApi.query.System.Account.getValue(address);
+
       // Extract balance information
-      const free = accountData.data.free.toString()
-      const reserved = accountData.data.reserved.toString()
-      const total = (accountData.data.free + accountData.data.reserved).toString()
-      
+      const free = accountData.data.free.toString();
+      const reserved = accountData.data.reserved.toString();
+      const total = (
+        accountData.data.free + accountData.data.reserved
+      ).toString();
+
       // Update state with results
-      setAccounts(prev => ({
+      setAccounts((prev) => ({
         ...prev,
         [name]: {
           address,
           balance: { free, reserved, total },
           nonce: accountData.nonce.toString(),
-          isLoading: false
-        }
-      }))
+          isLoading: false,
+        },
+      }));
     } catch (error) {
       // Simple error handling
-      setAccounts(prev => ({
+      setAccounts((prev) => ({
         ...prev,
         [name]: {
           ...prev[name],
           isLoading: false,
-          error: error instanceof Error ? error.message : "Failed to load account"
-        }
-      }))
+          error:
+            error instanceof Error ? error.message : "Failed to load account",
+        },
+      }));
     }
-  }
+  };
 
   return (
     <Card>
@@ -90,8 +93,8 @@ export function AccountExample() {
                     {address}
                   </div>
                 </div>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   variant="outline"
                   onClick={() => loadAccountInfo(name, address)}
                   disabled={accounts[name]?.isLoading}
@@ -109,21 +112,34 @@ export function AccountExample() {
                   ) : (
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <div className="text-muted-foreground">Free Balance</div>
+                        <div className="text-muted-foreground">
+                          Free Balance
+                        </div>
                         <div className="font-mono">
-                          {formatBalance(accounts[name].balance.free, "{{chainName}}")}
+                          {formatBalance(
+                            accounts[name].balance.free,
+                            "{{chainName}}",
+                          )}
                         </div>
                       </div>
                       <div>
                         <div className="text-muted-foreground">Reserved</div>
                         <div className="font-mono">
-                          {formatBalance(accounts[name].balance.reserved, "{{chainName}}")}
+                          {formatBalance(
+                            accounts[name].balance.reserved,
+                            "{{chainName}}",
+                          )}
                         </div>
                       </div>
                       <div>
-                        <div className="text-muted-foreground">Total Balance</div>
+                        <div className="text-muted-foreground">
+                          Total Balance
+                        </div>
                         <div className="font-mono font-semibold">
-                          {formatBalance(accounts[name].balance.total, "{{chainName}}")}
+                          {formatBalance(
+                            accounts[name].balance.total,
+                            "{{chainName}}",
+                          )}
                         </div>
                       </div>
                       <div>
@@ -143,14 +159,22 @@ export function AccountExample() {
           <div className="text-sm text-blue-800">
             <div className="font-medium mb-1">💡 PAPI Learning Notes</div>
             <ul className="text-xs space-y-1 text-blue-700">
-              <li>• <code>typedApi.query.System.Account(address)</code> - Query on-chain storage</li>
-              <li>• Account data includes free, reserved, and frozen balances</li>
+              <li>
+                • <code>typedApi.query.System.Account(address)</code> - Query
+                on-chain storage
+              </li>
+              <li>
+                • Account data includes free, reserved, and frozen balances
+              </li>
               <li>• Nonce tracks number of transactions from this account</li>
-              <li>• All balance values are in the smallest chain unit (planck/atomic)</li>
+              <li>
+                • All balance values are in the smallest chain unit
+                (planck/atomic)
+              </li>
             </ul>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

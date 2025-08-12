@@ -1,54 +1,59 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import Prism from "prismjs"
+import { useEffect } from "react";
+import Prism from "prismjs";
 
 // Import TypeScript language definition
-import "prismjs/components/prism-typescript"
-import "prismjs/components/prism-javascript"
+import "prismjs/components/prism-typescript";
+import "prismjs/components/prism-javascript";
 
 interface SyntaxHighlighterProps {
-  code: string
-  language?: string
-  className?: string
+  code: string;
+  language?: string;
+  className?: string;
 }
 
-export function SyntaxHighlighter({ code, language = "typescript", className = "" }: SyntaxHighlighterProps) {
+export function SyntaxHighlighter({
+  code,
+  language = "typescript",
+  className = "",
+}: SyntaxHighlighterProps) {
   useEffect(() => {
     // Highlight all code blocks
-    Prism.highlightAll()
-  }, [code])
+    Prism.highlightAll();
+  }, [code]);
 
   if (!code.trim()) {
     return (
       <div className={`text-muted-foreground italic ${className}`}>
         {`// Select a pallet call to generate code`}
       </div>
-    )
+    );
   }
 
   // Get the language grammar, with fallbacks
-  const grammar = Prism.languages[language] || 
-                  Prism.languages.typescript || 
-                  Prism.languages.javascript ||
-                  {}
+  const grammar =
+    Prism.languages[language] ||
+    Prism.languages.typescript ||
+    Prism.languages.javascript ||
+    {};
 
-  let highlightedCode: string
+  let highlightedCode: string;
   try {
-    highlightedCode = Prism.highlight(code, grammar as any, language)
+    highlightedCode = Prism.highlight(code, grammar as any, language);
   } catch {
     // Fallback to plain text if highlighting fails
-    highlightedCode = code
+    highlightedCode = code;
   }
 
   return (
     <pre className={`${className} overflow-x-auto`}>
-      <code 
+      <code
         className={`language-${language}`}
         dangerouslySetInnerHTML={{
-          __html: highlightedCode
+          __html: highlightedCode,
         }}
       />
     </pre>
-  )
+  );
 }

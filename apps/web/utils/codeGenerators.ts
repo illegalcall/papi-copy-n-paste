@@ -2,84 +2,106 @@
  * Code generation utilities for PAPI transactions and storage queries
  */
 
-import { PalletCall } from "@workspace/core"
-import { getDescriptorImport, getDescriptorName, getSetupCommands, getParameterDescription } from "./chainConfig"
-import { detectStorageParameters, generateStorageParams } from "./storageHelpers"
+import { PalletCall } from "@workspace/core";
+import {
+  getDescriptorImport,
+  getDescriptorName,
+  getSetupCommands,
+  getParameterDescription,
+} from "./chainConfig";
+import {
+  detectStorageParameters,
+  generateStorageParams,
+} from "./storageHelpers";
 
 export function generateStorageQueryByType(
   queryType: string,
   pallet: string,
   storageName: string,
   paramString: string,
-  hasParams: boolean
+  hasParams: boolean,
 ): string {
-  const baseQuery = `typedApi.query.${pallet}.${storageName}`
-  const params = hasParams ? `(${paramString})` : '()'
-  
+  const baseQuery = `typedApi.query.${pallet}.${storageName}`;
+  const params = hasParams ? `(${paramString})` : "()";
+
   // Check if this query type needs RxJS
-  const needsRxJS = ['watchValue', 'watchValueFinalized', 'watchValueBest', 'watchEntries', 'watchEntriesPartial', 
-                     'combineMultiple', 'throttledWatch', 'debouncedWatch', 'mapValues', 
-                     'filterChanges', 'takeUntilChange', 'resilientWatch', 'comprehensiveWatch'].includes(queryType)
-  
-  const rxjsImports = needsRxJS ? `
-import { combineLatest, throttleTime, debounceTime, map, filter, takeUntil, distinctUntilChanged, retry, startWith } from 'rxjs'` : ''
+  const needsRxJS = [
+    "watchValue",
+    "watchValueFinalized",
+    "watchValueBest",
+    "watchEntries",
+    "watchEntriesPartial",
+    "combineMultiple",
+    "throttledWatch",
+    "debouncedWatch",
+    "mapValues",
+    "filterChanges",
+    "takeUntilChange",
+    "resilientWatch",
+    "comprehensiveWatch",
+  ].includes(queryType);
+
+  const rxjsImports = needsRxJS
+    ? `
+import { combineLatest, throttleTime, debounceTime, map, filter, takeUntil, distinctUntilChanged, retry, startWith } from 'rxjs'`
+    : "";
 
   switch (queryType) {
-    case 'getValue':
+    case "getValue":
       return `${rxjsImports}
 
 // Get current value
 const result = await ${baseQuery}.getValue${params}
-console.log('Current value:', result)`
+console.log('Current value:', result)`;
 
-    case 'getValueAt':
+    case "getValueAt":
       return `${rxjsImports}
 
 // Get value at specific block states
-const resultFinalized = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "finalized" })
-const resultBest = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "best" })
+const resultFinalized = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ", " : ""}{ at: "finalized" })
+const resultBest = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ", " : ""}{ at: "best" })
 console.log('At finalized block:', resultFinalized)
-console.log('At best block:', resultBest)`
+console.log('At best block:', resultBest)`;
 
-    case 'getEntries':
+    case "getEntries":
       if (hasParams) {
         return `${rxjsImports}
 
 // Note: This storage requires parameters, showing parameter-based approach
 const result = await ${baseQuery}.getValue()
-console.log('Storage value:', result)`
+console.log('Storage value:', result)`;
       } else {
         return `${rxjsImports}
 
 // Get all entries for this storage map
 const entries = await ${baseQuery}.getEntries()
-console.log('All entries:', entries)`
+console.log('All entries:', entries)`;
       }
 
-    case 'getValues':
+    case "getValues":
       return `${rxjsImports}
 
 // Get multiple values (batch query)
 const keys = [${paramString}, "//Bob", "//Charlie"] // Add more keys as needed
 const results = await ${baseQuery}.getValues(keys)
-console.log('Multiple values:', results)`
+console.log('Multiple values:', results)`;
 
-    case 'getEntriesPaged':
+    case "getEntriesPaged":
       if (hasParams) {
         return `${rxjsImports}
 
 // Note: This storage requires parameters
 const entries = await ${baseQuery}.getEntries()
-console.log('Storage entries:', entries)`
+console.log('Storage entries:', entries)`;
       } else {
         return `${rxjsImports}
 
 // Get entries with pagination
 const entries = await ${baseQuery}.getEntries()
-console.log('Paged entries:', entries)`
+console.log('Paged entries:', entries)`;
       }
 
-    case 'watchValue':
+    case "watchValue":
       return `${rxjsImports}
 
 // Watch for value changes
@@ -94,13 +116,13 @@ const subscription = ${baseQuery}.watchValue${params}.subscribe({
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
-    case 'watchValueFinalized':
+    case "watchValueFinalized":
       return `${rxjsImports}
 
 // Watch for value changes at finalized blocks only
-const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ', ' : ''}"finalized").subscribe({
+const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ", " : ""}"finalized").subscribe({
   next: (value) => {
     console.log('Finalized value changed:', value)
     // Handle the finalized value here
@@ -111,13 +133,13 @@ const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? 
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
-    case 'watchValueBest':
+    case "watchValueBest":
       return `${rxjsImports}
 
 // Watch for value changes at best blocks
-const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ', ' : ''}"best").subscribe({
+const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ", " : ""}"best").subscribe({
   next: (value) => {
     console.log('Best block value changed:', value)
     // Handle the best value here
@@ -128,9 +150,9 @@ const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? 
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
-    case 'watchEntries':
+    case "watchEntries":
       return `${rxjsImports}
 
 // Watch for entry changes across the entire storage map
@@ -145,9 +167,9 @@ const subscription = ${baseQuery}.watchEntries().subscribe({
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
-    case 'watchEntriesPartial':
+    case "watchEntriesPartial":
       return `${rxjsImports}
 
 // Watch for partial entry changes (useful for large storage maps)
@@ -162,9 +184,9 @@ const subscription = ${baseQuery}.watchEntries().subscribe({
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
-    case 'combineMultiple':
+    case "combineMultiple":
       return `${rxjsImports}
 
 // Combine multiple storage queries
@@ -190,9 +212,9 @@ const subscription = combined$.subscribe({
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
-    case 'throttledWatch':
+    case "throttledWatch":
       return `${rxjsImports}
 
 // Watch with throttling (limit update frequency)
@@ -209,9 +231,9 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
-    case 'debouncedWatch':
+    case "debouncedWatch":
       return `${rxjsImports}
 
 // Watch with debouncing (wait for pause in changes)
@@ -228,9 +250,9 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
-    case 'mapValues':
+    case "mapValues":
       return `${rxjsImports}
 
 // Watch and transform values
@@ -256,9 +278,9 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
-    case 'filterChanges':
+    case "filterChanges":
       return `${rxjsImports}
 
 // Watch and filter specific changes
@@ -282,9 +304,9 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
-    case 'takeUntilChange':
+    case "takeUntilChange":
       return `${rxjsImports}
 
 // Watch until a specific condition is met
@@ -315,9 +337,9 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
-    case 'resilientWatch':
+    case "resilientWatch":
       return `${rxjsImports}
 
 // Watch with error recovery and retry logic
@@ -337,16 +359,16 @@ const subscription = resilientWatch$.subscribe({
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
-    case 'comprehensiveWatch':
+    case "comprehensiveWatch":
       return `${rxjsImports}
 
 // Comprehensive watching with multiple strategies
 const comprehensive$ = combineLatest([
   ${baseQuery}.watchValue${params},
-  ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ', ' : ''}"finalized"),
-  ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ', ' : ''}"best")
+  ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ", " : ""}"finalized"),
+  ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ", " : ""}"best")
 ]).pipe(
   map(([current, finalized, best]) => ({
     current,
@@ -368,14 +390,14 @@ const subscription = comprehensive$.subscribe({
 })
 
 // Don't forget to unsubscribe when done
-// subscription.unsubscribe()`
+// subscription.unsubscribe()`;
 
     default:
       return `${rxjsImports}
 
 // Basic storage query
 const result = await ${baseQuery}.getValue${params}
-console.log('Result:', result)`
+console.log('Result:', result)`;
   }
 }
 
@@ -385,20 +407,34 @@ export function generateStorageQueryCode(
   pallet: string,
   storage: any,
   queryType: string,
-  storageParams: Record<string, any>
+  storageParams: Record<string, any>,
 ): string {
-  const template = getCodeTemplate()
-  
-  if (template === 'function') {
-    return generateFunctionStorageCode(chainKey, providerId, pallet, storage, queryType, storageParams)
+  const template = getCodeTemplate();
+
+  if (template === "function") {
+    return generateFunctionStorageCode(
+      chainKey,
+      providerId,
+      pallet,
+      storage,
+      queryType,
+      storageParams,
+    );
   } else {
-    return generateInlineStorageCode(chainKey, providerId, pallet, storage, queryType, storageParams)
+    return generateInlineStorageCode(
+      chainKey,
+      providerId,
+      pallet,
+      storage,
+      queryType,
+      storageParams,
+    );
   }
 }
 
-function getCodeTemplate(): 'function' | 'inline' {
+function getCodeTemplate(): "function" | "inline" {
   // This could be made configurable in the future
-  return 'inline'
+  return "inline";
 }
 
 function generateInlineStorageCode(
@@ -407,30 +443,43 @@ function generateInlineStorageCode(
   pallet: string,
   storage: any,
   queryType: string,
-  storageParams: Record<string, any>
+  storageParams: Record<string, any>,
 ): string {
-  const descriptorImport = getDescriptorImport(chainKey)
-  const descriptorName = getDescriptorName(chainKey)
-  
-  const requiresKeys = detectStorageParameters(pallet, storage.name)
-  const hasParams = Boolean(requiresKeys && Object.keys(storageParams).length > 0)
-  
+  const descriptorImport = getDescriptorImport(chainKey);
+  const descriptorName = getDescriptorName(chainKey);
+
+  const requiresKeys = detectStorageParameters(pallet, storage.name);
+  const hasParams = Boolean(
+    requiresKeys && Object.keys(storageParams).length > 0,
+  );
+
   // Generate parameter string for the query
-  const paramString = hasParams && requiresKeys ? generateStorageParams(storageParams, requiresKeys) : ''
-  
+  const paramString =
+    hasParams && requiresKeys
+      ? generateStorageParams(storageParams, requiresKeys)
+      : "";
+
   // Generate the actual query code based on type
-  const queryCode = generateStorageQueryByType(queryType, pallet, storage.name, paramString, hasParams)
-  
+  const queryCode = generateStorageQueryByType(
+    queryType,
+    pallet,
+    storage.name,
+    paramString,
+    hasParams,
+  );
+
   return `import { createClient } from "polkadot-api"
 ${descriptorImport}
 
 async function query${pallet}${storage.name}() {
+  // Create the client instance
+  const client = createClient(provider) // Replace with your provider
   const typedApi = client.getTypedApi(${descriptorName})
   
   ${queryCode}
 }
 
-query${pallet}${storage.name}().catch(console.error)`
+query${pallet}${storage.name}().catch(console.error)`;
 }
 
 function generateFunctionStorageCode(
@@ -439,24 +488,26 @@ function generateFunctionStorageCode(
   pallet: string,
   storage: any,
   queryType: string,
-  storageParams: Record<string, any>
+  storageParams: Record<string, any>,
 ): string {
-  const descriptorImport = getDescriptorImport(chainKey)
-  const descriptorName = getDescriptorName(chainKey)
-  
+  const descriptorImport = getDescriptorImport(chainKey);
+  const descriptorName = getDescriptorName(chainKey);
+
   return `import { createClient } from "polkadot-api"
 ${descriptorImport}
 
-export async function query${pallet}${storage.name}(${Object.keys(storageParams).length > 0 ? 'params: any' : ''}) {
+export async function query${pallet}${storage.name}(${Object.keys(storageParams).length > 0 ? "params: any" : ""}) {
+  // Create the client instance
+  const client = createClient(provider) // Replace with your provider
   const typedApi = client.getTypedApi(${descriptorName})
   
   try {
-    const result = await typedApi.query.${pallet}.${storage.name}${Object.keys(storageParams).length > 0 ? '(params)' : '.getValue()'}
+    const result = await typedApi.query.${pallet}.${storage.name}${Object.keys(storageParams).length > 0 ? "(params)" : ".getValue()"}
     return { success: true, result }
   } catch (error) {
     return { success: false, error: error.message }
   }
-}`
+}`;
 }
 
 export function generateCodeSnippet(
@@ -464,14 +515,14 @@ export function generateCodeSnippet(
   providerId: string,
   pallet: string,
   call: PalletCall,
-  formData: Record<string, any>
+  formData: Record<string, any>,
 ): string {
-  const template = getCodeTemplate()
-  
-  if (template === 'function') {
-    return generateFunctionCode(chainKey, providerId, pallet, call, formData)
+  const template = getCodeTemplate();
+
+  if (template === "function") {
+    return generateFunctionCode(chainKey, providerId, pallet, call, formData);
   } else {
-    return generateInlineCode(chainKey, providerId, pallet, call, formData)
+    return generateInlineCode(chainKey, providerId, pallet, call, formData);
   }
 }
 
@@ -480,40 +531,50 @@ function generateInlineCode(
   providerId: string,
   pallet: string,
   call: PalletCall,
-  formData: Record<string, any>
+  formData: Record<string, any>,
 ): string {
-  const args = call.args.map(arg => {
-    const value = formData[arg.name] || ''
-    
-    // Handle MultiAddress types properly for dest/target fields
-    if (arg.name === 'dest' || arg.name === 'target' || arg.type.includes('MultiAddress')) {
-      if (typeof value === 'string' && value.startsWith('//')) {
-        const accountMap: Record<string, string> = {
-          '//Alice': '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
-          '//Bob': '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
-          '//Charlie': '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
-        }
-        const address = accountMap[value] || accountMap['//Alice']
-        return `  ${arg.name}: MultiAddress.Id("${address}"), // ${value}`
-      }
-      else if (typeof value === 'string' && value.length > 40) {
-        return `  ${arg.name}: MultiAddress.Id("${value}")`
-      }
-      else {
-        return `  ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`
-      }
-    }
-    
-    if (arg.type.includes('u128') || arg.type.includes('u64') || arg.name === 'value' || arg.name === 'amount') {
-      const numValue = typeof value === 'string' ? value : String(value || '0')
-      return `  ${arg.name}: ${numValue}n`
-    }
-    
-    return `  ${arg.name}: ${JSON.stringify(value)}`
-  }).join(',\n')
+  const args = call.args
+    .map((arg) => {
+      const value = formData[arg.name] || "";
 
-  const descriptorImport = getDescriptorImport(chainKey)
-  const descriptorName = getDescriptorName(chainKey)
+      // Handle MultiAddress types properly for dest/target fields
+      if (
+        arg.name === "dest" ||
+        arg.name === "target" ||
+        arg.type.includes("MultiAddress")
+      ) {
+        if (typeof value === "string" && value.startsWith("//")) {
+          const accountMap: Record<string, string> = {
+            "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+            "//Bob": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
+            "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
+          };
+          const address = accountMap[value] || accountMap["//Alice"];
+          return `  ${arg.name}: MultiAddress.Id("${address}"), // ${value}`;
+        } else if (typeof value === "string" && value.length > 40) {
+          return `  ${arg.name}: MultiAddress.Id("${value}")`;
+        } else {
+          return `  ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`;
+        }
+      }
+
+      if (
+        arg.type.includes("u128") ||
+        arg.type.includes("u64") ||
+        arg.name === "value" ||
+        arg.name === "amount"
+      ) {
+        const numValue =
+          typeof value === "string" ? value : String(value || "0");
+        return `  ${arg.name}: ${numValue}n`;
+      }
+
+      return `  ${arg.name}: ${JSON.stringify(value)}`;
+    })
+    .join(",\n");
+
+  const descriptorImport = getDescriptorImport(chainKey);
+  const descriptorName = getDescriptorName(chainKey);
 
   return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
@@ -531,7 +592,7 @@ ${args}
   console.log('Transaction hash:', hash)
 }
 
-execute${pallet}${call.name}().catch(console.error)`
+execute${pallet}${call.name}().catch(console.error)`;
 }
 
 function generateFunctionCode(
@@ -539,40 +600,50 @@ function generateFunctionCode(
   providerId: string,
   pallet: string,
   call: PalletCall,
-  formData: Record<string, any>
+  formData: Record<string, any>,
 ): string {
-  const args = call.args.map(arg => {
-    const value = formData[arg.name] || ''
-    
-    // Handle MultiAddress types properly for dest/target fields
-    if (arg.name === 'dest' || arg.name === 'target' || arg.type.includes('MultiAddress')) {
-      if (typeof value === 'string' && value.startsWith('//')) {
-        const accountMap: Record<string, string> = {
-          '//Alice': '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
-          '//Bob': '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
-          '//Charlie': '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
-        }
-        const address = accountMap[value] || accountMap['//Alice']
-        return `    ${arg.name}: MultiAddress.Id("${address}"), // ${value}`
-      }
-      else if (typeof value === 'string' && value.length > 40) {
-        return `    ${arg.name}: MultiAddress.Id("${value}")`
-      }
-      else {
-        return `    ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`
-      }
-    }
-    
-    if (arg.type.includes('u128') || arg.type.includes('u64') || arg.name === 'value' || arg.name === 'amount') {
-      const numValue = typeof value === 'string' ? value : String(value || '0')
-      return `    ${arg.name}: ${numValue}n`
-    }
-    
-    return `    ${arg.name}: ${JSON.stringify(value)}`
-  }).join(',\n')
+  const args = call.args
+    .map((arg) => {
+      const value = formData[arg.name] || "";
 
-  const descriptorImport = getDescriptorImport(chainKey)
-  const descriptorName = getDescriptorName(chainKey)
+      // Handle MultiAddress types properly for dest/target fields
+      if (
+        arg.name === "dest" ||
+        arg.name === "target" ||
+        arg.type.includes("MultiAddress")
+      ) {
+        if (typeof value === "string" && value.startsWith("//")) {
+          const accountMap: Record<string, string> = {
+            "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+            "//Bob": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
+            "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
+          };
+          const address = accountMap[value] || accountMap["//Alice"];
+          return `    ${arg.name}: MultiAddress.Id("${address}"), // ${value}`;
+        } else if (typeof value === "string" && value.length > 40) {
+          return `    ${arg.name}: MultiAddress.Id("${value}")`;
+        } else {
+          return `    ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`;
+        }
+      }
+
+      if (
+        arg.type.includes("u128") ||
+        arg.type.includes("u64") ||
+        arg.name === "value" ||
+        arg.name === "amount"
+      ) {
+        const numValue =
+          typeof value === "string" ? value : String(value || "0");
+        return `    ${arg.name}: ${numValue}n`;
+      }
+
+      return `    ${arg.name}: ${JSON.stringify(value)}`;
+    })
+    .join(",\n");
+
+  const descriptorImport = getDescriptorImport(chainKey);
+  const descriptorName = getDescriptorName(chainKey);
 
   return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
@@ -593,55 +664,78 @@ ${args}
     return { success: false, error: error.message }
   }
 }
-`
+`;
 }
 
 export function generateMultiMethodCode(
-  chainKey: string, 
+  chainKey: string,
   providerId: string,
-  methodQueue: Array<{ pallet: string; call: PalletCall; formData: Record<string, any>; id: string }>
+  methodQueue: Array<{
+    pallet: string;
+    call: PalletCall;
+    formData: Record<string, any>;
+    id: string;
+  }>,
 ): string {
-  const descriptorImport = getDescriptorImport(chainKey)
-  const descriptorName = getDescriptorName(chainKey)
+  const descriptorImport = getDescriptorImport(chainKey);
+  const descriptorName = getDescriptorName(chainKey);
 
   // Generate method calls
-  const methodCalls = methodQueue.map((method, index) => {
-    const args = method.call.args.map(arg => {
-      const value = method.formData[arg.name] || ''
-      
-      // Handle MultiAddress types properly for dest/target fields
-      if (arg.name === 'dest' || arg.name === 'target' || arg.type.includes('MultiAddress')) {
-        if (typeof value === 'string' && value.startsWith('//')) {
-          const accountMap: Record<string, string> = {
-            '//Alice': '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
-            '//Bob': '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
-            '//Charlie': '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
-          }
-          const address = accountMap[value] || accountMap['//Alice']
-          return `    ${arg.name}: MultiAddress.Id("${address}"), // ${value}`
-        } else if (typeof value === 'string' && value.length > 40) {
-          return `    ${arg.name}: MultiAddress.Id("${value}")`
-        } else {
-          return `    ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY") // //Alice`
-        }
-      }
-      
-      // Handle BigInt values properly
-      if (arg.type.includes('u128') || arg.type.includes('u64') || arg.name === 'value' || arg.name === 'amount') {
-        const numValue = typeof value === 'string' ? value : String(value || '0')
-        if (numValue && !numValue.includes('n') && (parseInt(numValue) > Number.MAX_SAFE_INTEGER || numValue.length > 10)) {
-          return `    ${arg.name}: ${numValue}n`
-        }
-        return `    ${arg.name}: ${numValue}n`
-      }
-      
-      return `    ${arg.name}: ${JSON.stringify(value)}`
-    }).join(',\n')
+  const methodCalls = methodQueue
+    .map((method, index) => {
+      const args = method.call.args
+        .map((arg) => {
+          const value = method.formData[arg.name] || "";
 
-    return `
+          // Handle MultiAddress types properly for dest/target fields
+          if (
+            arg.name === "dest" ||
+            arg.name === "target" ||
+            arg.type.includes("MultiAddress")
+          ) {
+            if (typeof value === "string" && value.startsWith("//")) {
+              const accountMap: Record<string, string> = {
+                "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+                "//Bob": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
+                "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
+              };
+              const address = accountMap[value] || accountMap["//Alice"];
+              return `    ${arg.name}: MultiAddress.Id("${address}"), // ${value}`;
+            } else if (typeof value === "string" && value.length > 40) {
+              return `    ${arg.name}: MultiAddress.Id("${value}")`;
+            } else {
+              return `    ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY") // //Alice`;
+            }
+          }
+
+          // Handle BigInt values properly
+          if (
+            arg.type.includes("u128") ||
+            arg.type.includes("u64") ||
+            arg.name === "value" ||
+            arg.name === "amount"
+          ) {
+            const numValue =
+              typeof value === "string" ? value : String(value || "0");
+            if (
+              numValue &&
+              !numValue.includes("n") &&
+              (parseInt(numValue) > Number.MAX_SAFE_INTEGER ||
+                numValue.length > 10)
+            ) {
+              return `    ${arg.name}: ${numValue}n`;
+            }
+            return `    ${arg.name}: ${numValue}n`;
+          }
+
+          return `    ${arg.name}: ${JSON.stringify(value)}`;
+        })
+        .join(",\n");
+
+      return `
   // Method ${index + 1}: ${method.pallet}.${method.call.name}
   console.log("Creating ${method.pallet}.${method.call.name}...")
-  const call${index + 1} = typedApi.tx.${method.pallet}.${method.call.name}({${args ? '\n' + args + '\n  ' : ''}})
+  const call${index + 1} = typedApi.tx.${method.pallet}.${method.call.name}({${args ? "\n" + args + "\n  " : ""}})
   const result${index + 1} = await call${index + 1}.signAndSubmit(signer)
   console.log("Result ${index + 1}:", result${index + 1})
   
@@ -649,8 +743,9 @@ export function generateMultiMethodCode(
   if (!result${index + 1}.success) {
     console.error("Method ${index + 1} failed, stopping execution")
     return
-  }`
-  }).join('\n')
+  }`;
+    })
+    .join("\n");
 
   return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
@@ -666,5 +761,65 @@ async function executeMultipleMethods() {
   console.log("All methods completed successfully!")
 }
 
-executeMultipleMethods().catch(console.error)`
+executeMultipleMethods().catch(console.error)`;
+}
+
+export function generateMultiStorageCode(
+  chainKey: string,
+  providerId: string,
+  storageQueue: Array<{
+    pallet: string;
+    storage: any;
+    queryType: string;
+    storageParams: Record<string, any>;
+    id: string;
+  }>,
+): string {
+  const descriptorImport = getDescriptorImport(chainKey);
+  const descriptorName = getDescriptorName(chainKey);
+
+  // Generate storage queries
+  const storageQueries = storageQueue
+    .map((storage, index) => {
+      const requiresKeys = detectStorageParameters(storage.pallet, storage.storage.name);
+      const hasParams = Boolean(
+        requiresKeys && Object.keys(storage.storageParams).length > 0,
+      );
+
+      // Generate parameter string for the query
+      const paramString =
+        hasParams && requiresKeys
+          ? generateStorageParams(storage.storageParams, requiresKeys)
+          : "";
+
+      // Generate the actual query code based on type
+      const queryCode = generateStorageQueryByType(
+        storage.queryType,
+        storage.pallet,
+        storage.storage.name,
+        paramString,
+        hasParams,
+      );
+
+      return `
+  // Storage Query ${index + 1}: ${storage.pallet}.${storage.storage.name} (${storage.queryType})
+  console.log("Querying ${storage.pallet}.${storage.storage.name}...")
+  ${queryCode.replace(/typedApi\./g, `typedApi.`).replace(/^/gm, '  ')}
+  `;
+    })
+    .join("\n");
+
+  return `import { createClient } from "polkadot-api"
+${descriptorImport}
+
+async function executeMultipleStorageQueries() {
+  // Create the client instance
+  const client = createClient(provider) // Replace with your provider
+  const typedApi = client.getTypedApi(${descriptorName})
+  ${storageQueries}
+
+  console.log("All storage queries completed!")
+}
+
+executeMultipleStorageQueries().catch(console.error)`;
 }

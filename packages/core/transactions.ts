@@ -1,108 +1,137 @@
-import { PalletCall } from './metadata'
-import { createTestAccountSigner, validateSigner, formatSignerInfo, type TestAccount } from './signing'
-import { getExplorerLinks, getExplorerName, hasExplorer } from './explorer'
-import { detectSyncStatus, getStaleDataWarning } from './sync-status'
+import { PalletCall } from "./metadata";
+import {
+  createTestAccountSigner,
+  validateSigner,
+  formatSignerInfo,
+  type TestAccount,
+} from "./signing";
+import { getExplorerLinks, getExplorerName, hasExplorer } from "./explorer";
+import { detectSyncStatus, getStaleDataWarning } from "./sync-status";
 
 export interface TransactionResult {
-  success: boolean
-  hash?: string // For backward compatibility
-  txHash?: string // New field for PAPI results
-  blockNumber?: number
-  blockHash?: string // New field for PAPI results
-  error?: any // Can be string or DispatchError
-  events?: any[]
+  success: boolean;
+  hash?: string; // For backward compatibility
+  txHash?: string; // New field for PAPI results
+  blockNumber?: number;
+  blockHash?: string; // New field for PAPI results
+  error?: any; // Can be string or DispatchError
+  events?: any[];
 }
 
 export interface TransactionStep {
-  message: string
-  type: 'info' | 'success' | 'error' | 'warning'
-  timestamp: number
+  message: string;
+  type: "info" | "success" | "error" | "warning";
+  timestamp: number;
 }
 
 export interface TransactionOptions {
-  signer: TestAccount // Test account name like "//Alice"
-  chainKey: string
-  client: any
+  signer: TestAccount; // Test account name like "//Alice"
+  chainKey: string;
+  client: any;
 }
 
 export class TransactionExecutor {
-  private steps: TransactionStep[] = []
-  private onStep?: (step: TransactionStep) => void
+  private steps: TransactionStep[] = [];
+  private onStep?: (step: TransactionStep) => void;
 
   constructor(private options: TransactionOptions) {}
 
   setStepCallback(callback: (step: TransactionStep) => void) {
-    this.onStep = callback
+    this.onStep = callback;
   }
 
-  private addStep(message: string, type: TransactionStep['type'] = 'info') {
+  private addStep(message: string, type: TransactionStep["type"] = "info") {
     const step: TransactionStep = {
       message,
       type,
-      timestamp: Date.now()
-    }
-    this.steps.push(step)
-    this.onStep?.(step)
+      timestamp: Date.now(),
+    };
+    this.steps.push(step);
+    this.onStep?.(step);
   }
 
   async executeTransaction(
     pallet: string,
     callName: string,
-    args: Record<string, any>
+    args: Record<string, any>,
   ): Promise<TransactionResult> {
     try {
-      this.addStep(`> Running ${pallet}.${callName}...`)
-      this.addStep(`> Using real blockchain connection to ${this.options.chainKey}`)
+      this.addStep(`> Running ${pallet}.${callName}...`);
+      this.addStep(
+        `> Using real blockchain connection to ${this.options.chainKey}`,
+      );
 
       // Validate client
       if (!this.options.client) {
-        throw new Error('No client available for transaction execution')
+        throw new Error("No client available for transaction execution");
       }
 
       // Get blockchain data and check sync status
-      this.addStep('> Getting blockchain information...')
-      const finalizedBlock = await this.options.client.getFinalizedBlock()
-      const blockNumber = finalizedBlock.number
+      this.addStep("> Getting blockchain information...");
+      const finalizedBlock = await this.options.client.getFinalizedBlock();
+      const blockNumber = finalizedBlock.number;
 
       // Get additional blockchain data using correct PAPI methods
-      const bestBlocks = await this.options.client.getBestBlocks()
-      const bestBlockNumber = bestBlocks[0].number // First element is the best block
+      const bestBlocks = await this.options.client.getBestBlocks();
+      const bestBlockNumber = bestBlocks[0].number; // First element is the best block
 
       // Get connection type from client state
-      const connectionType = this.options.client.connectionType || 'unknown'
-      
+      const connectionType = this.options.client.connectionType || "unknown";
+
       // Detect sync status
-      const syncStatus = detectSyncStatus(this.options.chainKey, bestBlockNumber)
-      const warning = getStaleDataWarning(syncStatus, this.options.chainKey)
+      const syncStatus = detectSyncStatus(
+        this.options.chainKey,
+        bestBlockNumber,
+      );
+      const warning = getStaleDataWarning(syncStatus, this.options.chainKey);
 
       // Show simplified blockchain data
-      this.addStep(`> ✅ Connected to ${this.options.chainKey} (Block #${blockNumber})`, 'success')
-      
+      this.addStep(
+        `> ✅ Connected to ${this.options.chainKey} (Block #${blockNumber})`,
+        "success",
+      );
+
       // Only show warning if data is significantly stale
-      if (warning && syncStatus.blocksBehind && syncStatus.blocksBehind > 1000) {
-        this.addStep(`> ⚠️  Data is ${syncStatus.estimatedAge} old`, 'warning')
+      if (
+        warning &&
+        syncStatus.blocksBehind &&
+        syncStatus.blocksBehind > 1000
+      ) {
+        this.addStep(`> ⚠️  Data is ${syncStatus.estimatedAge} old`, "warning");
       }
 
       // Build the transaction
-      this.addStep(`> Building transaction: ${pallet}.${callName}`)
-      this.addStep(`> Arguments: ${JSON.stringify(args, null, 2).split('\n').join('\n>   ')}`)
+      this.addStep(`> Building transaction: ${pallet}.${callName}`);
+      this.addStep(
+        `> Arguments: ${JSON.stringify(args, null, 2).split("\n").join("\n>   ")}`,
+      );
 
       // Create the signer for the test account
-      this.addStep(`> Creating signer for ${this.options.signer}...`)
-      const signerInfo = createTestAccountSigner(this.options.signer)
+      this.addStep(`> Creating signer for ${this.options.signer}...`);
+      const signerInfo = createTestAccountSigner(this.options.signer);
 
       if (!validateSigner(signerInfo)) {
-        throw new Error(`Invalid signer configuration for ${this.options.signer}`)
+        throw new Error(
+          `Invalid signer configuration for ${this.options.signer}`,
+        );
       }
 
-      this.addStep(`> ✓ Signer created: ${formatSignerInfo(signerInfo)}`, 'success')
+      this.addStep(
+        `> ✓ Signer created: ${formatSignerInfo(signerInfo)}`,
+        "success",
+      );
 
       // Create PAPI transaction structure (simulated for safety)
-      this.addStep('> Creating PAPI transaction structure...')
+      this.addStep("> Creating PAPI transaction structure...");
 
       // Create the PAPI transaction using raw client
-      const papiTransaction = await this.createPapiTransaction(this.options.client, pallet, callName, args)
-      this.addStep('> ✓ PAPI transaction structure created', 'success')
+      const papiTransaction = await this.createPapiTransaction(
+        this.options.client,
+        pallet,
+        callName,
+        args,
+      );
+      this.addStep("> ✓ PAPI transaction structure created", "success");
 
       // Create a transaction object that includes the signer and PAPI transaction
       const transaction = {
@@ -111,73 +140,104 @@ export class TransactionExecutor {
         args,
         signer: signerInfo,
         chainKey: this.options.chainKey,
-        papiTransaction
-      }
+        papiTransaction,
+      };
 
       // Simulate PAPI transaction submission (for safety)
       if (transaction.papiTransaction && !transaction.papiTransaction.mock) {
-        this.addStep('> Simulating PAPI transaction submission...')
-        const result = await this.submitRealTransaction(transaction)
-        return result
+        this.addStep("> Simulating PAPI transaction submission...");
+        const result = await this.submitRealTransaction(transaction);
+        return result;
       } else {
         // Fallback to simulated signing and submission flow
-        this.addStep(`> Simulating signing with ${formatSignerInfo(transaction.signer)}...`)
+        this.addStep(
+          `> Simulating signing with ${formatSignerInfo(transaction.signer)}...`,
+        );
 
-        const signedTransaction = await this.signTransaction(transaction)
-        this.addStep('> ✓ Transaction signing simulated (no real signature)', 'success')
+        const signedTransaction = await this.signTransaction(transaction);
+        this.addStep(
+          "> ✓ Transaction signing simulated (no real signature)",
+          "success",
+        );
 
         // Simulate submission
-        this.addStep('> Simulating network submission...')
+        this.addStep("> Simulating network submission...");
 
-        const result = await this.submitTransaction(signedTransaction, blockNumber)
-        return result
+        const result = await this.submitTransaction(
+          signedTransaction,
+          blockNumber,
+        );
+        return result;
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      this.addStep(`> ❌ Error: ${errorMessage}`, 'error')
-      
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      this.addStep(`> ❌ Error: ${errorMessage}`, "error");
+
       return {
         success: false,
-        error: errorMessage
-      }
+        error: errorMessage,
+      };
     }
   }
 
-  private async createPapiTransaction(client: any, pallet: string, callName: string, args: any): Promise<any> {
+  private async createPapiTransaction(
+    client: any,
+    pallet: string,
+    callName: string,
+    args: any,
+  ): Promise<any> {
     try {
-      this.addStep(`> Building ${pallet}.${callName} transaction...`)
+      this.addStep(`> Building ${pallet}.${callName} transaction...`);
 
       // Import the typed API helper - now synchronous
-      const { getTypedApiForChain } = await import('./descriptors')
-      
+      const { getTypedApiForChain } = await import("./descriptors");
+
       // Get typed API for this chain - now synchronous
-      const chainKey = this.options.chainKey || 'polkadot'
-      
-      let typedApi
+      const chainKey = this.options.chainKey || "polkadot";
+
+      let typedApi;
       try {
-        typedApi = getTypedApiForChain(client, chainKey)
+        typedApi = getTypedApiForChain(client, chainKey);
       } catch (descriptorError) {
-        this.addStep(`> ❌ Failed to load descriptors: ${descriptorError instanceof Error ? descriptorError.message : 'Unknown error'}`, 'error')
-        throw new Error(`Cannot create transaction: ${descriptorError instanceof Error ? descriptorError.message : 'Descriptor loading failed'}`)
+        this.addStep(
+          `> ❌ Failed to load descriptors: ${descriptorError instanceof Error ? descriptorError.message : "Unknown error"}`,
+          "error",
+        );
+        throw new Error(
+          `Cannot create transaction: ${descriptorError instanceof Error ? descriptorError.message : "Descriptor loading failed"}`,
+        );
       }
 
       // Helper function to safely serialize objects with BigInt values
       const safeStringify = (obj: any): string => {
-        return JSON.stringify(obj, (key, value) => {
-          if (typeof value === 'bigint') {
-            return value.toString()
-          }
-          return value
-        }, 2)
-      }
+        return JSON.stringify(
+          obj,
+          (key, value) => {
+            if (typeof value === "bigint") {
+              return value.toString();
+            }
+            return value;
+          },
+          2,
+        );
+      };
 
-      if (pallet === 'Balances' && (callName === 'transfer_allow_death' || callName === 'transfer_keep_alive')) {
-        this.addStep(`> Creating balance transfer transaction using getTypedApi()...`)
+      if (
+        pallet === "Balances" &&
+        (callName === "transfer_allow_death" ||
+          callName === "transfer_keep_alive")
+      ) {
+        this.addStep(
+          `> Creating balance transfer transaction using getTypedApi()...`,
+        );
 
         // Validate that we have the Balances pallet and the specific method in the typedApi
-        const transferMethod = typedApi.tx?.Balances?.[callName]
+        const transferMethod = typedApi.tx?.Balances?.[callName];
         if (!transferMethod) {
-          throw new Error(`Balances.${callName} not found in chain descriptors. The descriptors may be incomplete or outdated.`)
+          throw new Error(
+            `Balances.${callName} not found in chain descriptors. The descriptors may be incomplete or outdated.`,
+          );
         }
 
         // Now using proper PAPI v1.14+ pattern
@@ -188,29 +248,37 @@ export class TransactionExecutor {
           mock: false, // This now uses the real PAPI pattern
 
           // Real PAPI transaction - now with actual signing and submission
-          signAndSubmit: async (signer: any, stepCallback: (step: string, type?: string) => void) => {
+          signAndSubmit: async (
+            signer: any,
+            stepCallback: (step: string, type?: string) => void,
+          ) => {
             try {
               // This is the real PAPI v1.14+ way to create transactions:
               // 1. Get typed API (already done above)
               // 2. Create transaction using real typed API
-              
+
               // Validate and convert the amount
-              let amount: bigint
+              let amount: bigint;
               try {
-                amount = BigInt(args.value)
+                amount = BigInt(args.value);
               } catch (error) {
-                throw new Error(`Invalid amount value: ${args.value}. Must be a valid number.`)
+                throw new Error(
+                  `Invalid amount value: ${args.value}. Must be a valid number.`,
+                );
               }
 
-              stepCallback('> Creating real PAPI transaction with typed API...', 'info')
-              
+              stepCallback(
+                "> Creating real PAPI transaction with typed API...",
+                "info",
+              );
+
               // Create the transaction using PAPI's typed API - this builds the extrinsic structure
               // The typedApi provides type-safe access to blockchain calls
               const tx = typedApi.tx.Balances[callName]({
                 dest: args.dest, // Destination account (already validated from form)
-                value: amount    // Transfer amount in planck units (smallest unit)
-              })
-              
+                value: amount, // Transfer amount in planck units (smallest unit)
+              });
+
               // TODO: SCALE encoding for educational purposes - TEMPORARILY DISABLED
               // This section shows users the raw SCALE-encoded transaction hex
               // Commented out to hide from users until ready for production
@@ -246,82 +314,125 @@ export class TransactionExecutor {
                 stepCallback(`> 📝 You can use the transaction structure above for verification`, 'info')
               }
               */
-              
+
               // Transaction created successfully - this object contains the signed transaction data
-              stepCallback('> ✓ Real transaction object created successfully', 'success')
-              stepCallback(`> Transaction details: ${safeStringify(tx.decodedCall)}`, 'info')
-              
+              stepCallback(
+                "> ✓ Real transaction object created successfully",
+                "success",
+              );
+              stepCallback(
+                `> Transaction details: ${safeStringify(tx.decodedCall)}`,
+                "info",
+              );
+
               // Show educational information about the transaction
               // SCALE encoding is temporarily disabled, so we show simplified success message
-              stepCallback(`> 📝 Transaction created successfully using PAPI's typed API`, 'info')
-              stepCallback(`> 📝 You can use the transaction details above for verification`, 'info')
-              
+              stepCallback(
+                `> 📝 Transaction created successfully using PAPI's typed API`,
+                "info",
+              );
+              stepCallback(
+                `> 📝 You can use the transaction details above for verification`,
+                "info",
+              );
+
               // 3. Sign the transaction using proper PAPI signing pattern
-              stepCallback('> Signing transaction with test account...', 'info')
-              
+              stepCallback(
+                "> Signing transaction with test account...",
+                "info",
+              );
+
               // For PAPI v1.14+, we need to properly integrate the signer
               // Since we're simulating for safety, we'll show the real PAPI pattern but simulate the result
               try {
                 // This would be the real PAPI signing pattern in production:
                 // const signedTx = await tx.sign(signer.publicKey)
                 // For safety, we simulate the signing process
-                
-                stepCallback('> ✓ Transaction signed successfully (simulated for safety)', 'success')
-                
+
+                stepCallback(
+                  "> ✓ Transaction signed successfully (simulated for safety)",
+                  "success",
+                );
+
                 // Simulate submission process
-                stepCallback('> Simulating submission to network...', 'info')
-                await new Promise(resolve => setTimeout(resolve, 1000))
-                stepCallback('> ✓ Transaction submission simulated', 'success')
-                
+                stepCallback("> Simulating submission to network...", "info");
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+                stepCallback("> ✓ Transaction submission simulated", "success");
+
                 // Simulate finalization
-                stepCallback('> Simulating transaction finalization...', 'info')
-                await new Promise(resolve => setTimeout(resolve, 500))
-                stepCallback('> ✓ Transaction finalization simulated', 'success')
-                
+                stepCallback(
+                  "> Simulating transaction finalization...",
+                  "info",
+                );
+                await new Promise((resolve) => setTimeout(resolve, 500));
+                stepCallback(
+                  "> ✓ Transaction finalization simulated",
+                  "success",
+                );
               } catch (signingError) {
-                stepCallback(`> ❌ Error during signing: ${signingError instanceof Error ? signingError.message : 'Unknown signing error'}`, 'error')
-                throw signingError
+                stepCallback(
+                  `> ❌ Error during signing: ${signingError instanceof Error ? signingError.message : "Unknown signing error"}`,
+                  "error",
+                );
+                throw signingError;
               }
-              
+
               // Return simulated result
               return {
-                txHash: '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
-                blockHash: '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+                txHash:
+                  "0x" +
+                  Array.from({ length: 64 }, () =>
+                    Math.floor(Math.random() * 16).toString(16),
+                  ).join(""),
+                blockHash:
+                  "0x" +
+                  Array.from({ length: 64 }, () =>
+                    Math.floor(Math.random() * 16).toString(16),
+                  ).join(""),
                 mock: true, // This is now a simulated transaction
                 success: true,
                 finalized: true,
                 events: [
                   {
-                    section: 'Balances',
-                    method: 'Transfer',
+                    section: "Balances",
+                    method: "Transfer",
                     data: {
                       from: signer.address,
                       to: args.dest,
-                      amount: amount.toString()
-                    }
-                  }
+                      amount: amount.toString(),
+                    },
+                  },
                 ],
-                note: 'Real signature with simulated submission'
-              }
-              
+                note: "Real signature with simulated submission",
+              };
             } catch (error) {
-              stepCallback(`> ❌ Error creating real transaction: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
-              throw error
+              stepCallback(
+                `> ❌ Error creating real transaction: ${error instanceof Error ? error.message : "Unknown error"}`,
+                "error",
+              );
+              throw error;
             }
-          }
-        }
+          },
+        };
 
-        this.addStep(`> ✓ Real PAPI transaction created for ${pallet}.${callName}`, 'success')
-        return transaction
+        this.addStep(
+          `> ✓ Real PAPI transaction created for ${pallet}.${callName}`,
+          "success",
+        );
+        return transaction;
       }
 
-      if (pallet === 'System' && callName === 'remark') {
-        this.addStep(`> Creating System.remark transaction using getTypedApi()...`)
+      if (pallet === "System" && callName === "remark") {
+        this.addStep(
+          `> Creating System.remark transaction using getTypedApi()...`,
+        );
 
         // Validate that we have the System pallet and the remark method in the typedApi
-        const remarkMethod = typedApi.tx?.System?.remark
+        const remarkMethod = typedApi.tx?.System?.remark;
         if (!remarkMethod) {
-          throw new Error(`System.remark not found in chain descriptors. The descriptors may be incomplete or outdated.`)
+          throw new Error(
+            `System.remark not found in chain descriptors. The descriptors may be incomplete or outdated.`,
+          );
         }
 
         const transaction = {
@@ -330,29 +441,43 @@ export class TransactionExecutor {
           args,
           mock: false,
 
-          signAndSubmit: async (signer: any, stepCallback: (step: string, type?: string) => void) => {
+          signAndSubmit: async (
+            signer: any,
+            stepCallback: (step: string, type?: string) => void,
+          ) => {
             try {
               // Import Binary from polkadot-api for proper SCALE encoding
-              const { Binary } = await import('polkadot-api')
-              
+              const { Binary } = await import("polkadot-api");
+
               // Convert remark to Binary object for SCALE encoding
-              let remarkBinary
-              if (typeof args.remark === 'string') {
-                remarkBinary = Binary.fromText(args.remark)
+              let remarkBinary;
+              if (typeof args.remark === "string") {
+                remarkBinary = Binary.fromText(args.remark);
               } else if (args.remark instanceof Uint8Array) {
-                remarkBinary = Binary.fromBytes(args.remark)
+                remarkBinary = Binary.fromBytes(args.remark);
               } else {
-                throw new Error(`Invalid remark value: ${args.remark}. Must be a string or Uint8Array.`)
+                throw new Error(
+                  `Invalid remark value: ${args.remark}. Must be a string or Uint8Array.`,
+                );
               }
 
-              stepCallback('> Creating real PAPI transaction with typed API...', 'info')
+              stepCallback(
+                "> Creating real PAPI transaction with typed API...",
+                "info",
+              );
               const tx = typedApi.tx.System.remark({
-                remark: remarkBinary
-              })
-              
-              stepCallback('> ✓ Real transaction object created successfully', 'success')
-              stepCallback(`> Transaction details: ${safeStringify(tx.decodedCall)}`, 'info')
-              
+                remark: remarkBinary,
+              });
+
+              stepCallback(
+                "> ✓ Real transaction object created successfully",
+                "success",
+              );
+              stepCallback(
+                `> Transaction details: ${safeStringify(tx.decodedCall)}`,
+                "info",
+              );
+
               // TODO: SCALE encoding for educational purposes - TEMPORARILY DISABLED
               // This section shows users the raw SCALE-encoded transaction hex
               // Commented out to hide from users until ready for production
@@ -388,58 +513,81 @@ export class TransactionExecutor {
                 stepCallback(`> 📝 You can use the transaction structure above for verification`, 'info')
               }
               */
-              
-              stepCallback('> Signing transaction with test account...', 'info')
-              stepCallback('> ✓ Transaction signed successfully (simulated for safety)', 'success')
-              
+
+              stepCallback(
+                "> Signing transaction with test account...",
+                "info",
+              );
+              stepCallback(
+                "> ✓ Transaction signed successfully (simulated for safety)",
+                "success",
+              );
+
               // Simulate submission process
-              stepCallback('> Simulating submission to network...', 'info')
-              await new Promise(resolve => setTimeout(resolve, 1000))
-              stepCallback('> ✓ Transaction submission simulated', 'success')
-              
+              stepCallback("> Simulating submission to network...", "info");
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+              stepCallback("> ✓ Transaction submission simulated", "success");
+
               // Simulate finalization
-              stepCallback('> Simulating transaction finalization...', 'info')
-              await new Promise(resolve => setTimeout(resolve, 500))
-              stepCallback('> ✓ Transaction finalization simulated', 'success')
-              
+              stepCallback("> Simulating transaction finalization...", "info");
+              await new Promise((resolve) => setTimeout(resolve, 500));
+              stepCallback("> ✓ Transaction finalization simulated", "success");
+
               // Return simulated result
               return {
-                txHash: '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
-                blockHash: '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+                txHash:
+                  "0x" +
+                  Array.from({ length: 64 }, () =>
+                    Math.floor(Math.random() * 16).toString(16),
+                  ).join(""),
+                blockHash:
+                  "0x" +
+                  Array.from({ length: 64 }, () =>
+                    Math.floor(Math.random() * 16).toString(16),
+                  ).join(""),
                 mock: true,
                 success: true,
                 finalized: true,
                 events: [
                   {
-                    section: 'System',
-                    method: 'Remarked',
+                    section: "System",
+                    method: "Remarked",
                     data: {
                       sender: signer.address,
-                      remark: args.remark
-                    }
-                  }
+                      remark: args.remark,
+                    },
+                  },
                 ],
-                note: 'Real signature with simulated submission'
-              }
-              
+                note: "Real signature with simulated submission",
+              };
             } catch (error) {
-              stepCallback(`> ❌ Error creating real transaction: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
-              throw error
+              stepCallback(
+                `> ❌ Error creating real transaction: ${error instanceof Error ? error.message : "Unknown error"}`,
+                "error",
+              );
+              throw error;
             }
-          }
-        }
+          },
+        };
 
-        this.addStep(`> ✓ Real PAPI transaction created for ${pallet}.${callName}`, 'success')
-        return transaction
+        this.addStep(
+          `> ✓ Real PAPI transaction created for ${pallet}.${callName}`,
+          "success",
+        );
+        return transaction;
       }
 
-      if (pallet === 'Timestamp' && callName === 'set') {
-        this.addStep(`> Creating Timestamp.set transaction using getTypedApi()...`)
+      if (pallet === "Timestamp" && callName === "set") {
+        this.addStep(
+          `> Creating Timestamp.set transaction using getTypedApi()...`,
+        );
 
         // Validate that we have the Timestamp pallet and the set method in the typedApi
-        const setMethod = typedApi.tx?.Timestamp?.set
+        const setMethod = typedApi.tx?.Timestamp?.set;
         if (!setMethod) {
-          throw new Error(`Timestamp.set not found in chain descriptors. The descriptors may be incomplete or outdated.`)
+          throw new Error(
+            `Timestamp.set not found in chain descriptors. The descriptors may be incomplete or outdated.`,
+          );
         }
 
         const transaction = {
@@ -448,81 +596,127 @@ export class TransactionExecutor {
           args,
           mock: false,
 
-          signAndSubmit: async (signer: any, stepCallback: (step: string, type?: string) => void) => {
+          signAndSubmit: async (
+            signer: any,
+            stepCallback: (step: string, type?: string) => void,
+          ) => {
             try {
               // Validate and convert the timestamp (should be in milliseconds as u64)
-              let now: bigint
+              let now: bigint;
               try {
-                now = BigInt(args.now || Date.now())
+                now = BigInt(args.now || Date.now());
               } catch (error) {
-                throw new Error(`Invalid timestamp value: ${args.now}. Must be a valid number.`)
+                throw new Error(
+                  `Invalid timestamp value: ${args.now}. Must be a valid number.`,
+                );
               }
 
-              stepCallback('> Creating real PAPI transaction with typed API...', 'info')
+              stepCallback(
+                "> Creating real PAPI transaction with typed API...",
+                "info",
+              );
               const tx = typedApi.tx.Timestamp.set({
-                now
-              })
-              
-              stepCallback('> ✓ Real transaction object created successfully', 'success')
-              stepCallback(`> Transaction details: ${safeStringify(tx.decodedCall)}`, 'info')
-              
+                now,
+              });
+
+              stepCallback(
+                "> ✓ Real transaction object created successfully",
+                "success",
+              );
+              stepCallback(
+                `> Transaction details: ${safeStringify(tx.decodedCall)}`,
+                "info",
+              );
+
               // Educational note about transaction hex encoding
-              stepCallback(`> 📝 Transaction encoding skipped due to PAPI metadata compatibility`, 'info')
-              stepCallback(`> 📝 You can use the transaction structure above for verification`, 'info')
-              
-              stepCallback('> Signing transaction with test account...', 'info')
-              stepCallback('> ✓ Transaction signed successfully (simulated for safety)', 'success')
-              
+              stepCallback(
+                `> 📝 Transaction encoding skipped due to PAPI metadata compatibility`,
+                "info",
+              );
+              stepCallback(
+                `> 📝 You can use the transaction structure above for verification`,
+                "info",
+              );
+
+              stepCallback(
+                "> Signing transaction with test account...",
+                "info",
+              );
+              stepCallback(
+                "> ✓ Transaction signed successfully (simulated for safety)",
+                "success",
+              );
+
               // Simulate submission process
-              stepCallback('> Simulating submission to network...', 'info')
-              await new Promise(resolve => setTimeout(resolve, 1000))
-              stepCallback('> ✓ Transaction submission simulated', 'success')
-              
+              stepCallback("> Simulating submission to network...", "info");
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+              stepCallback("> ✓ Transaction submission simulated", "success");
+
               // Simulate finalization
-              stepCallback('> Simulating transaction finalization...', 'info')
-              await new Promise(resolve => setTimeout(resolve, 500))
-              stepCallback('> ✓ Transaction finalization simulated', 'success')
-              
+              stepCallback("> Simulating transaction finalization...", "info");
+              await new Promise((resolve) => setTimeout(resolve, 500));
+              stepCallback("> ✓ Transaction finalization simulated", "success");
+
               // Return simulated result
               return {
-                txHash: '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
-                blockHash: '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+                txHash:
+                  "0x" +
+                  Array.from({ length: 64 }, () =>
+                    Math.floor(Math.random() * 16).toString(16),
+                  ).join(""),
+                blockHash:
+                  "0x" +
+                  Array.from({ length: 64 }, () =>
+                    Math.floor(Math.random() * 16).toString(16),
+                  ).join(""),
                 mock: true,
                 success: true,
                 finalized: true,
                 events: [
                   {
-                    section: 'Timestamp',
-                    method: 'TimestampSet',
+                    section: "Timestamp",
+                    method: "TimestampSet",
                     data: {
-                      now: now.toString()
-                    }
-                  }
+                      now: now.toString(),
+                    },
+                  },
                 ],
-                note: 'Real signature with simulated submission'
-              }
-              
+                note: "Real signature with simulated submission",
+              };
             } catch (error) {
-              stepCallback(`> ❌ Error creating real transaction: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
-              throw error
+              stepCallback(
+                `> ❌ Error creating real transaction: ${error instanceof Error ? error.message : "Unknown error"}`,
+                "error",
+              );
+              throw error;
             }
-          }
-        }
+          },
+        };
 
-        this.addStep(`> ✓ Real PAPI transaction created for ${pallet}.${callName}`, 'success')
-        return transaction
+        this.addStep(
+          `> ✓ Real PAPI transaction created for ${pallet}.${callName}`,
+          "success",
+        );
+        return transaction;
       }
 
       // For other pallets/calls, try to create a generic transaction
-      this.addStep(`> Creating generic transaction for ${pallet}.${callName}...`)
+      this.addStep(
+        `> Creating generic transaction for ${pallet}.${callName}...`,
+      );
 
       // Check if the pallet and method exist in the typed API
-      const palletApi = typedApi.tx?.[pallet]
-      const methodApi = palletApi?.[callName]
-      
+      const palletApi = typedApi.tx?.[pallet];
+      const methodApi = palletApi?.[callName];
+
       if (!methodApi) {
-        this.addStep(`> ❌ ${pallet}.${callName} not found in chain descriptors`, 'error')
-        throw new Error(`${pallet}.${callName} not found in chain descriptors. The pallet or method may not be available on this chain.`)
+        this.addStep(
+          `> ❌ ${pallet}.${callName} not found in chain descriptors`,
+          "error",
+        );
+        throw new Error(
+          `${pallet}.${callName} not found in chain descriptors. The pallet or method may not be available on this chain.`,
+        );
       }
 
       const transaction = {
@@ -531,37 +725,66 @@ export class TransactionExecutor {
         args,
         mock: false,
 
-        signAndSubmit: async (signer: any, stepCallback: (step: string, type?: string) => void) => {
+        signAndSubmit: async (
+          signer: any,
+          stepCallback: (step: string, type?: string) => void,
+        ) => {
           try {
-            stepCallback('> Creating PAPI transaction with typed API...', 'info')
-            
+            stepCallback(
+              "> Creating PAPI transaction with typed API...",
+              "info",
+            );
+
             // Try to create transaction with the provided arguments
-            const tx = methodApi(args)
-            
-            stepCallback('> ✓ Transaction object created successfully', 'success')
-            stepCallback(`> Transaction details: ${safeStringify(tx.decodedCall)}`, 'info')
-            
+            const tx = methodApi(args);
+
+            stepCallback(
+              "> ✓ Transaction object created successfully",
+              "success",
+            );
+            stepCallback(
+              `> Transaction details: ${safeStringify(tx.decodedCall)}`,
+              "info",
+            );
+
             // Educational note about transaction hex encoding
-            stepCallback(`> 📝 Transaction encoding skipped due to PAPI metadata compatibility`, 'info')
-            stepCallback(`> 📝 You can use the transaction structure above for verification`, 'info')
-            
-            stepCallback('> Signing transaction with test account...', 'info')
-            stepCallback('> ✓ Transaction signed successfully (simulated for safety)', 'success')
-            
+            stepCallback(
+              `> 📝 Transaction encoding skipped due to PAPI metadata compatibility`,
+              "info",
+            );
+            stepCallback(
+              `> 📝 You can use the transaction structure above for verification`,
+              "info",
+            );
+
+            stepCallback("> Signing transaction with test account...", "info");
+            stepCallback(
+              "> ✓ Transaction signed successfully (simulated for safety)",
+              "success",
+            );
+
             // Simulate submission process
-            stepCallback('> Simulating submission to network...', 'info')
-            await new Promise(resolve => setTimeout(resolve, 1000))
-            stepCallback('> ✓ Transaction submission simulated', 'success')
-            
+            stepCallback("> Simulating submission to network...", "info");
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            stepCallback("> ✓ Transaction submission simulated", "success");
+
             // Simulate finalization
-            stepCallback('> Simulating transaction finalization...', 'info')
-            await new Promise(resolve => setTimeout(resolve, 500))
-            stepCallback('> ✓ Transaction finalization simulated', 'success')
-            
+            stepCallback("> Simulating transaction finalization...", "info");
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            stepCallback("> ✓ Transaction finalization simulated", "success");
+
             // Return simulated result
             return {
-              txHash: '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
-              blockHash: '0x' + Array.from({length: 64}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+              txHash:
+                "0x" +
+                Array.from({ length: 64 }, () =>
+                  Math.floor(Math.random() * 16).toString(16),
+                ).join(""),
+              blockHash:
+                "0x" +
+                Array.from({ length: 64 }, () =>
+                  Math.floor(Math.random() * 16).toString(16),
+                ).join(""),
               mock: true,
               success: true,
               finalized: true,
@@ -571,120 +794,151 @@ export class TransactionExecutor {
                   method: `${callName}Executed`,
                   data: {
                     sender: signer.address,
-                    ...args
-                  }
-                }
+                    ...args,
+                  },
+                },
               ],
-              note: 'Generic transaction with simulated submission'
-            }
-            
+              note: "Generic transaction with simulated submission",
+            };
           } catch (error) {
-            stepCallback(`> ❌ Error creating transaction: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
-            throw error
+            stepCallback(
+              `> ❌ Error creating transaction: ${error instanceof Error ? error.message : "Unknown error"}`,
+              "error",
+            );
+            throw error;
           }
-        }
-      }
+        },
+      };
 
-      this.addStep(`> ✓ Generic PAPI transaction created for ${pallet}.${callName}`, 'success')
-      return transaction
+      this.addStep(
+        `> ✓ Generic PAPI transaction created for ${pallet}.${callName}`,
+        "success",
+      );
+      return transaction;
     } catch (error) {
-      this.addStep(`> ❌ Failed to create PAPI transaction: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
-      throw error
+      this.addStep(
+        `> ❌ Failed to create PAPI transaction: ${error instanceof Error ? error.message : "Unknown error"}`,
+        "error",
+      );
+      throw error;
     }
   }
 
-  private async submitRealTransaction(transaction: any): Promise<TransactionResult> {
+  private async submitRealTransaction(
+    transaction: any,
+  ): Promise<TransactionResult> {
     try {
-      this.addStep(`> Processing transaction with ${formatSignerInfo(transaction.signer)}...`)
+      this.addStep(
+        `> Processing transaction with ${formatSignerInfo(transaction.signer)}...`,
+      );
 
       // Simulate PAPI's signAndSubmit method with real-time monitoring callback
       // Since we're using test accounts without real signers, we simulate the signing process
       const result = await transaction.papiTransaction.signAndSubmit(
         transaction.signer, // Pass the full signer object for simulation
-        (step: string, type?: string) => this.addStep(step, type as any)
-      )
+        (step: string, type?: string) => this.addStep(step, type as any),
+      );
 
       // Add simulated chain-specific explorer link
       if (hasExplorer(this.options.chainKey)) {
-        const explorerLinks = getExplorerLinks(this.options.chainKey)
-        const explorerName = getExplorerName(this.options.chainKey)
+        const explorerLinks = getExplorerLinks(this.options.chainKey);
+        const explorerName = getExplorerName(this.options.chainKey);
         if (explorerLinks && result.txHash) {
-          const explorerUrl = explorerLinks.transaction(result.txHash)
-          this.addStep(`🔗 ${explorerName} link (simulated): ${explorerUrl}`)
+          const explorerUrl = explorerLinks.transaction(result.txHash);
+          this.addStep(`🔗 ${explorerName} link (simulated): ${explorerUrl}`);
         }
       }
 
       // Show transaction details
-      this.addStep(`🔗 From: ${transaction.signer.name} (${transaction.signer.address})`)
+      this.addStep(
+        `🔗 From: ${transaction.signer.name} (${transaction.signer.address})`,
+      );
 
       // Show simulated finalization status
       if (result.finalized) {
-        this.addStep('🔒 Transaction finalization simulated', 'success')
+        this.addStep("🔒 Transaction finalization simulated", "success");
       }
 
       // Show simulated event details
       if (result.events && result.events.length > 0) {
-        this.addStep('📋 Transaction Events:', 'info')
+        this.addStep("📋 Transaction Events:", "info");
         result.events.forEach((event: any, index: number) => {
-          this.addStep(`  ${index + 1}. ${event.section}.${event.method}`, 'info')
-        })
+          this.addStep(
+            `  ${index + 1}. ${event.section}.${event.method}`,
+            "info",
+          );
+        });
       }
 
       // Handle different result structures from PAPI
-      const isSuccess = result.ok !== false && result.success !== false
-      
+      const isSuccess = result.ok !== false && result.success !== false;
+
       if (isSuccess) {
-        this.addStep('✅ Transaction simulation executed successfully!', 'success')
+        this.addStep(
+          "✅ Transaction simulation executed successfully!",
+          "success",
+        );
       } else {
-        this.addStep('⚠️ Transaction simulation failed', 'warning')
+        this.addStep("⚠️ Transaction simulation failed", "warning");
         // Handle different error structures
         if (result.dispatchError) {
-          this.addStep(`> Simulated Dispatch Error: ${JSON.stringify(result.dispatchError)}`, 'error')
+          this.addStep(
+            `> Simulated Dispatch Error: ${JSON.stringify(result.dispatchError)}`,
+            "error",
+          );
         } else if (result.error) {
-          this.addStep(`> Simulated Error: ${JSON.stringify(result.error)}`, 'error')
+          this.addStep(
+            `> Simulated Error: ${JSON.stringify(result.error)}`,
+            "error",
+          );
         } else if (result.dispatchResult && result.dispatchResult.isErr) {
-          this.addStep(`> Simulated Dispatch Error: ${JSON.stringify(result.dispatchResult.asErr)}`, 'error')
+          this.addStep(
+            `> Simulated Dispatch Error: ${JSON.stringify(result.dispatchResult.asErr)}`,
+            "error",
+          );
         }
       }
 
       // Format the amount for display (assuming it's a balance transfer)
-      if (transaction.pallet === 'Balances' && transaction.args.value) {
-        const amountInDot = Number(transaction.args.value) / 1_000_000_000_000
-        this.addStep(`🔗 To: ${transaction.args.dest} 🔗 Amount: ${amountInDot.toFixed(12)} DOT`)
+      if (transaction.pallet === "Balances" && transaction.args.value) {
+        const amountInDot = Number(transaction.args.value) / 1_000_000_000_000;
+        this.addStep(
+          `🔗 To: ${transaction.args.dest} 🔗 Amount: ${amountInDot.toFixed(12)} DOT`,
+        );
       }
 
-      const finalMessage = isSuccess ?
-        '✅ Transaction completed successfully! (Real signature, simulated submission)' :
-        '⚠️ Transaction completed with errors'
-      this.addStep(finalMessage, isSuccess ? 'success' : 'warning')
+      const finalMessage = isSuccess
+        ? "✅ Transaction completed successfully! (Real signature, simulated submission)"
+        : "⚠️ Transaction completed with errors";
+      this.addStep(finalMessage, isSuccess ? "success" : "warning");
 
       // Handle PAPI transaction result structure
       // PAPI results have different structure than traditional Substrate results
-      let blockNumber: number | undefined
-      let blockHash: string | undefined
-      
+      let blockNumber: number | undefined;
+      let blockHash: string | undefined;
+
       if (result.block) {
         // Traditional Substrate result structure
-        blockNumber = result.block.number
-        blockHash = result.block.hash
+        blockNumber = result.block.number;
+        blockHash = result.block.hash;
       } else if (result.blockNumber) {
         // PAPI result structure
-        blockNumber = result.blockNumber
-        blockHash = result.blockHash
+        blockNumber = result.blockNumber;
+        blockHash = result.blockHash;
       }
-      
+
       // Handle different error structures
-      let errorDetails = undefined
+      let errorDetails = undefined;
       if (result.ok === false) {
         if (result.dispatchError) {
-          errorDetails = result.dispatchError
+          errorDetails = result.dispatchError;
         } else if (result.error) {
-          errorDetails = result.error
+          errorDetails = result.error;
         } else if (result.dispatchResult && result.dispatchResult.isErr) {
-          errorDetails = result.dispatchResult.asErr
+          errorDetails = result.dispatchResult.asErr;
         }
       }
-      
+
       return {
         success: isSuccess,
         hash: result.txHash || result.hash, // For backward compatibility
@@ -692,19 +946,28 @@ export class TransactionExecutor {
         blockNumber,
         blockHash,
         events: result.events || [],
-        error: errorDetails
-      }
+        error: errorDetails,
+      };
     } catch (error) {
-      this.addStep(`> ❌ Real submission failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
+      this.addStep(
+        `> ❌ Real submission failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        "error",
+      );
 
       // Handle specific PAPI errors
       if (error instanceof Error) {
-        if (error.message.includes('InvalidTransaction')) {
-          this.addStep('> This might be due to insufficient funds, invalid nonce, or expired transaction', 'error')
-        } else if (error.message.includes('network')) {
-          this.addStep('> This might be a network connectivity issue', 'error')
-        } else if (error.message.includes('descriptors')) {
-          this.addStep('> This might be due to missing or invalid chain descriptors', 'error')
+        if (error.message.includes("InvalidTransaction")) {
+          this.addStep(
+            "> This might be due to insufficient funds, invalid nonce, or expired transaction",
+            "error",
+          );
+        } else if (error.message.includes("network")) {
+          this.addStep("> This might be a network connectivity issue", "error");
+        } else if (error.message.includes("descriptors")) {
+          this.addStep(
+            "> This might be due to missing or invalid chain descriptors",
+            "error",
+          );
         }
       }
 
@@ -716,8 +979,8 @@ export class TransactionExecutor {
         blockNumber: undefined,
         blockHash: undefined,
         events: [],
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
@@ -729,109 +992,131 @@ export class TransactionExecutor {
         callName: transaction.callName,
         args: transaction.args,
         chainKey: transaction.chainKey,
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      };
 
       // Convert to bytes for signing (simplified)
-      const payloadBytes = new TextEncoder().encode(JSON.stringify(transactionPayload))
+      const payloadBytes = new TextEncoder().encode(
+        JSON.stringify(transactionPayload),
+      );
 
       // Use the real signer to sign the payload
-      this.addStep(`> Generating cryptographic signature...`)
+      this.addStep(`> Generating cryptographic signature...`);
 
       // For Phase 3.2, we'll use signBytes for demonstration
       // In Phase 3.3, we'll use signTx with actual transaction objects
-      const signature = await transaction.signer.signer.signBytes(payloadBytes)
+      const signature = await transaction.signer.signer.signBytes(payloadBytes);
 
-      this.addStep(`> ✓ Signature generated: ${signature.length} bytes`, 'success')
+      this.addStep(
+        `> ✓ Signature generated: ${signature.length} bytes`,
+        "success",
+      );
 
       // Return signed transaction
       return {
         ...transaction,
         signature,
         signedAt: Date.now(),
-        payloadHash: this.generatePayloadHash(payloadBytes)
-      }
+        payloadHash: this.generatePayloadHash(payloadBytes),
+      };
     } catch (error) {
-      this.addStep(`> ❌ Signing failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
-      throw error
+      this.addStep(
+        `> ❌ Signing failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        "error",
+      );
+      throw error;
     }
   }
 
   private generatePayloadHash(payload: Uint8Array): string {
     // Simple hash generation for demo (in real implementation, use proper hashing)
-    let hash = 0
+    let hash = 0;
     for (let i = 0; i < payload.length; i++) {
-      const byte = payload[i]
+      const byte = payload[i];
       if (byte !== undefined) {
-        hash = ((hash << 5) - hash + byte) & 0xffffffff
+        hash = ((hash << 5) - hash + byte) & 0xffffffff;
       }
     }
-    return '0x' + Math.abs(hash).toString(16).padStart(8, '0')
+    return "0x" + Math.abs(hash).toString(16).padStart(8, "0");
   }
 
-  private async submitTransaction(signedTransaction: any, currentBlockNumber: number): Promise<TransactionResult> {
+  private async submitTransaction(
+    signedTransaction: any,
+    currentBlockNumber: number,
+  ): Promise<TransactionResult> {
     try {
       // For Phase 3.2, we'll show information about the signed transaction
       // This will be replaced with actual submission in Phase 3.3
 
-      this.addStep(`> ✓ Transaction signed by: ${formatSignerInfo(signedTransaction.signer)}`, 'success')
-      this.addStep(`> ✓ Payload hash: ${signedTransaction.payloadHash}`, 'success')
-      this.addStep(`> ✓ Signature length: ${signedTransaction.signature.length} bytes`, 'success')
+      this.addStep(
+        `> ✓ Transaction signed by: ${formatSignerInfo(signedTransaction.signer)}`,
+        "success",
+      );
+      this.addStep(
+        `> ✓ Payload hash: ${signedTransaction.payloadHash}`,
+        "success",
+      );
+      this.addStep(
+        `> ✓ Signature length: ${signedTransaction.signature.length} bytes`,
+        "success",
+      );
 
       // Generate a realistic transaction hash
-      const txHash = this.generateRealisticTxHash()
-      this.addStep(`> ✓ Transaction hash: ${txHash}`, 'success')
+      const txHash = this.generateRealisticTxHash();
+      this.addStep(`> ✓ Transaction hash: ${txHash}`, "success");
 
       // Simulate network propagation delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Use real block number + 1 for inclusion
-      const inclusionBlock = currentBlockNumber + 1
-      this.addStep(`> ✓ Included in block #${inclusionBlock}`, 'success')
+      const inclusionBlock = currentBlockNumber + 1;
+      this.addStep(`> ✓ Included in block #${inclusionBlock}`, "success");
 
       // Add chain-specific explorer links
-      this.addStep(``)
+      this.addStep(``);
       if (hasExplorer(this.options.chainKey)) {
-        const explorerLinks = getExplorerLinks(this.options.chainKey)
-        const explorerName = getExplorerName(this.options.chainKey)
+        const explorerLinks = getExplorerLinks(this.options.chainKey);
+        const explorerName = getExplorerName(this.options.chainKey);
         if (explorerLinks) {
-          const explorerUrl = explorerLinks.transaction(txHash)
-          this.addStep(`🔗 View on ${explorerName}: ${explorerUrl}`)
+          const explorerUrl = explorerLinks.transaction(txHash);
+          this.addStep(`🔗 View on ${explorerName}: ${explorerUrl}`);
         }
       }
-      this.addStep(`🔗 From: ${this.options.signer} (5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY)`)
+      this.addStep(
+        `🔗 From: ${this.options.signer} (5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY)`,
+      );
 
-      this.addStep(``)
-      this.addStep(`✅ Transaction executed successfully!`, 'success')
+      this.addStep(``);
+      this.addStep(`✅ Transaction executed successfully!`, "success");
 
       return {
         success: true,
         hash: txHash,
-        blockNumber: inclusionBlock
-      }
+        blockNumber: inclusionBlock,
+      };
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 
   private generateRealisticTxHash(): string {
     // Generate a more realistic transaction hash that follows Substrate patterns
-    const prefix = '0x'
-    const hash = Array.from({length: 64}, () => {
+    const prefix = "0x";
+    const hash = Array.from({ length: 64 }, () => {
       // Use a more realistic distribution of hex characters
-      const chars = '0123456789abcdef'
-      return chars[Math.floor(Math.random() * chars.length)]
-    }).join('')
-    
-    return prefix + hash
+      const chars = "0123456789abcdef";
+      return chars[Math.floor(Math.random() * chars.length)];
+    }).join("");
+
+    return prefix + hash;
   }
 
   getSteps(): TransactionStep[] {
-    return [...this.steps]
+    return [...this.steps];
   }
 
   clearSteps() {
-    this.steps = []
+    this.steps = [];
   }
 }
 
@@ -840,56 +1125,62 @@ export async function executeTransactionWithSteps(
   selectedCall: { pallet: string; call: PalletCall },
   formData: Record<string, any>,
   options: TransactionOptions,
-  onStep: (step: TransactionStep) => void
+  onStep: (step: TransactionStep) => void,
 ): Promise<TransactionResult> {
-  const executor = new TransactionExecutor(options)
-  executor.setStepCallback(onStep)
+  const executor = new TransactionExecutor(options);
+  executor.setStepCallback(onStep);
 
   return executor.executeTransaction(
     selectedCall.pallet,
     selectedCall.call.name,
-    formData
-  )
+    formData,
+  );
 }
 
 // Helper function to format transaction details for display
 export function formatTransactionDetails(
-  selectedCall: { pallet: string; call: PalletCall }, 
-  formData: Record<string, any>
+  selectedCall: { pallet: string; call: PalletCall },
+  formData: Record<string, any>,
 ): string {
-  if (selectedCall.pallet === 'Balances' && selectedCall.call.name.includes('transfer')) {
-    const dest = formData.dest || '//Bob'
-    const value = formData.value || 0
-    const formatted = (value / 1000000000000).toFixed(12) // Convert from planck to DOT
+  if (
+    selectedCall.pallet === "Balances" &&
+    selectedCall.call.name.includes("transfer")
+  ) {
+    const dest = formData.dest || "//Bob";
+    const value = formData.value || 0;
+    const formatted = (value / 1000000000000).toFixed(12); // Convert from planck to DOT
     return `🔗 To: ${dest} (5FHneW46...)
-🔗 Amount: ${formatted} DOT`
-  }
-  
-  if (selectedCall.pallet === 'System' && selectedCall.call.name === 'remark') {
-    const remarkText = typeof formData.remark === 'string' ? formData.remark : 'Hello World'
-    return `🔗 Remark: "${remarkText}"`
+🔗 Amount: ${formatted} DOT`;
   }
 
-  if (selectedCall.pallet === 'Timestamp' && selectedCall.call.name === 'set') {
-    const timestamp = formData.now || Date.now()
-    const date = new Date(Number(timestamp)).toISOString()
-    return `🔗 Timestamp: ${timestamp} (${date})`
+  if (selectedCall.pallet === "System" && selectedCall.call.name === "remark") {
+    const remarkText =
+      typeof formData.remark === "string" ? formData.remark : "Hello World";
+    return `🔗 Remark: "${remarkText}"`;
   }
-  
+
+  if (selectedCall.pallet === "Timestamp" && selectedCall.call.name === "set") {
+    const timestamp = formData.now || Date.now();
+    const date = new Date(Number(timestamp)).toISOString();
+    return `🔗 Timestamp: ${timestamp} (${date})`;
+  }
+
   // For other pallets, create a generic parameter display
   const paramStr = Object.entries(formData)
     .map(([k, v]) => {
       // Handle different value types
-      if (typeof v === 'bigint') {
-        return `${k}: ${v.toString()}`
+      if (typeof v === "bigint") {
+        return `${k}: ${v.toString()}`;
       } else if (v instanceof Uint8Array) {
-        return `${k}: [${v.length} bytes]`
-      } else if (typeof v === 'object' && v !== null) {
-        return `${k}: ${JSON.stringify(v)}`
+        return `${k}: [${v.length} bytes]`;
+      } else if (typeof v === "object" && v !== null) {
+        return `${k}: ${JSON.stringify(v)}`;
       }
-      return `${k}: ${v}`
+      return `${k}: ${v}`;
     })
-    .join(', ')
-  
-  return paramStr ? `🔗 Parameters: ${paramStr}` : `🔗 ${selectedCall.pallet}.${selectedCall.call.name} transaction`
+    .join(", ");
+
+  return paramStr
+    ? `🔗 Parameters: ${paramStr}`
+    : `🔗 ${selectedCall.pallet}.${selectedCall.call.name} transaction`;
 }
