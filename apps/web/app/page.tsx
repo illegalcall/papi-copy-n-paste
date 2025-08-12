@@ -227,7 +227,7 @@ export default function Page() {
         </div>
 
         {/* Left pane - always visible on desktop, sheet on mobile */}
-        <div className="hidden lg:block">
+        <div className="hidden lg:block lg:w-[25%] lg:flex-shrink-0">
           <LeftPane 
             isOpen={true}
             onClose={() => {}}
@@ -265,40 +265,44 @@ export default function Page() {
         </Sheet>
         
         {/* Center pane */}
-        <CenterPane 
-          chainStatus={chainStatus}
-          selectedChain={selectedChain}
-          selectedCall={selectedCall}
-          selectedStorage={selectedStorage}
-          onFormChange={handleFormChange}
-          onValidChange={handleValidChange}
-          onStorageQueryTypeChange={handleStorageQueryTypeChange}
-          onStorageParamsChange={handleStorageParamsChange}
-          onAddToQueue={handleAddToQueue}
-          onAddStorageToQueue={handleAddStorageToQueue}
-          onRemoveFromQueue={removeFromMethodQueue}
-          onRemoveStorageFromQueue={removeFromStorageQueue}
-          onClearQueue={clearMethodQueue}
-          onClearStorageQueue={clearStorageQueue}
-          canRun={canRunAny}
-          canRunStorage={canRunStorage}
-          isRunning={isRunning}
-          onRunClick={onRunClick}
-          onAbortClick={handleAbortClick}
-          methodQueue={methodQueue}
-          storageQueue={storageQueue}
-          storageQueryType={storageQueryType}
-          storageParams={storageParams}
-        />
+        <div className="w-full lg:w-[25%] lg:flex-shrink-0">
+          <CenterPane 
+            chainStatus={chainStatus}
+            selectedChain={selectedChain}
+            selectedCall={selectedCall}
+            selectedStorage={selectedStorage}
+            onFormChange={handleFormChange}
+            onValidChange={handleValidChange}
+            onStorageQueryTypeChange={handleStorageQueryTypeChange}
+            onStorageParamsChange={handleStorageParamsChange}
+            onAddToQueue={handleAddToQueue}
+            onAddStorageToQueue={handleAddStorageToQueue}
+            onRemoveFromQueue={removeFromMethodQueue}
+            onRemoveStorageFromQueue={removeFromStorageQueue}
+            onClearQueue={clearMethodQueue}
+            onClearStorageQueue={clearStorageQueue}
+            canRun={canRunAny}
+            canRunStorage={canRunStorage}
+            isRunning={isRunning}
+            onRunClick={onRunClick}
+            onAbortClick={handleAbortClick}
+            methodQueue={methodQueue}
+            storageQueue={storageQueue}
+            storageQueryType={storageQueryType}
+            storageParams={storageParams}
+          />
+        </div>
         
         {/* Right pane */}
-        <RightPane 
-          code={code}
-          consoleOutput={consoleOutput}
-          activeTab={activeTab}
-          onClearConsole={handleClearConsole}
-          selectedChain={selectedChain}
-        />
+        <div className="w-full lg:w-[50%] lg:flex-shrink-0">
+          <RightPane 
+            code={code}
+            consoleOutput={consoleOutput}
+            activeTab={activeTab}
+            onClearConsole={handleClearConsole}
+            selectedChain={selectedChain}
+          />
+        </div>
       </div>
     </div>
   )

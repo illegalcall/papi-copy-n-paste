@@ -454,15 +454,15 @@ export function CenterPane({
           onFormChange={onFormChange}
           onValidChange={onValidChange}
         />
-      ) : selectedStorage && onStorageQueryTypeChange && onStorageParamsChange ? (
+      ) : selectedStorage ? (
         <StorageForm
           pallet={selectedStorage.pallet}
           storage={selectedStorage.storage}
           chainKey={selectedChain}
-          queryType={storageQueryType}
-          storageParams={storageParams}
-          onQueryTypeChange={onStorageQueryTypeChange}
-          onParamsChange={onStorageParamsChange}
+          queryType={storageQueryType || 'getValue'}
+          storageParams={storageParams || {}}
+          onQueryTypeChange={onStorageQueryTypeChange || (() => {})}
+          onParamsChange={onStorageParamsChange || (() => {})}
         />
       ) : (
         <Card>

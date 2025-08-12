@@ -35,7 +35,7 @@ export function RightPane({
     }
   }, [activeTab])
 
-  const getSetupCommands = (chainKey: string): { commands: string[], description: string } => {
+  const getSetupCommands = (chainKey: string): { commands: string[], createPapiCommands: string[], description: string, templates: { name: string, description: string }[] } => {
     const chainConfigs: Record<string, { wellKnown?: string; wsUrl?: string; description: string; keyName: string }> = {
       polkadot: {
         wellKnown: "polkadot",
@@ -85,13 +85,22 @@ export function RightPane({
       : `papi add ${config.keyName} --wsUrl ${config.wsUrl}`
     
     return {
+      createPapiCommands: [
+        "npx create-papi-app"
+      ],
       commands: [
         "npm install -g polkadot-api",
         addCommand,
         "papi generate",
         "npm install"
       ],
-      description: config.description
+      description: config.description,
+      templates: [
+        { name: "minimal", description: "Basic setup for learning" },
+        { name: "vite-react", description: "React + Vite with modern UI (Recommended)" },
+        { name: "next-app", description: "Next.js with App Router" },
+        { name: "node-cli", description: "Command-line application" }
+      ]
     }
   }
 
@@ -292,7 +301,7 @@ export function RightPane({
           </TabsList>
         </div>
         
-        <TabsContent value="setup" className="flex-1 p-4 m-0 h-0 max-h-full overflow-hidden">
+        <TabsContent value="setup" className="flex-1 p-4 m-0 h-0 max-h-full overflow-auto">
           <Card className="h-full flex flex-col max-h-full">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
@@ -304,30 +313,68 @@ export function RightPane({
             </CardHeader>
             <CardContent className="p-4 flex-1 overflow-auto">
               {selectedChain ? (
-                <div className="space-y-4">
-                  <div className="space-y-4">
-                    {/* Setup Commands Section */}
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-3">
-                        Run these commands in your project:
-                      </div>
-                      
-                      <div className="bg-muted/50 border rounded-lg p-4 space-y-2">
-                        {getSetupCommands(selectedChain).commands.map((command, index) => (
-                          <div key={index} className="group flex items-center gap-2 hover:bg-muted/70 p-2 rounded-md transition-colors">
-                            <span className="text-muted-foreground select-none font-mono text-xs">$</span>
-                            <span className="font-mono text-sm text-foreground flex-1">{command}</span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
-                              onClick={() => handleCopyCommand(command)}
-                            >
-                              <Copy className="w-3 h-3" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
+                <div className="space-y-6">
+                  {/* Option 1: Quick Start with Template */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">
+                        Recommended
+                      </Badge>
+                      <h3 className="font-medium">Option 1: Quick Start with Template</h3>
+                    </div>
+                    
+                    <div className="text-sm text-muted-foreground mb-3">
+                      Run the command below and follow the interactive prompts to create your project:
+                    </div>
+                    
+                    <div className="bg-muted/50 border rounded-lg p-4 space-y-2">
+                      {getSetupCommands(selectedChain).createPapiCommands.map((command, index) => (
+                        <div key={index} className="group flex items-center gap-2 hover:bg-muted/70 p-2 rounded-md transition-colors">
+                          <span className="text-muted-foreground select-none font-mono text-xs">$</span>
+                          <span className="font-mono text-sm text-foreground flex-1">{command}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
+                            onClick={() => handleCopyCommand(command)}
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="text-xs text-muted-foreground mt-3 p-3 bg-green-50/50 dark:bg-green-950/20 rounded-md space-y-1">
+                      <div><strong>Template Options (you'll be prompted to choose):</strong></div>
+                      {getSetupCommands(selectedChain).templates.map((template, index) => (
+                        <div key={index}>• <strong>{template.name}</strong>: {template.description}</div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Option 2: Manual Setup */}
+                  <div className="space-y-3">
+                    <h3 className="font-medium">Option 2: Manual Setup in Existing Project</h3>
+                    
+                    <div className="text-sm text-muted-foreground mb-3">
+                      Add PAPI to your existing project:
+                    </div>
+                    
+                    <div className="bg-muted/50 border rounded-lg p-4 space-y-2">
+                      {getSetupCommands(selectedChain).commands.map((command, index) => (
+                        <div key={index} className="group flex items-center gap-2 hover:bg-muted/70 p-2 rounded-md transition-colors">
+                          <span className="text-muted-foreground select-none font-mono text-xs">$</span>
+                          <span className="font-mono text-sm text-foreground flex-1">{command}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
+                            onClick={() => handleCopyCommand(command)}
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
                     </div>
                   </div>
                   
@@ -335,13 +382,6 @@ export function RightPane({
                     <strong>Setting up:</strong> {getSetupCommands(selectedChain).description}
                   </div>
                   
-                  <div className="text-xs text-muted-foreground mt-4 p-3 bg-muted/50 rounded-md space-y-2">
-                    <div><strong>Recommended Workflow:</strong></div>
-                    <div>1. Run the setup commands above in your project</div>
-                    <div>2. Configure your transactions using the UI</div>
-                    <div>3. Copy the generated code from the Code tab</div>
-                    <div>4. Paste into your project and run it</div>
-                  </div>
                 </div>
               ) : (
                 <div className="text-sm text-muted-foreground">
