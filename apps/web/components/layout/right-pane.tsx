@@ -378,7 +378,6 @@ export function RightPane({
             <CardContent className="p-4 flex-1 overflow-auto">
               {selectedChain ? (
                 <div className="space-y-6">
-                  {/* Option 1: Quick Start with Template */}
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">Recommended</Badge>

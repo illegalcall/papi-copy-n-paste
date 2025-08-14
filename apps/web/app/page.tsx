@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { Header } from "@/components/layout/header";
-import { LeftPane } from "@/components/layout/left-pane";
+import { LeftPane, LeftPaneRef } from "@/components/layout/left-pane";
 import { CenterPane } from "@/components/layout/center-pane";
 import { RightPane } from "@/components/layout/right-pane";
 import { Sheet, SheetContent } from "@workspace/ui/components/sheet";
@@ -17,6 +17,7 @@ import { useTransactionQueue } from "../hooks/useTransactionQueue";
 import { useCodeGeneration } from "../hooks/useCodeGeneration";
 import { useExecution } from "../hooks/useExecution";
 import { useDebounce } from "../hooks/useDebounce";
+import { useGlobalSearch } from "../hooks/useGlobalSearch";
 
 // Import execution helpers
 import {
@@ -99,6 +100,33 @@ export default function Page() {
     setLeftPaneOpen,
     setActiveTab,
   } = useExecution();
+
+  // Refs for left pane to enable global search functionality
+  const leftPaneRef = useRef<LeftPaneRef>(null);
+  const leftPaneMobileRef = useRef<LeftPaneRef>(null);
+
+  // Global search functionality
+  const {} = useGlobalSearch({
+    onSearchActivate: () => {
+      // Check if we're on mobile or desktop
+      const isMobile = window.innerWidth < 1024; // lg breakpoint
+      
+      if (isMobile) {
+        // Open left pane if it's closed on mobile
+        if (!leftPaneOpen) {
+          setLeftPaneOpen(true);
+        }
+        // Focus the mobile search input after a small delay to ensure sheet is open
+        setTimeout(() => {
+          leftPaneMobileRef.current?.focusSearch();
+        }, 100);
+      } else {
+        // Focus the desktop search input
+        leftPaneRef.current?.focusSearch();
+      }
+    },
+    isEnabled: true
+  });
 
   // Debounce form data to prevent expensive code generation on every keystroke
   const debouncedFormData = useDebounce(formData, 300);
@@ -332,6 +360,7 @@ export default function Page() {
         {/* Left pane - always visible on desktop, sheet on mobile */}
         <div className="hidden lg:block lg:w-[25%] lg:flex-shrink-0">
           <LeftPane
+            ref={leftPaneRef}
             isOpen={true}
             onClose={() => {}}
             pallets={pallets}
@@ -359,6 +388,7 @@ export default function Page() {
         <Sheet open={leftPaneOpen} onOpenChange={setLeftPaneOpen}>
           <SheetContent side="left" className="p-0 w-80">
             <LeftPane
+              ref={leftPaneMobileRef}
               isOpen={leftPaneOpen}
               onClose={() => setLeftPaneOpen(false)}
               pallets={pallets}

@@ -7,7 +7,7 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "create-app": "pnpm build && node packages/create-papi-app/bin/create-papi-app.js"
+    "create-app": "npx create-papi-app"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@polkadot-api/descriptors": "file:.papi/descriptors",
+    "@polkadot/api": "^16.4.6",
     "@polkadot/keyring": "^13.5.6",
     "@polkadot/util-crypto": "^13.5.6"
   }
