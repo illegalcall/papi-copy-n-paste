@@ -391,10 +391,10 @@ export function getSetupCommandsForProvider(
 // cd my-app && npm run dev
 //
 // Option 2 - Manual setup:
-// npm install -g polkadot-api
-// papi add ${chainKey} --wsUrl ${provider.url || "wss://default-rpc-url.com"}
-// papi generate
 // npm install polkadot-api
+// npx papi add ${chainKey} --wsUrl ${provider.url || "wss://default-rpc-url.com"}
+// npx papi
+// npm install
 //
 // 📚 Docs: https://papi.how/docs/`;
 
@@ -405,10 +405,10 @@ export function getSetupCommandsForProvider(
 // cd my-app && npm run dev
 //
 // Option 2 - Manual setup in existing project:
-// npm install -g polkadot-api
-// papi add ${chainKey} --wsUrl ${provider.url}
-// papi generate
 // npm install polkadot-api
+// npx papi add ${chainKey} --wsUrl ${provider.url}
+// npx papi
+// npm install
 //
 // 📚 Docs: https://papi.how/docs/
 // 🌐 Provider: ${provider.name || "Custom RPC"}`;
@@ -420,10 +420,10 @@ export function getSetupCommandsForProvider(
 // npx @acala-network/chopsticks --endpoint=${provider.url?.replace("ws://", "wss://").replace("localhost:8000", "rpc.polkadot.io")} --port=${provider.url?.split(":")[2] || "8000"}
 //
 // Step 2 - Setup PAPI:
-// npm install -g polkadot-api
-// papi add ${chainKey} --wsUrl ${provider.url}
-// papi generate
 // npm install polkadot-api
+// npx papi add ${chainKey} --wsUrl ${provider.url}
+// npx papi
+// npm install
 //
 // 📚 Docs: https://papi.how/docs/
 // 🧪 Dev: https://github.com/AcalaNetwork/chopsticks`;
@@ -435,10 +435,10 @@ export function getSetupCommandsForProvider(
 // cd my-app && npm run start
 //
 // Option 2 - Manual setup in existing project:
-// npm install -g polkadot-api
-// papi add ${chainKey} --wsUrl ${provider.url}
-// papi generate
 // npm install polkadot-api
+// npx papi add ${chainKey} --wsUrl ${provider.url}
+// npx papi
+// npm install
 //
 // 📚 Docs: https://papi.how/docs/
 // 🌐 Provider: ${provider.name || "Custom RPC"}`;
@@ -450,9 +450,10 @@ export function getSetupCommandsForProvider(
 // cd my-app && npm run dev
 //
 // Option 2 - Manual setup:
-// npm install -g polkadot-api
-// papi generate
 // npm install polkadot-api
+// npx papi add {chain-name} -n {well-known-chain}
+// npx papi
+// npm install
 //
 // 📚 Docs: https://papi.how/docs/`;
   }

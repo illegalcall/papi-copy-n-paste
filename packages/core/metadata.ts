@@ -16,11 +16,19 @@ export interface PalletEvent {
   docs: string[];
 }
 
+export interface PalletConstant {
+  name: string;
+  type: string;
+  value: any;
+  docs: string[];
+}
+
 export interface PalletInfo {
   name: string;
   calls: PalletCall[];
   storage: PalletStorage[];
   events: PalletEvent[];
+  constants: PalletConstant[];
 }
 
 export interface ChainMetadata {
@@ -313,6 +321,14 @@ function getChainSpecificPallets(chainKey: string): PalletInfo[] {
               docs: ["Token transfer occurred."],
             },
           ],
+          constants: [
+            {
+              name: "GetNativeCurrencyId",
+              type: "CurrencyId",
+              value: "0",
+              docs: ["Native currency identifier."],
+            },
+          ],
         },
         {
           name: "DEX",
@@ -346,6 +362,7 @@ function getChainSpecificPallets(chainKey: string): PalletInfo[] {
               docs: ["Token swap occurred."],
             },
           ],
+          constants: [],
         },
       ];
 
@@ -382,6 +399,7 @@ function getChainSpecificPallets(chainKey: string): PalletInfo[] {
               docs: ["Bond and stake event."],
             },
           ],
+          constants: [],
         },
       ];
 
@@ -414,6 +432,7 @@ function getChainSpecificPallets(chainKey: string): PalletInfo[] {
               docs: ["Ethereum transaction executed via XCM."],
             },
           ],
+          constants: [],
         },
       ];
 
@@ -468,6 +487,38 @@ function getBasePallets(): PalletInfo[] {
             { name: "hash", type: "Hash" },
           ],
           docs: ["On-chain remark happened."],
+        },
+      ],
+      constants: [
+        {
+          name: "BlockHashCount",
+          type: "u32",
+          value: "4096",
+          docs: ["Maximum number of block hashes to keep in storage."],
+        },
+        {
+          name: "DbWeight",
+          type: "RuntimeDbWeight",
+          value: '{"read": 25000000, "write": 100000000}',
+          docs: ["Database weight constants."],
+        },
+        {
+          name: "MaximumBlockWeight",
+          type: "Weight",
+          value: '{"ref_time": 2000000000000, "proof_size": 5242880}',
+          docs: ["Maximum weight of a block."],
+        },
+        {
+          name: "MaximumBlockLength",
+          type: "u32",
+          value: "5242880",
+          docs: ["Maximum length of a block (in bytes)."],
+        },
+        {
+          name: "Version",
+          type: "RuntimeVersion",
+          value: '{"spec_name": "polkadot", "impl_name": "parity-polkadot", "spec_version": 1000000}',
+          docs: ["Runtime version information."],
         },
       ],
     },
@@ -571,6 +622,38 @@ function getBasePallets(): PalletInfo[] {
           docs: ["A balance was set by root."],
         },
       ],
+      constants: [
+        {
+          name: "ExistentialDeposit",
+          type: "u128",
+          value: "10000000000",
+          docs: ["The minimum amount required to keep an account open. This MUST be greater than zero."],
+        },
+        {
+          name: "MaxLocks",
+          type: "u32",
+          value: "50",
+          docs: ["The maximum number of locks that should exist on an account."],
+        },
+        {
+          name: "MaxReserves",
+          type: "u32", 
+          value: "50",
+          docs: ["The maximum number of named reserves that can exist on an account."],
+        },
+        {
+          name: "MaxHolds",
+          type: "u32",
+          value: "50", 
+          docs: ["The maximum number of holds that can exist on an account at any time."],
+        },
+        {
+          name: "MaxFreezes",
+          type: "u32",
+          value: "50",
+          docs: ["The maximum number of individual freeze locks that can exist on an account at any time."],
+        },
+      ],
     },
     {
       name: "Timestamp",
@@ -589,6 +672,20 @@ function getBasePallets(): PalletInfo[] {
         },
       ],
       events: [],
+      constants: [
+        {
+          name: "Now",
+          type: "u64",
+          value: "1699123456000",
+          docs: ["Current timestamp in milliseconds."],
+        },
+        {
+          name: "MinimumPeriod",
+          type: "u64", 
+          value: "3000",
+          docs: ["Minimum period between blocks."],
+        },
+      ],
     },
     {
       name: "Staking",
@@ -679,6 +776,44 @@ function getBasePallets(): PalletInfo[] {
           docs: ["Account was unbonded."],
         },
       ],
+      constants: [
+        {
+          name: "BondingDuration",
+          type: "u32",
+          value: "28",
+          docs: ["Number of eras that staked funds must remain bonded for."],
+        },
+        {
+          name: "SlashDeferDuration",
+          type: "u32",
+          value: "27",
+          docs: ["Number of eras that slashes are deferred by."],
+        },
+        {
+          name: "SessionsPerEra",
+          type: "u32",
+          value: "6",
+          docs: ["Number of sessions per era."],
+        },
+        {
+          name: "MaxNominatorRewardedPerValidator",
+          type: "u32",
+          value: "512",
+          docs: ["Maximum number of nominators rewarded for each validator."],
+        },
+        {
+          name: "OffendingValidatorsThreshold",
+          type: "Perbill",
+          value: "170000000",
+          docs: ["Threshold for offending validators."],
+        },
+        {
+          name: "MaxExposurePageSize",
+          type: "u32",
+          value: "512",
+          docs: ["Maximum size of validator exposure page."],
+        },
+      ],
     },
     {
       name: "Democracy",
@@ -745,6 +880,44 @@ function getBasePallets(): PalletInfo[] {
           docs: ["An account has voted in a referendum."],
         },
       ],
+      constants: [
+        {
+          name: "LaunchPeriod",
+          type: "u32",
+          value: "28800",
+          docs: ["How often (in blocks) new public referenda are launched."],
+        },
+        {
+          name: "VotingPeriod", 
+          type: "u32",
+          value: "28800",
+          docs: ["How often (in blocks) to check for new votes."],
+        },
+        {
+          name: "VoteLockingPeriod",
+          type: "u32",
+          value: "28800", 
+          docs: ["The period for which a vote is locked."],
+        },
+        {
+          name: "MinimumDeposit",
+          type: "u128",
+          value: "100000000000000",
+          docs: ["The minimum amount to be used as a deposit for a public referendum proposal."],
+        },
+        {
+          name: "EnactmentPeriod",
+          type: "u32",
+          value: "28800",
+          docs: ["The period between a proposal being approved and enacted."],
+        },
+        {
+          name: "FastTrackVotingPeriod",
+          type: "u32",
+          value: "900", 
+          docs: ["Minimum voting period allowed for a fast-track referendum."],
+        },
+      ],
     },
     {
       name: "Treasury",
@@ -803,6 +976,50 @@ function getBasePallets(): PalletInfo[] {
           docs: ["Some funds have been allocated."],
         },
       ],
+      constants: [
+        {
+          name: "ProposalBond",
+          type: "Permill", 
+          value: "50000",
+          docs: ["Fraction of a proposal's value that should be bonded in order to place the proposal."],
+        },
+        {
+          name: "ProposalBondMinimum",
+          type: "u128",
+          value: "20000000000000",
+          docs: ["Minimum amount of funds that should be placed in a deposit for making a proposal."],
+        },
+        {
+          name: "ProposalBondMaximum",
+          type: "Option<u128>",
+          value: "1000000000000000",
+          docs: ["Maximum amount of funds that should be placed in a deposit for making a proposal."],
+        },
+        {
+          name: "SpendPeriod",
+          type: "u32",
+          value: "86400",
+          docs: ["Period between successive spends."],
+        },
+        {
+          name: "Burn",
+          type: "Permill",
+          value: "2000",
+          docs: ["Percentage of spare funds (if any) that are burnt per spend period."],
+        },
+        {
+          name: "PalletId",
+          type: "[u8; 8]",
+          value: '"py/trsry"',
+          docs: ["The treasury's pallet id, used for deriving its sovereign account ID."],
+        },
+        {
+          name: "MaxApprovals",
+          type: "u32",
+          value: "100",
+          docs: ["The maximum number of approvals that can wait in the spending queue."],
+        },
+      ],
     },
     {
       name: "Vesting",
@@ -851,6 +1068,20 @@ function getBasePallets(): PalletInfo[] {
           name: "VestingCompleted",
           args: [{ name: "account", type: "AccountId32" }],
           docs: ["An account has become fully vested."],
+        },
+      ],
+      constants: [
+        {
+          name: "MinVestedTransfer",
+          type: "u128",
+          value: "100000000000",
+          docs: ["The minimum amount transferred to call vested_transfer."],
+        },
+        {
+          name: "MaxVestingSchedules",
+          type: "u32",
+          value: "28",
+          docs: ["Maximum number of vesting schedules an account may have at a given moment."],
         },
       ],
     },
@@ -928,6 +1159,7 @@ function getBasePallets(): PalletInfo[] {
           docs: ["Some assets have been placed in an asset trap."],
         },
       ],
+      constants: [],
     },
     {
       name: "Utility",
@@ -972,8 +1204,168 @@ function getBasePallets(): PalletInfo[] {
           docs: ["Batch of dispatches completed fully with no error."],
         },
       ],
+      constants: [
+        {
+          name: "batched_calls_limit",
+          type: "u32",
+          value: "10922",
+          docs: ["The limit on the number of batched calls."],
+        },
+      ],
     },
   ];
+}
+
+// Helper function to get enhanced constants for known pallets
+function getEnhancedConstantsForPallet(palletName: string): PalletConstant[] {
+  const normalizedName = palletName.toLowerCase();
+  
+  // Return additional constants for pallets that might not have complete metadata
+  switch (normalizedName) {
+    case "multisig":
+      return [
+        {
+          name: "DepositBase",
+          type: "u128", 
+          value: "500000000000",
+          docs: ["The base amount of currency needed to reserve for creating a multisig execution or to store a dispatch call for later."],
+        },
+        {
+          name: "DepositFactor",
+          type: "u128",
+          value: "32000000000",
+          docs: ["The amount of currency needed per unit threshold when creating a multisig execution."],
+        },
+        {
+          name: "MaxSignatories",
+          type: "u32",
+          value: "100",
+          docs: ["The maximum amount of signatories allowed in the multisig."],
+        },
+      ];
+      
+    case "proxy":
+      return [
+        {
+          name: "ProxyDepositBase",
+          type: "u128",
+          value: "200080000000",
+          docs: ["The base amount of currency needed to reserve for creating a proxy."],
+        },
+        {
+          name: "ProxyDepositFactor", 
+          type: "u128",
+          value: "330000000",
+          docs: ["The amount of currency needed per proxy type."],
+        },
+        {
+          name: "MaxProxies",
+          type: "u32",
+          value: "32",
+          docs: ["The maximum amount of proxies allowed for a single account."],
+        },
+        {
+          name: "MaxPending",
+          type: "u32",
+          value: "32",
+          docs: ["The maximum amount of time-delayed announcements that are allowed to be pending."],
+        },
+        {
+          name: "AnnouncementDepositBase",
+          type: "u128", 
+          value: "200080000000",
+          docs: ["The base amount of currency needed to reserve for creating an announcement."],
+        },
+      ];
+      
+    case "identity":
+      return [
+        {
+          name: "BasicDeposit",
+          type: "u128",
+          value: "200000000000",
+          docs: ["The amount held on deposit for a registered identity."],
+        },
+        {
+          name: "FieldDeposit",
+          type: "u128",
+          value: "66000000000",
+          docs: ["The amount held on deposit per additional field for a registered identity."],
+        },
+        {
+          name: "SubAccountDeposit",
+          type: "u128",
+          value: "200000000000",
+          docs: ["The amount held on deposit for a registered subaccount."],
+        },
+        {
+          name: "MaxSubAccounts",
+          type: "u32",
+          value: "100",
+          docs: ["Maximum number of additional fields that may be stored in an ID."],
+        },
+        {
+          name: "MaxAdditionalFields",
+          type: "u32",
+          value: "100", 
+          docs: ["Maxmimum number of additional fields that may be stored in an ID."],
+        },
+      ];
+      
+    case "scheduler":
+      return [
+        {
+          name: "MaximumWeight",
+          type: "Weight",
+          value: '{"ref_time": 1000000000000, "proof_size": 2621440}',
+          docs: ["The maximum weight that may be scheduled per block for any dispatchables."],
+        },
+        {
+          name: "MaxScheduledPerBlock",
+          type: "u32",
+          value: "50",
+          docs: ["The maximum number of scheduled calls in the queue for a single block."],
+        },
+      ];
+      
+    case "assets":
+    case "tokens":
+      return [
+        {
+          name: "AssetDeposit",
+          type: "u128",
+          value: "10000000000000",
+          docs: ["The basic amount of funds that must be reserved for an asset."],
+        },
+        {
+          name: "AssetAccountDeposit", 
+          type: "u128",
+          value: "1000000000",
+          docs: ["The amount of funds that must be reserved for a non-provider asset account to be maintained."],
+        },
+        {
+          name: "MetadataDepositBase",
+          type: "u128",
+          value: "1000000000000",
+          docs: ["The basic amount of funds that must be reserved when adding metadata to your asset."],
+        },
+        {
+          name: "MetadataDepositPerByte",
+          type: "u128", 
+          value: "10000000",
+          docs: ["The additional funds that must be reserved for the number of bytes you store in your metadata."],
+        },
+        {
+          name: "ApprovalDeposit",
+          type: "u128",
+          value: "100000000",
+          docs: ["The amount of funds that must be reserved when creating an approval."],
+        },
+      ];
+      
+    default:
+      return [];
+  }
 }
 
 async function parseRawMetadata(
@@ -1110,6 +1502,7 @@ function parseDecodedMetadata(
         calls: [],
         storage: [],
         events: [],
+        constants: [],
       };
 
       // Parse calls - always try to parse calls for every pallet
@@ -1136,6 +1529,24 @@ function parseDecodedMetadata(
         // Similar to calls, events are referenced by type index
         palletInfo.events = parseEventsFromPallet(pallet);
       }
+
+      // Parse constants
+      if (pallet.constants && Array.isArray(pallet.constants)) {
+        for (const constant of pallet.constants) {
+          palletInfo.constants.push({
+            name: constant.name || "Unknown",
+            type: constant.type || "Unknown",
+            value: constant.value || null,
+            docs: Array.isArray(constant.docs) ? constant.docs : [],
+          });
+        }
+      }
+
+      // Add enhanced constants based on pallet name
+      palletInfo.constants = [
+        ...palletInfo.constants,
+        ...getEnhancedConstantsForPallet(pallet.name || ""),
+      ];
 
       pallets.push(palletInfo);
     }
@@ -2431,6 +2842,7 @@ function parseMetadata(metadata: any, chainKey: string): ChainMetadata {
         calls: [],
         storage: [],
         events: [],
+        constants: [],
       };
 
       // Parse calls
@@ -2470,6 +2882,18 @@ function parseMetadata(metadata: any, chainKey: string): ChainMetadata {
                 type: field.type || "unknown",
               })) || [],
             docs: event.docs || [],
+          });
+        }
+      }
+
+      // Parse constants
+      if (pallet.constants && Array.isArray(pallet.constants)) {
+        for (const constant of pallet.constants) {
+          palletInfo.constants.push({
+            name: constant.name || "Unknown",
+            type: constant.type || "Unknown", 
+            value: constant.value || null,
+            docs: constant.docs || [],
           });
         }
       }
@@ -2702,6 +3126,11 @@ export function buildPalletTree(metadata: ChainMetadata | null): PalletInfo[] {
       storage: pallet.storage.map((storage) => ({
         ...storage,
         type: storage.type || "Unknown",
+      })),
+      // Ensure constants have proper types
+      constants: pallet.constants.map((constant) => ({
+        ...constant,
+        type: constant.type || "Unknown",
       })),
     }))
     .sort((a, b) => a.name.localeCompare(b.name));

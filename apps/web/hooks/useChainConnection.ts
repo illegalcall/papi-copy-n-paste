@@ -43,11 +43,12 @@ export function useChainConnection(
   // Enhanced metadata fetching with better state management
   useEffect(() => {
     if (enhancedStatus === "connected" && api) {
+      // Clear any previous errors when connection is established
+      setMetadataError(null);
       // Add a small delay to ensure client is fully stable
       const timeoutId = setTimeout(
         async () => {
           setIsLoadingMetadata(true);
-          setMetadataError(null);
 
           try {
             const metadata = await fetchMetadata(selectedChain, api);
@@ -111,6 +112,15 @@ export function useChainConnection(
       setMetadataError(null);
     }
   }, [enhancedStatus, api, selectedChain, selectedProvider, provider, error]);
+
+  // Additional effect to clear errors when pallets are successfully loaded
+  // This is the most important fix - if pallets exist, no error should be shown
+  useEffect(() => {
+    if (pallets.length > 0) {
+      // If we have pallets, connection is working - clear any error
+      setMetadataError(null);
+    }
+  }, [pallets.length]);
 
   const handleNetworkChange = (chainKey: string, providerId: string) => {
     setSelectedChain(chainKey);

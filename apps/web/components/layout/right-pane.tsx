@@ -108,15 +108,15 @@ export function RightPane({
     }
 
     const addCommand = config.wellKnown
-      ? `papi add ${config.keyName} -n ${config.wellKnown}`
-      : `papi add ${config.keyName} --wsUrl ${config.wsUrl}`;
+      ? `npx papi add ${config.keyName} -n ${config.wellKnown}`
+      : `npx papi add ${config.keyName} --wsUrl ${config.wsUrl}`;
 
     return {
       createPapiCommands: ["npx create-papi-app"],
       commands: [
-        "npm install -g polkadot-api",
+        "npm install polkadot-api",
         addCommand,
-        "papi generate",
+        "npx papi",
         "npm install",
       ],
       description: config.description,
