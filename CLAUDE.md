@@ -54,7 +54,7 @@ Successfully implemented comprehensive learning features for the PAPI Copy-n-Pas
   - Bifrost: `wss://hk.p.bifrost-rpc.liebi.com/ws`
   - Astar: `wss://rpc.astar.network`
   - Acala: `wss://acala-rpc.dwellir.com`
-  - Hydration: `wss://rpc.hydration.cloud`
+  - Hydration: `wss://hydration-rpc.n.dwellir.com`
 
 ### 3. Generated Code Format
 

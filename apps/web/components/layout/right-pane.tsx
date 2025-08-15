@@ -95,7 +95,7 @@ export function RightPane({
         keyName: "acala",
       },
       hydration: {
-        wsUrl: "wss://rpc.hydration.cloud",
+        wsUrl: "wss://hydration-rpc.n.dwellir.com",
         description: "Hydration parachain",
         keyName: "hydration",
       },

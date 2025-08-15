@@ -319,7 +319,7 @@ export const networkConfigs: NetworkConfig[] = [
         name: "Hydration Network",
         type: "rpc",
         description: "Official Hydration RPC",
-        url: "wss://rpc.hydration.cloud",
+        url: "wss://hydration-rpc.n.dwellir.com",
         reliability: "high",
         latency: "low",
       },
