@@ -11,13 +11,42 @@ import {
   getNetworkConfig,
   getProvider,
 } from "@workspace/core";
+import { loadChainPreferences, saveChainPreferences } from "../utils/localStorage";
+
+function getInitialChainPreferences(
+  defaultChain: string,
+  defaultProvider: string,
+): { chain: string; provider: string } {
+  const saved = loadChainPreferences();
+
+  if (saved) {
+    // Validate that the saved chain and provider are still valid
+    const networkConfig = getNetworkConfig(saved.selectedChain);
+    const providerConfig = getProvider(saved.selectedChain, saved.selectedProvider);
+
+    if (networkConfig && providerConfig) {
+      return {
+        chain: saved.selectedChain,
+        provider: saved.selectedProvider,
+      };
+    }
+  }
+
+  return {
+    chain: defaultChain,
+    provider: defaultProvider,
+  };
+}
 
 export function useChainConnection(
   initialChain = "polkadot",
   initialProvider = "allnodes-polkadot",
 ) {
-  const [selectedChain, setSelectedChain] = useState(initialChain);
-  const [selectedProvider, setSelectedProvider] = useState(initialProvider);
+  // Initialize with localStorage preferences if available and valid
+  const initialPreferences = getInitialChainPreferences(initialChain, initialProvider);
+
+  const [selectedChain, setSelectedChain] = useState(initialPreferences.chain);
+  const [selectedProvider, setSelectedProvider] = useState(initialPreferences.provider);
   const [pallets, setPallets] = useState<PalletInfo[]>([]);
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
   const [metadataError, setMetadataError] = useState<string | null>(null);
@@ -125,6 +154,10 @@ export function useChainConnection(
   const handleNetworkChange = (chainKey: string, providerId: string) => {
     setSelectedChain(chainKey);
     setSelectedProvider(providerId);
+
+    // Save preferences to localStorage
+    saveChainPreferences(chainKey, providerId);
+
     // Reset state when network changes
     setPallets([]);
     setMetadataError(null);

@@ -12,12 +12,11 @@ import {
 import { Checkbox } from "@workspace/ui/components/checkbox";
 import { Badge } from "@workspace/ui/components/badge";
 import { Label } from "@workspace/ui/components/label";
-// import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@workspace/ui/components/tooltip"
 import { PalletCall } from "@workspace/core";
 import { HelpCircle, Code2, ChevronDown, ChevronUp } from "lucide-react";
 import { getParameterEducation } from "../../data/parameter-education";
 import { generateCallSignature } from "@/utils/typeExtraction";
-import { TypeAliasDisplay, CallSignature } from "@/components/type-display";
+import { CallSignature } from "@/components/type-display";
 
 interface SimpleCallFormProps {
   pallet: string;

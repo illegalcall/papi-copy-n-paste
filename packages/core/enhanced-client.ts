@@ -61,8 +61,6 @@ async function createSmoldotProvider(
   networkConfig: any,
   provider: NetworkProvider,
 ) {
-  console.log(`🌟 Creating Smoldot provider for ${networkConfig.chainName}`);
-
   const smoldot = getSmoldotInstance();
 
   if (!networkConfig.chainSpecPath) {
@@ -78,10 +76,6 @@ async function createSmoldotProvider(
 }
 
 function createRpcProvider(networkConfig: any, provider: NetworkProvider) {
-  console.log(
-    `🔗 Creating RPC provider for ${networkConfig.chainName}: ${provider.url}`,
-  );
-
   if (!provider.url) {
     throw new Error(`RPC URL not configured for provider ${provider.name}`);
   }
@@ -93,10 +87,6 @@ function createChopsticksProvider(
   networkConfig: any,
   provider: NetworkProvider,
 ) {
-  console.log(
-    `🥢 Creating Chopsticks provider for ${networkConfig.chainName}: ${provider.url}`,
-  );
-
   if (!provider.url) {
     throw new Error(
       `Chopsticks URL not configured for provider ${provider.name}`,
@@ -107,10 +97,6 @@ function createChopsticksProvider(
 }
 
 function createCustomProvider(networkConfig: any, provider: NetworkProvider) {
-  console.log(
-    `⚙️ Creating custom provider for ${networkConfig.chainName}: ${provider.url}`,
-  );
-
   if (!provider.url) {
     throw new Error(`Custom URL not configured for provider ${provider.name}`);
   }
@@ -167,7 +153,6 @@ export async function createEnhancedClient(
   // Check cache first
   const cached = getCachedConnection(chainKey, providerId);
   if (cached) {
-    console.log(`⚡ Using cached connection for ${chainKey}:${providerId}`);
     return {
       client: cached.client,
       provider: cached.provider,
@@ -185,9 +170,6 @@ export async function createEnhancedClient(
     throw new Error(`Provider not found: ${providerId} for chain: ${chainKey}`);
   }
 
-  console.log(
-    `🔄 Creating client for ${networkConfig.chainName} using ${provider.name} (${provider.type})`,
-  );
 
   let rawProvider: any;
 
@@ -236,20 +218,12 @@ export async function createEnhancedClient(
     ]);
 
     const connectionTime = Date.now() - startTime;
-    console.log(
-      `✅ Successfully connected to ${networkConfig.chainName} via ${provider.name} (${connectionTime}ms)`,
-    );
 
     // Cache the connection
     setCachedConnection(chainKey, providerId, client, provider);
 
     return { client, provider, connectionTime };
   } catch (error) {
-    const connectionTime = Date.now() - startTime;
-    console.error(
-      `❌ Failed to connect to ${networkConfig.chainName} via ${provider.name} (${connectionTime}ms):`,
-      error,
-    );
     throw error;
   }
 }
@@ -342,10 +316,7 @@ export function useEnhancedClient(
                 return;
               }
             } catch (fallbackError) {
-              console.error(
-                `❌ Fallback also failed for ${chainKey}:`,
-                fallbackError,
-              );
+              // Fallback failed, will use error state
             }
           }
         }

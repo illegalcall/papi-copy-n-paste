@@ -19,7 +19,7 @@ import {
   generateStorageSignature,
 } from "../../utils/typeExtraction";
 import { detectStorageParameters, getStorageParameterInfo } from "../../utils/dynamicStorageDetection";
-import { TypeAliasDisplay, CallSignature } from "@/components/type-display";
+import { CallSignature } from "@/components/type-display";
 
 interface StorageFormProps {
   pallet: string;
@@ -65,7 +65,6 @@ function getStorageTypeInfo(
     const paramTypes = determineStorageParameters(
       pallet,
       storageName,
-      storageType,
       chainKey
     );
 
@@ -88,7 +87,6 @@ function getStorageTypeInfo(
 function determineStorageParameters(
   pallet: string,
   storageName: string,
-  storageType: string,
   chainKey: string = 'polkadot'
 ): string[] {
   // Use dynamic detection to get parameter types

@@ -25,6 +25,7 @@ import {
   executeMultipleTransactions,
   executeMultipleStorageQueries,
   executeStorageQuery,
+  stopWatchValue,
 } from "../utils/transactionHelpers";
 
 export default function Page() {
@@ -89,14 +90,16 @@ export default function Page() {
     isRunning,
     consoleOutput,
     activeTab,
-    hasSelectedPallet,
     leftPaneOpen,
+    isWatching,
+    currentWatchKey,
     handleRunClick,
+    handleWatchClick,
+    handleStopWatch,
     handleAbortClick,
     handleClearConsole,
     resetExecutionState,
     setConsoleOutput,
-    setHasSelectedPallet,
     setLeftPaneOpen,
     setActiveTab,
   } = useExecution();
@@ -174,21 +177,6 @@ export default function Page() {
     updateGeneratedCode,
   ]);
 
-  // Update hasSelectedPallet when pallets are selected
-  useEffect(() => {
-    const hasPalletSelection =
-      !!selectedCall ||
-      !!selectedStorage ||
-      methodQueue.length > 0 ||
-      storageQueue.length > 0;
-    setHasSelectedPallet(hasPalletSelection);
-  }, [
-    selectedCall,
-    selectedStorage,
-    methodQueue.length,
-    storageQueue.length,
-    setHasSelectedPallet,
-  ]);
 
   // Handle network changes - reset all state
   const onNetworkChange = useCallback(
@@ -325,9 +313,56 @@ export default function Page() {
     setConsoleOutput,
   ]);
 
+  // Special handling for watch operations
+  const executeWatchOperation = useCallback(async () => {
+    if (!api || !selectedStorage) return { watchKey: '', isWatching: false };
+
+    try {
+      const result = await executeStorageQuery(
+        selectedStorage,
+        storageQueryType,
+        storageParams,
+        selectedChain,
+        api,
+        setConsoleOutput,
+        () => {},
+      );
+
+      // Ensure we return a proper watch result
+      if (result && typeof result === 'object' && 'watchKey' in result) {
+        return result;
+      }
+
+      // If no result returned, assume watch started successfully
+      return { watchKey: `${selectedChain}-${selectedStorage.pallet}-${selectedStorage.storage.name}`, isWatching: true };
+    } catch (error) {
+      console.error('Watch operation failed:', error);
+      return { watchKey: '', isWatching: false };
+    }
+  }, [selectedStorage, storageQueryType, storageParams, selectedChain, api, setConsoleOutput]);
+
+  // Handle stop watching
+  const onStopWatch = useCallback(() => {
+    if (currentWatchKey) {
+      const logger = {
+        success: (msg: string) => setConsoleOutput(prev => [...prev, msg]),
+        info: (msg: string) => setConsoleOutput(prev => [...prev, msg])
+      };
+      const stopped = stopWatchValue(currentWatchKey, logger);
+      if (stopped) {
+        handleStopWatch();
+      }
+    }
+  }, [currentWatchKey, setConsoleOutput, handleStopWatch]);
+
   const onRunClick = useCallback(() => {
-    handleRunClick(executeCurrentOperation);
-  }, [handleRunClick, executeCurrentOperation]);
+    // Check if this is a watchValue operation
+    if (selectedStorage && storageQueryType === 'watchValue') {
+      handleWatchClick(executeWatchOperation);
+    } else {
+      handleRunClick(executeCurrentOperation);
+    }
+  }, [selectedStorage, storageQueryType, handleWatchClick, executeWatchOperation, handleRunClick, executeCurrentOperation]);
 
   // Determine if we can run anything
   const canRunAny =
@@ -423,7 +458,7 @@ export default function Page() {
         </Sheet>
 
         {/* Center pane */}
-        <div className="w-full lg:w-[25%] lg:flex-shrink-0">
+        <div className="w-full lg:w-[25%] lg:flex-shrink-0 h-full">
           <CenterPane
             chainStatus={chainStatus}
             selectedChain={selectedChain}
@@ -442,7 +477,9 @@ export default function Page() {
             canRun={canRunAny}
             canRunStorage={canRunStorage}
             isRunning={isRunning}
+            isWatching={isWatching}
             onRunClick={onRunClick}
+            onStopWatch={onStopWatch}
             onAbortClick={handleAbortClick}
             methodQueue={methodQueue}
             storageQueue={storageQueue}

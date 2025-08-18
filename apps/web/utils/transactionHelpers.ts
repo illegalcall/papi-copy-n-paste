@@ -11,9 +11,13 @@ import { getDescriptorName } from "./chainConfig";
 import {
   detectStorageParameters,
   generateStorageParamValues,
-  formatStorageResult,
+  formatStorageResult as formatStorageResultHelper,
   decodeStorageResult,
 } from "./storageHelpers";
+import { createCleanLogger, QueryResult } from "./cleanLogger";
+
+// Observable subscriptions storage for watch functionality
+let activeWatchSubscriptions = new Map<string, any>();
 
 // Execute a single transaction with real blockchain interaction
 export async function executeRealTransaction(
@@ -21,7 +25,7 @@ export async function executeRealTransaction(
   formData: Record<string, any>,
   chainKey: string,
   client: any,
-  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<any[]>>,
   setIsRunning: React.Dispatch<React.SetStateAction<boolean>>,
 ) {
   const { pallet, call } = selectedCall;
@@ -77,7 +81,7 @@ export async function executeMultipleTransactions(
   }>,
   chainKey: string,
   client: any,
-  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<any[]>>,
 ) {
   setConsoleOutput((prev) => [
     ...prev,
@@ -157,7 +161,8 @@ export async function executeMultipleStorageQueries(
   }>,
   chainKey: string,
   client: any,
-  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<any[]>>,
+  addResultDisplay?: (result: QueryResult) => void,
 ) {
   setConsoleOutput((prev) => [
     ...prev,
@@ -214,15 +219,15 @@ export async function executeStorageQuery(
   storageParams: Record<string, any>,
   chainKey: string,
   client: any,
-  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<any[]>>,
   setIsRunning: React.Dispatch<React.SetStateAction<boolean>>,
-) {
+  addResultDisplay?: (result: QueryResult) => void,
+): Promise<{ watchKey: string; isWatching: boolean } | undefined> {
+  const logger = createCleanLogger(setConsoleOutput);
+  const { pallet, storage } = selectedStorage;
+
   try {
-    setConsoleOutput((prev) => [
-      ...prev,
-      `🔍 Executing ${selectedStorage.pallet}.${selectedStorage.storage.name} storage query...`,
-    ]);
-    setConsoleOutput((prev) => [...prev, `📊 Query Type: ${queryType}`]);
+    logger.startQuery(pallet, storage.name, queryType);
 
     // Import the appropriate descriptor dynamically
     const descriptorName = getDescriptorName(chainKey);
@@ -249,21 +254,11 @@ export async function executeStorageQuery(
     const storageQuery = (client as any).query?.[palletName]?.[storageName];
 
     if (storageQuery) {
-      setConsoleOutput((prev) => [
-        ...prev,
-        `🔧 Using typed API for ${palletName}.${storageName}`,
-      ]);
-
       if (hasParams && paramValues.length > 0) {
-        // Handle BigInt serialization in parameters too
         const serializedParams = JSON.stringify(paramValues, (key, value) =>
           typeof value === 'bigint' ? value.toString() : value
         );
-
-        setConsoleOutput((prev) => [
-          ...prev,
-          `📝 Parameters: ${serializedParams}`,
-        ]);
+        logger.info(`Parameters: ${serializedParams}`);
       }
 
       // Execute the appropriate query type
@@ -272,8 +267,11 @@ export async function executeStorageQuery(
           await executeGetValue(
             storageQuery,
             paramValues,
-            setConsoleOutput,
+            logger,
             hasParams,
+            palletName,
+            storageName,
+            queryType,
           );
           break;
         case "getValueAt":
@@ -282,43 +280,58 @@ export async function executeStorageQuery(
             undefined,
             selectedStorage.pallet,
             selectedStorage.storage.name,
-            setConsoleOutput,
+            logger,
           );
           break;
         case "watchValue":
-          await executeWatchValue(
+          const watchResult = await executeWatchValue(
             client,
             undefined,
             selectedStorage.pallet,
             selectedStorage.storage.name,
-            setConsoleOutput,
+            logger,
+            chainKey,
           );
+          return watchResult; // Return watch state for UI
           break;
         default:
           await executeGetValue(
             storageQuery,
             paramValues,
-            setConsoleOutput,
+            logger,
             hasParams,
+            palletName,
+            storageName,
+            queryType,
           );
       }
     } else {
-      await executeRawStorageQuery(
+      const rawResult = await executeRawStorageQuery(
         selectedStorage,
         queryType,
         storageParams,
         chainKey,
         client,
-        setConsoleOutput,
+        logger,
       );
+      // Return watch result if it's a watchValue operation
+      if (queryType === 'watchValue' && rawResult) {
+        return rawResult;
+      }
     }
+
+    // For non-watchValue operations, return undefined
+    return undefined;
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    setConsoleOutput((prev) => [
-      ...prev,
-      `❌ Storage query error: ${errorMessage}`,
-    ]);
+    logger.queryError(pallet, storage.name, queryType, errorMessage);
+
+    // Return failed state for watchValue operations
+    if (queryType === 'watchValue') {
+      return { watchKey: '', isWatching: false };
+    }
+    return undefined;
   } finally {
     setIsRunning(false);
   }
@@ -328,27 +341,20 @@ export async function executeStorageQuery(
 async function executeGetValue(
   storageQuery: any,
   paramValues: any[],
-  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
+  logger: any,
   hasParams: boolean,
+  pallet: string,
+  storageName: string,
+  queryType: string,
 ) {
   try {
     const result = hasParams
       ? await storageQuery(...paramValues)
       : await storageQuery();
-    const formattedResult = formatStorageResult(result);
-    setConsoleOutput((prev) => [
-      ...prev,
-      `📋 Current Value: ${formattedResult}`,
-    ]);
-    setConsoleOutput((prev) => [
-      ...prev,
-      `🎉 Successfully retrieved current storage value!`,
-    ]);
+    logger.querySuccess(pallet, storageName, queryType, result);
   } catch (error) {
-    setConsoleOutput((prev) => [
-      ...prev,
-      `❌ Get value failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-    ]);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    logger.queryError(pallet, storageName, queryType, `Get value failed: ${errorMessage}`);
   }
 }
 
@@ -359,23 +365,14 @@ async function executeRawStorageQuery(
   storageParams: Record<string, any>,
   chainKey: string,
   client: any,
-  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
-) {
+  logger: any,
+): Promise<{ watchKey: string; isWatching: boolean } | undefined> {
   const palletName = selectedStorage.pallet;
   const storageName = selectedStorage.storage.name;
-
-  setConsoleOutput((prev) => [
-    ...prev,
-    `🔍 Attempting basic query for ${palletName}.${storageName}`,
-  ]);
 
   try {
     // Try to get runtime metadata to understand the storage structure
     if (client._request && typeof client._request === "function") {
-      setConsoleOutput((prev) => [
-        ...prev,
-        `📡 Fetching chain information and attempting storage query...`,
-      ]);
 
       // Execute basic query based on type
       switch (queryType) {
@@ -385,7 +382,7 @@ async function executeRawStorageQuery(
             palletName,
             storageName,
             chainKey,
-            setConsoleOutput,
+            logger,
           );
           break;
         case "getValueAt":
@@ -394,40 +391,44 @@ async function executeRawStorageQuery(
             undefined,
             palletName,
             storageName,
-            setConsoleOutput,
+            logger,
           );
           break;
         case "watchValue":
-          await executeWatchValue(
+          const watchResult = await executeWatchValue(
             client,
             undefined,
             palletName,
             storageName,
-            setConsoleOutput,
+            logger,
+            chainKey,
           );
-          break;
+          return watchResult; // Return watch state for UI
         default:
           await executeRawGetValue(
             client,
             palletName,
             storageName,
             chainKey,
-            setConsoleOutput,
+            logger,
           );
       }
     } else {
-      setConsoleOutput((prev) => [
-        ...prev,
-        `❌ Client does not support raw queries`,
-      ]);
+      logger.error("Client does not support raw queries");
     }
+
+    // For non-watchValue operations, return undefined
+    return undefined;
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    setConsoleOutput((prev) => [
-      ...prev,
-      `❌ Raw storage query failed: ${errorMessage}`,
-    ]);
+    logger.error(`Raw storage query failed: ${errorMessage}`);
+
+    // Return failed state for watchValue operations
+    if (queryType === 'watchValue') {
+      return { watchKey: '', isWatching: false };
+    }
+    return undefined;
   }
 }
 
@@ -437,82 +438,29 @@ async function executeRawGetValue(
   palletName: string,
   storageName: string,
   chainKey: string,
-  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
+  logger: any,
 ) {
   try {
-    setConsoleOutput((prev) => [
-      ...prev,
-      `🔍 Using dynamic storage query for ${palletName}.${storageName}`,
-    ]);
-
-    // First, let's try to use the client to get metadata and construct the storage key
-    setConsoleOutput((prev) => [
-      ...prev,
-      `📡 Fetching runtime metadata to generate storage key...`,
-    ]);
-
-    setConsoleOutput((prev) => [
-      ...prev,
-      `✅ Dynamic parameter detection completed successfully`,
-    ]);
-
-    setConsoleOutput((prev) => [
-      ...prev,
-      `📋 Analysis Results:`,
-    ]);
-
-    setConsoleOutput((prev) => [
-      ...prev,
-      `   • Storage Item: ${palletName}.${storageName}`,
-    ]);
-
     // Detect storage parameters for this specific query
     const requiredParams = detectStorageParameters(palletName, storageName, chainKey);
 
-    // Show actual parameter detection results
-    const paramDisplayText = requiredParams.length > 0
-      ? `${requiredParams.join(', ')} (${requiredParams.length} parameter${requiredParams.length > 1 ? 's' : ''})`
-      : 'None (detected by pattern matching)';
-
-    setConsoleOutput((prev) => [
-      ...prev,
-      `   • Parameters Required: ${paramDisplayText}`,
-    ]);
-
-    setConsoleOutput((prev) => [
-      ...prev,
-      `🚀 Attempting proper PAPI typed API integration...`,
-    ]);
+    if (requiredParams.length > 0) {
+      logger.info(`Parameters required: ${requiredParams.join(', ')}`);
+    }
 
     // Now attempt the proper PAPI integration
     try {
-      // Import the descriptor for the current chain dynamically
-      setConsoleOutput((prev) => [
-        ...prev,
-        `📦 Loading chain descriptor for runtime integration...`,
-      ]);
-
       // Get the correct descriptor based on chain
       const descriptors = (window as any).papiDescriptors || {};
       const descriptorName = getDescriptorName(chainKey);
 
       // Check if descriptor is available for this chain
       if (!descriptorName) {
-        setConsoleOutput((prev) => [
-          ...prev,
-          `❌ No descriptor available for chain: ${chainKey}`,
-          `💡 This chain is not currently supported for typed API queries`,
-          `🔧 Supported chains: polkadot, kusama, moonbeam, bifrost, astar, paseo, westend, rococo, hydration`,
-        ]);
+        logger.error(`Chain '${chainKey}' not supported for typed queries`);
         return;
       }
 
       if (!descriptors[descriptorName]) {
-        // Try to import the descriptor dynamically
-        setConsoleOutput((prev) => [
-          ...prev,
-          `🔄 Importing ${descriptorName} descriptor dynamically for ${chainKey}...`,
-        ]);
 
         // Dynamically import the correct descriptor
         const descriptorModule = await import('../../../.papi/descriptors/dist');
@@ -522,44 +470,11 @@ async function executeRawGetValue(
           throw new Error(`Descriptor ${descriptorName} not found in descriptors module`);
         }
 
-        setConsoleOutput((prev) => [
-          ...prev,
-          `✅ Descriptor imported successfully`,
-        ]);
-
-        // Get typed API with the descriptor
-        setConsoleOutput((prev) => [
-          ...prev,
-          `🔗 Creating typed API connection...`,
-        ]);
-
         const typedApi = client.getTypedApi(descriptor);
-
-        setConsoleOutput((prev) => [
-          ...prev,
-          `📊 Accessing ${palletName} pallet...`,
-        ]);
-
-        // Dynamically access the pallet and storage
         const palletQueries = typedApi.query[palletName];
+
         if (palletQueries && palletQueries[storageName]) {
-          setConsoleOutput((prev) => [
-            ...prev,
-            `✅ Found ${palletName}.${storageName} in typed API`,
-          ]);
-
-          // Check the type of the storage function
           const storageFunction = palletQueries[storageName];
-          setConsoleOutput((prev) => [
-            ...prev,
-            `🔍 Storage function type: ${typeof storageFunction}`,
-            `🔍 Is function: ${typeof storageFunction === 'function'}`,
-          ]);
-
-          setConsoleOutput((prev) => [
-            ...prev,
-            `🔍 Executing storage query...`,
-          ]);
 
           // Execute the actual storage query - handle both direct function and object cases
           let result;
@@ -581,10 +496,6 @@ async function executeRawGetValue(
               })
             : [];
 
-          setConsoleOutput((prev) => [
-            ...prev,
-            `🔧 Using parameters: ${paramValues.length > 0 ? JSON.stringify(paramValues) : 'none'}`,
-          ]);
 
           if (typeof storageFunction === 'function') {
             result = paramValues.length > 0
@@ -602,94 +513,23 @@ async function executeRawGetValue(
             throw new Error(`Storage item ${palletName}.${storageName} is not callable: ${typeof storageFunction}`);
           }
 
-          // Handle BigInt serialization safely
-          const serializedResult = typeof result === 'bigint'
-            ? result.toString()
-            : JSON.stringify(result, (key, value) =>
-                typeof value === 'bigint' ? value.toString() : value
-              );
-
-          setConsoleOutput((prev) => [
-            ...prev,
-            `📋 Raw Result: ${serializedResult}`,
-          ]);
-
-          if (result !== null && result !== undefined) {
-            setConsoleOutput((prev) => [
-              ...prev,
-              `🎉 SUCCESS: Retrieved actual storage value!`,
-            ]);
-
-            // Handle BigInt serialization for the display value too
-            const displayValue = typeof result === 'bigint'
-              ? result.toString()
-              : JSON.stringify(result, (key, value) =>
-                  typeof value === 'bigint' ? value.toString() : value, 2
-                );
-
-            setConsoleOutput((prev) => [
-              ...prev,
-              `💎 Value: ${displayValue}`,
-            ]);
-          } else {
-            setConsoleOutput((prev) => [
-              ...prev,
-              `📊 Result: null/empty (this is normal for some storage items)`,
-            ]);
-          }
-
-          setConsoleOutput((prev) => [
-            ...prev,
-            `✅ COMPLETE SUCCESS: Full dynamic PAPI integration working!`,
-          ]);
+          // Handle result display
+          logger.querySuccess(palletName, storageName, 'getValue', result);
 
         } else {
-          setConsoleOutput((prev) => [
-            ...prev,
-            `❌ Storage ${palletName}.${storageName} not found in typed API`,
-          ]);
-
-          setConsoleOutput((prev) => [
-            ...prev,
-            `💡 This may mean the storage doesn't exist in the current runtime`,
-          ]);
+          logger.error(`Storage ${palletName}.${storageName} not found`);
         }
 
-      } else {
-        setConsoleOutput((prev) => [
-          ...prev,
-          `❌ No descriptors available for PAPI integration`,
-        ]);
       }
 
     } catch (integrationError) {
-      setConsoleOutput((prev) => [
-        ...prev,
-        `⚠️ PAPI integration error: ${integrationError instanceof Error ? integrationError.message : "Unknown error"}`,
-      ]);
-
-      setConsoleOutput((prev) => [
-        ...prev,
-        `💡 Falling back to RPC-based approach for demonstration`,
-      ]);
-
-      // Fallback to show the system is working
-      setConsoleOutput((prev) => [
-        ...prev,
-        `✅ Dynamic Detection System: FULLY OPERATIONAL`,
-      ]);
+      const errorMessage = integrationError instanceof Error ? integrationError.message : "Unknown error";
+      logger.queryError(palletName, storageName, 'getValue', errorMessage);
     }
 
   } catch (error) {
-    setConsoleOutput((prev) => [
-      ...prev,
-      `❌ Dynamic storage query failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-    ]);
-
-    setConsoleOutput((prev) => [
-      ...prev,
-      `💡 This may be due to RPC limitations or network issues`,
-    ]);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    logger.queryError(palletName, storageName, 'getValue', errorMessage);
   }
 }
 
@@ -699,21 +539,15 @@ async function executeGetValueAt(
   storageKey: string | undefined,
   palletName: string,
   storageName: string,
-  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
+  logger: any,
 ) {
   try {
     if (!storageKey) {
-      setConsoleOutput((prev) => [
-        ...prev,
-        `⚠️ Storage key lookup not implemented for ${palletName}.${storageName}`,
-      ]);
+      logger.warning(`Storage key lookup not implemented for ${palletName}.${storageName}`);
       return;
     }
 
-    setConsoleOutput((prev) => [
-      ...prev,
-      `🔍 Fetching values at finalized and best blocks...`,
-    ]);
+    logger.info('Fetching values at finalized and best blocks');
 
     // Get finalized block hash
     const finalizedHash = await client._request("chain_getFinalizedHead", []);
@@ -736,101 +570,201 @@ async function executeGetValueAt(
       ? decodeStorageResult(bestValue, palletName, storageName)
       : "null";
 
-    setConsoleOutput((prev) => [
-      ...prev,
-      `📋 At Finalized Block: ${decodedFinalized}`,
-    ]);
-    setConsoleOutput((prev) => [...prev, `📋 At Best Block: ${decodedBest}`]);
-    setConsoleOutput((prev) => [
-      ...prev,
-      `🎉 Successfully retrieved values at different blocks!`,
-    ]);
+    logger.result('At Finalized Block', decodedFinalized);
+    logger.result('At Best Block', decodedBest);
+    logger.success('Successfully retrieved values at different blocks');
   } catch (error) {
-    setConsoleOutput((prev) => [
-      ...prev,
-      `❌ Get value at blocks failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-    ]);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    logger.error(`Get value at blocks failed: ${errorMessage}`);
   }
 }
 
-// Watch for storage value changes
+// Watch for storage value changes using modern PAPI architecture with manual control
 async function executeWatchValue(
   client: any,
-  storageKey: string | undefined,
+  storageKey: string | undefined, // Legacy parameter, now unused
   palletName: string,
   storageName: string,
-  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
+  logger: any,
+  chainKey: string,
 ) {
   try {
-    if (!storageKey) {
-      setConsoleOutput((prev) => [
-        ...prev,
-        `⚠️ Storage key lookup not implemented for ${palletName}.${storageName}`,
-      ]);
-      return;
+    const watchKey = `${chainKey}-${palletName}-${storageName}`;
+
+    // Check if already watching
+    if (activeWatchSubscriptions.has(watchKey)) {
+      logger.info(`Already watching ${palletName}.${storageName}. Click Stop to end current watch.`);
+      return { watchKey, isWatching: true };
     }
 
-    setConsoleOutput((prev) => [
-      ...prev,
-      `👁️ Starting to watch ${palletName}.${storageName} for changes...`,
-    ]);
-    setConsoleOutput((prev) => [
-      ...prev,
-      `⏰ Will monitor for 10 seconds, checking every 2 seconds`,
-    ]);
+    // Get the appropriate descriptor for the current chain
+    const descriptorName = getDescriptorName(chainKey);
 
-    let checkCount = 0;
-    const maxChecks = 5; // 10 seconds total
-    let lastValue: string | null = null;
-
-    const watchInterval = setInterval(async () => {
-      try {
-        checkCount++;
-        const currentValue = await client._request("state_getStorage", [
-          storageKey,
-        ]);
-        const decodedValue = currentValue
-          ? decodeStorageResult(currentValue, palletName, storageName)
-          : "null";
-
-        if (lastValue === null) {
-          setConsoleOutput((prev) => [
-            ...prev,
-            `📋 Initial Value: ${decodedValue}`,
-          ]);
-        } else if (lastValue !== decodedValue) {
-          setConsoleOutput((prev) => [
-            ...prev,
-            `🔄 Value Changed: ${decodedValue}`,
-          ]);
-        } else {
-          setConsoleOutput((prev) => [
-            ...prev,
-            `⏱️ Check ${checkCount}/5 - No change: ${decodedValue}`,
-          ]);
-        }
-
-        lastValue = decodedValue;
-
-        if (checkCount >= maxChecks) {
-          clearInterval(watchInterval);
-          setConsoleOutput((prev) => [
-            ...prev,
-            `✅ Finished watching ${palletName}.${storageName}`,
-          ]);
-        }
-      } catch (error) {
-        setConsoleOutput((prev) => [
-          ...prev,
-          `❌ Watch error: ${error instanceof Error ? error.message : "Unknown error"}`,
-        ]);
-        clearInterval(watchInterval);
+    // Dynamically import the descriptor - clean imports at top
+    let descriptor: any;
+    try {
+      if (!descriptorName) {
+        throw new Error(`Invalid descriptor name for chain: ${chainKey}`);
       }
-    }, 2000); // Check every 2 seconds
+
+      const descriptorsModule = await import('@polkadot-api/descriptors');
+      descriptor = descriptorsModule[descriptorName as keyof typeof descriptorsModule];
+
+      if (!descriptor) {
+        throw new Error(`Descriptor ${descriptorName} not found`);
+      }
+    } catch (importError) {
+      logger.error(`Failed to import descriptor ${descriptorName}: ${importError}`);
+      return { watchKey, isWatching: false };
+    }
+
+    // Create typed API with the proper descriptor
+    const typedApi = client.getTypedApi(descriptor);
+    const storageQuery = typedApi.query?.[palletName]?.[storageName];
+
+    if (storageQuery && typeof storageQuery.watchValue === 'function') {
+      logger.info(`🔴 Starting continuous watch for ${palletName}.${storageName}`);
+      logger.info('📡 Using PAPI observable - will log every value change');
+      logger.info('🛑 Click "Stop Watching" button to end');
+
+      let valueCount = 0;
+      let subscription: any = null;
+
+      try {
+        // Use PAPI's reactive watchValue with proper Observable handling
+        subscription = storageQuery.watchValue().subscribe({
+          next: (value: any) => {
+            valueCount++;
+            const formattedValue = formatPapiStorageResult(value);
+            const timestamp = new Date().toLocaleTimeString();
+
+            if (valueCount === 1) {
+              // Pass raw value to logger.result so it can detect large arrays
+              logger.result('Initial Value', value);
+            } else {
+              // For subsequent updates, also use logger.result for array copy functionality
+              logger.result(`Update #${valueCount} [${timestamp}]`, value);
+            }
+          },
+          error: (error: any) => {
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
+            logger.error(`Observable error: ${errorMessage}`);
+            activeWatchSubscriptions.delete(watchKey);
+          },
+          complete: () => {
+            logger.info('Observable completed');
+            activeWatchSubscriptions.delete(watchKey);
+          }
+        });
+
+        // Store subscription for manual control
+        activeWatchSubscriptions.set(watchKey, {
+          subscription,
+          palletName,
+          storageName,
+          valueCount,
+          startTime: Date.now()
+        });
+
+        return { watchKey, isWatching: true };
+
+      } catch (subscriptionError) {
+        const errorMessage = subscriptionError instanceof Error ? subscriptionError.message : "Unknown error";
+        logger.error(`Failed to create subscription: ${errorMessage}`);
+        return { watchKey, isWatching: false };
+      }
+    } else {
+      logger.error(`watchValue not available for ${palletName}.${storageName}`);
+      return { watchKey, isWatching: false };
+    }
+
   } catch (error) {
-    setConsoleOutput((prev) => [
-      ...prev,
-      `❌ Watch setup failed: ${error instanceof Error ? error.message : "Unknown error"}`,
-    ]);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    logger.error(`Watch value setup failed: ${errorMessage}`);
+    return { watchKey: '', isWatching: false };
   }
+}
+
+// Stop watching a specific storage value
+export function stopWatchValue(watchKey: string, logger: any): boolean {
+  const watchData = activeWatchSubscriptions.get(watchKey);
+
+  if (watchData) {
+    const { subscription, palletName, storageName, valueCount, startTime } = watchData;
+    const duration = Math.round((Date.now() - startTime) / 1000);
+
+    subscription.unsubscribe();
+    activeWatchSubscriptions.delete(watchKey);
+
+    logger.success(`🛑 Stopped watching ${palletName}.${storageName}`);
+    logger.info(`📊 Watched for ${duration}s, received ${valueCount} updates`);
+
+    return true;
+  }
+
+  return false;
+}
+
+// Check if currently watching
+export function isWatching(watchKey: string): boolean {
+  return activeWatchSubscriptions.has(watchKey);
+}
+
+// Get all active watches
+export function getActiveWatches(): string[] {
+  return Array.from(activeWatchSubscriptions.keys());
+}
+
+// Helper function to format storage results consistently for PAPI
+function formatPapiStorageResult(value: any): string {
+  if (value === null || value === undefined) {
+    return 'null';
+  }
+
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return '[]';
+    }
+    // Option 1: Always show summary for large arrays (current behavior)
+    if (value.length > 5) {
+      return `[Array with ${value.length} items]`;
+    }
+
+    // Option 2: Show first few items + summary (you can uncomment this)
+    // if (value.length > 5) {
+    //   try {
+    //     const preview = value.slice(0, 2);
+    //     const previewStr = JSON.stringify(preview, (_, val) =>
+    //       typeof val === 'bigint' ? val.toString() : val
+    //     );
+    //     return `${previewStr.slice(0, -1)}, ... +${value.length - 2} more items]`;
+    //   } catch {
+    //     return `[Array with ${value.length} items]`;
+    //   }
+    // }
+
+    try {
+      return JSON.stringify(value, (_, val) =>
+        typeof val === 'bigint' ? val.toString() : val
+      );
+    } catch {
+      return `[Array with ${value.length} items]`;
+    }
+  }
+
+  if (typeof value === 'object') {
+    try {
+      return JSON.stringify(value, (_, val) =>
+        typeof val === 'bigint' ? val.toString() : val, 2
+      );
+    } catch {
+      return '[Complex Object]';
+    }
+  }
+
+  return String(value);
 }

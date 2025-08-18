@@ -148,7 +148,6 @@ interface EnhancedQuerySelectorProps {
 export function EnhancedQuerySelector({
   value,
   onValueChange,
-  storageName,
 }: EnhancedQuerySelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);

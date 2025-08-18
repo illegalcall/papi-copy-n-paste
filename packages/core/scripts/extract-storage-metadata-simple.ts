@@ -80,37 +80,53 @@ class SimpleStorageExtractor {
     const fileContent = fs.readFileSync(descriptorFile, 'utf-8');
     const metadata: ChainStorageMetadata = { pallets: {} };
 
-    // Find the IStorage type definition
-    const storageTypeMatch = fileContent.match(/type IStorage = \{([\s\S]*?)\};/);
-    if (!storageTypeMatch) {
+    // Find the IStorage type definition using a more robust approach
+    const storageTypeStart = fileContent.indexOf('type IStorage = {');
+    if (storageTypeStart === -1) {
       console.warn(`No IStorage type found in ${chainKey}`);
       return metadata;
     }
 
-    const storageContent = storageTypeMatch[1];
+    // Find the matching closing brace by counting braces
+    let braceCount = 0;
+    let storageTypeEnd = -1;
+    let inStorage = false;
+
+    for (let i = storageTypeStart; i < fileContent.length; i++) {
+      const char = fileContent[i];
+
+      if (char === '{') {
+        braceCount++;
+        inStorage = true;
+      } else if (char === '}') {
+        braceCount--;
+        if (inStorage && braceCount === 0) {
+          storageTypeEnd = i;
+          break;
+        }
+      }
+    }
+
+    if (storageTypeEnd === -1) {
+      console.warn(`Could not find end of IStorage type in ${chainKey}`);
+      return metadata;
+    }
+
+    // Extract the content between the opening and closing braces
+    const openBracePos = fileContent.indexOf('{', storageTypeStart) + 1;
+    const storageContent = fileContent.substring(openBracePos, storageTypeEnd);
     console.log(`  🔍 IStorage content length: ${storageContent.length} characters`);
-    console.log(`  🔍 First 500 chars: ${storageContent.substring(0, 500)}...`);
 
-    // Test pallets regex specifically
-    console.log(`  🔍 Testing pallet regex on content...`);
-    const testPalletRegex = /(\w+): \{/g;
-    const palletMatches = [...storageContent.matchAll(testPalletRegex)];
-    console.log(`  🔍 Found ${palletMatches.length} potential pallets: ${palletMatches.map(m => m[1]).join(', ')}`);
+    // Parse pallets by finding pallet blocks with proper brace matching
+    const pallets = this.parsePallets(storageContent);
+    console.log(`  🔍 Found ${Object.keys(pallets).length} pallets: ${Object.keys(pallets).join(', ')}`);
 
-    // Use a direct regex approach to find all pallets and their storage items
-    // The structure is: "    PalletName: {\n...content...\n    };"
-    const palletRegex = /(\w+): \{([\s\S]*?)\};/g;
-    let palletMatch;
-
-    while ((palletMatch = palletRegex.exec(storageContent)) !== null) {
-      const palletName = palletMatch[1];
-      const palletContent = palletMatch[2];
+    for (const [palletName, palletContent] of Object.entries(pallets)) {
+      console.log(`  📦 Processing pallet: ${palletName}`);
       metadata.pallets[palletName] = {};
 
-      console.log(`  📦 Processing pallet: ${palletName}`);
-
-      // Parse storage items in the pallet - more specific regex for StorageDescriptor
-      const storageRegex = /(\w+): StorageDescriptor<\[(.*?)\],\s*(.*?),\s*([\w]+),\s*([\w]+)>/g;
+      // Parse storage items in the pallet using improved regex
+      const storageRegex = /(\w+): StorageDescriptor<\[(.*?)\],\s*([^,]+),\s*[^,]+,\s*[^>]+>/g;
       let storageMatch;
 
       while ((storageMatch = storageRegex.exec(palletContent)) !== null) {
@@ -136,6 +152,71 @@ class SimpleStorageExtractor {
     }
 
     return metadata;
+  }
+
+  /**
+   * Parse pallets from IStorage content using proper brace matching
+   */
+  private parsePallets(content: string): Record<string, string> {
+    const pallets: Record<string, string> = {};
+    const lines = content.split('\n');
+
+    let currentPallet = '';
+    let currentContent: string[] = [];
+    let braceDepth = 0;
+    let inPallet = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      // Check if line starts a new pallet (format: "    PalletName: {")
+      const palletMatch = line.match(/^\s{4}(\w+): \{$/);
+      if (palletMatch) {
+        // Save previous pallet if we have one
+        if (currentPallet && currentContent.length > 0) {
+          pallets[currentPallet] = currentContent.join('\n').trim();
+        }
+
+        // Start new pallet
+        currentPallet = palletMatch[1];
+        currentContent = [];
+        braceDepth = 1;
+        inPallet = true;
+        continue;
+      }
+
+      if (inPallet) {
+        // Count braces to track depth
+        const openBraces = (line.match(/\{/g) || []).length;
+        const closeBraces = (line.match(/\}/g) || []).length;
+        braceDepth += openBraces - closeBraces;
+
+        // Add line to current pallet content
+        currentContent.push(line);
+
+        // If we've closed all braces for this pallet, end it
+        if (braceDepth === 0 && line.trim() === '};') {
+          // Remove the closing "};" line from content
+          currentContent.pop();
+          pallets[currentPallet] = currentContent.join('\n').trim();
+          console.log(`    ✅ Extracted pallet ${currentPallet}: ${currentContent.length} lines`);
+
+          // Reset for next pallet
+          currentPallet = '';
+          currentContent = [];
+          inPallet = false;
+        }
+      }
+    }
+
+    // Handle final pallet if file doesn't end cleanly
+    if (currentPallet && currentContent.length > 0) {
+      pallets[currentPallet] = currentContent.join('\n').trim();
+      console.log(`    ✅ Extracted final pallet ${currentPallet}: ${currentContent.length} lines`);
+    }
+
+    console.log(`  🔍 Total pallets extracted: ${Object.keys(pallets).length}`);
+    return pallets;
   }
 
   /**
@@ -263,16 +344,23 @@ class SimpleStorageExtractor {
       'SS58String': 'AccountId',
       'AccountId32': 'AccountId',
       'MultiAddress': 'AccountId',
+      'HexString': 'HexString',
       'number': 'u32',
       'bigint': 'u64',
       'boolean': 'bool',
       'string': 'string',
       'Binary': 'bytes',
+      'FixedSizeBinary<32>': 'Hash',
       'FixedSizeBinary': 'Hash',
       'H256': 'Hash'
     };
 
-    // Check exact matches first
+    // Check exact matches first for FixedSizeBinary<32>
+    if (tsType.includes('FixedSizeBinary<32>')) {
+      return 'Hash';
+    }
+
+    // Check other exact matches
     for (const [pattern, result] of Object.entries(typeMap)) {
       if (tsType.includes(pattern)) {
         return result;
@@ -280,10 +368,6 @@ class SimpleStorageExtractor {
     }
 
     // Handle specific patterns
-    if (tsType.startsWith('FixedSizeBinary<32>') || tsType.includes('H256')) {
-      return 'Hash';
-    }
-
     if (tsType.includes('AccountId') || tsType.includes('SS58')) {
       return 'AccountId';
     }

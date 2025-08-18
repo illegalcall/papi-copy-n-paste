@@ -9,6 +9,35 @@
 
 import { storageMetadata, getStorageParameters, hasStorage, getSupportedChains, getSupportedPallets, getSupportedStorage } from '../../../packages/core/generated/storage-metadata';
 
+/**
+ * Helper function to get dynamic storage parameters
+ * Used by both the new dynamic system and legacy compatibility
+ */
+function getDynamicStorageParameters(chainKey: string, pallet: string, storage: string): string[] | null {
+  try {
+    if (hasStorage(chainKey, pallet, storage)) {
+      const params = getStorageParameters(chainKey, pallet, storage);
+      return params || [];
+    }
+
+    // Try cross-chain lookup
+    const supportedChains = getSupportedChains();
+    for (const otherChain of supportedChains) {
+      if (otherChain !== chainKey && hasStorage(otherChain, pallet, storage)) {
+        const params = getStorageParameters(otherChain, pallet, storage);
+        if (params) {
+          console.warn(`🔄 Using ${otherChain} metadata for ${chainKey}.${pallet}.${storage}`);
+          return params;
+        }
+      }
+    }
+  } catch (error) {
+    console.warn(`⚠️  Error accessing dynamic metadata for ${chainKey}.${pallet}.${storage}:`, error);
+  }
+
+  return null;
+}
+
 export interface StorageParameterInfo {
   required: string[];
   optional: string[];
@@ -54,20 +83,24 @@ export class DynamicStorageDetector {
    * Primary detection: Use generated metadata for the specific chain
    */
   private detectFromMetadata(chainKey: string, pallet: string, storage: string): StorageParameterInfo | null {
-    if (!hasStorage(chainKey, pallet, storage)) {
-      return null;
-    }
+    try {
+      if (!hasStorage(chainKey, pallet, storage)) {
+        return null;
+      }
 
-    const paramTypes = getStorageParameters(chainKey, pallet, storage);
-    const metadata = storageMetadata[chainKey]?.pallets?.[pallet]?.[storage];
+      const paramTypes = getStorageParameters(chainKey, pallet, storage);
+      const metadata = storageMetadata[chainKey]?.pallets?.[pallet]?.[storage];
 
-    if (metadata) {
-      return {
-        required: paramTypes,
-        optional: [],
-        description: metadata.description,
-        returnType: metadata.returnType
-      };
+      if (paramTypes && paramTypes.length >= 0) {
+        return {
+          required: paramTypes,
+          optional: [],
+          description: metadata?.description || `Dynamic metadata for ${chainKey}.${pallet}.${storage}`,
+          returnType: metadata?.returnType || 'Codec'
+        };
+      }
+    } catch (error) {
+      console.warn(`⚠️  Error accessing dynamic metadata for ${chainKey}.${pallet}.${storage}:`, error);
     }
 
     return null;
@@ -101,293 +134,57 @@ export class DynamicStorageDetector {
   }
 
   /**
-   * Tertiary detection: Enhanced pattern matching with semantic analysis
+   * Fallback detection: Minimal pattern matching for edge cases only
    */
   private detectFromPatterns(pallet: string, storage: string): StorageParameterInfo {
-    // Comprehensive patterns from complete Hydration descriptor analysis (275 storage items across 71 pallets)
-    // IMPORTANT: Pallet-specific patterns must come FIRST to override generic patterns
+    // Minimal fallback patterns - only for cases not covered by dynamic metadata
     const patterns = [
-      // Pallet-specific patterns (FIRST - highest priority)
-      ...(pallet === 'AssetRegistry' ? [
-        { pattern: /^(Assets|AssetLocations|BannedAssets)$/, params: ["u32"] },
-        { pattern: /^(NextAssetId|ExistentialDepositCounter)$/, params: [] },
-        { pattern: /^AssetIds$/, params: ["Binary"] },
-        { pattern: /^LocationAssets$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'Aura' ? [
-        { pattern: /^Authorities$/, params: ["u32","u32"] },
-        { pattern: /^CurrentSlot$/, params: [] }
-      ] : []),
-      ...(pallet === 'AuraExt' ? [
-        { pattern: /^(Authorities|SlotInfo)$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'Authorship' ? [
-        { pattern: /^Author$/, params: [] }
-      ] : []),
-      ...(pallet === 'Balances' ? [
-        { pattern: /^(TotalIssuance|InactiveIssuance)$/, params: [] },
-        { pattern: /^(Account|Locks|Reserves|Holds|Freezes)$/, params: ["SS58String"] }
-      ] : []),
-      ...(pallet === 'Bonds' ? [
-        { pattern: /^BondIds$/, params: ["u32","u32"] },
-        { pattern: /^Bonds$/, params: ["u32"] }
-      ] : []),
-      ...(pallet === 'Broadcast' ? [
-        { pattern: /^(IncrementalId|Swapper)$/, params: [] },
-        { pattern: /^ExecutionContext$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'CircuitBreaker' ? [
-        { pattern: /^(TradeVolumeLimitPerAsset|AllowedTradeVolumeLimitPerAsset|LiquidityAddLimitPerAsset|AllowedAddLiquidityAmountPerAsset|AssetLockdownState|LiquidityRemoveLimitPerAsset|AllowedRemoveLiquidityAmountPerAsset)$/, params: ["u32"] }
-      ] : []),
-      ...(pallet === 'Claims' ? [
-        { pattern: /^Claims$/, params: [] }
-      ] : []),
-      ...(pallet === 'CollatorRewards' ? [
-        { pattern: /^Collators$/, params: ["u32"] }
-      ] : []),
-      ...(pallet === 'CollatorSelection' ? [
-        { pattern: /^(Invulnerables|CandidateList)$/, params: ["u32","u32"] },
-        { pattern: /^LastAuthoredBlock$/, params: ["SS58String"] },
-        { pattern: /^(DesiredCandidates|CandidacyBond)$/, params: [] }
-      ] : []),
-      ...(pallet === 'ConvictionVoting' ? [
-        { pattern: /^VotingFor$/, params: ["u32","u32"] },
-        { pattern: /^ClassLocksFor$/, params: ["SS58String"] }
-      ] : []),
-      ...(pallet === 'DCA' ? [
-        { pattern: /^ScheduleIdSequencer$/, params: [] },
-        { pattern: /^(Schedules|RemainingAmounts|RetriesOnError|ScheduleExecutionBlock|ScheduleIdsPerBlock)$/, params: ["u32"] },
-        { pattern: /^ScheduleOwnership$/, params: ["u32","u32"] }
-      ] : []),
+      // Critical Hash-based patterns (highest priority fallback)
       ...(pallet === 'Democracy' ? [
-        { pattern: /^(PublicPropCount|ReferendumCount|LowestUnbaked|LastTabledWasExternal)$/, params: [] },
         { pattern: /^(Blacklist|Cancellations)$/, params: ["Hash"] },
-        { pattern: /^(PublicProps|NextExternal|MetadataOf)$/, params: ["u32","u32"] },
-        { pattern: /^(DepositOf|ReferendumInfoOf)$/, params: ["u32"] },
-        { pattern: /^VotingOf$/, params: ["SS58String"] }
+        { pattern: /^VotingOf$/, params: ["AccountId"] }
       ] : []),
-      ...(pallet === 'Dispatcher' ? [
-        { pattern: /^(AaveManagerAccount|ExtraGas)$/, params: [] }
-      ] : []),
-      ...(pallet === 'Duster' ? [
-        { pattern: /^AccountBlacklist$/, params: ["SS58String"] },
-        { pattern: /^(RewardAccount|DustAccount)$/, params: [] }
-      ] : []),
-      ...(pallet === 'DynamicEvmFee' ? [
-        { pattern: /^BaseFeePerGas$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'DynamicFees' ? [
-        { pattern: /^(AssetFee|AssetFeeConfiguration)$/, params: ["u32"] }
-      ] : []),
-      ...(pallet === 'EVM' ? [
-        { pattern: /^(AccountCodes|AccountCodesMetadata|Suicided)$/, params: [] },
-        { pattern: /^AccountStorages$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'EVMAccounts' ? [
-        { pattern: /^(AccountExtension|ContractDeployer|ApprovedContract)$/, params: [] }
-      ] : []),
-      ...(pallet === 'EVMChainId' ? [
-        { pattern: /^ChainId$/, params: [] }
-      ] : []),
-      ...(pallet === 'EmaOracle' ? [
-        { pattern: /^(Accumulator|Oracles|WhitelistedAssets)$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'Ethereum' ? [
-        { pattern: /^Pending$/, params: ["u32"] },
-        { pattern: /^CounterForPending$/, params: [] },
-        { pattern: /^(CurrentBlock|CurrentReceipts|CurrentTransactionStatuses|BlockHash)$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'GenesisHistory' ? [
-        { pattern: /^PreviousChain$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'HSM' ? [
-        { pattern: /^(Collaterals|HollarAmountReceived)$/, params: ["u32"] },
-        { pattern: /^FlashMinter$/, params: [] }
-      ] : []),
-      ...(pallet === 'Identity' ? [
-        { pattern: /^(IdentityOf|SuperOf|SubsOf|UsernameAuthorities)$/, params: ["SS58String"] },
-        { pattern: /^Registrars$/, params: ["u32","u32"] },
-        { pattern: /^(AccountOfUsername|PendingUsernames)$/, params: ["Binary"] }
-      ] : []),
-      ...(pallet === 'LBP' ? [
-        { pattern: /^PoolData$/, params: ["SS58String"] },
-        { pattern: /^FeeCollectorWithAsset$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'Liquidation' ? [
-        { pattern: /^BorrowingContract$/, params: [] }
-      ] : []),
-      ...(pallet === 'MessageQueue' ? [
-        { pattern: /^(BookStateFor|ServiceHead|Pages)$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'MultiTransactionPayment' ? [
-        { pattern: /^(AccountCurrencyMap|TransactionCurrencyOverride)$/, params: ["SS58String"] },
-        { pattern: /^(AcceptedCurrencies|AcceptedCurrencyPrice)$/, params: ["u32"] }
-      ] : []),
-      ...(pallet === 'Multisig' ? [
-        { pattern: /^Multisigs$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'OTC' ? [
-        { pattern: /^NextOrderId$/, params: [] },
-        { pattern: /^Orders$/, params: ["u32"] }
-      ] : []),
-      ...(pallet === 'Omnipool' ? [
-        { pattern: /^(Assets|Positions)$/, params: ["u32"] },
-        { pattern: /^(HubAssetTradability|NextPositionId)$/, params: [] }
-      ] : []),
-      ...(pallet === 'OmnipoolLiquidityMining' ? [
-        { pattern: /^OmniPositionId$/, params: ["u32"] }
-      ] : []),
-      ...(pallet === 'OmnipoolWarehouseLM' ? [
-        { pattern: /^(FarmSequencer|DepositSequencer)$/, params: [] },
-        { pattern: /^(GlobalFarm|Deposit)$/, params: ["u32"] },
-        { pattern: /^(YieldFarm|ActiveYieldFarm)$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'ParachainInfo' ? [
-        { pattern: /^ParachainId$/, params: [] }
-      ] : []),
-      ...(pallet === 'ParachainSystem' ? [
-        { pattern: /^(UnincludedSegment|AggregatedUnincludedSegment|ValidationData|UpgradeRestrictionSignal|UpgradeGoAhead|RelayStateProof|RelevantMessagingState|HostConfiguration|LastHrmpMqcHeads|HrmpOutboundMessages|UpwardMessages|PendingUpwardMessages|ReservedXcmpWeightOverride|ReservedDmpWeightOverride)$/, params: ["u32","u32"] },
-        { pattern: /^(PendingValidationCode|NewValidationCode|DidSetValidationCode|LastRelayChainBlockNumber|LastDmqMqcHead|ProcessedDownwardMessages|HrmpWatermark|UpwardDeliveryFeeFactor|AnnouncedHrmpMessagesPerCandidate|CustomValidationHeadData)$/, params: [] }
-      ] : []),
-      ...(pallet === 'Parameters' ? [
-        { pattern: /^IsTestnet$/, params: [] }
-      ] : []),
-      ...(pallet === 'PolkadotXcm' ? [
-        { pattern: /^(QueryCounter|AssetTraps|SafeXcmVersion|CurrentMigration|XcmExecutionSuspended|ShouldRecordXcm)$/, params: [] },
-        { pattern: /^Queries$/, params: ["u32"] },
-        { pattern: /^(SupportedVersion|VersionNotifiers|VersionNotifyTargets|VersionDiscoveryQueue|RemoteLockedFungibles|RecordedXcm)$/, params: ["u32","u32"] },
-        { pattern: /^LockedFungibles$/, params: ["SS58String"] }
-      ] : []),
-      ...(pallet === 'Preimage' ? [
-        { pattern: /^(StatusFor|RequestStatusFor)$/, params: ["Hash"] },
-        { pattern: /^PreimageFor$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'Proxy' ? [
-        { pattern: /^(Proxies|Announcements)$/, params: ["SS58String"] }
-      ] : []),
-      ...(pallet === 'Referenda' ? [
-        { pattern: /^ReferendumCount$/, params: [] },
-        { pattern: /^(ReferendumInfoFor|TrackQueue|DecidingCount|MetadataOf)$/, params: ["u32"] }
-      ] : []),
-      ...(pallet === 'Referrals' ? [
-        { pattern: /^ReferralCodes$/, params: ["Binary"] },
-        { pattern: /^(ReferralAccounts|LinkedAccounts|ReferrerShares|TraderShares|Referrer)$/, params: ["SS58String"] },
-        { pattern: /^(TotalShares|CounterForPendingConversions)$/, params: [] },
-        { pattern: /^AssetRewards$/, params: ["u32","u32"] },
-        { pattern: /^PendingConversions$/, params: ["u32"] }
-      ] : []),
-      ...(pallet === 'Router' ? [
-        { pattern: /^Routes$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'Scheduler' ? [
-        { pattern: /^(IncompleteSince|Lookup)$/, params: [] },
-        { pattern: /^Agenda$/, params: ["u32"] },
-        { pattern: /^Retries$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'Session' ? [
-        { pattern: /^(Validators|QueuedKeys|DisabledValidators|KeyOwner)$/, params: ["u32","u32"] },
-        { pattern: /^(CurrentIndex|QueuedChanged)$/, params: [] },
-        { pattern: /^NextKeys$/, params: ["SS58String"] }
-      ] : []),
-      ...(pallet === 'Stableswap' ? [
-        { pattern: /^(Pools|PoolPegs|PoolSnapshots)$/, params: ["u32"] },
-        { pattern: /^AssetTradability$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'Staking' ? [
-        { pattern: /^(Staking|VotesRewarded|ProcessedVotes)$/, params: ["u32","u32"] },
-        { pattern: /^(Positions|Votes|PositionVotes)$/, params: ["u32"] },
-        { pattern: /^(NextPositionId|SixSecBlocksSince)$/, params: [] }
-      ] : []),
-      ...(pallet === 'StateTrieMigration' ? [
-        { pattern: /^(MigrationProcess|AutoLimits|SignedMigrationMaxLimits)$/, params: ["u32","u32"] }
-      ] : []),
+
       ...(pallet === 'System' ? [
-        { pattern: /^Account$/, params: ["SS58String"] },
-        { pattern: /^(ExtrinsicCount|InherentsApplied|AllExtrinsicsLen|Number|ParentHash|EventCount|UpgradedToU32RefCount|UpgradedToTripleRefCount|ExecutionPhase)$/, params: [] },
+        { pattern: /^Account$/, params: ["AccountId"] },
         { pattern: /^EventTopics$/, params: ["Hash"] },
-        { pattern: /^(BlockWeight|Digest|Events|LastRuntimeUpgrade|AuthorizedUpgrade)$/, params: ["u32","u32"] },
         { pattern: /^(BlockHash|ExtrinsicData)$/, params: ["u32"] }
       ] : []),
+
+      ...(pallet === 'Preimage' ? [
+        { pattern: /^(StatusFor|RequestStatusFor)$/, params: ["Hash"] }
+      ] : []),
+
       ...(pallet === 'TechnicalCommittee' ? [
-        { pattern: /^(Proposals|Members)$/, params: ["u32","u32"] },
-        { pattern: /^(ProposalOf|Voting)$/, params: ["Hash"] },
-        { pattern: /^(ProposalCount|Prime)$/, params: [] }
+        { pattern: /^(ProposalOf|Voting)$/, params: ["Hash"] }
       ] : []),
-      ...(pallet === 'Timestamp' ? [
-        { pattern: /^(Now|DidUpdate)$/, params: [] }
-      ] : []),
-      ...(pallet === 'Tokens' ? [
-        { pattern: /^TotalIssuance$/, params: ["u32"] },
-        { pattern: /^(Locks|Accounts|Reserves)$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'TransactionPause' ? [
-        { pattern: /^PausedTransactions$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'TransactionPayment' ? [
-        { pattern: /^(NextFeeMultiplier|StorageVersion)$/, params: [] }
-      ] : []),
-      ...(pallet === 'Treasury' ? [
-        { pattern: /^(ProposalCount|Deactivated|SpendCount)$/, params: [] },
-        { pattern: /^(Proposals|Spends)$/, params: ["u32"] },
-        { pattern: /^Approvals$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'Uniques' ? [
-        { pattern: /^(Class|ClassMetadataOf|CollectionMaxSupply)$/, params: ["u32"] },
-        { pattern: /^OwnershipAcceptance$/, params: ["SS58String"] },
-        { pattern: /^(Account|ClassAccount|Asset|InstanceMetadataOf|Attribute|ItemPriceOf)$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'UnknownTokens' ? [
-        { pattern: /^(ConcreteFungibleBalances|AbstractFungibleBalances)$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'Vesting' ? [
-        { pattern: /^VestingSchedules$/, params: ["SS58String"] }
-      ] : []),
+
       ...(pallet === 'Whitelist' ? [
         { pattern: /^WhitelistedCall$/, params: ["Hash"] }
       ] : []),
-      ...(pallet === 'XYK' ? [
-        { pattern: /^(ShareToken|TotalLiquidity|PoolAssets)$/, params: ["SS58String"] }
-      ] : []),
-      ...(pallet === 'XYKWarehouseLM' ? [
-        { pattern: /^(FarmSequencer|DepositSequencer)$/, params: [] },
-        { pattern: /^(GlobalFarm|Deposit)$/, params: ["u32"] },
-        { pattern: /^(YieldFarm|ActiveYieldFarm)$/, params: ["u32","u32"] }
-      ] : []),
-      ...(pallet === 'XcmpQueue' ? [
-        { pattern: /^(InboundXcmpSuspended|OutboundXcmpStatus|OutboundXcmpMessages|QueueConfig)$/, params: ["u32","u32"] },
-        { pattern: /^(SignalMessages|DeliveryFeeFactor)$/, params: ["u32"] },
-        { pattern: /^QueueSuspended$/, params: [] }
+
+      // Essential Balance patterns (minimal fallback)
+      ...(pallet === 'Balances' ? [
+        { pattern: /^Account$/, params: ["AccountId"] },
+        { pattern: /^(Reserves|Locks|Freezes|Holds)$/, params: ["AccountId"] }
       ] : []),
 
-      // Generic patterns (LOWER PRIORITY - only used if no pallet-specific match)
-      // No parameters (common global state)
-      { pattern: /^(Total|Current|Next|Last|Min|Max)/, params: [] },
-      { pattern: /^(Issuance|Supply|Index|Number|Now|Deposit)$/, params: [] },
-      { pattern: /Count$/, params: [] }, // Anything ending with Count (BountyCount, EventCount, etc.)
-      { pattern: /^(InactiveIssuance|TotalIssuance|ExtrinsicCount|EventCount|BountyCount)$/, params: [] },
-
-      // Account-based (single AccountId parameter)
+      // Generic patterns (LOWEST PRIORITY - only used if no specific match)
+      // Account-based storage
       { pattern: /^(Account|Balance|Lock|Reserve|Hold|Freeze)s?$/, params: ["AccountId"] },
       { pattern: /(Of|For)Account$/, params: ["AccountId"] },
-      { pattern: /^(Bonded|Payee|Validators|Nominators|Ledger)$/, params: ["AccountId"] },
-
-      // ID-based (requires numeric/hash ID)
-      { pattern: /^(Proposal|Referendum|Era|Session|Block)/, params: ["u32"] },
-      { pattern: /(Of|For)(Proposal|Referendum|Era|Session|Block)/, params: ["u32"] },
-      { pattern: /^(Agenda|Lookup|Reports|Disputes)$/, params: ["u32"] },
-
-      // Complex mappings (multiple parameters)
-      { pattern: /^(Era.*Staker|Session.*Validator)/, params: ["u32", "AccountId"] },
-      { pattern: /^Asset(Account|Approval)/, params: ["AssetId", "AccountId"] },
-      { pattern: /^(Claimed|Slashing|Validator.*Era|Nominator.*Era)/, params: ["u32", "AccountId"] },
 
       // Hash-based storage
-      { pattern: /^(BlockHash|ParentHash|CodeHash)$/, params: ["Hash"] },
-      { pattern: /^(Preimage|Code)For$/, params: ["Hash"] },
+      { pattern: /^(Blacklist|Cancellations|StatusFor|RequestStatusFor|ProposalOf|Voting|WhitelistedCall)$/, params: ["Hash"] },
+      { pattern: /^EventTopics$/, params: ["Hash"] },
 
-      // Multi-key mappings
-      { pattern: /^(Keys|QueuedKeys|NextKeys)$/, params: ["AccountId"] },
-      { pattern: /^(Proxies|Announcements|Multisigs)$/, params: ["AccountId"] }
+      // ID-based storage
+      { pattern: /^(Proposal|Referendum|Era|Session|Block)/, params: ["u32"] },
+      { pattern: /(Of|For)(Proposal|Referendum|Era|Session|Block)/, params: ["u32"] },
+
+      // No parameters (counters and flags)
+      { pattern: /Count$/, params: [] },
+      { pattern: /^(Total|Current|Next|Last|Min|Max)/, params: [] }
     ];
 
     // Try each pattern

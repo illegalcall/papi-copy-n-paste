@@ -23,7 +23,6 @@ export function Header({
   selectedProvider,
   onNetworkChange,
   isConnecting = false,
-  hasError = false,
 }: HeaderProps) {
   const { theme, setTheme } = useTheme();
 

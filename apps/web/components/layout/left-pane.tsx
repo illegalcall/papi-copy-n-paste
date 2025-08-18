@@ -24,8 +24,6 @@ export interface LeftPaneRef {
 }
 
 export const LeftPane = forwardRef<LeftPaneRef, LeftPaneProps>(({
-  isOpen,
-  onClose,
   pallets,
   onCallSelect,
   onStorageSelect,
