@@ -1,0 +1,26 @@
+{
+  "astar": {
+    "pallets": {}
+  },
+  "bifrost": {
+    "pallets": {}
+  },
+  "kusama": {
+    "pallets": {}
+  },
+  "moonbeam": {
+    "pallets": {}
+  },
+  "paseo": {
+    "pallets": {}
+  },
+  "polkadot": {
+    "pallets": {}
+  },
+  "rococo": {
+    "pallets": {}
+  },
+  "westend": {
+    "pallets": {}
+  }
+}

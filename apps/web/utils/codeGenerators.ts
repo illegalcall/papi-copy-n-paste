@@ -6,7 +6,7 @@ import { PalletCall } from "@workspace/core";
 import {
   getDescriptorImport,
   getDescriptorName,
-  getSetupCommands,
+  getChainConnection,
   getParameterDescription,
 } from "./chainConfig";
 import {
@@ -447,8 +447,9 @@ function generateInlineStorageCode(
 ): string {
   const descriptorImport = getDescriptorImport(chainKey);
   const descriptorName = getDescriptorName(chainKey);
+  const connectionInfo = getChainConnection(chainKey);
 
-  const requiresKeys = detectStorageParameters(pallet, storage.name);
+  const requiresKeys = detectStorageParameters(pallet, storage.name, chainKey);
   const hasParams = Boolean(
     requiresKeys && Object.keys(storageParams).length > 0,
   );
@@ -470,13 +471,13 @@ function generateInlineStorageCode(
 
   return `import { createClient } from "polkadot-api"
 ${descriptorImport}
+${connectionInfo.imports}
 
 async function query${pallet}${storage.name}() {
-  // Create the client instance
-  const client = createClient(provider) // Replace with your provider
+${connectionInfo.connection}
   const typedApi = client.getTypedApi(${descriptorName})
-  
-  ${queryCode}
+
+  ${queryCode}${connectionInfo.cleanup || ''}
 }
 
 query${pallet}${storage.name}().catch(console.error)`;
@@ -492,19 +493,20 @@ function generateFunctionStorageCode(
 ): string {
   const descriptorImport = getDescriptorImport(chainKey);
   const descriptorName = getDescriptorName(chainKey);
+  const connectionInfo = getChainConnection(chainKey);
 
   return `import { createClient } from "polkadot-api"
 ${descriptorImport}
+${connectionInfo.imports}
 
 export async function query${pallet}${storage.name}(${Object.keys(storageParams).length > 0 ? "params: any" : ""}) {
-  // Create the client instance
-  const client = createClient(provider) // Replace with your provider
+${connectionInfo.connection}
   const typedApi = client.getTypedApi(${descriptorName})
-  
+
   try {
-    const result = await typedApi.query.${pallet}.${storage.name}${Object.keys(storageParams).length > 0 ? "(params)" : ".getValue()"}
+    const result = await typedApi.query.${pallet}.${storage.name}${Object.keys(storageParams).length > 0 ? "(params)" : ".getValue()"}${connectionInfo.cleanup || ''}
     return { success: true, result }
-  } catch (error) {
+  } catch (error) {${connectionInfo.cleanup || ''}
     return { success: false, error: error.message }
   }
 }`;
@@ -575,21 +577,24 @@ function generateInlineCode(
 
   const descriptorImport = getDescriptorImport(chainKey);
   const descriptorName = getDescriptorName(chainKey);
+  const connectionInfo = getChainConnection(chainKey);
 
   return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
 ${descriptorImport}
+${connectionInfo.imports}
 
 async function execute${pallet}${call.name}() {
-  const ${descriptorName}Api = client.getTypedApi(${descriptorName})
-  
-  const call = ${descriptorName}Api.tx.${pallet}.${call.name}({
+${connectionInfo.connection}
+  const typedApi = client.getTypedApi(${descriptorName})
+
+  const call = typedApi.tx.${pallet}.${call.name}({
 ${args}
   })
-  
+
   // You'll need a proper signer here
   const hash = await call.signAndSubmit(signer)
-  console.log('Transaction hash:', hash)
+  console.log('Transaction hash:', hash)${connectionInfo.cleanup || ''}
 }
 
 execute${pallet}${call.name}().catch(console.error)`;
@@ -644,23 +649,26 @@ function generateFunctionCode(
 
   const descriptorImport = getDescriptorImport(chainKey);
   const descriptorName = getDescriptorName(chainKey);
+  const connectionInfo = getChainConnection(chainKey);
 
   return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
 ${descriptorImport}
+${connectionInfo.imports}
 
 export async function execute${pallet}${call.name}(signer: any) {
   try {
+${connectionInfo.connection}
     const typedApi = client.getTypedApi(${descriptorName})
-    
+
     const call = typedApi.tx.${pallet}.${call.name}({
 ${args}
     })
-    
-    const hash = await call.signAndSubmit(signer)
-    
+
+    const hash = await call.signAndSubmit(signer)${connectionInfo.cleanup || ''}
+
     return { success: true, hash }
-  } catch (error) {
+  } catch (error) {${connectionInfo.cleanup || ''}
     return { success: false, error: error.message }
   }
 }
@@ -679,6 +687,7 @@ export function generateMultiMethodCode(
 ): string {
   const descriptorImport = getDescriptorImport(chainKey);
   const descriptorName = getDescriptorName(chainKey);
+  const connectionInfo = getChainConnection(chainKey);
 
   // Generate method calls
   const methodCalls = methodQueue
@@ -750,15 +759,17 @@ export function generateMultiMethodCode(
   return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
 ${descriptorImport}
+${connectionInfo.imports}
 
 async function executeMultipleMethods() {
+${connectionInfo.connection}
   const typedApi = client.getTypedApi(${descriptorName})
-  
+
   // You'll need a proper signer here
   const signer = yourSigner // Replace with actual signer
   ${methodCalls}
 
-  console.log("All methods completed successfully!")
+  console.log("All methods completed successfully!")${connectionInfo.cleanup || ''}
 }
 
 executeMultipleMethods().catch(console.error)`;
@@ -777,11 +788,12 @@ export function generateMultiStorageCode(
 ): string {
   const descriptorImport = getDescriptorImport(chainKey);
   const descriptorName = getDescriptorName(chainKey);
+  const connectionInfo = getChainConnection(chainKey);
 
   // Generate storage queries
   const storageQueries = storageQueue
     .map((storage, index) => {
-      const requiresKeys = detectStorageParameters(storage.pallet, storage.storage.name);
+      const requiresKeys = detectStorageParameters(storage.pallet, storage.storage.name, chainKey);
       const hasParams = Boolean(
         requiresKeys && Object.keys(storage.storageParams).length > 0,
       );
@@ -811,14 +823,14 @@ export function generateMultiStorageCode(
 
   return `import { createClient } from "polkadot-api"
 ${descriptorImport}
+${connectionInfo.imports}
 
 async function executeMultipleStorageQueries() {
-  // Create the client instance
-  const client = createClient(provider) // Replace with your provider
+${connectionInfo.connection}
   const typedApi = client.getTypedApi(${descriptorName})
   ${storageQueries}
 
-  console.log("All storage queries completed!")
+  console.log("All storage queries completed!")${connectionInfo.cleanup || ''}
 }
 
 executeMultipleStorageQueries().catch(console.error)`;
