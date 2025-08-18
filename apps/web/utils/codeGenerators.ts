@@ -445,9 +445,17 @@ function generateInlineStorageCode(
   queryType: string,
   storageParams: Record<string, any>,
 ): string {
-  const descriptorImport = getDescriptorImport(chainKey);
-  const descriptorName = getDescriptorName(chainKey);
-  const connectionInfo = getChainConnection(chainKey);
+  try {
+    const descriptorImport = getDescriptorImport(chainKey);
+    const descriptorName = getDescriptorName(chainKey);
+
+    if (!descriptorName) {
+      return `// ❌ Chain "${chainKey}" is not supported for typed API queries
+// 🔧 Supported chains: polkadot, kusama, moonbeam, bifrost, astar, hydration, paseo, westend, rococo
+// 💡 Please switch to a supported chain to generate code`;
+    }
+
+    const connectionInfo = getChainConnection(chainKey);
 
   const requiresKeys = detectStorageParameters(pallet, storage.name, chainKey);
   const hasParams = Boolean(
@@ -481,6 +489,10 @@ ${connectionInfo.connection}
 }
 
 query${pallet}${storage.name}().catch(console.error)`;
+  } catch (error) {
+    return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
+// 💡 This chain may not be supported for typed API queries`;
+  }
 }
 
 function generateFunctionStorageCode(
@@ -491,9 +503,17 @@ function generateFunctionStorageCode(
   queryType: string,
   storageParams: Record<string, any>,
 ): string {
-  const descriptorImport = getDescriptorImport(chainKey);
-  const descriptorName = getDescriptorName(chainKey);
-  const connectionInfo = getChainConnection(chainKey);
+  try {
+    const descriptorImport = getDescriptorImport(chainKey);
+    const descriptorName = getDescriptorName(chainKey);
+
+    if (!descriptorName) {
+      return `// ❌ Chain "${chainKey}" is not supported for typed API queries
+// 🔧 Supported chains: polkadot, kusama, moonbeam, bifrost, astar, hydration, paseo, westend, rococo
+// 💡 Please switch to a supported chain to generate code`;
+    }
+
+    const connectionInfo = getChainConnection(chainKey);
 
   return `import { createClient } from "polkadot-api"
 ${descriptorImport}
@@ -510,6 +530,10 @@ ${connectionInfo.connection}
     return { success: false, error: error.message }
   }
 }`;
+  } catch (error) {
+    return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
+// 💡 This chain may not be supported for typed API queries`;
+  }
 }
 
 export function generateCodeSnippet(
@@ -575,9 +599,17 @@ function generateInlineCode(
     })
     .join(",\n");
 
-  const descriptorImport = getDescriptorImport(chainKey);
-  const descriptorName = getDescriptorName(chainKey);
-  const connectionInfo = getChainConnection(chainKey);
+  try {
+    const descriptorImport = getDescriptorImport(chainKey);
+    const descriptorName = getDescriptorName(chainKey);
+
+    if (!descriptorName) {
+      return `// ❌ Chain "${chainKey}" is not supported for typed API queries
+// 🔧 Supported chains: polkadot, kusama, moonbeam, bifrost, astar, hydration, paseo, westend, rococo
+// 💡 Please switch to a supported chain to generate code`;
+    }
+
+    const connectionInfo = getChainConnection(chainKey);
 
   return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
@@ -598,6 +630,10 @@ ${args}
 }
 
 execute${pallet}${call.name}().catch(console.error)`;
+  } catch (error) {
+    return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
+// 💡 This chain may not be supported for typed API queries`;
+  }
 }
 
 function generateFunctionCode(
@@ -647,9 +683,17 @@ function generateFunctionCode(
     })
     .join(",\n");
 
-  const descriptorImport = getDescriptorImport(chainKey);
-  const descriptorName = getDescriptorName(chainKey);
-  const connectionInfo = getChainConnection(chainKey);
+  try {
+    const descriptorImport = getDescriptorImport(chainKey);
+    const descriptorName = getDescriptorName(chainKey);
+
+    if (!descriptorName) {
+      return `// ❌ Chain "${chainKey}" is not supported for typed API queries
+// 🔧 Supported chains: polkadot, kusama, moonbeam, bifrost, astar, hydration, paseo, westend, rococo
+// 💡 Please switch to a supported chain to generate code`;
+    }
+
+    const connectionInfo = getChainConnection(chainKey);
 
   return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
@@ -673,6 +717,10 @@ ${args}
   }
 }
 `;
+  } catch (error) {
+    return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
+// 💡 This chain may not be supported for typed API queries`;
+  }
 }
 
 export function generateMultiMethodCode(
@@ -685,9 +733,17 @@ export function generateMultiMethodCode(
     id: string;
   }>,
 ): string {
-  const descriptorImport = getDescriptorImport(chainKey);
-  const descriptorName = getDescriptorName(chainKey);
-  const connectionInfo = getChainConnection(chainKey);
+  try {
+    const descriptorImport = getDescriptorImport(chainKey);
+    const descriptorName = getDescriptorName(chainKey);
+
+    if (!descriptorName) {
+      return `// ❌ Chain "${chainKey}" is not supported for typed API queries
+// 🔧 Supported chains: polkadot, kusama, moonbeam, bifrost, astar, hydration, paseo, westend, rococo
+// 💡 Please switch to a supported chain to generate code`;
+    }
+
+    const connectionInfo = getChainConnection(chainKey);
 
   // Generate method calls
   const methodCalls = methodQueue
@@ -773,6 +829,10 @@ ${connectionInfo.connection}
 }
 
 executeMultipleMethods().catch(console.error)`;
+  } catch (error) {
+    return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
+// 💡 This chain may not be supported for typed API queries`;
+  }
 }
 
 export function generateMultiStorageCode(
@@ -786,9 +846,17 @@ export function generateMultiStorageCode(
     id: string;
   }>,
 ): string {
-  const descriptorImport = getDescriptorImport(chainKey);
-  const descriptorName = getDescriptorName(chainKey);
-  const connectionInfo = getChainConnection(chainKey);
+  try {
+    const descriptorImport = getDescriptorImport(chainKey);
+    const descriptorName = getDescriptorName(chainKey);
+
+    if (!descriptorName) {
+      return `// ❌ Chain "${chainKey}" is not supported for typed API queries
+// 🔧 Supported chains: polkadot, kusama, moonbeam, bifrost, astar, hydration, paseo, westend, rococo
+// 💡 Please switch to a supported chain to generate code`;
+    }
+
+    const connectionInfo = getChainConnection(chainKey);
 
   // Generate storage queries
   const storageQueries = storageQueue
@@ -834,4 +902,8 @@ ${connectionInfo.connection}
 }
 
 executeMultipleStorageQueries().catch(console.error)`;
+  } catch (error) {
+    return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
+// 💡 This chain may not be supported for typed API queries`;
+  }
 }

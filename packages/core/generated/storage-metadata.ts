@@ -1,6 +1,6 @@
 /**
  * Auto-generated storage metadata from PAPI descriptors
- * Generated on: 2025-09-13T07:11:45.964Z
+ * Generated on: 2025-09-15T13:34:14.046Z
  */
 
 export interface StorageParameterInfo {
@@ -23,6 +23,9 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
     "pallets": {}
   },
   "bifrost": {
+    "pallets": {}
+  },
+  "hydration": {
     "pallets": {}
   },
   "kusama": {
