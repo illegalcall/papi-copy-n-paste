@@ -70,20 +70,25 @@ export function ProviderSelector({
     setCustomProviders(getCustomProvidersForChain(selectedChain));
   }, [selectedChain]);
 
-  // Update custom providers when dialog opens
+  // Update custom providers when dialog opens or closes
   useEffect(() => {
-    if (isCustomProviderDialogOpen) {
-      setCustomProviders(getCustomProvidersForChain(selectedChain));
-    }
+    setCustomProviders(getCustomProvidersForChain(selectedChain));
   }, [isCustomProviderDialogOpen, selectedChain]);
 
   // Find current provider (could be standard or custom)
   const currentProvider = providers.find((p) => p.id === selectedProvider);
   const currentCustomProvider = customProviders.find((p) => p.id === selectedProvider);
 
+  // Fallback: if custom provider not found in state, check localStorage directly
+  const fallbackCustomProvider = !currentCustomProvider && selectedProvider.startsWith('custom-')
+    ? getCustomProvidersForChain(selectedChain).find((p) => p.id === selectedProvider)
+    : null;
+
   const handleCustomProviderSelect = (provider: CustomProvider) => {
     onProviderChange(provider.id);
     setIsCustomProviderDialogOpen(false);
+    // Refresh custom providers to ensure the newly selected one is available
+    setCustomProviders(getCustomProvidersForChain(selectedChain));
   };
 
   return (
@@ -105,18 +110,18 @@ export function ProviderSelector({
               </span>
             </div>
           )}
-          {currentCustomProvider && (
+          {(currentCustomProvider || fallbackCustomProvider) && (
             <div className="flex items-center gap-2">
               <div className="text-blue-500">
                 <Globe className="h-3 w-3" />
               </div>
               <span className="text-sm font-medium truncate">
-                {currentCustomProvider.name}
+                {(currentCustomProvider || fallbackCustomProvider)?.name}
               </span>
-              {currentCustomProvider.isWorking === true && (
+              {(currentCustomProvider || fallbackCustomProvider)?.isWorking === true && (
                 <span className="text-green-500 text-xs">✓</span>
               )}
-              {currentCustomProvider.isWorking === false && (
+              {(currentCustomProvider || fallbackCustomProvider)?.isWorking === false && (
                 <span className="text-red-500 text-xs">✗</span>
               )}
             </div>
