@@ -52,6 +52,7 @@ export class DynamicStorageDetector {
 
   /**
    * Detect storage parameters for a given chain, pallet, and storage item
+   * Only uses actual metadata - no fallbacks or cross-chain lookups
    */
   detectParameters(
     chainKey: string,
@@ -68,10 +69,12 @@ export class DynamicStorageDetector {
       return this.cache.get(cacheKey)!;
     }
 
-    // Primary: Use generated metadata
-    const result = this.detectFromMetadata(chainKey, pallet, storage) ||
-                  this.detectFromCrossChain(chainKey, pallet, storage) ||
-                  this.detectFromPatterns(pallet, storage);
+    // Only use actual metadata for this specific chain
+    const result = this.detectFromMetadata(chainKey, pallet, storage);
+
+    if (!result) {
+      throw new Error(`No metadata available for ${chainKey}.${pallet}.${storage} - metadata may be incomplete or missing`);
+    }
 
     // Cache the result
     this.cache.set(cacheKey, result);
@@ -106,108 +109,6 @@ export class DynamicStorageDetector {
     return null;
   }
 
-  /**
-   * Secondary detection: Cross-chain lookup (try other chains)
-   */
-  private detectFromCrossChain(chainKey: string, pallet: string, storage: string): StorageParameterInfo | null {
-    const supportedChains = getSupportedChains();
-
-    for (const otherChain of supportedChains) {
-      if (otherChain === chainKey) continue; // Skip the original chain
-
-      if (hasStorage(otherChain, pallet, storage)) {
-        const paramTypes = getStorageParameters(otherChain, pallet, storage);
-        const metadata = storageMetadata[otherChain]?.pallets?.[pallet]?.[storage];
-
-        console.warn(`🔄 Using ${otherChain} metadata for ${chainKey}.${pallet}.${storage}`);
-
-        return {
-          required: paramTypes,
-          optional: [],
-          description: `Cross-chain metadata from ${otherChain}: ${metadata?.description || ''}`,
-          returnType: metadata?.returnType
-        };
-      }
-    }
-
-    return null;
-  }
-
-  /**
-   * Fallback detection: Minimal pattern matching for edge cases only
-   */
-  private detectFromPatterns(pallet: string, storage: string): StorageParameterInfo {
-    // Minimal fallback patterns - only for cases not covered by dynamic metadata
-    const patterns = [
-      // Critical Hash-based patterns (highest priority fallback)
-      ...(pallet === 'Democracy' ? [
-        { pattern: /^(Blacklist|Cancellations)$/, params: ["Hash"] },
-        { pattern: /^VotingOf$/, params: ["AccountId"] }
-      ] : []),
-
-      ...(pallet === 'System' ? [
-        { pattern: /^Account$/, params: ["AccountId"] },
-        { pattern: /^EventTopics$/, params: ["Hash"] },
-        { pattern: /^(BlockHash|ExtrinsicData)$/, params: ["u32"] }
-      ] : []),
-
-      ...(pallet === 'Preimage' ? [
-        { pattern: /^(StatusFor|RequestStatusFor)$/, params: ["Hash"] }
-      ] : []),
-
-      ...(pallet === 'TechnicalCommittee' ? [
-        { pattern: /^(ProposalOf|Voting)$/, params: ["Hash"] }
-      ] : []),
-
-      ...(pallet === 'Whitelist' ? [
-        { pattern: /^WhitelistedCall$/, params: ["Hash"] }
-      ] : []),
-
-      // Essential Balance patterns (minimal fallback)
-      ...(pallet === 'Balances' ? [
-        { pattern: /^Account$/, params: ["AccountId"] },
-        { pattern: /^(Reserves|Locks|Freezes|Holds)$/, params: ["AccountId"] }
-      ] : []),
-
-      // Generic patterns (LOWEST PRIORITY - only used if no specific match)
-      // Account-based storage
-      { pattern: /^(Account|Balance|Lock|Reserve|Hold|Freeze)s?$/, params: ["AccountId"] },
-      { pattern: /(Of|For)Account$/, params: ["AccountId"] },
-
-      // Hash-based storage
-      { pattern: /^(Blacklist|Cancellations|StatusFor|RequestStatusFor|ProposalOf|Voting|WhitelistedCall)$/, params: ["Hash"] },
-      { pattern: /^EventTopics$/, params: ["Hash"] },
-
-      // ID-based storage
-      { pattern: /^(Proposal|Referendum|Era|Session|Block)/, params: ["u32"] },
-      { pattern: /(Of|For)(Proposal|Referendum|Era|Session|Block)/, params: ["u32"] },
-
-      // No parameters (counters and flags)
-      { pattern: /Count$/, params: [] },
-      { pattern: /^(Total|Current|Next|Last|Min|Max)/, params: [] }
-    ];
-
-    // Try each pattern
-    for (const { pattern, params } of patterns) {
-      if (pattern.test(storage)) {
-        return {
-          required: params,
-          optional: [],
-          description: `Pattern-matched: ${pattern.source} → [${params.join(', ')}]`,
-          returnType: 'Codec'
-        };
-      }
-    }
-
-    // Default: assume no parameters for safety
-    console.warn(`⚠️  No pattern match for ${pallet}.${storage}, defaulting to no parameters`);
-    return {
-      required: [],
-      optional: [],
-      description: 'Default: no parameters (pattern fallback)',
-      returnType: 'Codec'
-    };
-  }
 
   /**
    * Get cache performance statistics
@@ -320,6 +221,9 @@ export function generateParameterDefaults(paramTypes: string[]): Record<string, 
       case 'SS58String':
         defaults[key] = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'; // Alice
         break;
+      case 'AssetId':
+        defaults[key] = '1'; // Common asset ID default
+        break;
       case 'u32':
       case 'u64':
         defaults[key] = '0';
@@ -341,30 +245,3 @@ export function generateParameterDefaults(paramTypes: string[]): Record<string, 
   }, {} as Record<string, any>);
 }
 
-/**
- * Debug function to show detection process
- */
-export function debugStorageDetection(
-  chainKey: string,
-  pallet: string,
-  storage: string
-): {
-  fromMetadata: StorageParameterInfo | null;
-  fromCrossChain: StorageParameterInfo | null;
-  fromPatterns: StorageParameterInfo;
-  final: StorageParameterInfo;
-} {
-  const detector = new DynamicStorageDetector();
-
-  const fromMetadata = detector['detectFromMetadata'](chainKey, pallet, storage);
-  const fromCrossChain = !fromMetadata ? detector['detectFromCrossChain'](chainKey, pallet, storage) : null;
-  const fromPatterns = detector['detectFromPatterns'](pallet, storage);
-  const final = detector.detectParameters(chainKey, pallet, storage);
-
-  return {
-    fromMetadata,
-    fromCrossChain,
-    fromPatterns,
-    final
-  };
-}
