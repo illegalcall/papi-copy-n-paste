@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { parseSimpleType, getDefaultValue, createFieldChangeHandler, initializeFormData, hasFormDataChanged } from "../../utils/formHelpers";
 import { Input } from "@workspace/ui/components/input";
 import {
   Select,
@@ -14,6 +15,7 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Label } from "@workspace/ui/components/label";
 import { PalletCall } from "@workspace/core";
 import { HelpCircle, Code2, ChevronDown, ChevronUp } from "lucide-react";
+import type { FormData, FormChangeHandler, ValidChangeHandler } from "../../types/forms";
 import { getParameterEducation } from "../../data/parameter-education";
 import { generateCallSignature } from "@/utils/typeExtraction";
 import { CallSignature } from "@/components/type-display";
@@ -21,8 +23,8 @@ import { CallSignature } from "@/components/type-display";
 interface SimpleCallFormProps {
   pallet: string;
   call: PalletCall;
-  onFormChange: (formData: Record<string, any>) => void;
-  onValidChange: (isValid: boolean) => void;
+  onFormChange: FormChangeHandler;
+  onValidChange: ValidChangeHandler;
 }
 
 // This function is now replaced by external data source
@@ -34,8 +36,8 @@ export function SimpleCallForm({
   onFormChange,
   onValidChange,
 }: SimpleCallFormProps) {
-  const [formData, setFormData] = useState<Record<string, any>>({});
-  const [initialValues, setInitialValues] = useState<Record<string, any>>({});
+  const [formData, setFormData] = useState<FormData>({});
+  const [initialValues, setInitialValues] = useState<FormData>({});
   const [showTypeInfo, setShowTypeInfo] = useState(true);
   
   // Generate TypeScript type information
@@ -43,10 +45,7 @@ export function SimpleCallForm({
 
   // Initialize form data when call changes
   useEffect(() => {
-    const initialData: Record<string, any> = {};
-    call.args.forEach((arg) => {
-      initialData[arg.name] = getDefaultValue(arg.type);
-    });
+    const initialData = initializeFormData(call.args);
     setFormData(initialData);
     setInitialValues(initialData);
   }, [call]);
@@ -58,22 +57,11 @@ export function SimpleCallForm({
     // Validation logic:
     // - If call has no parameters, disable run button (no input = can't run)
     // - If call has parameters, check if user has modified any values from defaults
-    const hasUserInput =
-      call.args.length > 0 &&
-      call.args.some((arg) => {
-        const currentValue = formData[arg.name];
-        const initialValue = initialValues[arg.name];
-        return currentValue !== initialValue;
-      });
+    const hasUserInput = hasFormDataChanged(formData, initialValues, call.args);
     onValidChange(hasUserInput);
   }, [formData, initialValues, call.args, onFormChange, onValidChange]);
 
-  const handleFieldChange = (fieldName: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [fieldName]: value,
-    }));
-  };
+  const handleFieldChange = createFieldChangeHandler(setFormData);
 
   const renderField = (arg: { name: string; type: string }) => {
     const fieldType = parseSimpleType(arg.type);
@@ -255,35 +243,5 @@ export function SimpleCallForm({
   );
 }
 
-function parseSimpleType(type: string): string {
-  if (type.includes("Bool") || type === "bool") return "bool";
-  if (type.includes("AccountId") || type.includes("MultiAddress"))
-    return "account";
-  if (
-    type.includes("u8") ||
-    type.includes("u16") ||
-    type.includes("u32") ||
-    type.includes("u64") ||
-    type.includes("u128") ||
-    type.includes("Compact")
-  )
-    return "number";
-  return "string";
-}
-
-function getDefaultValue(type: string): any {
-  const simpleType = parseSimpleType(type);
-  switch (simpleType) {
-    case "bool":
-      return false;
-    case "number":
-      return 0;
-    case "account":
-      return "//Alice";
-    default:
-      return "";
-  }
-}
-
-// This function has been moved to external data source
-// See: data/parameter-education/index.ts
+// Form helper functions moved to utils/formHelpers.ts
+// Parameter education functions moved to data/parameter-education/index.ts
