@@ -2,6 +2,8 @@
  * Chain configuration utilities for PAPI setup commands and descriptors
  */
 
+import { getAllCustomProviders, CustomProvider } from "./customRpc";
+
 export function getSetupCommands(chainKey: string): string {
   // This function is kept for backward compatibility but should not be used for code generation
   // Setup instructions are now handled by the Setup tab in RightPane
@@ -65,11 +67,42 @@ export function getDescriptorName(chainKey: string): string | null {
   return descriptorMap[chainKey as keyof typeof descriptorMap] || null;
 }
 
-export function getChainConnection(chainKey: string): {
+export function getCustomRPCConnection(rpcId: string): {
+  imports: string;
+  connection: string;
+  cleanup?: string;
+} | null {
+  const customRPCs = getAllCustomProviders();
+  const rpc = customRPCs.find(r => r.id === rpcId);
+
+  if (!rpc) {
+    return null;
+  }
+
+  return {
+    imports: `import { getWsProvider } from "polkadot-api/ws-provider/web"`,
+    connection: `  // Using custom RPC: ${rpc.name}
+  const wsProvider = getWsProvider("${rpc.wsUrl}")
+  const client = createClient(wsProvider)`,
+    cleanup: `
+  // Cleanup WebSocket connection
+  client.destroy()`,
+  };
+}
+
+export function getChainConnection(chainKey: string, providerId?: string): {
   imports: string;
   connection: string;
   cleanup?: string;
 } {
+  // Handle custom RPC connections
+  if (chainKey === "custom" && providerId) {
+    const customConnection = getCustomRPCConnection(providerId);
+    if (customConnection) {
+      return customConnection;
+    }
+  }
+
   // Chains that use smoldot as default
   const smoldotChains = ["polkadot", "kusama", "paseo", "westend"];
 
