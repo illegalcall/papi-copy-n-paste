@@ -16,10 +16,22 @@ import {
   decodeStorageResult,
 } from "./storageHelpers";
 import { createCleanLogger, QueryResult } from "./cleanLogger";
+import { extractActualTypes } from "./typeExtraction";
 import { getDescriptorForChain } from "@workspace/core/descriptors";
 
 // Observable subscriptions storage for watch functionality
 let activeWatchSubscriptions = new Map<string, any>();
+
+// Helper function to get storage parameters using the same logic as code generation
+function getStorageParameters(chainKey: string, pallet: string, storageName: string): string[] {
+  try {
+    const actualTypeInfo = extractActualTypes(chainKey, pallet, storageName);
+    return actualTypeInfo.paramTypes.length > 0 ? actualTypeInfo.paramTypes : [];
+  } catch (error) {
+    // Fallback to detectStorageParameters if extractActualTypes fails
+    return detectStorageParameters(pallet, storageName, chainKey);
+  }
+}
 
 // Execute a single transaction with real blockchain interaction
 export async function executeRealTransaction(
@@ -240,8 +252,8 @@ export async function executeStorageQuery(
     const palletName = selectedStorage.pallet;
     const storageName = selectedStorage.storage.name;
 
-    // Detect if this storage requires parameters using dynamic detection
-    const requiredParams = detectStorageParameters(palletName, storageName, chainKey);
+    // Detect if this storage requires parameters using the same logic as code generation
+    const requiredParams = getStorageParameters(chainKey, palletName, storageName);
     const hasParams = Boolean(
       requiredParams && requiredParams.length > 0 && Object.keys(storageParams).length > 0,
     );
@@ -430,8 +442,8 @@ async function executeRawGetValue(
   storageParams: StorageParams = {},
 ) {
   try {
-    // Detect storage parameters for this specific query
-    const requiredParams = detectStorageParameters(palletName, storageName, chainKey);
+    // Detect storage parameters for this specific query using the same logic as code generation
+    const requiredParams = getStorageParameters(chainKey, palletName, storageName);
 
     if (requiredParams.length > 0) {
       logger.info(`Parameters required: ${requiredParams.join(', ')}`);

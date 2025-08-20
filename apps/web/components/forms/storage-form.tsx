@@ -11,7 +11,9 @@ import {
   Code2,
   ChevronDown,
   ChevronUp,
+  AlertCircle,
 } from "lucide-react";
+import { useStorageValidation } from "../../hooks/useStorageValidation";
 import { EnhancedQuerySelector } from "./enhanced-query-selector";
 import {
   extractActualTypes,
@@ -19,7 +21,7 @@ import {
   formatTypeForDisplay,
   generateStorageSignature,
 } from "../../utils/typeExtraction";
-import { detectStorageParameters, getStorageParameterInfo } from "../../utils/dynamicStorageDetection";
+import { getStorageParameterInfo } from "../../utils/dynamicStorageDetection";
 import { CallSignature } from "@/components/type-display";
 
 interface StorageFormProps {
@@ -28,6 +30,7 @@ interface StorageFormProps {
   chainKey: string;
   onQueryTypeChange: (queryType: string) => void;
   onParamsChange: StorageParamsChangeHandler;
+  onValidationChange?: (isValid: boolean, errors: Record<string, string>) => void;
   queryType: string;
   storageParams: StorageParams;
 }
@@ -42,57 +45,7 @@ const typeInfoCache = new Map<
   { returnType: string; paramTypes: string[] }
 >();
 
-// Get type information dynamically from the actual storage object passed to the component
-function getStorageTypeInfo(
-  chainKey: string,
-  pallet: string,
-  storageName: string,
-  storageEntry?: any,
-): { returnType: string; paramTypes: string[] } {
-  const cacheKey = `${chainKey}:${pallet}:${storageName}`;
 
-  // Check cache first
-  if (typeInfoCache.has(cacheKey)) {
-    return typeInfoCache.get(cacheKey)!;
-  }
-
-  let result: { returnType: string; paramTypes: string[] };
-
-  // Extract from the storage entry - it has a simple 'type' property
-  if (storageEntry && storageEntry.type) {
-    const storageType = storageEntry.type;
-
-    // Determine if this storage requires parameters based on common patterns
-    const paramTypes = determineStorageParameters(
-      pallet,
-      storageName,
-      chainKey
-    );
-
-    result = {
-      returnType: storageType,
-      paramTypes,
-    };
-  } else {
-    // Fallback to pattern-based inference
-    result = inferFromStorageName(pallet, storageName, chainKey);
-  }
-
-  // Cache the result
-  typeInfoCache.set(cacheKey, result);
-
-  return result;
-}
-
-// Determine if storage requires parameters using dynamic detection
-function determineStorageParameters(
-  pallet: string,
-  storageName: string,
-  chainKey: string = 'polkadot'
-): string[] {
-  // Use dynamic detection to get parameter types
-  return detectStorageParameters(pallet, storageName, chainKey);
-}
 
 // Dynamic inference using metadata-driven detection
 function inferFromStorageName(
@@ -363,6 +316,7 @@ export function StorageForm({
   chainKey,
   onQueryTypeChange,
   onParamsChange,
+  onValidationChange,
   queryType,
   storageParams,
 }: StorageFormProps) {
@@ -370,6 +324,7 @@ export function StorageForm({
     useState<StorageParams>(storageParams);
   const [showResponseStructure, setShowResponseStructure] = useState(false);
   const [showTypeInfo, setShowTypeInfo] = useState(true);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   // Get ACTUAL type information from PAPI descriptors - no fallbacks
   let actualTypeInfo;
@@ -379,13 +334,32 @@ export function StorageForm({
 
   try {
     actualTypeInfo = extractActualTypes(chainKey, pallet, storage.name);
+
+    // Use dynamic detection for parameters if extractActualTypes doesn't have them
+    if (!actualTypeInfo.paramTypes || actualTypeInfo.paramTypes.length === 0) {
+      const dynamicInfo = getStorageParameterInfo(chainKey, pallet, storage.name);
+      if (dynamicInfo.required && dynamicInfo.required.length > 0) {
+        actualTypeInfo.paramTypes = dynamicInfo.required;
+      }
+    }
+
     requiredParams = actualTypeInfo.paramTypes.length > 0 ? actualTypeInfo.paramTypes : null;
     actualType = actualTypeInfo.actualType;
     displayType = formatTypeForDisplay(actualTypeInfo);
   } catch (error) {
     console.error(`Type extraction failed for ${chainKey}.${pallet}.${storage.name}:`, error);
-    // No fallback - let it be unknown
+
+    // Fallback to dynamic detection
+    try {
+      const dynamicInfo = getStorageParameterInfo(chainKey, pallet, storage.name);
+      requiredParams = dynamicInfo.required && dynamicInfo.required.length > 0 ? dynamicInfo.required : null;
+    } catch (fallbackError) {
+      console.error(`Dynamic detection also failed for ${chainKey}.${pallet}.${storage.name}:`, fallbackError);
+    }
   }
+
+  // Set up validation
+  const { validateParams, hasRequiredParams } = useStorageValidation(requiredParams);
 
   // Generate response structure with type information
   const responseStructure = actualTypeInfo ? generateEnhancedResponseStructure(
@@ -410,7 +384,24 @@ console.log('Result:', result);`;
 
   useEffect(() => {
     onParamsChange(localParams);
-  }, [localParams]); // Remove onParamsChange from deps to prevent unnecessary re-renders
+
+    // Perform validation when params change
+    if (hasRequiredParams) {
+      const validation = validateParams(localParams);
+      setValidationErrors(validation.errors);
+
+      // Notify parent component about validation state
+      if (onValidationChange) {
+        onValidationChange(validation.isValid, validation.errors);
+      }
+    } else {
+      // No required params means always valid
+      setValidationErrors({});
+      if (onValidationChange) {
+        onValidationChange(true, {});
+      }
+    }
+  }, [localParams, hasRequiredParams, validateParams, onValidationChange]);
 
   const handleParamChange = useCallback((paramType: string, value: string) => {
     setLocalParams((prev) => ({ ...prev, [paramType.toLowerCase()]: value }));
@@ -508,31 +499,43 @@ console.log('Result:', result);`;
               <HelpCircle className="w-3 h-3 text-muted-foreground" />
             </div>
 
-            {requiredParams.map((paramType) => (
-              <div key={paramType} className="space-y-1">
-                <Label htmlFor={paramType} className="text-xs">
-                  {paramType}
-                </Label>
-                <Input
-                  id={paramType}
-                  placeholder={getParameterPlaceholder(paramType)}
-                  value={localParams[paramType.toLowerCase()] || ""}
-                  onChange={(e) => handleParamChange(paramType, e.target.value)}
-                  className="font-mono text-xs"
-                />
-                <div className="text-xs text-muted-foreground">
-                  {(paramType === "AccountId" || paramType === "SS58String") &&
-                    "Use test accounts (//Alice, //Bob) or full addresses"}
-                  {paramType === "AssetId" &&
-                    "Asset identifier (varies by chain)"}
-                  {(paramType === "BlockNumber" || paramType === "number") &&
-                    "Block number to query (empty uses latest)"}
-                  {paramType.includes("Index") &&
-                    "Index number for this entry type"}
-                  {paramType === "Hash" && "32-byte hash (0x prefix required)"}
+            {requiredParams.map((paramType) => {
+              const fieldKey = paramType.toLowerCase();
+              const hasError = validationErrors[fieldKey];
+
+              return (
+                <div key={paramType} className="space-y-1">
+                  <Label htmlFor={paramType} className="text-xs">
+                    {paramType}
+                    <span className="text-red-500 ml-1">*</span>
+                  </Label>
+                  <Input
+                    id={paramType}
+                    placeholder={getParameterPlaceholder(paramType)}
+                    value={localParams[fieldKey] || ""}
+                    onChange={(e) => handleParamChange(paramType, e.target.value)}
+                    className={`font-mono text-xs ${hasError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                  />
+                  {hasError && (
+                    <div className="flex items-center space-x-1 text-xs text-red-600">
+                      <AlertCircle className="w-3 h-3" />
+                      <span>{hasError}</span>
+                    </div>
+                  )}
+                  <div className="text-xs text-muted-foreground">
+                    {(paramType === "AccountId" || paramType === "SS58String") &&
+                      "Use test accounts (//Alice, //Bob) or full addresses"}
+                    {paramType === "AssetId" &&
+                      "Asset identifier (varies by chain)"}
+                    {(paramType === "BlockNumber" || paramType === "number") &&
+                      "Block number to query (empty uses latest)"}
+                    {paramType.includes("Index") &&
+                      "Index number for this entry type"}
+                    {paramType === "Hash" && "32-byte hash (0x prefix required)"}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

@@ -13,6 +13,7 @@ import {
   detectStorageParameters,
   generateStorageParams,
 } from "./storageHelpers";
+import { extractActualTypes } from "./typeExtraction";
 
 export function generateStorageQueryByType(
   queryType: string,
@@ -493,9 +494,18 @@ queryStorage().then(result => {
 
     const connectionInfo = getChainConnection(chainKey, providerId);
 
-  const requiresKeys = detectStorageParameters(pallet, storage.name, chainKey);
+  // First try to get parameters from the same source as the form (extractActualTypes)
+  let requiresKeys: string[] = [];
+  try {
+    const actualTypeInfo = extractActualTypes(chainKey, pallet, storage.name);
+    requiresKeys = actualTypeInfo.paramTypes.length > 0 ? actualTypeInfo.paramTypes : [];
+  } catch (error) {
+    // Fallback to detectStorageParameters if extractActualTypes fails
+    requiresKeys = detectStorageParameters(pallet, storage.name, chainKey);
+  }
+
   const hasParams = Boolean(
-    requiresKeys && Object.keys(storageParams).length > 0,
+    requiresKeys && requiresKeys.length > 0 && Object.keys(storageParams).length > 0,
   );
 
   // Generate parameter string for the query
@@ -906,6 +916,168 @@ executeMultipleMethods().catch(console.error)`;
   }
 }
 
+export function generateConstantCode(
+  chainKey: string,
+  providerId: string,
+  pallet: string,
+  constant: any,
+): string {
+  try {
+    // Handle custom RPC connections
+    if (chainKey === "custom") {
+      const connectionInfo = getChainConnection(chainKey, providerId);
+
+      return `import { createClient } from "polkadot-api"
+${connectionInfo.imports}
+
+async function getConstant() {
+${connectionInfo.connection}
+
+  try {
+    // Note: Custom RPC - constants may not be accessible via typed API
+    // For constants on custom chains, you may need to:
+    // 1. Generate proper descriptors with 'papi add <chain>'
+    // 2. Or use raw RPC calls like client.getApi()._request()
+
+    console.log('Connected to custom RPC')
+    console.log('Available constants depend on the chain')
+
+    // Example raw constant query (uncomment and modify as needed):
+    // const result = await client.getApi()._request("state_getMetadata", [])
+
+    return { success: true, message: 'Connected to custom RPC successfully' }
+  } catch (error) {${connectionInfo.cleanup || ''}
+    console.error('Constant access failed:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+// Execute the query
+getConstant().then(result => {
+  console.log('Constant result:', result)
+})`;
+    }
+
+    const descriptorImport = getDescriptorImport(chainKey);
+    const descriptorName = getDescriptorName(chainKey);
+
+    if (!descriptorName) {
+      return `// ❌ Chain "${chainKey}" is not supported for typed API queries
+// 🔧 Supported chains: polkadot, kusama, moonbeam, bifrost, astar, hydration, paseo, westend, rococo
+// 💡 Please switch to a supported chain to generate code`;
+    }
+
+    const connectionInfo = getChainConnection(chainKey, providerId);
+
+    return `import { createClient } from "polkadot-api"
+${descriptorImport}
+${connectionInfo.imports}
+
+async function get${pallet}${constant.name}Constant() {
+${connectionInfo.connection}
+  const typedApi = client.getTypedApi(${descriptorName})
+
+  // PAPI Constants: Two ways to access constants
+
+  // Method 1: Promise-based call (asynchronous)
+  const constantValueAsync = await typedApi.constants.${pallet}.${constant.name}()
+  console.log('${pallet}.${constant.name} constant value (async):', constantValueAsync)
+
+  // Method 2: Synchronous call with compatibility token
+  const compatibilityToken = await typedApi.compatibilityToken
+  const constantValueSync = typedApi.constants.${pallet}.${constant.name}(compatibilityToken)
+  console.log('${pallet}.${constant.name} constant value (sync):', constantValueSync)
+
+  // Constants are defined at runtime and never change
+  // Type: ${constant.type || 'unknown'}
+  // ${constant.docs?.[0] || 'Runtime constant'}
+
+  return constantValueAsync${connectionInfo.cleanup || ''}
+}
+
+get${pallet}${constant.name}Constant().catch(console.error)`;
+  } catch (error) {
+    return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
+// 💡 This chain may not be supported for typed API queries`;
+  }
+}
+
+export function generateErrorCode(
+  chainKey: string,
+  providerId: string,
+  pallet: string,
+  error: any,
+): string {
+  try {
+    const descriptorImport = getDescriptorImport(chainKey);
+    const descriptorName = getDescriptorName(chainKey);
+
+    if (!descriptorName) {
+      return `// ❌ Chain "${chainKey}" is not supported for typed API queries
+// 🔧 Supported chains: polkadot, kusama, moonbeam, bifrost, astar, hydration, paseo, westend, rococo
+// 💡 Please switch to a supported chain to generate code`;
+    }
+
+    const connectionInfo = getChainConnection(chainKey, providerId);
+
+    return `import { createClient } from "polkadot-api"
+${descriptorImport}
+${connectionInfo.imports}
+
+// Example error handling for ${pallet}.${error.name}
+async function handle${pallet}Errors() {
+${connectionInfo.connection}
+  const typedApi = client.getTypedApi(${descriptorName})
+
+  try {
+    // Example transaction that might throw ${pallet}.${error.name}
+    // Replace this with your actual transaction
+    const call = typedApi.tx.${pallet}.someMethod({
+      // your parameters here
+    })
+
+    const result = await call.signAndSubmit(signer)
+    console.log('Transaction successful:', result)
+
+  } catch (error) {
+    // Check if the error is specifically ${pallet}.${error.name}
+    if (error.type === '${pallet}' && error.value.type === '${error.name}') {
+      console.error('Caught ${pallet}.${error.name} error:', error)
+
+      // Handle this specific error
+      // ${error.docs?.[0] || 'This error can occur during runtime execution'}
+      console.log('Error details:', {
+        pallet: '${pallet}',
+        error: '${error.name}',
+        type: '${error.type}',
+        message: error.message
+      })
+
+      // Add your error handling logic here
+
+    } else {
+      // Handle other errors
+      console.error('Other transaction error:', error)
+    }${connectionInfo.cleanup || ''}
+  }
+}
+
+// Usage example
+handle${pallet}Errors().catch(console.error)
+
+// Alternative: Check error types in transaction results
+/*
+const result = await call.signAndSubmit(signer)
+if (result.type === 'txError' && result.value.type === '${pallet}' && result.value.value.type === '${error.name}') {
+  console.log('Transaction failed with ${pallet}.${error.name}')
+}
+*/`;
+  } catch (error) {
+    return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
+// 💡 This chain may not be supported for typed API queries`;
+  }
+}
+
 export function generateMultiStorageCode(
   chainKey: string,
   providerId: string,
@@ -973,6 +1145,139 @@ ${connectionInfo.connection}
 }
 
 executeMultipleStorageQueries().catch(console.error)`;
+  } catch (error) {
+    return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
+// 💡 This chain may not be supported for typed API queries`;
+  }
+}
+
+export function generateEventCode(
+  chainKey: string,
+  providerId: string,
+  pallet: string,
+  event: any,
+): string {
+  try {
+    const descriptorImport = getDescriptorImport(chainKey);
+    const descriptorName = getDescriptorName(chainKey);
+
+    if (!descriptorName) {
+      return `// ❌ Chain "${chainKey}" is not supported for typed API queries
+// 🔧 Supported chains: polkadot, kusama, moonbeam, bifrost, astar, hydration, paseo, westend, rococo
+// 💡 Please switch to a supported chain to generate code`;
+    }
+
+    const connectionInfo = getChainConnection(chainKey, providerId);
+
+    // Generate event arguments description
+    const argsDescription = event.args && event.args.length > 0
+      ? event.args.map((arg: any, index: number) =>
+          `    // ${arg.name}: ${arg.type} - ${getParameterDescription(arg.name, arg.type)}`
+        ).join('\n')
+      : '    // No arguments for this event';
+
+    // Generate event listening examples
+    const eventListeningExamples = `
+  // Method 1: Listen to all events from this pallet
+  const allPalletEvents$ = typedApi.event.${pallet}.*$
+  allPalletEvents$.subscribe({
+    next: (event) => {
+      if (event.type === '${event.name}') {
+        console.log('Caught ${pallet}.${event.name} event:', event.value)
+        // Handle the event data here
+      }
+    },
+    error: (error) => console.error('Event subscription error:', error)
+  })
+
+  // Method 2: Listen specifically to ${pallet}.${event.name} events
+  const ${event.name.toLowerCase()}Events$ = typedApi.event.${pallet}.${event.name}$
+  ${event.name.toLowerCase()}Events$.subscribe({
+    next: (eventData) => {
+      console.log('${pallet}.${event.name} event received:', eventData)
+      ${event.args && event.args.length > 0
+        ? `
+      // Access event data:
+${event.args.map((arg: any) => `      // eventData.${arg.name} - ${arg.type}`).join('\n')}`
+        : '      // This event has no data'
+      }
+    },
+    error: (error) => console.error('${event.name} event error:', error)
+  })
+
+  // Method 3: Filter events from all pallets (for comprehensive monitoring)
+  const allEvents$ = client.finalizedBlock$.pipe(
+    switchMap(block => block.events$),
+    filter(event => event.pallet === '${pallet}' && event.name === '${event.name}')
+  )
+
+  allEvents$.subscribe({
+    next: (event) => {
+      console.log('Filtered ${pallet}.${event.name} event:', {
+        blockHash: event.blockHash,
+        blockNumber: event.blockNumber,
+        eventData: event.value
+      })
+    }
+  })`;
+
+    return `import { createClient } from "polkadot-api"
+${descriptorImport}
+${connectionInfo.imports}
+import { switchMap, filter } from 'rxjs'
+
+// Event listening for ${pallet}.${event.name}
+async function listen${pallet}${event.name}Events() {
+${connectionInfo.connection}
+  const typedApi = client.getTypedApi(${descriptorName})
+
+  console.log("Setting up event listeners for ${pallet}.${event.name}...")
+
+  // Event: ${pallet}.${event.name}
+  // Description: ${event.docs?.[0] || 'Blockchain event emitted during runtime execution'}
+  //
+  // Event Arguments:
+${argsDescription}
+  ${eventListeningExamples}
+
+  // Keep the subscription alive
+  console.log("Event listeners active. Press Ctrl+C to stop.")
+
+  // Prevent the script from exiting
+  await new Promise(() => {})${connectionInfo.cleanup || ''}
+}
+
+// Usage example
+listen${pallet}${event.name}Events().catch(console.error)
+
+// Alternative: One-time event filtering from recent blocks
+/*
+async function getRecentEvents() {
+${connectionInfo.connection}
+  const typedApi = client.getTypedApi(${descriptorName})
+
+  // Get events from the last 10 blocks
+  const latestBlock = await client.getBlock()
+  const blockHeight = latestBlock.number
+
+  for (let i = 0; i < 10; i++) {
+    const blockHash = await client.getBlockHash(blockHeight - i)
+    const block = await client.getBlock(blockHash)
+    const events = await block.events
+
+    const ${event.name.toLowerCase()}Events = events.filter(e =>
+      e.pallet === '${pallet}' && e.name === '${event.name}'
+    )
+
+    if (${event.name.toLowerCase()}Events.length > 0) {
+      console.log(\`Found \${${event.name.toLowerCase()}Events.length} ${pallet}.${event.name} events in block \${blockHeight - i}\`)
+      ${event.name.toLowerCase()}Events.forEach(event => {
+        console.log('Event data:', event.value)
+      })
+    }
+  }${connectionInfo.cleanup || ''}
+}
+*/`;
   } catch (error) {
     return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
 // 💡 This chain may not be supported for typed API queries`;

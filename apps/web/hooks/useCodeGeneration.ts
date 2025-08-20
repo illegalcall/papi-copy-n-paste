@@ -9,6 +9,9 @@ import {
   generateStorageQueryCode,
   generateMultiMethodCode,
   generateMultiStorageCode,
+  generateConstantCode,
+  generateErrorCode,
+  generateEventCode,
 } from "../utils/codeGenerators";
 
 export function useCodeGeneration(
@@ -150,11 +153,104 @@ export function useCodeGeneration(
     [selectedChain, selectedProvider],
   );
 
+  // Generate code for constant
+  const generateConstantCodeSnippet = useCallback(
+    (
+      selectedConstant: { pallet: string; constant: any } | undefined,
+    ) => {
+      if (!selectedConstant) {
+        setCode("");
+        setCanRun(false);
+        return;
+      }
+
+      try {
+        const generatedCode = generateConstantCode(
+          selectedChain,
+          selectedProvider,
+          selectedConstant.pallet,
+          selectedConstant.constant,
+        );
+        setCode(generatedCode);
+        setCanRun(true);
+      } catch (error) {
+        setCode(
+          `// Error generating code: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+        setCanRun(false);
+      }
+    },
+    [selectedChain, selectedProvider],
+  );
+
+  // Generate code for error
+  const generateErrorCodeSnippet = useCallback(
+    (
+      selectedError: { pallet: string; error: any } | undefined,
+    ) => {
+      if (!selectedError) {
+        setCode("");
+        setCanRun(false);
+        return;
+      }
+
+      try {
+        const generatedCode = generateErrorCode(
+          selectedChain,
+          selectedProvider,
+          selectedError.pallet,
+          selectedError.error,
+        );
+        setCode(generatedCode);
+        setCanRun(true);
+      } catch (error) {
+        setCode(
+          `// Error generating code: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+        setCanRun(false);
+      }
+    },
+    [selectedChain, selectedProvider],
+  );
+
+  // Generate code for event
+  const generateEventCodeSnippet = useCallback(
+    (
+      selectedEvent: { pallet: string; event: any } | undefined,
+    ) => {
+      if (!selectedEvent) {
+        setCode("");
+        setCanRun(false);
+        return;
+      }
+
+      try {
+        const generatedCode = generateEventCode(
+          selectedChain,
+          selectedProvider,
+          selectedEvent.pallet,
+          selectedEvent.event,
+        );
+        setCode(generatedCode);
+        setCanRun(true);
+      } catch (error) {
+        setCode(
+          `// Error generating code: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+        setCanRun(false);
+      }
+    },
+    [selectedChain, selectedProvider],
+  );
+
   // Update generated code when dependencies change
   const updateGeneratedCode = useCallback(
     (
       selectedCall: { pallet: string; call: PalletCall } | undefined,
       selectedStorage: { pallet: string; storage: any } | undefined,
+      selectedConstant: { pallet: string; constant: any } | undefined,
+      selectedError: { pallet: string; error: any } | undefined,
+      selectedEvent: { pallet: string; event: any } | undefined,
       formData: Record<string, any>,
       storageQueryType: string,
       storageParams: Record<string, any>,
@@ -172,7 +268,7 @@ export function useCodeGeneration(
         id: string;
       }>,
     ) => {
-      // Priority: method queue > storage queue > single call > single storage
+      // Priority: method queue > storage queue > single call > single storage > constant > error > event
       if (methodQueue.length > 0) {
         generateMultiMethodCodeSnippet(methodQueue);
       } else if (storageQueue.length > 0) {
@@ -182,6 +278,12 @@ export function useCodeGeneration(
         generateTransactionCode(selectedCall, formData);
       } else if (selectedStorage) {
         generateStorageCode(selectedStorage, storageQueryType, storageParams);
+      } else if (selectedConstant) {
+        generateConstantCodeSnippet(selectedConstant);
+      } else if (selectedError) {
+        generateErrorCodeSnippet(selectedError);
+      } else if (selectedEvent) {
+        generateEventCodeSnippet(selectedEvent);
       } else {
         setCode("");
         setCanRun(false);
@@ -192,6 +294,9 @@ export function useCodeGeneration(
       generateStorageCode,
       generateMultiMethodCodeSnippet,
       generateMultiStorageCodeSnippet,
+      generateConstantCodeSnippet,
+      generateErrorCodeSnippet,
+      generateEventCodeSnippet,
     ],
   );
 
@@ -211,6 +316,9 @@ export function useCodeGeneration(
     generateStorageCode,
     generateMultiMethodCodeSnippet,
     generateMultiStorageCodeSnippet,
+    generateConstantCodeSnippet,
+    generateErrorCodeSnippet,
+    generateEventCodeSnippet,
     updateGeneratedCode,
     clearCode,
 

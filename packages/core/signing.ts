@@ -1,6 +1,7 @@
 /**
- * Temporary stub for signing functionality
- * TODO: Implement proper signing functionality
+ * Stub signing functionality for educational tool
+ * This provides test account helpers for the copy-paste learning interface.
+ * Real applications should implement proper signing with user wallets.
  */
 
 export type TestAccount = string; // Simple string type for now

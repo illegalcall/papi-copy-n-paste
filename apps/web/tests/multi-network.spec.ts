@@ -60,12 +60,13 @@ test.describe("Multi-Network Testing", () => {
 
             // Code should contain network-specific setup
             const generatedCode = await codeDisplay.first().textContent();
-            expect(generatedCode).toContain("System");
-            expect(generatedCode).toContain("chain");
+            expect(generatedCode).toBeTruthy();
+            expect(generatedCode!).toContain("System");
+            expect(generatedCode!).toContain("chain");
 
             // Should contain network-specific chain spec or descriptor
             const lowerNetworkName = network.chainKey.toLowerCase();
-            expect(generatedCode.toLowerCase()).toContain(lowerNetworkName);
+            expect(generatedCode!.toLowerCase()).toContain(lowerNetworkName);
           }
         }
       });
@@ -108,8 +109,9 @@ test.describe("Multi-Network Testing", () => {
       const kusamaCode = await codeDisplay.textContent();
 
       // Code should be different for different networks
+      expect(kusamaCode).toBeTruthy();
       expect(kusamaCode).not.toBe(polkadotCode);
-      expect(kusamaCode.toLowerCase()).toContain("kusama");
+      expect(kusamaCode!.toLowerCase()).toContain("kusama");
     }
   });
 
@@ -163,9 +165,10 @@ test.describe("Multi-Network Testing", () => {
         const kusamaRpcCode = await codeDisplay.textContent();
 
         // Should contain RPC-specific imports for Kusama
-        expect(kusamaRpcCode).toContain("getWsProvider");
-        expect(kusamaRpcCode).toContain("withPolkadotSdkCompat");
-        expect(kusamaRpcCode.toLowerCase()).toContain("kusama");
+        expect(kusamaRpcCode).toBeTruthy();
+        expect(kusamaRpcCode!).toContain("getWsProvider");
+        expect(kusamaRpcCode!).toContain("withPolkadotSdkCompat");
+        expect(kusamaRpcCode!.toLowerCase()).toContain("kusama");
       }
     }
   });
@@ -294,7 +297,8 @@ test.describe("Multi-Network Testing", () => {
         // Should generate Moonbeam-specific code
         const codeDisplay = page.locator("pre, code").first();
         const moonbeamCode = await codeDisplay.textContent();
-        expect(moonbeamCode.toLowerCase()).toContain("moonbeam");
+        expect(moonbeamCode).toBeTruthy();
+        expect(moonbeamCode!.toLowerCase()).toContain("moonbeam");
       }
     }
   });

@@ -4,7 +4,7 @@
  * Now using Dynamic Storage Parameter Detection Engine
  */
 
-import { detectStorageParameters as dynamicDetectStorageParameters, getStorageParameterInfo } from './dynamicStorageDetection';
+import { getStorageParameterInfo } from './dynamicStorageDetection';
 
 export function detectStorageParameters(
   palletName: string,
@@ -12,7 +12,8 @@ export function detectStorageParameters(
   chainKey: string = 'polkadot'
 ): string[] {
   // Use the dynamic detector instead of hard-coded mappings
-  return dynamicDetectStorageParameters(palletName, storageName, chainKey);
+  const info = getStorageParameterInfo(chainKey, palletName, storageName);
+  return info.required;
 }
 
 export function isStorageQueryValid(
@@ -82,6 +83,11 @@ export function generateStorageParams(
       return String(parseInt(value || "0"));
     } else if (paramType === "Hash") {
       return `"${value || "0x0000000000000000000000000000000000000000000000000000000000000000"}"`;
+    } else if (paramType === "bytes") {
+      // Handle bytes parameters - ensure they're properly formatted as hex
+      const cleanValue = value || "";
+      const hexValue = cleanValue.startsWith("0x") ? cleanValue : `0x${cleanValue}`;
+      return `"${hexValue}"`;
     }
 
     return `"${value}"`;

@@ -167,6 +167,12 @@ test.describe("PAPI Copy-n-Paste E2E Tests", () => {
 
     const testFilePath = path.join(testDir, "test-generated-code.mjs");
 
+    // Get the current generated code from the UI
+    const currentCodeArea = page
+      .locator("pre, code, .language-typescript")
+      .first();
+    const generatedCode = await currentCodeArea.textContent();
+
     // Modify the generated code to make it testable (remove actual execution)
     let testableCode = generatedCode || "";
 

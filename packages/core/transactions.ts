@@ -279,9 +279,9 @@ export class TransactionExecutor {
                 value: amount, // Transfer amount in planck units (smallest unit)
               });
 
-              // TODO: SCALE encoding for educational purposes - TEMPORARILY DISABLED
-              // This section shows users the raw SCALE-encoded transaction hex
-              // Commented out to hide from users until ready for production
+              // NOTE: SCALE encoding educational feature is disabled
+              // This would show users the raw SCALE-encoded transaction hex
+              // Currently commented out to keep the interface simple
               /*
               let transactionHex: string | null = null
               try {
@@ -478,9 +478,9 @@ export class TransactionExecutor {
                 "info",
               );
 
-              // TODO: SCALE encoding for educational purposes - TEMPORARILY DISABLED
-              // This section shows users the raw SCALE-encoded transaction hex
-              // Commented out to hide from users until ready for production
+              // NOTE: SCALE encoding educational feature is disabled
+              // This would show users the raw SCALE-encoded transaction hex
+              // Currently commented out to keep the interface simple
               /*
               let transactionHex: string | null = null
               try {

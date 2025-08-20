@@ -1,6 +1,6 @@
 /**
  * Auto-generated storage metadata from PAPI descriptors
- * Generated on: 2025-09-16T11:59:22.877Z
+ * Generated on: 2025-09-17T17:00:00.308Z
  */
 
 export interface StorageParameterInfo {

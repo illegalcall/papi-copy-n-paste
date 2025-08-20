@@ -23,12 +23,112 @@ export interface PalletConstant {
   docs: string[];
 }
 
+export interface PalletError {
+  name: string;
+  type: string;
+  docs: string[];
+}
+
+export interface RuntimeCall {
+  name: string;
+  args: { name: string; type: string }[];
+  returnType: string;
+  docs: string[];
+}
+
+// Import comprehensive metadata for enhanced parsing
+import { papiMetadata } from "./generated/papi-metadata";
+
+
+/**
+ * Get events from comprehensive generated metadata
+ */
+function getEventsFromComprehensiveMetadata(
+  chainKey: string,
+  palletName: string,
+): PalletEvent[] {
+
+  try {
+    const chainMetadata = papiMetadata[chainKey];
+    if (!chainMetadata?.events) {
+      return [];
+    }
+
+    const palletEvents = chainMetadata.events[palletName];
+    if (!palletEvents) {
+      return [];
+    }
+
+    const events: PalletEvent[] = [];
+    for (const [eventName, eventMetadata] of Object.entries(palletEvents)) {
+      events.push({
+        name: eventName,
+        args: eventMetadata.fields?.map(field => ({
+          name: field.name,
+          type: field.type,
+        })) || [],
+        docs: eventMetadata.description ? [eventMetadata.description] : [],
+      });
+    }
+
+
+    return events;
+  } catch (error) {
+    return [];
+  }
+}
+
+/**
+ * Get errors from comprehensive generated metadata
+ */
+function getErrorsFromComprehensiveMetadata(
+  chainKey: string,
+  palletName: string,
+): PalletError[] {
+
+  try {
+    const chainMetadata = papiMetadata[chainKey];
+    if (!chainMetadata?.errors) {
+      return [];
+    }
+
+    const palletErrors = chainMetadata.errors[palletName];
+    if (!palletErrors) {
+      return [];
+    }
+
+    const errors: PalletError[] = [];
+    for (const [errorName, errorMetadata] of Object.entries(palletErrors)) {
+      errors.push({
+        name: errorName,
+        type: errorMetadata.type || "unknown",
+        docs: errorMetadata.description ? [errorMetadata.description] : [],
+      });
+    }
+
+
+    return errors;
+  } catch (error) {
+    return [];
+  }
+}
+
+export interface RuntimeApi {
+  name: string;
+  methods: RuntimeCall[];
+}
+
 export interface PalletInfo {
   name: string;
   calls: PalletCall[];
   storage: PalletStorage[];
   events: PalletEvent[];
   constants: PalletConstant[];
+  errors?: PalletError[];
+}
+
+export interface ChainMetadataExtended extends ChainMetadata {
+  runtimeApis: RuntimeApi[];
 }
 
 export interface ChainMetadata {
@@ -38,7 +138,7 @@ export interface ChainMetadata {
 }
 
 const METADATA_CACHE_KEY = "papi-metadata-cache";
-const METADATA_CACHE_VERSION = "2.5.0"; // Increment when cache format changes
+const METADATA_CACHE_VERSION = "3.2.0"; // Increment when cache format changes - FORCE CACHE REFRESH FOR CHAIN-SPECIFIC PALLETS
 const DEFAULT_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 const MAX_CACHE_SIZE = 10; // Maximum number of chains to cache
 
@@ -73,7 +173,6 @@ async function fetchWithRetry<T>(
         // Race between the actual request and timeout
         const result = await Promise.race([fn(), timeoutPromise]);
         if (timeoutHandle) clearTimeout(timeoutHandle);
-        console.log(`✅ Metadata fetch succeeded on attempt ${attempt}`);
         return result;
       } catch (raceError) {
         if (timeoutHandle) clearTimeout(timeoutHandle);
@@ -81,10 +180,8 @@ async function fetchWithRetry<T>(
       }
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Unknown error";
-      console.warn(`❌ Attempt ${attempt}/${maxRetries} failed:`, errorMsg);
 
       if (attempt === maxRetries) {
-        console.error(`💥 All ${maxRetries} attempts failed, throwing error`);
         throw error;
       }
 
@@ -92,7 +189,6 @@ async function fetchWithRetry<T>(
       const baseDelay = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
       const jitter = Math.random() * 1000; // Add some randomness
       const delay = Math.floor(baseDelay + jitter);
-      console.log(`⏳ Waiting ${delay}ms before retry...`);
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
@@ -118,7 +214,6 @@ export async function fetchMetadata(
   client: any,
 ): Promise<ChainMetadata | null> {
   try {
-    console.log("Fetching metadata for:", chainKey, "with client:", !!client);
 
     if (!client) {
       console.warn("No client available for metadata fetch");
@@ -146,7 +241,6 @@ export async function fetchMetadata(
       return cached;
     }
 
-    console.log("Client object keys:", Object.keys(client));
 
     // Use PAPI client's _request method to get raw metadata via JSON-RPC with enhanced retry logic
     let rawMetadata: any;
@@ -163,13 +257,11 @@ export async function fetchMetadata(
       // Single attempt with quick timeout for better UX
       rawMetadata = await fetchWithRetry(
         () => {
-          console.log("🚀 Executing state_getMetadata request...");
           return client._request("state_getMetadata", []);
         },
         1, // Single attempt
         quickTimeout,
       );
-      console.log("✅ Raw metadata received successfully!");
     } catch (error) {
       console.warn(
         `⚠️ Metadata fetch failed for ${chainKey}:`,
@@ -184,7 +276,6 @@ export async function fetchMetadata(
         // Don't retry for Polkadot - fall back immediately
       }
 
-      console.log(`🔄 Checking if mock metadata is enabled for ${chainKey}`);
       return getMockMetadataIfEnabled(chainKey);
     }
 
@@ -1503,6 +1594,7 @@ function parseDecodedMetadata(
         storage: [],
         events: [],
         constants: [],
+        errors: [],
       };
 
       // Parse calls - always try to parse calls for every pallet
@@ -1524,10 +1616,45 @@ function parseDecodedMetadata(
         }
       }
 
-      // Parse events
-      if (pallet.events?.type !== undefined) {
-        // Similar to calls, events are referenced by type index
-        palletInfo.events = parseEventsFromPallet(pallet);
+      // Parse events - prioritize comprehensive metadata as source of truth
+      const comprehensiveEvents = getEventsFromComprehensiveMetadata(
+        chainKey,
+        pallet.name || "Unknown",
+      );
+
+      if (comprehensiveEvents.length > 0) {
+        // Use comprehensive metadata as primary source
+        console.log(
+          `✅ Using comprehensive metadata for ${pallet.name} events: ${comprehensiveEvents.length} events found`,
+        );
+        palletInfo.events = comprehensiveEvents;
+      } else if (pallet.events) {
+        // Fallback to parsing from runtime metadata
+        if (pallet.events.variants && Array.isArray(pallet.events.variants)) {
+          // Parse real event variants from metadata
+          console.log(
+            `⚠️ Using runtime metadata for ${pallet.name} events: ${pallet.events.variants.length} events found`,
+          );
+          for (const event of pallet.events.variants) {
+            palletInfo.events.push({
+              name: event.name,
+              args:
+                event.fields?.map((field: any) => ({
+                  name: field.name || `arg${field.index}`,
+                  type: field.type || "unknown",
+                })) || [],
+              docs: event.docs || [],
+            });
+          }
+        } else if (pallet.events?.type !== undefined) {
+          // Final fallback to simplified parsing for older metadata formats
+          console.log(
+            `⚠️ Using fallback parsing for ${pallet.name} events`,
+          );
+          palletInfo.events = parseEventsFromPallet(pallet);
+        }
+      } else {
+        console.log(`ℹ️ No events found for ${pallet.name} in any source`);
       }
 
       // Parse constants
@@ -1548,6 +1675,29 @@ function parseDecodedMetadata(
         ...getEnhancedConstantsForPallet(pallet.name || ""),
       ];
 
+      // Parse errors - prioritize comprehensive metadata as source of truth
+      const comprehensiveErrors = getErrorsFromComprehensiveMetadata(
+        chainKey,
+        pallet.name || "Unknown",
+      );
+
+      if (comprehensiveErrors.length > 0) {
+        // Use comprehensive metadata as primary source
+        console.log(
+          `✅ [ERRORS] Using comprehensive metadata for ${pallet.name} errors: ${comprehensiveErrors.length} errors found`,
+        );
+        palletInfo.errors = comprehensiveErrors;
+
+        // Special logging for Balances to confirm it's working
+        if (pallet.name === "Balances") {
+          console.log(`🎯 [BALANCES ERRORS DETECTED] Found ${comprehensiveErrors.length} errors including:`,
+                     comprehensiveErrors.map(e => e.name).slice(0, 5));
+        }
+      } else {
+        console.log(`ℹ️ [ERRORS] No errors found for ${pallet.name} in comprehensive metadata`);
+        palletInfo.errors = [];
+      }
+
       pallets.push(palletInfo);
     }
 
@@ -1558,7 +1708,7 @@ function parseDecodedMetadata(
     return {
       pallets: pallets.filter(
         (p) =>
-          p.calls.length > 0 || p.storage.length > 0 || p.events.length > 0,
+          p.calls.length > 0 || p.storage.length > 0 || p.events.length > 0 || (p.errors && p.errors.length > 0),
       ),
       chainHash:
         chainKey === "polkadot"
@@ -2767,19 +2917,14 @@ function enhanceRealMetadata(
     return realPallet;
   });
 
-  // Add pallets from mock that don't exist in real metadata
-  const additionalPallets = mockMetadata.pallets.filter((mockPallet) => {
-    const mockName = mockPallet.name.toLowerCase();
-    return !existingPalletNames.has(mockName);
-  });
-
+  // ❌ REMOVED: Don't add pallets that don't exist on this chain
+  // This was causing ConvictionVoting to appear on Hydration where it doesn't exist
   console.log(
-    `📦 Adding ${additionalPallets.length} additional pallets:`,
-    additionalPallets.map((p) => p.name),
+    `✅ Enhanced ${enhancedExistingPallets.length} existing pallets for ${chainKey} (no cross-chain pallets added)`,
   );
 
-  // Merge enhanced existing pallets with additional pallets
-  const allEnhancedPallets = [...enhancedExistingPallets, ...additionalPallets];
+  // Only use existing pallets that are actually on this chain
+  const allEnhancedPallets = enhancedExistingPallets;
 
   return {
     ...realMetadata,
@@ -2788,10 +2933,12 @@ function enhanceRealMetadata(
 }
 
 function parseEventsFromPallet(pallet: any): PalletEvent[] {
-  // Simplified event parsing based on pallet name
+  // Legacy fallback event parsing - only used when comprehensive metadata is unavailable
+  // NOTE: This function should rarely be used now that we have comprehensive metadata
   const events: PalletEvent[] = [];
   const palletName = pallet.name?.toLowerCase() || "";
 
+  // Only keep minimal fallbacks for essential pallets that should always have events
   if (palletName.includes("balance") || palletName === "balances") {
     events.push({
       name: "Transfer",
@@ -2809,6 +2956,11 @@ function parseEventsFromPallet(pallet: any): PalletEvent[] {
       docs: ["An extrinsic completed successfully."],
     });
   }
+
+  // Removed hardcoded AssetRate events - now handled by comprehensive metadata
+  console.log(
+    `⚠️ Using legacy fallback for ${palletName} events. Consider updating comprehensive metadata if events are missing.`,
+  );
 
   return events;
 }
@@ -2843,6 +2995,7 @@ function parseMetadata(metadata: any, chainKey: string): ChainMetadata {
         storage: [],
         events: [],
         constants: [],
+        errors: [],
       };
 
       // Parse calls

@@ -17,6 +17,50 @@ export interface TypeScriptTypeInfo {
   complexity: 'simple' | 'medium' | 'complex';
 }
 
+// Import metadata for all chains
+let papiMetadata: any = null;
+
+// Load metadata dynamically
+try {
+  papiMetadata = require('../../../packages/core/generated/storage-metadata.json');
+} catch (error) {
+  console.warn('Could not load storage-metadata.json:', error);
+}
+
+// Parameter type mappings for common parameter names
+const parameterTypeMappings: Record<string, string> = {
+  'hash': 'Hash',
+  'Hash': 'Hash',
+  'ss58string': 'SS58String',
+  'accountid': 'AccountId',
+  'AccountId': 'AccountId',
+  'key': 'Hash',
+  'param': 'Hash',
+  'who': 'AccountId',
+  'dest': 'AccountId',
+  'target': 'AccountId',
+  'source': 'AccountId',
+  'account': 'AccountId',
+  'value': 'Balance',
+  'amount': 'Balance',
+  'balance': 'Balance',
+  'index': 'u32',
+  'block_number': 'u32',
+  'BlockNumber': 'u32'
+};
+
+// Default return types for common storage patterns
+const defaultReturnTypes: Record<string, string> = {
+  'Account': 'AccountInfo',
+  'Balance': 'bigint',
+  'TotalIssuance': 'bigint',
+  'Number': 'u32',
+  'Now': 'bigint',
+  'StatusFor': 'Option<RequestStatus>',
+  'RequestStatusFor': 'Option<RequestStatus>',
+  'PreimageFor': 'Option<Bytes>'
+};
+
 // Known type mappings from PAPI descriptors (updated when descriptors are available)
 const knownTypeMappings: Record<string, Record<string, Record<string, any>>> = {
   polkadot: {
@@ -116,8 +160,15 @@ export function extractActualTypes(
       return result;
     }
 
-    // No fallback - throw error if metadata is missing
-    throw new Error(`No type information available for ${chainKey}.${pallet}.${storageName} in known mappings`);
+    // Fallback to metadata-based extraction
+    const metadataResult = extractFromMetadata(chainKey, pallet, storageName);
+    if (metadataResult) {
+      typeCache.set(cacheKey, metadataResult);
+      return metadataResult;
+    }
+
+    // Final fallback with intelligent defaults
+    throw new Error(`No type information available for ${chainKey}.${pallet}.${storageName} in known mappings or metadata`);
   } catch (error) {
     throw new Error(`Failed to extract types for ${chainKey}.${pallet}.${storageName}: ${error instanceof Error ? error.message : error}`);
   }
@@ -205,12 +256,24 @@ export function formatTypeForDisplay(
 /**
  * Converts PAPI type strings to TypeScript equivalents for transaction calls
  */
-export function papiTypeToTypeScript(papiType: string): string {
+export function papiTypeToTypeScript(papiType: string | any): string {
+  // Ensure papiType is a string
+  let typeString: string;
+  if (typeof papiType !== 'string') {
+    if (papiType === null || papiType === undefined) {
+      return 'unknown';
+    }
+    // Convert to string if possible
+    typeString = String(papiType);
+  } else {
+    typeString = papiType;
+  }
+
   // Handle common PAPI to TypeScript conversions
   const typeMap: Record<string, string> = {
     // Numeric types
     'u8': 'number',
-    'u16': 'number', 
+    'u16': 'number',
     'u32': 'number',
     'u64': 'bigint',
     'u128': 'bigint',
@@ -219,13 +282,13 @@ export function papiTypeToTypeScript(papiType: string): string {
     'i32': 'number',
     'i64': 'bigint',
     'i128': 'bigint',
-    
+
     // Blockchain specific types
     'AccountId32': 'MultiAddress',
     'AccountId': 'MultiAddress',
     'H256': 'HexString',
     'Balance': 'bigint',
-    
+
     // Basic types
     'Bool': 'boolean',
     'Bytes': 'HexString',
@@ -234,43 +297,43 @@ export function papiTypeToTypeScript(papiType: string): string {
   };
 
   // Handle direct mappings
-  if (typeMap[papiType]) {
-    return typeMap[papiType];
+  if (typeMap[typeString]) {
+    return typeMap[typeString] as string;
   }
 
   // Handle Compact<T>
-  const compactMatch = papiType.match(/^Compact<(.+)>$/);
+  const compactMatch = typeString.match(/^Compact<(.+)>$/);
   if (compactMatch && compactMatch[1]) {
     return papiTypeToTypeScript(compactMatch[1]);
   }
 
   // Handle Option<T>
-  const optionMatch = papiType.match(/^Option<(.+)>$/);
+  const optionMatch = typeString.match(/^Option<(.+)>$/);
   if (optionMatch && optionMatch[1]) {
     return `${papiTypeToTypeScript(optionMatch[1])} | undefined`;
   }
 
   // Handle Vec<T>
-  const vecMatch = papiType.match(/^Vec<(.+)>$/);
+  const vecMatch = typeString.match(/^Vec<(.+)>$/);
   if (vecMatch && vecMatch[1]) {
     return `${papiTypeToTypeScript(vecMatch[1])}[]`;
   }
 
   // Handle Result<T, E>
-  const resultMatch = papiType.match(/^Result<(.+),\s*(.+)>$/);
+  const resultMatch = typeString.match(/^Result<(.+),\s*(.+)>$/);
   if (resultMatch && resultMatch[1] && resultMatch[2]) {
     return `Result<${papiTypeToTypeScript(resultMatch[1])}, ${papiTypeToTypeScript(resultMatch[2])}>`;
   }
 
   // Handle tuples (T, U, V)
-  const tupleMatch = papiType.match(/^\(([^)]+)\)$/);
+  const tupleMatch = typeString.match(/^\(([^)]+)\)$/);
   if (tupleMatch && tupleMatch[1]) {
     const types = tupleMatch[1].split(',').map(t => papiTypeToTypeScript(t.trim()));
     return `[${types.join(', ')}]`;
   }
 
   // Handle complex types - keep as-is but clean up
-  return papiType
+  return typeString
     .replace(/^sp_runtime::|^pallet_|^frame_/, '') // Remove common prefixes
     .replace(/::/, '.'); // Replace Rust :: with TS .
 }
@@ -357,6 +420,119 @@ function determineComplexity(parameters: Array<{ type: string; }>): 'simple' | '
   return 'complex';
 }
 
+/**
+ * Extract type information from loaded metadata
+ */
+function extractFromMetadata(
+  chainKey: string,
+  pallet: string,
+  storageName: string,
+): {
+  returnType: string;
+  actualType: string;
+  paramTypes: string[];
+  typeDefinition?: string;
+} | null {
+  if (!papiMetadata || !papiMetadata[chainKey]) {
+    return null;
+  }
+
+  const chainMetadata = papiMetadata[chainKey];
+  const storageMetadata = chainMetadata.pallets?.[pallet]?.[storageName];
+
+  if (!storageMetadata) {
+    return null;
+  }
+
+  // Extract parameter types from the metadata
+  const paramTypes: string[] = [];
+
+  // Handle required parameters
+  if (storageMetadata.required && Array.isArray(storageMetadata.required)) {
+    paramTypes.push(...storageMetadata.required.map(mapParameterType));
+  }
+
+  // Handle optional parameters
+  if (storageMetadata.optional && Array.isArray(storageMetadata.optional)) {
+    paramTypes.push(...storageMetadata.optional.map(mapParameterType));
+  }
+
+  // Determine return type using intelligent fallbacks
+  let returnType = 'unknown';
+  let actualType = 'unknown';
+
+  // Try to get return type from metadata
+  if (storageMetadata.returnType && storageMetadata.returnType !== 'unknown') {
+    returnType = storageMetadata.returnType;
+    actualType = storageMetadata.returnType;
+  } else {
+    // Use pattern matching for common storage items
+    if (defaultReturnTypes[storageName]) {
+      returnType = defaultReturnTypes[storageName];
+      actualType = defaultReturnTypes[storageName];
+    } else {
+      // Generic fallback based on pallet patterns
+      if (pallet === 'Balances' && storageName.toLowerCase().includes('account')) {
+        returnType = 'AccountInfo';
+        actualType = 'AccountInfo';
+      } else if (pallet === 'System' && storageName === 'Number') {
+        returnType = 'u32';
+        actualType = 'u32';
+      } else if (storageName.toLowerCase().includes('balance')) {
+        returnType = 'bigint';
+        actualType = 'bigint';
+      } else {
+        // Keep as unknown but don't throw error
+        returnType = 'unknown';
+        actualType = 'unknown';
+      }
+    }
+  }
+
+  return {
+    returnType,
+    actualType,
+    paramTypes,
+    typeDefinition: actualType !== 'unknown' ? actualType : undefined
+  };
+}
+
+/**
+ * Map parameter type names to expected input types
+ */
+function mapParameterType(paramType: string): string {
+  // Direct mapping
+  if (parameterTypeMappings[paramType]) {
+    return parameterTypeMappings[paramType];
+  }
+
+  // Lowercase mapping
+  const lowerType = paramType.toLowerCase();
+  if (parameterTypeMappings[lowerType]) {
+    return parameterTypeMappings[lowerType];
+  }
+
+  // Pattern matching
+  if (lowerType.includes('hash') || lowerType.includes('h256')) {
+    return 'Hash';
+  }
+
+  if (lowerType.includes('account') || lowerType.includes('ss58')) {
+    return 'AccountId';
+  }
+
+  if (lowerType.includes('balance') || lowerType.includes('amount')) {
+    return 'Balance';
+  }
+
+  if (lowerType.includes('index') || lowerType.includes('number')) {
+    return 'u32';
+  }
+
+  // Return as-is if no mapping found
+  return paramType;
+}
+
 // Unused constant signature functions removed - not referenced anywhere in codebase
 
 /**
@@ -385,6 +561,81 @@ function getParameterDescription(paramName: string, paramType: string): string {
   };
 
   return descriptions[paramName] || `Parameter of type ${paramType}`;
+}
+
+/**
+ * Generates TypeScript-style constant signature
+ */
+export function generateConstantSignature(
+  pallet: string,
+  constantName: string,
+  constantType: string = 'unknown'
+): TypeScriptTypeInfo {
+
+  const returnType = papiTypeToTypeScript(constantType);
+
+  // Constants have no parameters - they're just values
+  const signature = `Constant<${returnType}>`;
+
+  return {
+    signature,
+    parameters: [], // Constants never have parameters
+    returnType,
+    complexity: 'simple' // Constants are always simple
+  };
+}
+
+/**
+ * Generates TypeScript-style error signature
+ */
+export function generateErrorSignature(
+  pallet: string,
+  errorName: string
+): TypeScriptTypeInfo {
+
+  // Error signature shows it's part of a DispatchError
+  const signature = `DispatchError::Module { pallet: "${pallet}", error: "${errorName}" }`;
+
+  return {
+    signature,
+    parameters: [], // Errors don't have parameters
+    returnType: 'DispatchError',
+    complexity: 'simple' // Errors are always simple
+  };
+}
+
+/**
+ * Generates TypeScript-style event signature
+ */
+export function generateEventSignature(
+  pallet: string,
+  eventName: string,
+  eventArgs: Array<{ name: string; type: string; }> = []
+): TypeScriptTypeInfo {
+
+  const parameters = eventArgs.map(arg => ({
+    name: arg.name,
+    type: papiTypeToTypeScript(arg.type),
+    description: getParameterDescription(arg.name, arg.type)
+  }));
+
+  // Create TypeScript interface for event data
+  const eventInterface = parameters.length > 0
+    ? `{ ${parameters.map(p => `${p.name}: ${p.type}`).join('; ')} }`
+    : '{}';
+
+  // Generate the Event signature
+  const signature = `Event<${eventInterface}>`;
+
+  // Determine complexity based on parameter types and count
+  const complexity = determineComplexity(parameters);
+
+  return {
+    signature,
+    parameters,
+    returnType: 'RuntimeEvent',
+    complexity
+  };
 }
 
 // Unused type highlighting function removed - not referenced anywhere in codebase

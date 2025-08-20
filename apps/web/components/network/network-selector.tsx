@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -21,9 +22,22 @@ export function NetworkSelector({
   onNetworkChange,
   disabled = false,
 }: NetworkSelectorProps) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const selectedNetwork = networkConfigs.find(
     (config) => config.chain === selectedChain,
   );
+
+  // Prevent hydration mismatch by only rendering after client mount
+  if (!isClient) {
+    return (
+      <div className="w-[120px] h-8 bg-muted rounded-md animate-pulse" />
+    );
+  }
 
   return (
     <Select
