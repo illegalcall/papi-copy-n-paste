@@ -303,25 +303,25 @@ export const networkConfigs: NetworkConfig[] = [
     chainSpecPath: undefined, // Hydration is not a built-in chain, uses RPC
     genesisHash:
       "0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d",
-    defaultProvider: "hydration-rpc",
+    defaultProvider: "hydration-rpc", // Fixed: Use RPC as default since Smoldot requires chain spec
     providers: [
       {
-        id: "smoldot-hydration",
-        name: "Smoldot",
-        type: "smoldot",
-        description: "Light client for a decentralized experience",
+        id: "hydration-rpc",
+        name: "Hydration Network",
+        type: "rpc",
+        description: "Official Hydration RPC (Recommended)",
+        url: "wss://hydration-rpc.n.dwellir.com",
         isRecommended: true,
         reliability: "high",
         latency: "low",
       },
       {
-        id: "hydration-rpc",
-        name: "Hydration Network",
-        type: "rpc",
-        description: "Official Hydration RPC",
-        url: "wss://hydration-rpc.n.dwellir.com",
-        reliability: "high",
-        latency: "low",
+        id: "smoldot-hydration",
+        name: "Smoldot",
+        type: "smoldot",
+        description: "Light client (not available - no chain spec)",
+        reliability: "low", // Marked as low since it won't work
+        latency: "high",
       },
       {
         id: "chopsticks-hydration",

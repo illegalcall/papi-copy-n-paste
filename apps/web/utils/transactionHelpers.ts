@@ -10,26 +10,27 @@ import {
 import { getDescriptorName } from "./chainConfig";
 import type { StorageParams } from "../types/forms";
 import {
-  detectStorageParameters,
+  getAllStorageParameters,
   generateStorageParamValues,
-  formatStorageResult as formatStorageResultHelper,
   decodeStorageResult,
 } from "./storageHelpers";
 import { createCleanLogger, QueryResult } from "./cleanLogger";
-import { extractActualTypes } from "./typeExtraction";
 import { getDescriptorForChain } from "@workspace/core/descriptors";
 
 // Observable subscriptions storage for watch functionality
 let activeWatchSubscriptions = new Map<string, any>();
 
-// Helper function to get storage parameters using the same logic as code generation
-function getStorageParameters(chainKey: string, pallet: string, storageName: string): string[] {
+// Helper function to get storage parameters using the new dynamic detection system
+function getStorageParameters(chainKey: string, pallet: string, storageName: string): { required: string[], optional: string[] } {
   try {
-    const actualTypeInfo = extractActualTypes(chainKey, pallet, storageName);
-    return actualTypeInfo.paramTypes.length > 0 ? actualTypeInfo.paramTypes : [];
+    // Use the new getAllStorageParameters function which returns both required and optional
+    const paramInfo = getAllStorageParameters(pallet, storageName, chainKey);
+
+
+    return paramInfo;
   } catch (error) {
-    // Fallback to detectStorageParameters if extractActualTypes fails
-    return detectStorageParameters(pallet, storageName, chainKey);
+    // Fallback that returns empty arrays
+    return { required: [], optional: [] };
   }
 }
 
@@ -252,38 +253,47 @@ export async function executeStorageQuery(
     const palletName = selectedStorage.pallet;
     const storageName = selectedStorage.storage.name;
 
-    // Detect if this storage requires parameters using the same logic as code generation
-    const requiredParams = getStorageParameters(chainKey, palletName, storageName);
-    const hasParams = Boolean(
-      requiredParams && requiredParams.length > 0 && Object.keys(storageParams).length > 0,
-    );
+    // Detect storage parameters using the new dynamic detection system
+    const paramInfo = getStorageParameters(chainKey, palletName, storageName);
+    const allParams = [...paramInfo.required, ...paramInfo.optional];
 
-    // Debug logging for parameter detection
-    logger.info(`🔍 Storage ${palletName}.${storageName} analysis:`);
-    logger.info(`  Required params: ${requiredParams ? requiredParams.join(', ') : 'none'}`);
+    // Check if user has actually provided parameter values (not just empty strings)
+    const providedParamKeys = Object.keys(storageParams).filter(key => {
+      const value = storageParams[key];
+      return value !== undefined && value !== null && value !== '';
+    });
+
+    const hasParams = Boolean(allParams.length > 0 && providedParamKeys.length > 0);
+
     logger.info(`  Provided params: ${JSON.stringify(storageParams)}`);
     logger.info(`  Has params: ${hasParams}`);
 
 
-    // Generate parameter values if needed
-    const paramValues =
-      hasParams && requiredParams
-        ? generateStorageParamValues(storageParams, requiredParams)
-        : [];
+    // Generate parameter values only if we actually have parameter data provided
+    // For optional parameters, only use them if the user has actually provided values
+    const paramValues = hasParams
+      ? generateStorageParamValues(storageParams, allParams)
+      : [];
 
     // Note: For modern PAPI, we use typed API approach instead of legacy client.query
     // This supports all chain pallets including Assets on AssetHub chains
 
-    // Always log parameters for debugging
-    if (requiredParams && requiredParams.length > 0) {
-      logger.info(`Parameters required: ${requiredParams.join(', ')}`);
+    // Log parameter information using new optional system
+    if (allParams.length > 0) {
+      if (paramInfo.required.length > 0) {
+        logger.info(`Parameters required: ${paramInfo.required.join(', ')}`);
+      }
+      if (paramInfo.optional.length > 0) {
+        logger.info(`Parameters optional: ${paramInfo.optional.join(', ')}`);
+      }
+
       if (hasParams && paramValues.length > 0) {
         const serializedParams = JSON.stringify(paramValues, (key, value) =>
           typeof value === 'bigint' ? value.toString() : value
         );
         logger.info(`Parameters provided: ${serializedParams}`);
       } else {
-        logger.info(`⚠️ Parameters required but none provided: ${JSON.stringify(storageParams)}`);
+        logger.info(`💡 No parameters provided - will query all entries`);
       }
     }
 
@@ -442,11 +452,17 @@ async function executeRawGetValue(
   storageParams: StorageParams = {},
 ) {
   try {
-    // Detect storage parameters for this specific query using the same logic as code generation
-    const requiredParams = getStorageParameters(chainKey, palletName, storageName);
+    // Detect storage parameters using the new dynamic detection system
+    const paramInfo = getStorageParameters(chainKey, palletName, storageName);
+    const allParams = [...paramInfo.required, ...paramInfo.optional];
 
-    if (requiredParams.length > 0) {
-      logger.info(`Parameters required: ${requiredParams.join(', ')}`);
+    if (allParams.length > 0) {
+      if (paramInfo.required.length > 0) {
+        logger.info(`Parameters required: ${paramInfo.required.join(', ')}`);
+      }
+      if (paramInfo.optional.length > 0) {
+        logger.info(`Parameters optional: ${paramInfo.optional.join(', ')}`);
+      }
     }
 
     // Now attempt the proper PAPI integration
@@ -475,9 +491,14 @@ async function executeRawGetValue(
           // Execute the actual storage query - handle both direct function and object cases
           let result;
 
-          // Generate parameter values from actual form data
-          const paramValues = requiredParams.length > 0
-            ? generateStorageParamValues(storageParams, requiredParams)
+          // Generate parameter values only if user has actually provided them
+          const providedParamKeys = Object.keys(storageParams).filter(key => {
+            const value = storageParams[key];
+            return value !== undefined && value !== null && value !== '';
+          });
+
+          const paramValues = providedParamKeys.length > 0 && allParams.length > 0
+            ? generateStorageParamValues(storageParams, allParams)
             : [];
 
 
@@ -488,17 +509,18 @@ async function executeRawGetValue(
           } else if (storageFunction && typeof storageFunction.getValue === 'function') {
             result = paramValues.length > 0
               ? await storageFunction.getValue(...paramValues)
-              : await storageFunction.getValue();
+              : await storageFunction.getEntries();
           } else if (storageFunction && typeof storageFunction.query === 'function') {
             result = paramValues.length > 0
               ? await storageFunction.query(...paramValues)
-              : await storageFunction.query();
+              : await storageFunction.getEntries();
           } else {
             throw new Error(`Storage item ${palletName}.${storageName} is not callable: ${typeof storageFunction}`);
           }
 
           // Handle result display
-          logger.querySuccess(palletName, storageName, 'getValue', result);
+          const methodUsed = paramValues.length > 0 ? 'getValue' : 'getEntries';
+          logger.querySuccess(palletName, storageName, methodUsed, result);
 
         } else {
           logger.error(`Storage ${palletName}.${storageName} not found`);

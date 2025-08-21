@@ -13,7 +13,27 @@ export function detectStorageParameters(
 ): string[] {
   // Use the dynamic detector instead of hard-coded mappings
   const info = getStorageParameterInfo(chainKey, palletName, storageName);
+  // Return required parameters only (should be empty for most storage maps now)
   return info.required;
+}
+
+// New function to get all parameters (required + optional) for UI display
+export function getAllStorageParameters(
+  palletName: string,
+  storageName: string,
+  chainKey: string = 'polkadot'
+): { required: string[]; optional: string[] } {
+  const info = getStorageParameterInfo(chainKey, palletName, storageName);
+
+  // UNIVERSAL OPTIONAL PARAMETER POLICY
+  // ALL storage map parameters are treated as optional for UI flexibility
+  // This enables both getValue(params) and getEntries() patterns
+  const allDetectedParams = [...info.required, ...info.optional];
+
+  return {
+    required: [], // Force empty - all storage parameters are optional for UI
+    optional: allDetectedParams // Move all parameters to optional
+  };
 }
 
 export function isStorageQueryValid(
@@ -23,33 +43,13 @@ export function isStorageQueryValid(
 ): boolean {
   if (!selectedStorage) return false;
 
-  const requiredParams = detectStorageParameters(
-    selectedStorage.pallet,
-    selectedStorage.storage.name,
-    chainKey
-  );
-
-  console.log(`Validation: ${selectedStorage.pallet}.${selectedStorage.storage.name}, required: [${requiredParams.join(', ')}], provided:`, storageParams);
-
-  if (requiredParams.length === 0) {
-    return true;
-  }
-
-  // Check if all required parameters are provided and not empty
-  for (const paramType of requiredParams) {
-    const paramValue =
-      storageParams[paramType.toLowerCase()] ||
-      storageParams[paramType] ||
-      storageParams["ss58string"] || // Handle SS58String fields
-      storageParams["accountid"] ||  // Handle AccountId fields
-      storageParams["key"] ||
-      storageParams["param"];
-
-    if (!paramValue || paramValue.toString().trim() === "") {
-      console.log(`Missing param: ${paramType}, checked keys: ${paramType.toLowerCase()}, ${paramType}, ss58string, accountid, key, param`);
-      return false;
-    }
-  }
+  // ALWAYS RETURN TRUE - ALL STORAGE PARAMETERS ARE OPTIONAL FOR UI FLEXIBILITY
+  // This allows both:
+  // 1. Queries with parameters: getValue(param1, param2) -> specific entry
+  // 2. Queries without parameters: getEntries() -> all entries
+  //
+  // The form validation (useStorageValidation) handles parameter validation
+  // This function only checks if a storage item is selected
 
   return true;
 }

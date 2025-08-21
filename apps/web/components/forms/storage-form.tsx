@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import type { StorageParams, StorageParamsChangeHandler } from "../../types/forms";
 import { Badge } from "@workspace/ui/components/badge";
 import { Input } from "@workspace/ui/components/input";
@@ -39,28 +39,7 @@ interface StorageFormProps {
 
 // Dynamic type extraction utilities
 
-// Cache for descriptor type information to avoid repeated parsing
-const typeInfoCache = new Map<
-  string,
-  { returnType: string; paramTypes: string[] }
->();
 
-
-
-// Dynamic inference using metadata-driven detection
-function inferFromStorageName(
-  pallet: string,
-  storageName: string,
-  chainKey: string = 'polkadot'
-): { returnType: string; paramTypes: string[] } {
-  // Use dynamic detection to get both parameter and return type information
-  const storageInfo = getStorageParameterInfo(chainKey, pallet, storageName);
-
-  return {
-    returnType: storageInfo.returnType || "Codec",
-    paramTypes: storageInfo.required
-  };
-}
 
 // Enhanced response structure generator using PAPI types
 function generateEnhancedResponseStructure(
@@ -328,38 +307,66 @@ export function StorageForm({
 
   // Get ACTUAL type information from PAPI descriptors - no fallbacks
   let actualTypeInfo;
-  let requiredParams = null;
+  let parameterInfo: {
+    required: string[];
+    optional: string[];
+    description?: string;
+    returnType?: string;
+  } = { required: [], optional: [] };
   let actualType = "unknown";
   let displayType = "unknown";
 
   try {
     actualTypeInfo = extractActualTypes(chainKey, pallet, storage.name);
-
-    // Use dynamic detection for parameters if extractActualTypes doesn't have them
-    if (!actualTypeInfo.paramTypes || actualTypeInfo.paramTypes.length === 0) {
-      const dynamicInfo = getStorageParameterInfo(chainKey, pallet, storage.name);
-      if (dynamicInfo.required && dynamicInfo.required.length > 0) {
-        actualTypeInfo.paramTypes = dynamicInfo.required;
-      }
-    }
-
-    requiredParams = actualTypeInfo.paramTypes.length > 0 ? actualTypeInfo.paramTypes : null;
     actualType = actualTypeInfo.actualType;
     displayType = formatTypeForDisplay(actualTypeInfo);
   } catch (error) {
     console.error(`Type extraction failed for ${chainKey}.${pallet}.${storage.name}:`, error);
-
-    // Fallback to dynamic detection
-    try {
-      const dynamicInfo = getStorageParameterInfo(chainKey, pallet, storage.name);
-      requiredParams = dynamicInfo.required && dynamicInfo.required.length > 0 ? dynamicInfo.required : null;
-    } catch (fallbackError) {
-      console.error(`Dynamic detection also failed for ${chainKey}.${pallet}.${storage.name}:`, fallbackError);
-    }
   }
 
-  // Set up validation
-  const { validateParams, hasRequiredParams } = useStorageValidation(requiredParams);
+  // Memoize parameter detection to prevent infinite re-renders
+  parameterInfo = useMemo(() => {
+    try {
+      const detectedInfo = getStorageParameterInfo(chainKey, pallet, storage.name);
+
+      // FORCE ALL PARAMETERS TO BE OPTIONAL FOR UI FLEXIBILITY
+      // This ensures getValue(params) and getEntries() patterns both work
+      const allDetectedParams = [...detectedInfo.required, ...detectedInfo.optional];
+
+      return {
+        required: [], // Force empty - all storage map parameters are optional for UI
+        optional: allDetectedParams, // Move all parameters to optional
+        description: detectedInfo.description,
+        returnType: detectedInfo.returnType
+      };
+    } catch (fallbackError) {
+      console.error(`Parameter detection failed for ${chainKey}.${pallet}.${storage.name}:`, fallbackError);
+      return {
+        required: [],
+        optional: [],
+        description: undefined,
+        returnType: undefined
+      };
+    }
+  }, [chainKey, pallet, storage.name]);
+
+  // Memoize computed values to prevent re-renders
+  const optionalParams = useMemo(() =>
+    parameterInfo.optional.length > 0 ? parameterInfo.optional : null,
+    [parameterInfo.optional]
+  );
+
+  const allParams = useMemo(() =>
+    [...parameterInfo.required, ...parameterInfo.optional],
+    [parameterInfo.required, parameterInfo.optional]
+  );
+
+  // Set up validation - pass both required and optional parameters
+  const { validateParams, hasRequiredParams } = useStorageValidation(
+    parameterInfo.required.length > 0 ? parameterInfo.required : null,
+    parameterInfo.optional.length > 0 ? parameterInfo.optional : null
+  );
+
 
   // Generate response structure with type information
   const responseStructure = actualTypeInfo ? generateEnhancedResponseStructure(
@@ -385,21 +392,15 @@ console.log('Result:', result);`;
   useEffect(() => {
     onParamsChange(localParams);
 
-    // Perform validation when params change
-    if (hasRequiredParams) {
-      const validation = validateParams(localParams);
-      setValidationErrors(validation.errors);
+    // Perform validation when params change (now validates both required and optional)
+    const validation = validateParams(localParams);
 
-      // Notify parent component about validation state
-      if (onValidationChange) {
-        onValidationChange(validation.isValid, validation.errors);
-      }
-    } else {
-      // No required params means always valid
-      setValidationErrors({});
-      if (onValidationChange) {
-        onValidationChange(true, {});
-      }
+
+    setValidationErrors(validation.errors);
+
+    // Notify parent component about validation state
+    if (onValidationChange) {
+      onValidationChange(validation.isValid, validation.errors);
     }
   }, [localParams, hasRequiredParams, validateParams, onValidationChange]);
 
@@ -491,15 +492,21 @@ console.log('Result:', result);`;
           />
         </div>
 
-        {/* Storage Parameters (if needed) */}
-        {requiredParams && requiredParams.length > 0 && (
+        {/* Storage Parameters (optional) */}
+        {allParams && allParams.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center space-x-2">
-              <Label>Storage Parameters</Label>
+              <Label>Storage Parameters (Optional)</Label>
+              <Badge variant="secondary" className="text-xs">
+                Optional
+              </Badge>
               <HelpCircle className="w-3 h-3 text-muted-foreground" />
             </div>
+            <div className="text-xs text-muted-foreground mb-3">
+              💡 Leave empty to query all entries, or provide parameters to query specific entries
+            </div>
 
-            {requiredParams.map((paramType) => {
+            {allParams.map((paramType) => {
               const fieldKey = paramType.toLowerCase();
               const hasError = validationErrors[fieldKey];
 
@@ -507,7 +514,6 @@ console.log('Result:', result);`;
                 <div key={paramType} className="space-y-1">
                   <Label htmlFor={paramType} className="text-xs">
                     {paramType}
-                    <span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Input
                     id={paramType}
@@ -582,16 +588,19 @@ console.log('Result:', result);`;
           <div>
             <strong>Type:</strong> {storage.type || actualType}
           </div>
-          {requiredParams ? (
+          {optionalParams ? (
             <div>
-              <strong>Requires Keys:</strong> {requiredParams.join(", ")}
+              <strong>Optional Parameters:</strong> {optionalParams.join(", ")}
+              <div className="text-xs text-blue-500 mt-1">
+                Can query with parameters for specific entries or without for all entries
+              </div>
             </div>
           ) : (
             <div>
-              <strong>Simple Entry:</strong> No parameters required
+              <strong>Simple Entry:</strong> No parameters available
             </div>
           )}
-          {queryType === "getValues" && !requiredParams && (
+          {queryType === "getValues" && !optionalParams && (
             <div className="text-orange-500">
               ⚠️ getValues() only works with storage entries that have keys
             </div>

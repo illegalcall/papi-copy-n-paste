@@ -12,8 +12,8 @@ import {
 import {
   detectStorageParameters,
   generateStorageParams,
+  getAllStorageParameters,
 } from "./storageHelpers";
-import { extractActualTypes } from "./typeExtraction";
 
 export function generateStorageQueryByType(
   queryType: string,
@@ -49,11 +49,23 @@ import { combineLatest, throttleTime, debounceTime, map, filter, takeUntil, dist
 
   switch (queryType) {
     case "getValue":
-      return `${rxjsImports}
+      if (hasParams) {
+        return `${rxjsImports}
 
-// Get current value
+// Get specific entry with provided parameters
 const result = await ${baseQuery}.getValue${params}
-console.log('Current value:', result)`;
+console.log('Specific entry:', result)`;
+      } else {
+        return `${rxjsImports}
+
+// No parameters provided - getting all entries instead
+const entries = await ${baseQuery}.getEntries()
+console.log('All entries:', entries)
+
+// To get a specific entry, provide parameters:
+// const result = await ${baseQuery}.getValue(accountId) // Replace with actual parameters
+`;
+      }
 
     case "getValueAt":
       return `${rxjsImports}
@@ -68,9 +80,13 @@ console.log('At best block:', resultBest)`;
       if (hasParams) {
         return `${rxjsImports}
 
-// Note: This storage requires parameters, showing parameter-based approach
-const result = await ${baseQuery}.getValue()
-console.log('Storage value:', result)`;
+// Get all entries (ignoring provided parameters - this shows all entries)
+const entries = await ${baseQuery}.getEntries()
+console.log('All entries:', entries)
+
+// Alternative: Get specific entry with parameters
+// const specificResult = await ${baseQuery}.getValue${params}
+`;
       } else {
         return `${rxjsImports}
 
@@ -418,7 +434,6 @@ export function generateStorageQueryCode(
       providerId,
       pallet,
       storage,
-      queryType,
       storageParams,
     );
   } else {
@@ -494,25 +509,23 @@ queryStorage().then(result => {
 
     const connectionInfo = getChainConnection(chainKey, providerId);
 
-  // First try to get parameters from the same source as the form (extractActualTypes)
-  let requiresKeys: string[] = [];
-  try {
-    const actualTypeInfo = extractActualTypes(chainKey, pallet, storage.name);
-    requiresKeys = actualTypeInfo.paramTypes.length > 0 ? actualTypeInfo.paramTypes : [];
-  } catch (error) {
-    // Fallback to detectStorageParameters if extractActualTypes fails
-    requiresKeys = detectStorageParameters(pallet, storage.name, chainKey);
-  }
+  // Get parameter information from our new flexible system
+  const paramInfo = getAllStorageParameters(pallet, storage.name, chainKey);
+  const allPossibleParams = [...paramInfo.required, ...paramInfo.optional];
 
-  const hasParams = Boolean(
-    requiresKeys && requiresKeys.length > 0 && Object.keys(storageParams).length > 0,
+  // Check if user provided any parameters
+  const userProvidedParams = Object.keys(storageParams).filter(key =>
+    storageParams[key] && String(storageParams[key]).trim() !== ""
   );
 
-  // Generate parameter string for the query
-  const paramString =
-    hasParams && requiresKeys
-      ? generateStorageParams(storageParams, requiresKeys)
-      : "";
+  const hasParams = Boolean(
+    allPossibleParams.length > 0 && userProvidedParams.length > 0
+  );
+
+  // Generate parameter string for the query (only if user provided parameters)
+  const paramString = hasParams && allPossibleParams.length > 0
+    ? generateStorageParams(storageParams, allPossibleParams)
+    : "";
 
   // Generate the actual query code based on type
   const queryCode = generateStorageQueryByType(
@@ -546,7 +559,6 @@ function generateFunctionStorageCode(
   providerId: string,
   pallet: string,
   storage: any,
-  queryType: string,
   storageParams: Record<string, any>,
 ): string {
   try {
@@ -1171,7 +1183,7 @@ export function generateEventCode(
 
     // Generate event arguments description
     const argsDescription = event.args && event.args.length > 0
-      ? event.args.map((arg: any, index: number) =>
+      ? event.args.map((arg: any) =>
           `    // ${arg.name}: ${arg.type} - ${getParameterDescription(arg.name, arg.type)}`
         ).join('\n')
       : '    // No arguments for this event';
