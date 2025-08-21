@@ -302,10 +302,10 @@ export function ConstantForm({ pallet, constant, chainKey }: ConstantFormProps) 
           <strong>Access:</strong> Read-only constant value from runtime
         </div>
         <div className="text-blue-500">
-          💡 Constants are fixed values defined in the runtime and never change during execution
+          Constants are fixed values defined in the runtime and never change during execution
         </div>
         <div className="text-green-500">
-          🔍 No parameters required - constants are directly accessible values
+          No parameters required - constants are directly accessible values
         </div>
       </div>
     </div>

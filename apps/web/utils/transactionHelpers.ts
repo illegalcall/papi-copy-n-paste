@@ -17,6 +17,24 @@ import {
 import { createCleanLogger, QueryResult } from "./cleanLogger";
 import { getDescriptorForChain } from "@workspace/core/descriptors";
 
+// BigInt serialization helper
+function serializeBigInt(value: any): any {
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+  if (Array.isArray(value)) {
+    return value.map(serializeBigInt);
+  }
+  if (value && typeof value === 'object') {
+    const serialized: any = {};
+    for (const [key, val] of Object.entries(value)) {
+      serialized[key] = serializeBigInt(val);
+    }
+    return serialized;
+  }
+  return value;
+}
+
 // Observable subscriptions storage for watch functionality
 let activeWatchSubscriptions = new Map<string, any>();
 
@@ -359,7 +377,9 @@ async function executeGetValue(
       }
     }
 
-    logger.querySuccess(pallet, storageName, queryType, result);
+    // Serialize BigInt values before logging
+    const serializedResult = serializeBigInt(result);
+    logger.querySuccess(pallet, storageName, queryType, serializedResult);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     logger.queryError(pallet, storageName, queryType, `Get value failed: ${errorMessage}`);
@@ -526,7 +546,10 @@ async function executeRawGetValue(
           const methodUsed = isSimpleValue
             ? 'getValue'
             : (hasUserParams ? 'getValue' : 'getEntries');
-          logger.querySuccess(palletName, storageName, methodUsed, result);
+
+          // Serialize BigInt values before logging
+          const serializedResult = serializeBigInt(result);
+          logger.querySuccess(palletName, storageName, methodUsed, serializedResult);
 
         } else {
           logger.error(`Storage ${palletName}.${storageName} not found`);
@@ -639,11 +662,13 @@ async function executeWatchValue(
             const timestamp = new Date().toLocaleTimeString();
 
             if (valueCount === 1) {
-              // Pass raw value to logger.result so it can detect large arrays
-              logger.result('Initial Value', value);
+              // Serialize BigInt values before logging
+              const serializedValue = serializeBigInt(value);
+              logger.result('Initial Value', serializedValue);
             } else {
-              // For subsequent updates, also use logger.result for array copy functionality
-              logger.result(`Update #${valueCount} [${timestamp}]`, value);
+              // Serialize BigInt values before logging
+              const serializedValue = serializeBigInt(value);
+              logger.result(`Update #${valueCount} [${timestamp}]`, serializedValue);
             }
           },
           error: (error: any) => {
