@@ -91,7 +91,7 @@ export function ConstantsForm({ pallet, constants }: ConstantsFormProps) {
         {/* Type Explanation for Common Types */}
         {constant.type === "u128" && constant.name.includes("Deposit") && (
           <div className="text-xs text-blue-600">
-            💰 Amount in plancks (1 DOT = 10¹⁰ plancks)
+            💰 Amount in plancks (check chain decimals for conversion)
           </div>
         )}
         {constant.type === "u32" && constant.name.includes("Period") && (

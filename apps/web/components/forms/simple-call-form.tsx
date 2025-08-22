@@ -19,12 +19,14 @@ import type { FormData, FormChangeHandler, ValidChangeHandler } from "../../type
 import { getParameterEducation } from "../../data/parameter-education";
 import { generateCallSignature } from "@/utils/typeExtraction";
 import { CallSignature } from "@/components/type-display";
+import { useChainProperties, formatTokenAmount } from "../../hooks/useChainProperties";
 
 interface SimpleCallFormProps {
   pallet: string;
   call: PalletCall;
   onFormChange: FormChangeHandler;
   onValidChange: ValidChangeHandler;
+  chainKey: string;
 }
 
 // This function is now replaced by external data source
@@ -35,9 +37,11 @@ export function SimpleCallForm({
   call,
   onFormChange,
   onValidChange,
+  chainKey,
 }: SimpleCallFormProps) {
   const [formData, setFormData] = useState<FormData>({});
   const [showTypeInfo, setShowTypeInfo] = useState(true);
+  const chainProperties = useChainProperties(chainKey);
 
   // Generate TypeScript type information
   const typeInfo = generateCallSignature(pallet, call.name, call.args);
@@ -105,17 +109,32 @@ export function SimpleCallForm({
           <div className="space-y-1">
             <Input
               type="number"
-              value={value}
-              onChange={(e) =>
-                handleFieldChange(arg.name, Number(e.target.value) || 0)
-              }
-              placeholder={`Enter ${arg.name}${paramInfo.examples[0] ? ` (e.g., ${paramInfo.examples[0]})` : ""}`}
+              step="0.0001"
+              value={arg.name === "value" || arg.name === "amount" ?
+                (value / Math.pow(10, chainProperties.tokenDecimals)).toString() : value}
+              onChange={(e) => {
+                if (arg.name === "value" || arg.name === "amount") {
+                  // Convert from token units to planck units
+                  const tokenAmount = Number(e.target.value) || 0;
+                  const planckAmount = Math.floor(tokenAmount * Math.pow(10, chainProperties.tokenDecimals));
+                  handleFieldChange(arg.name, planckAmount);
+                } else {
+                  handleFieldChange(arg.name, Number(e.target.value) || 0);
+                }
+              }}
+              placeholder={arg.name === "value" || arg.name === "amount" ?
+                `Enter amount in ${chainProperties.tokenSymbol} (e.g., 1.0)` :
+                `Enter ${arg.name}${paramInfo.examples[0] ? ` (e.g., ${paramInfo.examples[0]})` : ""}`}
             />
             {arg.name === "value" || arg.name === "amount" ? (
-              <p className="text-xs text-muted-foreground">
-                {value > 0 &&
-                  `≈ ${(Number(value) / 10000000000).toFixed(4)} DOT`}
-              </p>
+              <div className="text-xs text-muted-foreground">
+                <p>Enter amount in {chainProperties.tokenSymbol} (will be converted to planck units automatically)</p>
+                {value > 0 && (
+                  <p className="font-mono">
+                    = {value.toLocaleString()} planck units
+                  </p>
+                )}
+              </div>
             ) : null}
           </div>
         )}

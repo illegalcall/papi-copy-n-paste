@@ -106,11 +106,28 @@ export function TransactionPreviewModal({
         total: total.toString()
       });
 
-      // Convert to readable format
-      const decimals = 12; // Most Substrate chains use 12 decimals
+      // Get decimals from chain spec data (papi-console-main approach)
+      const chainSpecData = await api.getChainSpecData();
+      const properties = chainSpecData.properties;
+
+      let decimals = 10; // Default for Paseo Asset Hub
+
+      if (properties && typeof properties === 'object' && 'tokenDecimals' in properties) {
+        decimals = Number(properties.tokenDecimals);
+        console.log('🔍 Got decimals from chain spec:', decimals);
+      } else {
+        console.log('🔍 Using default decimals for Paseo Asset Hub:', decimals);
+      }
+
       const divisor = BigInt(10 ** decimals);
+
+      // Convert to readable format with chain spec decimals
       const balanceFormatted = (Number(freeBalance) / Number(divisor)).toFixed(4);
 
+      console.log('🔍 Chain:', chainName);
+      console.log('🔍 Decimals from chain spec:', decimals);
+      console.log('🔍 Raw balance:', freeBalance.toString());
+      console.log('🔍 Divisor:', divisor.toString());
       console.log('🔍 Formatted balance:', balanceFormatted);
       setBalance(balanceFormatted);
 

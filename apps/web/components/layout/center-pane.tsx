@@ -252,6 +252,7 @@ export function CenterPane({
           call={selectedCall.call}
           onFormChange={onFormChange}
           onValidChange={onValidChange}
+          chainKey={selectedChain}
         />
       ) : selectedStorage ? (
         <StorageForm
