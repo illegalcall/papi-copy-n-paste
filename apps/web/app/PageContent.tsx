@@ -463,247 +463,52 @@ export default function PageContent() {
         ]);
 
         try {
-          setConsoleOutput((prev) => [
-            ...prev,
-            `🔧 [${i + 1}/${pendingTransactions.length}] Args object:`,
-            `   ${JSON.stringify(txInfo.args, null, 2)}`,
-          ]);
+          // Args prepared for transaction
 
           // Create transaction using PAPI typed API with proper argument structure
           // PAPI expects arguments as individual parameters, not as an object
           let tx;
 
           if (txInfo.pallet === "Balances" && txInfo.call === "transfer_allow_death") {
-            try {
-            // Clean approach following papi-console-main exactly
+            // Use proper PAPI typed API instead of manual encoding
             let destAddress = txInfo.args.dest;
+
+            console.log('🔍 Original destination from form:', destAddress);
 
             // Handle special cases like //Alice and //Bob for testing
             if (destAddress === "//Alice" || destAddress === "//Bob") {
               destAddress = selectedAccount.address;
               setConsoleOutput((prev) => [
                 ...prev,
-                `🔧 [${i + 1}/${pendingTransactions.length}] Using self-transfer for testing: ${destAddress}`,
+                `ℹ️ [${i + 1}/${pendingTransactions.length}] Converting test account to real address: ${destAddress}`,
               ]);
             }
 
-            const formValue = BigInt(txInfo.args.value || txInfo.args.amount || "0");
-            console.log('🔍 Using form value for transaction:', formValue.toString());
+            console.log('🔍 Final destination for transaction:', destAddress);
+
+            const valueAsBigInt = BigInt(txInfo.args.value || txInfo.args.amount || "0");
+            console.log('🔍 Using BigInt value for transaction:', valueAsBigInt.toString());
 
             setConsoleOutput((prev) => [
               ...prev,
-              `🔧 [${i + 1}/${pendingTransactions.length}] Creating transaction with papi-console-main approach...`,
-              `🔧 [${i + 1}/${pendingTransactions.length}] Dest: ${destAddress}, Value: ${formValue.toString()}`,
+              `🔄 [${i + 1}/${pendingTransactions.length}] Creating PAPI typed transaction...`,
             ]);
 
-            // Import descriptor helper at runtime
-            const { getTypedApiForChain } = await import('@workspace/core/descriptors');
-
-            // Get typed API for the current chain
-            const typedApi = getTypedApiForChain(api, selectedChain.toLowerCase());
-
-            // Use manual call data construction like papi-console-main
-            setConsoleOutput((prev) => [
-              ...prev,
-              `🔧 [${i + 1}/${pendingTransactions.length}] Building manual call data like papi-console-main...`,
-            ]);
-
-            // Manual call data construction to avoid typed API encoding issues
-            const { Binary } = await import('polkadot-api');
-            const { compactNumber } = await import('@polkadot-api/substrate-bindings');
-
-            // Build call data hex: Balances.transfer_allow_death
-            // Paseo Asset Hub: Balances pallet = 10 (0x0a), transfer_allow_death = 0 (0x00)
-            let callDataHex = "0x0a00";
-
-            // Add destination address as MultiAddress::Id (0x00 + 32-byte AccountId)
-            // Use getSs58AddressInfo to get the raw bytes
-            try {
-              const { getSs58AddressInfo } = await import('polkadot-api');
-              const addressInfo = getSs58AddressInfo(destAddress);
-              console.log('🔍 Address info:', addressInfo);
-
-              // Check if the address is valid and get the public key
-              if (addressInfo.isValid && 'payload' in addressInfo) {
-                const rawAccountId = (addressInfo as any).payload; // Type assertion for now
-                const accountIdHex = Array.from(new Uint8Array(rawAccountId)).map(b => b.toString(16).padStart(2, '0')).join('');
-                callDataHex += "00" + accountIdHex; // 0x00 = MultiAddress::Id variant
-                console.log('🔍 Raw AccountId hex:', accountIdHex);
-              } else {
-                throw new Error('Invalid SS58 address');
-              }
-            } catch (decodeError) {
-              console.log('🔍 SS58 decode failed, using fallback:', decodeError);
-              // For self-transfer testing, use a known good address
-              callDataHex += "00" + "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"; // Alice fallback
-            }
-
-            // Add value as compact-encoded u128
-            // Convert BigInt to number for compactNumber.enc (it expects number, not BigInt)
-            const valueAsNumber = Number(formValue);
-            console.log('🔍 Converting BigInt to number:', formValue, '→', valueAsNumber);
-
-            // Validate the conversion worked correctly
-            if (valueAsNumber !== 100000000000) {
-              console.warn('⚠️ Value conversion issue! Expected 100000000000, got:', valueAsNumber);
-            }
-
-            const valueBytes = compactNumber.enc(valueAsNumber);
-            const valueHex = Array.from(valueBytes).map(b => b.toString(16).padStart(2, '0')).join('');
-            callDataHex += valueHex;
-
-            console.log('🔍 Built call data hex:', callDataHex);
-            console.log('🔍 Original value:', formValue);
-            console.log('🔍 Value bytes:', valueBytes);
-            console.log('🔍 Value hex:', valueHex);
-            console.log('🔍 Value as number:', Number(formValue));
-            console.log('🔍 Expected in PAS:', Number(formValue) / Math.pow(10, 10));
-
-            // Use unsafeApi like papi-console-main
-            const unsafeApi = api.getUnsafeApi();
-            tx = await unsafeApi.txFromCallData(Binary.fromHex(callDataHex));
+            // Use PAPI typed API to create transaction with MultiAddress format
+            // The dest parameter expects a MultiAddress, which can be an Id variant
+            tx = typedApi.tx.Balances.transfer_allow_death({
+              dest: { type: "Id", value: destAddress }, // Use MultiAddress format
+              value: valueAsBigInt
+            });
 
             setConsoleOutput((prev) => [
               ...prev,
-              `✅ [${i + 1}/${pendingTransactions.length}] Transaction created with manual call data!`,
+              `✅ [${i + 1}/${pendingTransactions.length}] PAPI typed transaction created successfully!`,
             ]);
 
-            console.log('🔍 UnsafeApi Transaction created:', tx);
+            console.log('🔍 PAPI typed transaction created:', tx);
             console.log('🔍 Destination address:', destAddress);
-            console.log('🔍 Transaction value:', formValue);
-
-            // Now sign using the papi-console pattern
-            try {
-              const signedExtrinsic = await tx.sign(signer);
-
-              setConsoleOutput((prev) => [
-                ...prev,
-                `✅ [${i + 1}/${pendingTransactions.length}] Transaction signed successfully!`,
-                `🔧 [${i + 1}/${pendingTransactions.length}] Signed extrinsic: ${signedExtrinsic}`,
-              ]);
-
-              console.log('🔍 Signed extrinsic:', signedExtrinsic);
-
-              // Now submit the signed transaction to the blockchain
-              setConsoleOutput((prev) => [
-                ...prev,
-                `🌐 [${i + 1}/${pendingTransactions.length}] Submitting signed transaction to blockchain...`,
-              ]);
-
-              try {
-                // Submit the signed extrinsic
-                const submissionResult = await api.submitAndWatch(signedExtrinsic);
-
-                setConsoleOutput((prev) => [
-                  ...prev,
-                  `✅ [${i + 1}/${pendingTransactions.length}] Transaction submitted successfully!`,
-                  `🔍 [${i + 1}/${pendingTransactions.length}] Monitoring transaction status...`,
-                ]);
-
-                // Watch for transaction events
-                submissionResult.subscribe({
-                  next: (event: any) => {
-                    console.log('🔍 Transaction event:', event);
-                    setConsoleOutput((prev) => [
-                      ...prev,
-                      `📡 [${i + 1}/${pendingTransactions.length}] ${event.type}: ${event.txHash || 'Processing...'}`,
-                    ]);
-
-                    if (event.type === 'finalized') {
-                      // Create explorer link based on chain
-                      const getExplorerLink = (chain: string, txHash: string) => {
-                        const cleanHash = txHash.startsWith('0x') ? txHash : `0x${txHash}`;
-                        switch (chain.toLowerCase()) {
-                          case 'paseo_asset_hub':
-                          case 'paseo':
-                            return `https://assethub-paseo.subscan.io/extrinsic/${cleanHash}`;
-                          case 'polkadot':
-                            return `https://polkadot.subscan.io/extrinsic/${cleanHash}`;
-                          case 'kusama':
-                            return `https://kusama.subscan.io/extrinsic/${cleanHash}`;
-                          default:
-                            return null;
-                        }
-                      };
-
-                      const explorerLink = getExplorerLink(selectedChain, event.txHash);
-
-                      setConsoleOutput((prev) => [
-                        ...prev,
-                        `🎉 [${i + 1}/${pendingTransactions.length}] Transaction finalized! Hash: ${event.txHash}`,
-                        explorerLink ? `🔗 [${i + 1}/${pendingTransactions.length}] View on explorer: ${explorerLink}` : '',
-                      ].filter(Boolean));
-                    }
-                  },
-                  error: (error) => {
-                    console.error('🔍 Transaction submission error:', error);
-                    setConsoleOutput((prev) => [
-                      ...prev,
-                      `❌ [${i + 1}/${pendingTransactions.length}] Transaction submission failed: ${error.message}`,
-                    ]);
-                  }
-                });
-
-                // Add to transaction history with submitted status
-                const newTransaction = {
-                  txHash: signedExtrinsic,
-                  pallet: txInfo.pallet,
-                  call: txInfo.call,
-                  args: txInfo.args,
-                  status: 'submitted' as const,
-                  timestamp: Date.now(),
-                  chain: selectedChain,
-                  account: selectedAccount.address,
-                };
-
-                setConsoleOutput((prev) => [
-                  ...prev,
-                  `📝 [${i + 1}/${pendingTransactions.length}] Added to transaction history`,
-                  `🎯 [${i + 1}/${pendingTransactions.length}] Real wallet transaction completed!`,
-                ]);
-
-              } catch (submissionError) {
-                setConsoleOutput((prev) => [
-                  ...prev,
-                  `❌ [${i + 1}/${pendingTransactions.length}] Transaction submission failed: ${submissionError.message}`,
-                  `📝 [${i + 1}/${pendingTransactions.length}] But signing worked - this is still success!`,
-                ]);
-
-                // Still add to history as signed
-                const newTransaction = {
-                  txHash: signedExtrinsic,
-                  pallet: txInfo.pallet,
-                  call: txInfo.call,
-                  args: txInfo.args,
-                  status: 'signed' as const,
-                  timestamp: Date.now(),
-                  chain: selectedChain,
-                  account: selectedAccount.address,
-                };
-              }
-
-              // Skip normal transaction creation since we're done
-              continue;
-
-            } catch (signError) {
-              setConsoleOutput((prev) => [
-                ...prev,
-                `❌ [${i + 1}/${pendingTransactions.length}] Transaction signing failed: ${(signError as Error).message}`,
-                `🔧 [${i + 1}/${pendingTransactions.length}] This is the inner[tag] encoding error!`,
-              ]);
-
-              console.error('🔍 Transaction signing error:', signError);
-              // Don't return here, let it continue to general transaction creation
-            }
-          } catch (unsafeApiError) {
-              setConsoleOutput((prev) => [
-                ...prev,
-                `❌ [${i + 1}/${pendingTransactions.length}] UnsafeApi approach failed: ${unsafeApiError.message}`,
-              ]);
-
-              console.error('UnsafeApi approach failed:', unsafeApiError);
-              return;
-            }
+            console.log('🔍 Transaction value:', valueAsBigInt.toString())
           } else {
             // For other calls, pass the args object directly
             tx = typedApi.tx[txInfo.pallet][txInfo.call](txInfo.args);
@@ -712,7 +517,7 @@ export default function PageContent() {
           setConsoleOutput((prev) => [
             ...prev,
             `✅ [${i + 1}/${pendingTransactions.length}] Created PAPI transaction`,
-            `🔐 [${i + 1}/${pendingTransactions.length}] Signing with wallet (popup should appear)...`,
+            `🔄 [${i + 1}/${pendingTransactions.length}] Signing with wallet (popup should appear)...`,
           ]);
 
           // Debug signer and transaction before signing
@@ -779,8 +584,7 @@ export default function PageContent() {
               };
               setTransactionHistory((prev) => [newTransaction, ...prev]);
 
-              // Switch to transactions tab to show result
-              setActiveTab("transactions");
+              // Results are visible in console output
 
               // Skip the normal submission process since we already submitted
               continue;
@@ -798,21 +602,153 @@ export default function PageContent() {
 
           setConsoleOutput((prev) => [
             ...prev,
-            `📡 [${i + 1}/${pendingTransactions.length}] Submitting to chain...`,
+            `🔄 [${i + 1}/${pendingTransactions.length}] Submitting to blockchain...`,
           ]);
 
-          let txHash;
           try {
-            // Submit the signed transaction
-            txHash = await signedExtrinsic.submit();
+            // Submit the signed transaction using PAPI's submitAndWatch
+            setConsoleOutput((prev) => [
+              ...prev,
+              `🌐 [${i + 1}/${pendingTransactions.length}] Submitting signed transaction to blockchain...`,
+            ]);
+
+            const submissionResult = await api.submitAndWatch(signedExtrinsic);
 
             setConsoleOutput((prev) => [
               ...prev,
               `✅ [${i + 1}/${pendingTransactions.length}] Transaction submitted successfully!`,
-              `🔧 [${i + 1}/${pendingTransactions.length}] Transaction hash: ${txHash}`,
             ]);
 
-            console.log('🔍 Transaction hash:', txHash);
+            // Watch for transaction events
+            submissionResult.subscribe({
+              next: (event: any) => {
+                console.log('🔍 Transaction event:', event);
+                setConsoleOutput((prev) => [
+                  ...prev,
+                  `📡 [${i + 1}/${pendingTransactions.length}] ${event.type}: ${event.txHash || 'Processing...'}`,
+                ]);
+
+                // Add loading message after broadcast
+                if (event.type === 'broadcasted') {
+                  setTimeout(() => {
+                    setConsoleOutput((prev) => [
+                      ...prev,
+                      `🔄 [${i + 1}/${pendingTransactions.length}] Waiting for best block state...`,
+                    ]);
+
+                    // Add animated dots for best block state waiting
+                    let dotCount = 0;
+                    const bestBlockInterval = setInterval(() => {
+                      setConsoleOutput((prev) => {
+                        const lastIndex = prev.length - 1;
+                        const lastMessage = prev[lastIndex];
+                        if (lastIndex >= 0 && typeof lastMessage === 'string' && lastMessage.includes('Waiting for best block state')) {
+                          dotCount = (dotCount + 1) % 4; // Cycle through 0, 1, 2, 3 dots
+                          const dots = '.'.repeat(dotCount);
+                          const spaces = ' '.repeat(3 - dotCount); // Keep consistent spacing
+                          const baseMessage = `🔄 [${i + 1}/${pendingTransactions.length}] Waiting for best block state`;
+                          return [...prev.slice(0, -1), `${baseMessage}${dots}${spaces}`];
+                        }
+                        return prev;
+                      });
+                    }, 500);
+
+                    // Store interval reference to clear it later
+                    (window as any).bestBlockInterval = bestBlockInterval;
+                  }, 100); // Small delay to ensure proper order
+                }
+
+                // Clear best block animation when we get txBestBlocksState and add finalization loading
+                if (event.type === 'txBestBlocksState') {
+                  if ((window as any).bestBlockInterval) {
+                    clearInterval((window as any).bestBlockInterval);
+                    (window as any).bestBlockInterval = null;
+                  }
+
+                  // Add loading message after txBestBlocksState
+                  setTimeout(() => {
+                    setConsoleOutput((prev) => [
+                      ...prev,
+                      `🔄 [${i + 1}/${pendingTransactions.length}] Waiting for finalization...`,
+                    ]);
+
+                    // Add animated dots for finalization waiting
+                    let dotCount = 0;
+                    const finalizationInterval = setInterval(() => {
+                      setConsoleOutput((prev) => {
+                        const lastIndex = prev.length - 1;
+                        const lastMessage = prev[lastIndex];
+                        if (lastIndex >= 0 && typeof lastMessage === 'string' && lastMessage.includes('Waiting for finalization')) {
+                          dotCount = (dotCount + 1) % 4; // Cycle through 0, 1, 2, 3 dots
+                          const dots = '.'.repeat(dotCount);
+                          const spaces = ' '.repeat(3 - dotCount); // Keep consistent spacing
+                          const baseMessage = `🔄 [${i + 1}/${pendingTransactions.length}] Waiting for finalization`;
+                          return [...prev.slice(0, -1), `${baseMessage}${dots}${spaces}`];
+                        }
+                        return prev;
+                      });
+                    }, 500);
+
+                    // Store interval reference to clear it later
+                    (window as any).finalizationInterval = finalizationInterval;
+                  }, 100); // Small delay to ensure proper order
+                }
+
+                if (event.type === 'finalized') {
+                  // Clear best block animation if still running
+                  if ((window as any).bestBlockInterval) {
+                    clearInterval((window as any).bestBlockInterval);
+                    (window as any).bestBlockInterval = null;
+                  }
+
+                  // Clear finalization animation
+                  if ((window as any).finalizationInterval) {
+                    clearInterval((window as any).finalizationInterval);
+                    (window as any).finalizationInterval = null;
+                  }
+
+                  // Create explorer link based on chain
+                  const getExplorerLink = (chain: string, txHash: string) => {
+                    const cleanHash = txHash.startsWith('0x') ? txHash : `0x${txHash}`;
+                    switch (chain.toLowerCase()) {
+                      case 'paseo_asset_hub':
+                      case 'paseo':
+                        return `https://assethub-paseo.subscan.io/extrinsic/${cleanHash}`;
+                      case 'polkadot':
+                        return `https://polkadot.subscan.io/extrinsic/${cleanHash}`;
+                      case 'kusama':
+                        return `https://kusama.subscan.io/extrinsic/${cleanHash}`;
+                      default:
+                        return null;
+                    }
+                  };
+
+                  const explorerLink = getExplorerLink(selectedChain, event.txHash);
+
+                  setConsoleOutput((prev) => [
+                    ...prev,
+                    `🎉 [${i + 1}/${pendingTransactions.length}] Transaction finalized! Hash: ${event.txHash}`,
+                    explorerLink ? `🔗 [${i + 1}/${pendingTransactions.length}] View on explorer: ${explorerLink}` : '',
+                  ].filter(Boolean));
+
+                  // Add to transaction history
+                  const newTransaction: TransactionResult = {
+                    hash: event.txHash,
+                    success: true,
+                    events: [],
+                    timestamp: Date.now(),
+                  };
+                  setTransactionHistory((prev) => [newTransaction, ...prev]);
+                }
+              },
+              error: (error) => {
+                console.error('🔍 Transaction submission error:', error);
+                setConsoleOutput((prev) => [
+                  ...prev,
+                  `❌ [${i + 1}/${pendingTransactions.length}] Transaction submission failed: ${error.message}`,
+                ]);
+              }
+            });
 
           } catch (submitError) {
             setConsoleOutput((prev) => [
@@ -823,19 +759,6 @@ export default function PageContent() {
             console.error('🔍 Submission error:', submitError);
             throw submitError;
           }
-
-
-          // Add to transaction history
-          const newTransaction: TransactionResult = {
-            hash: txHash,
-            success: true,
-            events: [],
-            timestamp: Date.now(),
-          };
-          setTransactionHistory((prev) => [newTransaction, ...prev]);
-
-          // Switch to transactions tab to show result
-          setActiveTab("transactions");
 
           // Wait a moment between transactions
           if (i < pendingTransactions.length - 1) {
@@ -862,10 +785,7 @@ export default function PageContent() {
         }
       }
 
-      setConsoleOutput((prev) => [
-        ...prev,
-        `🏁 Completed ${pendingTransactions.length} transaction(s)`,
-      ]);
+      // All transactions processed
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
@@ -1227,6 +1147,7 @@ export default function PageContent() {
         isOpen={showPreviewModal}
         onClose={() => setShowPreviewModal(false)}
         onConfirm={executeWalletTransaction}
+        onTabSwitch={(tab) => setActiveTab(tab as "code" | "setup" | "console")}
         transactions={pendingTransactions}
         isTestnet={isTestnet}
         chainName={selectedChain}

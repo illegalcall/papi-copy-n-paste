@@ -51,7 +51,7 @@ export function RightPane({
   transactionHistory = [],
   onClearTransactionHistory,
 }: RightPaneProps) {
-  const [currentTab, setCurrentTab] = useState<"setup" | "code" | "console" | "transactions">(
+  const [currentTab, setCurrentTab] = useState<"setup" | "code" | "console">(
     "setup",
   );
   const [showToast, setShowToast] = useState(false);
@@ -367,26 +367,15 @@ export function RightPane({
       <Tabs
         value={currentTab}
         onValueChange={(value) =>
-          setCurrentTab(value as "setup" | "code" | "console" | "transactions")
+          setCurrentTab(value as "setup" | "code" | "console")
         }
         className="flex-1 flex flex-col min-h-0 max-h-full"
       >
         <div className="p-4 border-b">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="setup">Setup</TabsTrigger>
             <TabsTrigger value="code">Code</TabsTrigger>
             <TabsTrigger value="console">Console</TabsTrigger>
-            <TabsTrigger value="transactions" className="relative">
-              Transactions
-              {transactionHistory.length > 0 && (
-                <Badge
-                  variant="secondary"
-                  className="ml-1 h-4 px-1.5 text-xs"
-                >
-                  {transactionHistory.length}
-                </Badge>
-              )}
-            </TabsTrigger>
           </TabsList>
         </div>
 
@@ -679,142 +668,6 @@ export function RightPane({
           </Card>
         </TabsContent>
 
-        <TabsContent
-          value="transactions"
-          className="flex-1 p-4 m-0 h-0 max-h-full overflow-hidden"
-        >
-          <Card className="h-full flex flex-col max-h-full">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Receipt className="w-4 h-4" />
-                  Transaction History
-                  {transactionHistory.length > 0 && (
-                    <Badge variant="secondary" className="ml-2">
-                      {transactionHistory.length}
-                    </Badge>
-                  )}
-                </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onClearTransactionHistory}
-                  disabled={transactionHistory.length === 0}
-                >
-                  <Trash2 className="w-3 h-3 mr-1" />
-                  Clear
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0 flex-1 flex flex-col">
-              <div className="overflow-auto p-4 space-y-3 h-[calc(100vh-20rem)]">
-                {transactionHistory.length === 0 ? (
-                  <div className="text-muted-foreground text-center py-8">
-                    No wallet transactions yet. Use "Sign & Execute" to create real transactions.
-                  </div>
-                ) : (
-                  transactionHistory
-                    .slice()
-                    .reverse() // Show newest first
-                    .map((tx, index) => (
-                      <div
-                        key={tx.hash}
-                        className={`border rounded-lg p-4 space-y-3 ${
-                          tx.success
-                            ? "border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20"
-                            : "border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20"
-                        }`}
-                      >
-                        {/* Transaction Header */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Badge
-                              variant={tx.success ? "default" : "destructive"}
-                              className="text-xs"
-                            >
-                              {tx.success ? "Success" : "Failed"}
-                            </Badge>
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(tx.timestamp).toLocaleString()}
-                            </span>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-6 w-6 p-0"
-                            onClick={() => {
-                              navigator.clipboard.writeText(tx.hash);
-                              setShowToast(true);
-                            }}
-                            title="Copy transaction hash"
-                          >
-                            <Copy className="w-3 h-3" />
-                          </Button>
-                        </div>
-
-                        {/* Transaction Details */}
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">Hash:</span>
-                            <code className="text-xs font-mono bg-muted/50 px-2 py-1 rounded">
-                              {tx.hash.slice(0, 10)}...{tx.hash.slice(-8)}
-                            </code>
-                          </div>
-
-                          {tx.blockHash && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">Block:</span>
-                              <code className="text-xs font-mono bg-muted/50 px-2 py-1 rounded">
-                                {tx.blockHash.slice(0, 10)}...{tx.blockHash.slice(-8)}
-                              </code>
-                            </div>
-                          )}
-
-                          {tx.blockNumber && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">Block Number:</span>
-                              <span className="text-xs font-mono">{tx.blockNumber}</span>
-                            </div>
-                          )}
-
-                          {tx.fee && (
-                            <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">Fee:</span>
-                              <span className="text-xs font-mono">{tx.fee}</span>
-                            </div>
-                          )}
-
-                          {tx.error && (
-                            <div className="mt-2 p-2 bg-red-100 dark:bg-red-950/50 rounded text-xs text-red-800 dark:text-red-200">
-                              <strong>Error:</strong> {tx.error}
-                            </div>
-                          )}
-
-                          {tx.events && tx.events.length > 0 && (
-                            <div className="mt-2">
-                              <div className="text-xs text-muted-foreground mb-1">
-                                Events ({tx.events.length}):
-                              </div>
-                              <div className="max-h-32 overflow-auto bg-muted/30 rounded p-2">
-                                {tx.events.map((event, eventIndex) => (
-                                  <div
-                                    key={eventIndex}
-                                    className="text-xs font-mono text-muted-foreground"
-                                  >
-                                    {event.section}.{event.method}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
 
       <Toast
