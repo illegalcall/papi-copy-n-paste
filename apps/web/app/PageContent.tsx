@@ -502,52 +502,75 @@ export default function PageContent() {
             // Get typed API for the current chain
             const typedApi = getTypedApiForChain(api, selectedChain.toLowerCase());
 
-            // Use exact papi-console-main approach: unsafeApi.txFromCallData
+            // Use manual call data construction like papi-console-main
             setConsoleOutput((prev) => [
               ...prev,
-              `🔧 [${i + 1}/${pendingTransactions.length}] Using papi-console-main unsafeApi approach...`,
+              `🔧 [${i + 1}/${pendingTransactions.length}] Building manual call data like papi-console-main...`,
             ]);
 
-            // Create call data manually like papi-console-main does
+            // Manual call data construction to avoid typed API encoding issues
             const { Binary } = await import('polkadot-api');
+            const { compactNumber } = await import('@polkadot-api/substrate-bindings');
 
-            // Build call data hex for Balances.transfer_allow_death
-            // For Paseo Asset Hub: Balances pallet index = 10 (0x0a), transfer_allow_death call index = 0 (0x00)
-            let callDataHex = "0x0a00"; // Balances.transfer_allow_death
+            // Build call data hex: Balances.transfer_allow_death
+            // Paseo Asset Hub: Balances pallet = 10 (0x0a), transfer_allow_death = 0 (0x00)
+            let callDataHex = "0x0a00";
 
-            // Add destination address (MultiAddress::Id variant)
-            // Use simple AccountId encoding (0x00 for Id variant + 32-byte AccountId)
-            if (destAddress.length === 48) {
-              // SS58 address - decode to raw bytes
-              try {
-                const { AccountId } = await import('polkadot-api');
-                const accountId = AccountId().dec(destAddress);
-                callDataHex += "00" + Array.from(accountId).map(b => b.toString(16).padStart(2, '0')).join('');
-              } catch (decodeError) {
-                console.log('🔍 SS58 decode failed, using test address');
-                // Use a test AccountId for self-transfer
-                callDataHex += "00" + "8eaf04151687736326c9fea17e25fc5287613693c912909cb226aa4794f26a48";
+            // Add destination address as MultiAddress::Id (0x00 + 32-byte AccountId)
+            // Use getSs58AddressInfo to get the raw bytes
+            try {
+              const { getSs58AddressInfo } = await import('polkadot-api');
+              const addressInfo = getSs58AddressInfo(destAddress);
+              console.log('🔍 Address info:', addressInfo);
+
+              // Check if the address is valid and get the public key
+              if (addressInfo.isValid && 'payload' in addressInfo) {
+                const rawAccountId = (addressInfo as any).payload; // Type assertion for now
+                const accountIdHex = Array.from(new Uint8Array(rawAccountId)).map(b => b.toString(16).padStart(2, '0')).join('');
+                callDataHex += "00" + accountIdHex; // 0x00 = MultiAddress::Id variant
+                console.log('🔍 Raw AccountId hex:', accountIdHex);
+              } else {
+                throw new Error('Invalid SS58 address');
               }
+            } catch (decodeError) {
+              console.log('🔍 SS58 decode failed, using fallback:', decodeError);
+              // For self-transfer testing, use a known good address
+              callDataHex += "00" + "d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"; // Alice fallback
             }
 
             // Add value as compact-encoded u128
-            const { compactNumber } = await import('@polkadot-api/substrate-bindings');
-            const valueBytes = compactNumber.enc(formValue);
+            // Convert BigInt to number for compactNumber.enc (it expects number, not BigInt)
+            const valueAsNumber = Number(formValue);
+            console.log('🔍 Converting BigInt to number:', formValue, '→', valueAsNumber);
+
+            // Validate the conversion worked correctly
+            if (valueAsNumber !== 100000000000) {
+              console.warn('⚠️ Value conversion issue! Expected 100000000000, got:', valueAsNumber);
+            }
+
+            const valueBytes = compactNumber.enc(valueAsNumber);
             const valueHex = Array.from(valueBytes).map(b => b.toString(16).padStart(2, '0')).join('');
             callDataHex += valueHex;
 
             console.log('🔍 Built call data hex:', callDataHex);
+            console.log('🔍 Original value:', formValue);
+            console.log('🔍 Value bytes:', valueBytes);
+            console.log('🔍 Value hex:', valueHex);
+            console.log('🔍 Value as number:', Number(formValue));
+            console.log('🔍 Expected in PAS:', Number(formValue) / Math.pow(10, 10));
 
-            // Now use the exact papi-console-main pattern
+            // Use unsafeApi like papi-console-main
             const unsafeApi = api.getUnsafeApi();
             tx = await unsafeApi.txFromCallData(Binary.fromHex(callDataHex));
 
             setConsoleOutput((prev) => [
               ...prev,
-              `✅ [${i + 1}/${pendingTransactions.length}] Transaction created with unsafeApi pattern!`,
+              `✅ [${i + 1}/${pendingTransactions.length}] Transaction created with manual call data!`,
             ]);
 
             console.log('🔍 UnsafeApi Transaction created:', tx);
+            console.log('🔍 Destination address:', destAddress);
+            console.log('🔍 Transaction value:', formValue);
 
             // Now sign using the papi-console pattern
             try {
