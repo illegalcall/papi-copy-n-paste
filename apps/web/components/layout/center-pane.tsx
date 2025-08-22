@@ -9,7 +9,8 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
-import { Play, Square, Plus, X, List, Eye, EyeOff } from "lucide-react";
+import { Play, Square, Plus, X, List, Eye, EyeOff, Wallet } from "lucide-react";
+import { useWallet } from "../../hooks/useWallet";
 import { SimpleCallForm } from "@/components/forms/simple-call-form";
 import { StorageForm } from "@/components/forms/storage-form";
 import { ConstantForm } from "@/components/forms/constant-form";
@@ -41,6 +42,7 @@ interface CenterPaneProps {
   onFormChange: (formData: Record<string, any>) => void;
   onValidChange: (isValid: boolean) => void;
   onRunClick: () => void;
+  onWalletSignAndExecute?: () => void;
   onStopWatch?: () => void;
   onAbortClick: () => void;
   onAddToQueue: () => void;
@@ -75,6 +77,7 @@ export function CenterPane({
   onFormChange,
   onValidChange,
   onRunClick,
+  onWalletSignAndExecute,
   onStopWatch,
   onAbortClick,
   onAddToQueue,
@@ -93,6 +96,8 @@ export function CenterPane({
   onStorageParamsChange,
   onStorageValidationChange,
 }: CenterPaneProps) {
+  const { isConnected: isWalletConnected } = useWallet();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "connecting":
@@ -313,6 +318,21 @@ export function CenterPane({
                 <Play className="w-4 h-4 mr-2" />
                 {isRunning ? "Running..." : "Run"}
               </Button>
+
+              {/* Wallet Sign & Execute - Only show when wallet connected */}
+              {isWalletConnected && onWalletSignAndExecute && (
+                <Button
+                  variant="default"
+                  size={isRunning ? "default" : "lg"}
+                  disabled={!canRun || isRunning}
+                  onClick={onWalletSignAndExecute}
+                  className="min-w-0 flex-shrink bg-green-600 hover:bg-green-700"
+                >
+                  <Wallet className="w-4 h-4 mr-2" />
+                  {isRunning ? "Signing..." : "Sign & Execute"}
+                </Button>
+              )}
+
               <Button
                 variant="outline"
                 size={isRunning ? "default" : "lg"}
@@ -398,6 +418,21 @@ export function CenterPane({
                 <Play className="w-4 h-4 mr-2" />
                 {isRunning ? "Running..." : `Run Queue (${methodQueue.length})`}
               </Button>
+
+              {/* Wallet Sign & Execute Queue - Only show when wallet connected */}
+              {isWalletConnected && onWalletSignAndExecute && (
+                <Button
+                  variant="default"
+                  size={isRunning ? "default" : "lg"}
+                  disabled={isRunning}
+                  onClick={onWalletSignAndExecute}
+                  className="min-w-0 flex-shrink bg-green-600 hover:bg-green-700"
+                >
+                  <Wallet className="w-4 h-4 mr-2" />
+                  {isRunning ? "Signing..." : `Sign & Execute Queue (${methodQueue.length})`}
+                </Button>
+              )}
+
               {selectedCall && (
                 <Button
                   variant="outline"

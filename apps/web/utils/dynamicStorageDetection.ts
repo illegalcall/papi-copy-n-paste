@@ -304,13 +304,21 @@ export class DynamicStorageDetector {
 // Create a singleton instance for use across the application
 export const dynamicStorageDetector = new DynamicStorageDetector();
 
-// Clear cache on app start to ensure fresh detection
-if (typeof window !== 'undefined') {
+// Initialize client-side functionality when needed
+let clientInitialized = false;
+
+function initializeClientSide() {
+  if (clientInitialized || typeof window === 'undefined') return;
+  clientInitialized = true;
+
+  // Clear cache on client initialization
   dynamicStorageDetector.clearCache();
 
   // Also clear runtime detector cache
   import('./runtimeStorageDetection').then(({ runtimeStorageDetector }) => {
     runtimeStorageDetector.clearCache();
+  }).catch(() => {
+    // Silently handle import errors
   });
 }
 
@@ -323,6 +331,9 @@ export function getStorageParameterInfo(
   pallet: string,
   storage: string
 ): StorageParameterInfo {
+  // Initialize client-side functionality on first use
+  initializeClientSide();
+
   return dynamicStorageDetector.detectParameters(chainKey, pallet, storage);
 }
 
