@@ -51,7 +51,7 @@ export function RightPane({
   transactionHistory = [],
   onClearTransactionHistory,
 }: RightPaneProps) {
-  const [currentTab, setCurrentTab] = useState<"setup" | "code" | "console">(
+  const [currentTab, setCurrentTab] = useState<"setup" | "code" | "console" | "transactions">(
     "setup",
   );
   const [showToast, setShowToast] = useState(false);

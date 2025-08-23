@@ -1,6 +1,6 @@
 /**
  * Auto-generated call metadata from PAPI descriptors
- * Generated on: 2025-09-20T12:21:11.039Z
+ * Generated on: 2025-09-20T15:31:38.422Z
  */
 
 export interface CallParameterInfo {
@@ -20323,9 +20323,8 @@ export function getCallReturnType(chainKey: string, pallet: string, call: string
   return callMetadata[chainKey]?.pallets?.[pallet]?.[call]?.returnType || 'void';
 }
 
-
 /**
- * Get description for a call
+ * Get call description for a specific chain, pallet, and call
  */
 export function getCallDescription(chainKey: string, pallet: string, call: string): string {
   return callMetadata[chainKey]?.pallets?.[pallet]?.[call]?.description || `Call ${pallet}.${call}`;

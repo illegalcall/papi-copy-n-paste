@@ -11,7 +11,7 @@ import {
 import { Badge } from "@workspace/ui/components/badge";
 import { Play, Square, Plus, X, List, Eye, EyeOff, Wallet } from "lucide-react";
 import { useWallet } from "../../hooks/useWallet";
-import { SimpleCallForm } from "@/components/forms/simple-call-form";
+import { EnhancedCallForm } from "@/components/forms/enhanced-call-form";
 import { StorageForm } from "@/components/forms/storage-form";
 import { ConstantForm } from "@/components/forms/constant-form";
 import { ErrorForm } from "@/components/forms/error-form";
@@ -246,10 +246,10 @@ export function CenterPane({
       )}
 
       {selectedCall ? (
-        <SimpleCallForm
+        <EnhancedCallForm
           key={`${selectedCall.pallet}-${selectedCall.call.name}`}
           pallet={selectedCall.pallet}
-          call={selectedCall.call}
+          callName={selectedCall.call.name}
           onFormChange={onFormChange}
           onValidChange={onValidChange}
           chainKey={selectedChain}

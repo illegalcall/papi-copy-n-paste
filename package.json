@@ -3,13 +3,12 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "npx papi && npm run extract-storage-metadata && npm run extract-call-metadata && turbo build",
+    "build": "npx papi && npm run extract-storage-metadata && turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "create-app": "npx create-papi-app",
     "extract-storage-metadata": "tsx packages/core/scripts/extract-storage-metadata-simple.ts",
-    "extract-call-metadata": "tsx packages/core/scripts/extract-call-metadata-simple.ts",
     "constants": "tsx packages/core/scripts/extract-all-constants.ts"
   },
   "devDependencies": {
@@ -28,6 +27,7 @@
   },
   "dependencies": {
     "@polkadot-api/descriptors": "file:.papi/descriptors",
+    "@polkadot-api/metadata-builders": "^0.12.2",
     "@polkadot-api/smoldot": "^0.3.10",
     "@polkadot-api/substrate-bindings": "^0.14.0",
     "@polkadot/api": "^16.4.6",
