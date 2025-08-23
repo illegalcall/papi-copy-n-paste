@@ -615,6 +615,10 @@ export function generateCodeSnippet(
 ): string {
   const template = getCodeTemplate();
 
+  // Debug: Log form data to see what's being passed
+  console.log('🔍 Code generation - formData:', formData);
+  console.log('🔍 Code generation - call.args:', call.args);
+
   if (template === "function") {
     return generateFunctionCode(chainKey, providerId, pallet, call, formData);
   } else {
@@ -648,16 +652,29 @@ console.log('Connected to custom RPC')`;
   // Use sync description for now - async descriptions will be handled later
   const description = `Call ${pallet}.${call.name}`;
 
-  const args = call.args
-    .map((arg) => {
-      const value = formData[arg.name] || "";
+  // Create mapping from parameter name to type using call.args
+  const paramTypeMap = new Map<string, string>();
+  call.args.forEach(arg => {
+    paramTypeMap.set(arg.name, arg.type);
+  });
 
-      // Handle MultiAddress types properly for dest/target fields
-      if (
-        arg.name === "dest" ||
-        arg.name === "target" ||
-        arg.type.includes("MultiAddress")
-      ) {
+  // Generate arguments from form data keys with proper type handling
+  const args = Object.entries(formData)
+    .map(([paramName, value]) => {
+      console.log(`🔍 Processing param ${paramName}:`, value, 'type:', typeof value);
+
+      // Get the actual parameter type from call.args
+      const paramType = paramTypeMap.get(paramName) || 'unknown';
+      console.log(`🔍 Parameter ${paramName} has type:`, paramType);
+
+      // Extract actual value from form object structure if needed
+      if (typeof value === 'object' && value?.type === 'Id' && value?.value) {
+        console.log(`🔍 Extracting object value for ${paramName}:`, value, '→', value.value);
+        value = value.value; // Extract the actual address string
+      }
+
+      // Handle MultiAddress types based on actual parameter type
+      if (paramType.includes("MultiAddress") || paramType.includes("AccountId")) {
         if (typeof value === "string" && value.startsWith("//")) {
           const accountMap: Record<string, string> = {
             "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
@@ -665,28 +682,36 @@ console.log('Connected to custom RPC')`;
             "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
           };
           const address = accountMap[value] || accountMap["//Alice"];
-          return `  ${arg.name}: MultiAddress.Id("${address}"), // ${value}`;
+          return `  ${paramName}: MultiAddress.Id("${address}"), // ${value}`;
         } else if (typeof value === "string" && value.length > 40) {
-          return `  ${arg.name}: MultiAddress.Id("${value}")`;
+          return `  ${paramName}: MultiAddress.Id("${value}")`;
         } else {
-          return `  ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`;
+          return `  ${paramName}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`;
         }
       }
 
+      // Handle numeric types based on actual parameter type
       if (
-        arg.type.includes("u128") ||
-        arg.type.includes("u64") ||
-        arg.name === "value" ||
-        arg.name === "amount"
+        paramType.includes("u128") ||
+        paramType.includes("u64") ||
+        paramType.includes("u32") ||
+        paramType.includes("Balance") ||
+        paramType.includes("Compact")
       ) {
         const numValue =
           typeof value === "string" ? value : String(value || "0");
         // Ensure we have a valid number before adding 'n'
         const cleanValue = numValue.trim() || "0";
-        return `  ${arg.name}: ${cleanValue}n`;
+        return `  ${paramName}: ${cleanValue}n`;
       }
 
-      return `  ${arg.name}: ${JSON.stringify(value)}`;
+      // Handle boolean types
+      if (paramType.includes("bool")) {
+        return `  ${paramName}: ${Boolean(value)}`;
+      }
+
+      // Default: use JSON stringify
+      return `  ${paramName}: ${JSON.stringify(value)}`;
     })
     .join(",\n");
 
@@ -719,12 +744,12 @@ ${connectionInfo.imports}
 ${connectionInfo.connection}
 const typedApi = client.getTypedApi(${descriptorName})
 
-${metadataComment}${paramComment}const call = typedApi.tx.${pallet}.${call.name}({
+${metadataComment}${paramComment}const ${call.name} = typedApi.tx.${pallet}.${call.name}({
 ${args}
 })
 
-console.log('Transaction call created:', call)
-// To actually submit: await call.signAndSubmit(signer)${connectionInfo.cleanup || ''}`;
+console.log('Transaction call created:', ${call.name})
+// To actually submit: await ${call.name}.signAndSubmit(signer)${connectionInfo.cleanup || ''}`;
   } catch (error) {
     return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
 // 💡 This chain may not be supported for typed API queries`;
@@ -748,16 +773,24 @@ function generateFunctionCode(
   // Use basic parameter info from call.args for now
   paramInfo = { required: call.args.map(arg => arg.name), optional: [] };
 
-  const args = call.args
-    .map((arg) => {
-      const value = formData[arg.name] || "";
+  // Create mapping from parameter name to type using call.args
+  const paramTypeMap = new Map<string, string>();
+  call.args.forEach(arg => {
+    paramTypeMap.set(arg.name, arg.type);
+  });
 
-      // Handle MultiAddress types properly for dest/target fields
-      if (
-        arg.name === "dest" ||
-        arg.name === "target" ||
-        arg.type.includes("MultiAddress")
-      ) {
+  const args = Object.entries(formData)
+    .map(([paramName, value]) => {
+      // Get the actual parameter type from call.args
+      const paramType = paramTypeMap.get(paramName) || 'unknown';
+
+      // Extract actual value from form object structure if needed
+      if (typeof value === 'object' && value?.type === 'Id' && value?.value) {
+        value = value.value; // Extract the actual address string
+      }
+
+      // Handle MultiAddress types based on actual parameter type
+      if (paramType.includes("MultiAddress") || paramType.includes("AccountId")) {
         if (typeof value === "string" && value.startsWith("//")) {
           const accountMap: Record<string, string> = {
             "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
@@ -765,26 +798,33 @@ function generateFunctionCode(
             "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
           };
           const address = accountMap[value] || accountMap["//Alice"];
-          return `    ${arg.name}: MultiAddress.Id("${address}"), // ${value}`;
+          return `    ${paramName}: MultiAddress.Id("${address}"), // ${value}`;
         } else if (typeof value === "string" && value.length > 40) {
-          return `    ${arg.name}: MultiAddress.Id("${value}")`;
+          return `    ${paramName}: MultiAddress.Id("${value}")`;
         } else {
-          return `    ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`;
+          return `    ${paramName}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`;
         }
       }
 
+      // Handle numeric types based on actual parameter type
       if (
-        arg.type.includes("u128") ||
-        arg.type.includes("u64") ||
-        arg.name === "value" ||
-        arg.name === "amount"
+        paramType.includes("u128") ||
+        paramType.includes("u64") ||
+        paramType.includes("u32") ||
+        paramType.includes("Balance") ||
+        paramType.includes("Compact")
       ) {
         const numValue =
           typeof value === "string" ? value : String(value || "0");
-        return `    ${arg.name}: ${numValue}n`;
+        return `    ${paramName}: ${numValue}n`;
       }
 
-      return `    ${arg.name}: ${JSON.stringify(value)}`;
+      // Handle boolean types
+      if (paramType.includes("bool")) {
+        return `    ${paramName}: ${Boolean(value)}`;
+      }
+
+      return `    ${paramName}: ${JSON.stringify(value)}`;
     })
     .join(",\n");
 

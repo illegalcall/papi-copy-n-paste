@@ -471,9 +471,20 @@ export default function PageContent() {
 
           if (txInfo.pallet === "Balances" && txInfo.call === "transfer_allow_death") {
             // Use proper PAPI typed API instead of manual encoding
-            let destAddress = txInfo.args.dest;
+            let destAddressRaw = txInfo.args.dest;
 
-            console.log('🔍 Original destination from form:', destAddress);
+            // Extract the actual address string from the form object
+            let destAddress: string;
+            if (typeof destAddressRaw === 'object' && destAddressRaw?.type === 'Id' && destAddressRaw?.value) {
+              destAddress = destAddressRaw.value;
+            } else if (typeof destAddressRaw === 'string') {
+              destAddress = destAddressRaw;
+            } else {
+              throw new Error(`Invalid destination format: ${JSON.stringify(destAddressRaw)}`);
+            }
+
+            console.log('🔍 Original destination from form:', destAddressRaw);
+            console.log('🔍 Extracted address string:', destAddress);
 
             // Handle special cases like //Alice and //Bob for testing
             if (destAddress === "//Alice" || destAddress === "//Bob") {
@@ -486,6 +497,9 @@ export default function PageContent() {
 
             console.log('🔍 Final destination for transaction:', destAddress);
 
+            // Use SS58 address directly - PAPI handles the conversion internally
+            console.log('🔍 Using SS58 address directly for PAPI transaction:', destAddress);
+
             const valueAsBigInt = BigInt(txInfo.args.value || txInfo.args.amount || "0");
             console.log('🔍 Using BigInt value for transaction:', valueAsBigInt.toString());
 
@@ -495,9 +509,9 @@ export default function PageContent() {
             ]);
 
             // Use PAPI typed API to create transaction with MultiAddress format
-            // The dest parameter expects a MultiAddress, which can be an Id variant
+            // The dest parameter expects a MultiAddress Id variant - PAPI handles SS58 conversion
             tx = typedApi.tx.Balances.transfer_allow_death({
-              dest: { type: "Id", value: destAddress }, // Use MultiAddress format
+              dest: { type: "Id", value: destAddress }, // Use SS58 string directly
               value: valueAsBigInt
             });
 

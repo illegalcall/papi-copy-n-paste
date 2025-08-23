@@ -1,5 +1,6 @@
 /**
  * Clean, minimal wallet integration code generation
+ * Updated: Fixed form object value extraction
  */
 
 import { PalletCall } from "@workspace/core";
@@ -18,6 +19,9 @@ export function generateWalletIntegratedCode(
   isWalletConnected: boolean,
 ): string {
   try {
+    console.log('🔍 Wallet code generation - formData:', formData);
+    console.log('🔍 Wallet code generation - call.args:', call.args);
+
     const descriptorImport = getDescriptorImport(chainKey);
     const descriptorName = getDescriptorName(chainKey);
     const connectionInfo = getChainConnection(chainKey, providerId);
@@ -26,16 +30,26 @@ export function generateWalletIntegratedCode(
       return `// ❌ Chain "${chainKey}" is not supported for typed API queries`;
     }
 
-    const args = call.args
-      .map((arg) => {
-        const value = formData[arg.name] || "";
+    // Create mapping from parameter name to type using call.args
+    const paramTypeMap = new Map<string, string>();
+    call.args.forEach(arg => {
+      paramTypeMap.set(arg.name, arg.type);
+    });
 
-        // Handle MultiAddress types properly for dest/target fields
-        if (
-          arg.name === "dest" ||
-          arg.name === "target" ||
-          arg.type.includes("MultiAddress")
-        ) {
+    const args = Object.entries(formData)
+      .map(([paramName, value]) => {
+        // Get the actual parameter type from call.args
+        const paramType = paramTypeMap.get(paramName) || 'unknown';
+        console.log(`🔍 Processing param ${paramName}: ${value}, type: ${paramType}`);
+
+        // Extract actual value from form object structure if needed
+        if (typeof value === 'object' && value?.type === 'Id' && value?.value) {
+          console.log(`🔍 Extracting value for ${paramName}: ${JSON.stringify(value)} → ${value.value}`);
+          value = value.value; // Extract the actual address string
+        }
+
+        // Handle MultiAddress types based on actual parameter type
+        if (paramType.includes("MultiAddress") || paramType.includes("AccountId")) {
           if (typeof value === "string" && value.startsWith("//")) {
             const accountMap: Record<string, string> = {
               "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
@@ -43,26 +57,34 @@ export function generateWalletIntegratedCode(
               "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
             };
             const address = accountMap[value] || accountMap["//Alice"];
-            return `  ${arg.name}: MultiAddress.Id("${address}"), // ${value}`;
+            return `  ${paramName}: MultiAddress.Id("${address}"), // ${value}`;
           } else if (typeof value === "string" && value.length > 40) {
-            return `  ${arg.name}: MultiAddress.Id("${value}")`;
+            return `  ${paramName}: MultiAddress.Id("${value}")`;
           } else {
-            return `  ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`;
+            return `  ${paramName}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`;
           }
         }
 
+        // Handle numeric types based on actual parameter type
         if (
-          arg.type.includes("u128") ||
-          arg.type.includes("u64") ||
-          arg.name === "value" ||
-          arg.name === "amount"
+          paramType.includes("u128") ||
+          paramType.includes("u64") ||
+          paramType.includes("u32") ||
+          paramType.includes("Balance") ||
+          paramType.includes("Compact")
         ) {
           const numValue = typeof value === "string" ? value : String(value || "0");
           const cleanValue = numValue.trim() || "0";
-          return `  ${arg.name}: ${cleanValue}n`;
+          return `  ${paramName}: ${cleanValue}n`;
         }
 
-        return `  ${arg.name}: ${JSON.stringify(value)}`;
+        // Handle boolean types
+        if (paramType.includes("bool")) {
+          return `  ${paramName}: ${Boolean(value)}`;
+        }
+
+        // Handle other types with proper parameter names
+        return `  ${paramName}: ${JSON.stringify(value)}`;
       })
       .join(",\n");
 
@@ -80,12 +102,12 @@ const extension = await window.injectedWeb3["polkadot-js"].enable("app")
 const accounts = await extension.accounts.get()
 const signer = getPolkadotSigner(extension.signer)
 
-const call = typedApi.tx.${pallet}.${call.name}({
+const ${call.name} = typedApi.tx.${pallet}.${call.name}({
 ${args}
 })
 
 // Sign and submit
-const txHash = await call.signAndSubmit(signer)
+const txHash = await ${call.name}.signAndSubmit(signer)
 console.log("Transaction hash:", txHash)${connectionInfo.cleanup || ''}`;
 
   } catch (error) {
