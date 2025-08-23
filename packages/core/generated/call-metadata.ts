@@ -1,0 +1,20332 @@
+/**
+ * Auto-generated call metadata from PAPI descriptors
+ * Generated on: 2025-09-20T12:21:11.039Z
+ */
+
+export interface CallParameterInfo {
+  required: string[];
+  optional: string[];
+  description?: string;
+  returnType?: string;
+}
+
+export interface ChainCallMetadata {
+  pallets: {
+    [pallet: string]: {
+      [call: string]: CallParameterInfo;
+    };
+  };
+}
+
+export const callMetadata: { [chainKey: string]: ChainCallMetadata } = {
+  "astar": {
+    "pallets": {
+      "System": {
+        "remark": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call remark",
+          "returnType": "void"
+        },
+        "set_heap_pages": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_heap_pages",
+          "returnType": "void"
+        },
+        "set_code": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call set_code",
+          "returnType": "void"
+        },
+        "set_code_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_without_checks",
+          "returnType": "void"
+        },
+        "set_storage": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_storage",
+          "returnType": "void"
+        },
+        "kill_storage": {
+          "required": [
+            "Vec<bytes>"
+          ],
+          "optional": [],
+          "description": "Call kill_storage",
+          "returnType": "void"
+        },
+        "kill_prefix": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_prefix",
+          "returnType": "void"
+        },
+        "remark_with_event": {
+          "required": [],
+          "optional": [],
+          "description": "Call remark_with_event",
+          "returnType": "void"
+        },
+        "authorize_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade",
+          "returnType": "void"
+        },
+        "authorize_upgrade_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade_without_checks",
+          "returnType": "void"
+        },
+        "apply_authorized_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_authorized_upgrade",
+          "returnType": "void"
+        }
+      },
+      "Utility": {
+        "batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch",
+          "returnType": "void"
+        },
+        "as_derivative": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_derivative",
+          "returnType": "void"
+        },
+        "batch_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch_all",
+          "returnType": "void"
+        },
+        "dispatch_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as",
+          "returnType": "void"
+        },
+        "force_batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_batch",
+          "returnType": "void"
+        },
+        "with_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call with_weight",
+          "returnType": "void"
+        }
+      },
+      "Identity": {
+        "add_registrar": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_registrar",
+          "returnType": "void"
+        },
+        "set_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_identity",
+          "returnType": "void"
+        },
+        "set_subs": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_subs",
+          "returnType": "void"
+        },
+        "clear_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_identity",
+          "returnType": "void"
+        },
+        "request_judgement": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_judgement",
+          "returnType": "void"
+        },
+        "cancel_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_request",
+          "returnType": "void"
+        },
+        "set_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fee",
+          "returnType": "void"
+        },
+        "set_account_id": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_account_id",
+          "returnType": "void"
+        },
+        "set_fields": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fields",
+          "returnType": "void"
+        },
+        "provide_judgement": {
+          "required": [],
+          "optional": [],
+          "description": "Call provide_judgement",
+          "returnType": "void"
+        },
+        "kill_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_identity",
+          "returnType": "void"
+        },
+        "add_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_sub",
+          "returnType": "void"
+        },
+        "rename_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call rename_sub",
+          "returnType": "void"
+        },
+        "remove_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_sub",
+          "returnType": "void"
+        },
+        "quit_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call quit_sub",
+          "returnType": "void"
+        },
+        "add_username_authority": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_username_authority",
+          "returnType": "void"
+        },
+        "remove_username_authority": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_username_authority",
+          "returnType": "void"
+        },
+        "set_username_for": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_username_for",
+          "returnType": "void"
+        },
+        "accept_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call accept_username",
+          "returnType": "void"
+        },
+        "remove_expired_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_expired_approval",
+          "returnType": "void"
+        },
+        "set_primary_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_primary_username",
+          "returnType": "void"
+        },
+        "unbind_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call unbind_username",
+          "returnType": "void"
+        },
+        "remove_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_username",
+          "returnType": "void"
+        },
+        "kill_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_username",
+          "returnType": "void"
+        }
+      },
+      "Timestamp": {
+        "set": {
+          "required": [],
+          "optional": [],
+          "description": "Call set",
+          "returnType": "void"
+        }
+      },
+      "Multisig": {
+        "as_multi_threshold_1": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi_threshold_1",
+          "returnType": "void"
+        },
+        "as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi",
+          "returnType": "void"
+        },
+        "approve_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_as_multi",
+          "returnType": "void"
+        },
+        "cancel_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_as_multi",
+          "returnType": "void"
+        }
+      },
+      "Proxy": {
+        "proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy",
+          "returnType": "void"
+        },
+        "add_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_proxy",
+          "returnType": "void"
+        },
+        "remove_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxy",
+          "returnType": "void"
+        },
+        "remove_proxies": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxies",
+          "returnType": "void"
+        },
+        "create_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pure",
+          "returnType": "void"
+        },
+        "kill_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_pure",
+          "returnType": "void"
+        },
+        "announce": {
+          "required": [],
+          "optional": [],
+          "description": "Call announce",
+          "returnType": "void"
+        },
+        "remove_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_announcement",
+          "returnType": "void"
+        },
+        "reject_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call reject_announcement",
+          "returnType": "void"
+        },
+        "proxy_announced": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy_announced",
+          "returnType": "void"
+        }
+      },
+      "Scheduler": {
+        "schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "schedule_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named",
+          "returnType": "void"
+        },
+        "cancel_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_named",
+          "returnType": "void"
+        },
+        "schedule_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_after",
+          "returnType": "void"
+        },
+        "schedule_named_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named_after",
+          "returnType": "void"
+        },
+        "set_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry",
+          "returnType": "void"
+        },
+        "set_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry_named",
+          "returnType": "void"
+        },
+        "cancel_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry",
+          "returnType": "void"
+        },
+        "cancel_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry_named",
+          "returnType": "void"
+        }
+      },
+      "ParachainSystem": {
+        "set_validation_data": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_data",
+          "returnType": "void"
+        },
+        "sudo_send_upward_message": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_send_upward_message",
+          "returnType": "void"
+        }
+      },
+      "Balances": {
+        "transfer_allow_death": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_allow_death",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [
+            "AccountId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "force_unreserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unreserve",
+          "returnType": "void"
+        },
+        "upgrade_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call upgrade_accounts",
+          "returnType": "void"
+        },
+        "force_set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_balance",
+          "returnType": "void"
+        },
+        "force_adjust_total_issuance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_adjust_total_issuance",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        }
+      },
+      "Vesting": {
+        "vest": {
+          "required": [],
+          "optional": [],
+          "description": "Call vest",
+          "returnType": "void"
+        },
+        "vest_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call vest_other",
+          "returnType": "void"
+        },
+        "vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call vested_transfer",
+          "returnType": "void"
+        },
+        "force_vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_vested_transfer",
+          "returnType": "void"
+        },
+        "merge_schedules": {
+          "required": [],
+          "optional": [],
+          "description": "Call merge_schedules",
+          "returnType": "void"
+        },
+        "force_remove_vesting_schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_remove_vesting_schedule",
+          "returnType": "void"
+        }
+      },
+      "Inflation": {
+        "force_set_inflation_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_inflation_params",
+          "returnType": "void"
+        },
+        "force_inflation_recalculation": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_inflation_recalculation",
+          "returnType": "void"
+        },
+        "force_readjust_config": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_readjust_config",
+          "returnType": "void"
+        }
+      },
+      "DappStaking": {
+        "unbond_and_unstake": {
+          "required": [],
+          "optional": [],
+          "description": "Call unbond_and_unstake",
+          "returnType": "void"
+        },
+        "withdraw_unbonded": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_unbonded",
+          "returnType": "void"
+        },
+        "maintenance_mode": {
+          "required": [],
+          "optional": [],
+          "description": "Call maintenance_mode",
+          "returnType": "void"
+        },
+        "register": {
+          "required": [],
+          "optional": [],
+          "description": "Call register",
+          "returnType": "void"
+        },
+        "set_dapp_reward_beneficiary": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_dapp_reward_beneficiary",
+          "returnType": "void"
+        },
+        "set_dapp_owner": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_dapp_owner",
+          "returnType": "void"
+        },
+        "unregister": {
+          "required": [],
+          "optional": [],
+          "description": "Call unregister",
+          "returnType": "void"
+        },
+        "lock": {
+          "required": [],
+          "optional": [],
+          "description": "Call lock",
+          "returnType": "void"
+        },
+        "unlock": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock",
+          "returnType": "void"
+        },
+        "claim_unlocked": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_unlocked",
+          "returnType": "void"
+        },
+        "relock_unlocking": {
+          "required": [],
+          "optional": [],
+          "description": "Call relock_unlocking",
+          "returnType": "void"
+        },
+        "stake": {
+          "required": [],
+          "optional": [],
+          "description": "Call stake",
+          "returnType": "void"
+        },
+        "unstake": {
+          "required": [],
+          "optional": [],
+          "description": "Call unstake",
+          "returnType": "void"
+        },
+        "claim_staker_rewards": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_staker_rewards",
+          "returnType": "void"
+        },
+        "claim_bonus_reward": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_bonus_reward",
+          "returnType": "void"
+        },
+        "claim_dapp_reward": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_dapp_reward",
+          "returnType": "void"
+        },
+        "unstake_from_unregistered": {
+          "required": [],
+          "optional": [],
+          "description": "Call unstake_from_unregistered",
+          "returnType": "void"
+        },
+        "cleanup_expired_entries": {
+          "required": [],
+          "optional": [],
+          "description": "Call cleanup_expired_entries",
+          "returnType": "void"
+        },
+        "force": {
+          "required": [],
+          "optional": [],
+          "description": "Call force",
+          "returnType": "void"
+        },
+        "claim_staker_rewards_for": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_staker_rewards_for",
+          "returnType": "void"
+        },
+        "claim_bonus_reward_for": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_bonus_reward_for",
+          "returnType": "void"
+        },
+        "move_stake": {
+          "required": [],
+          "optional": [],
+          "description": "Call move_stake",
+          "returnType": "void"
+        },
+        "set_static_tier_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_static_tier_params",
+          "returnType": "void"
+        }
+      },
+      "Assets": {
+        "create": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "force_create": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_create",
+          "returnType": "void"
+        },
+        "start_destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call start_destroy",
+          "returnType": "void"
+        },
+        "destroy_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy_accounts",
+          "returnType": "void"
+        },
+        "destroy_approvals": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy_approvals",
+          "returnType": "void"
+        },
+        "finish_destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call finish_destroy",
+          "returnType": "void"
+        },
+        "mint": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call mint",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "freeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze",
+          "returnType": "void"
+        },
+        "thaw": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw",
+          "returnType": "void"
+        },
+        "freeze_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze_asset",
+          "returnType": "void"
+        },
+        "thaw_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw_asset",
+          "returnType": "void"
+        },
+        "transfer_ownership": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_ownership",
+          "returnType": "void"
+        },
+        "set_team": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_team",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        },
+        "clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_metadata",
+          "returnType": "void"
+        },
+        "force_set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_metadata",
+          "returnType": "void"
+        },
+        "force_clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_clear_metadata",
+          "returnType": "void"
+        },
+        "force_asset_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_asset_status",
+          "returnType": "void"
+        },
+        "approve_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_transfer",
+          "returnType": "void"
+        },
+        "cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_approval",
+          "returnType": "void"
+        },
+        "force_cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_cancel_approval",
+          "returnType": "void"
+        },
+        "transfer_approved": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_approved",
+          "returnType": "void"
+        },
+        "touch": {
+          "required": [],
+          "optional": [],
+          "description": "Call touch",
+          "returnType": "void"
+        },
+        "refund": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund",
+          "returnType": "void"
+        },
+        "set_min_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_min_balance",
+          "returnType": "void"
+        },
+        "touch_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call touch_other",
+          "returnType": "void"
+        },
+        "refund_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_other",
+          "returnType": "void"
+        },
+        "block": {
+          "required": [],
+          "optional": [],
+          "description": "Call block",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        }
+      },
+      "Oracle": {
+        "feed_values": {
+          "required": [],
+          "optional": [],
+          "description": "Call feed_values",
+          "returnType": "void"
+        }
+      },
+      "OracleMembership": {
+        "add_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_member",
+          "returnType": "void"
+        },
+        "remove_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_member",
+          "returnType": "void"
+        },
+        "swap_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap_member",
+          "returnType": "void"
+        },
+        "reset_members": {
+          "required": [],
+          "optional": [],
+          "description": "Call reset_members",
+          "returnType": "void"
+        },
+        "change_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call change_key",
+          "returnType": "void"
+        },
+        "set_prime": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_prime",
+          "returnType": "void"
+        },
+        "clear_prime": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_prime",
+          "returnType": "void"
+        }
+      },
+      "CollatorSelection": {
+        "set_invulnerables": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_invulnerables",
+          "returnType": "void"
+        },
+        "set_desired_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_desired_candidates",
+          "returnType": "void"
+        },
+        "set_candidacy_bond": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_candidacy_bond",
+          "returnType": "void"
+        },
+        "register_as_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_as_candidate",
+          "returnType": "void"
+        },
+        "leave_intent": {
+          "required": [],
+          "optional": [],
+          "description": "Call leave_intent",
+          "returnType": "void"
+        },
+        "withdraw_bond": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_bond",
+          "returnType": "void"
+        },
+        "set_slash_destination": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_slash_destination",
+          "returnType": "void"
+        },
+        "add_invulnerable": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_invulnerable",
+          "returnType": "void"
+        },
+        "remove_invulnerable": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_invulnerable",
+          "returnType": "void"
+        }
+      },
+      "Session": {
+        "set_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_keys",
+          "returnType": "void"
+        },
+        "purge_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call purge_keys",
+          "returnType": "void"
+        }
+      },
+      "XcmpQueue": {
+        "suspend_xcm_execution": {
+          "required": [],
+          "optional": [],
+          "description": "Call suspend_xcm_execution",
+          "returnType": "void"
+        },
+        "resume_xcm_execution": {
+          "required": [],
+          "optional": [],
+          "description": "Call resume_xcm_execution",
+          "returnType": "void"
+        },
+        "update_suspend_threshold": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_suspend_threshold",
+          "returnType": "void"
+        },
+        "update_drop_threshold": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_drop_threshold",
+          "returnType": "void"
+        },
+        "update_resume_threshold": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_resume_threshold",
+          "returnType": "void"
+        }
+      },
+      "PolkadotXcm": {
+        "send": {
+          "required": [],
+          "optional": [],
+          "description": "Call send",
+          "returnType": "void"
+        },
+        "teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call teleport_assets",
+          "returnType": "void"
+        },
+        "reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "force_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_xcm_version",
+          "returnType": "void"
+        },
+        "force_default_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_default_xcm_version",
+          "returnType": "void"
+        },
+        "force_subscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_subscribe_version_notify",
+          "returnType": "void"
+        },
+        "force_unsubscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unsubscribe_version_notify",
+          "returnType": "void"
+        },
+        "limited_reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "limited_teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_teleport_assets",
+          "returnType": "void"
+        },
+        "force_suspension": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_suspension",
+          "returnType": "void"
+        },
+        "transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets",
+          "returnType": "void"
+        },
+        "claim_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_assets",
+          "returnType": "void"
+        },
+        "transfer_assets_using_type_and_then": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets_using_type_and_then",
+          "returnType": "void"
+        }
+      },
+      "XcAssetConfig": {
+        "register_asset_location": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_asset_location",
+          "returnType": "void"
+        },
+        "set_asset_units_per_second": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_asset_units_per_second",
+          "returnType": "void"
+        },
+        "change_existing_asset_location": {
+          "required": [],
+          "optional": [],
+          "description": "Call change_existing_asset_location",
+          "returnType": "void"
+        },
+        "remove_payment_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_payment_asset",
+          "returnType": "void"
+        },
+        "remove_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_asset",
+          "returnType": "void"
+        }
+      },
+      "XTokens": {
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "transfer_multiasset": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_multiasset",
+          "returnType": "void"
+        },
+        "transfer_with_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_with_fee",
+          "returnType": "void"
+        },
+        "transfer_multiasset_with_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_multiasset_with_fee",
+          "returnType": "void"
+        },
+        "transfer_multicurrencies": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_multicurrencies",
+          "returnType": "void"
+        },
+        "transfer_multiassets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_multiassets",
+          "returnType": "void"
+        }
+      },
+      "MessageQueue": {
+        "reap_page": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_page",
+          "returnType": "void"
+        },
+        "execute_overweight": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_overweight",
+          "returnType": "void"
+        }
+      },
+      "EVM": {
+        "withdraw": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw",
+          "returnType": "void"
+        },
+        "call": {
+          "required": [],
+          "optional": [],
+          "description": "Call call",
+          "returnType": "void"
+        },
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "create2": {
+          "required": [],
+          "optional": [],
+          "description": "Call create2",
+          "returnType": "void"
+        }
+      },
+      "Ethereum": {
+        "transact": {
+          "required": [],
+          "optional": [],
+          "description": "Call transact",
+          "returnType": "void"
+        }
+      },
+      "DynamicEvmBaseFee": {
+        "set_base_fee_per_gas": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_base_fee_per_gas",
+          "returnType": "void"
+        }
+      },
+      "Contracts": {
+        "call_old_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call call_old_weight",
+          "returnType": "void"
+        },
+        "instantiate_with_code_old_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call instantiate_with_code_old_weight",
+          "returnType": "void"
+        },
+        "instantiate_old_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call instantiate_old_weight",
+          "returnType": "void"
+        },
+        "upload_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call upload_code",
+          "returnType": "void"
+        },
+        "remove_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_code",
+          "returnType": "void"
+        },
+        "set_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code",
+          "returnType": "void"
+        },
+        "call": {
+          "required": [],
+          "optional": [],
+          "description": "Call call",
+          "returnType": "void"
+        },
+        "instantiate_with_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call instantiate_with_code",
+          "returnType": "void"
+        },
+        "instantiate": {
+          "required": [],
+          "optional": [],
+          "description": "Call instantiate",
+          "returnType": "void"
+        },
+        "migrate": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate",
+          "returnType": "void"
+        }
+      },
+      "Preimage": {
+        "note_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_preimage",
+          "returnType": "void"
+        },
+        "unnote_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unnote_preimage",
+          "returnType": "void"
+        },
+        "request_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_preimage",
+          "returnType": "void"
+        },
+        "unrequest_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unrequest_preimage",
+          "returnType": "void"
+        },
+        "ensure_updated": {
+          "required": [],
+          "optional": [],
+          "description": "Call ensure_updated",
+          "returnType": "void"
+        }
+      },
+      "Sudo": {
+        "sudo": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo",
+          "returnType": "void"
+        },
+        "sudo_unchecked_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_unchecked_weight",
+          "returnType": "void"
+        },
+        "set_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_key",
+          "returnType": "void"
+        },
+        "sudo_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_as",
+          "returnType": "void"
+        },
+        "remove_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_key",
+          "returnType": "void"
+        }
+      },
+      "CouncilMembership": {
+        "add_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_member",
+          "returnType": "void"
+        },
+        "remove_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_member",
+          "returnType": "void"
+        },
+        "swap_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap_member",
+          "returnType": "void"
+        },
+        "reset_members": {
+          "required": [],
+          "optional": [],
+          "description": "Call reset_members",
+          "returnType": "void"
+        },
+        "change_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call change_key",
+          "returnType": "void"
+        },
+        "set_prime": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_prime",
+          "returnType": "void"
+        },
+        "clear_prime": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_prime",
+          "returnType": "void"
+        }
+      },
+      "TechnicalCommitteeMembership": {
+        "add_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_member",
+          "returnType": "void"
+        },
+        "remove_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_member",
+          "returnType": "void"
+        },
+        "swap_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap_member",
+          "returnType": "void"
+        },
+        "reset_members": {
+          "required": [],
+          "optional": [],
+          "description": "Call reset_members",
+          "returnType": "void"
+        },
+        "change_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call change_key",
+          "returnType": "void"
+        },
+        "set_prime": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_prime",
+          "returnType": "void"
+        },
+        "clear_prime": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_prime",
+          "returnType": "void"
+        }
+      },
+      "CommunityCouncilMembership": {
+        "add_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_member",
+          "returnType": "void"
+        },
+        "remove_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_member",
+          "returnType": "void"
+        },
+        "swap_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap_member",
+          "returnType": "void"
+        },
+        "reset_members": {
+          "required": [],
+          "optional": [],
+          "description": "Call reset_members",
+          "returnType": "void"
+        },
+        "change_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call change_key",
+          "returnType": "void"
+        },
+        "set_prime": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_prime",
+          "returnType": "void"
+        },
+        "clear_prime": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_prime",
+          "returnType": "void"
+        }
+      },
+      "Council": {
+        "set_members": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_members",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "propose": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "disapprove_proposal": {
+          "required": [],
+          "optional": [],
+          "description": "Call disapprove_proposal",
+          "returnType": "void"
+        },
+        "close": {
+          "required": [],
+          "optional": [],
+          "description": "Call close",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "release_proposal_cost": {
+          "required": [],
+          "optional": [],
+          "description": "Call release_proposal_cost",
+          "returnType": "void"
+        }
+      },
+      "TechnicalCommittee": {
+        "set_members": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_members",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "propose": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "disapprove_proposal": {
+          "required": [],
+          "optional": [],
+          "description": "Call disapprove_proposal",
+          "returnType": "void"
+        },
+        "close": {
+          "required": [],
+          "optional": [],
+          "description": "Call close",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "release_proposal_cost": {
+          "required": [],
+          "optional": [],
+          "description": "Call release_proposal_cost",
+          "returnType": "void"
+        }
+      },
+      "CommunityCouncil": {
+        "set_members": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_members",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "propose": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "disapprove_proposal": {
+          "required": [],
+          "optional": [],
+          "description": "Call disapprove_proposal",
+          "returnType": "void"
+        },
+        "close": {
+          "required": [],
+          "optional": [],
+          "description": "Call close",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "release_proposal_cost": {
+          "required": [],
+          "optional": [],
+          "description": "Call release_proposal_cost",
+          "returnType": "void"
+        }
+      },
+      "Democracy": {
+        "propose": {
+          "required": [
+            "Hash",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call propose",
+          "returnType": "void"
+        },
+        "second": {
+          "required": [
+            "u32",
+            "u32"
+          ],
+          "optional": [],
+          "description": "Call second",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [
+            "u32",
+            "AccountVote"
+          ],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "emergency_cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call emergency_cancel",
+          "returnType": "void"
+        },
+        "external_propose": {
+          "required": [],
+          "optional": [],
+          "description": "Call external_propose",
+          "returnType": "void"
+        },
+        "external_propose_majority": {
+          "required": [],
+          "optional": [],
+          "description": "Call external_propose_majority",
+          "returnType": "void"
+        },
+        "external_propose_default": {
+          "required": [],
+          "optional": [],
+          "description": "Call external_propose_default",
+          "returnType": "void"
+        },
+        "fast_track": {
+          "required": [],
+          "optional": [],
+          "description": "Call fast_track",
+          "returnType": "void"
+        },
+        "veto_external": {
+          "required": [],
+          "optional": [],
+          "description": "Call veto_external",
+          "returnType": "void"
+        },
+        "cancel_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_referendum",
+          "returnType": "void"
+        },
+        "delegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate",
+          "returnType": "void"
+        },
+        "undelegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call undelegate",
+          "returnType": "void"
+        },
+        "clear_public_proposals": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_public_proposals",
+          "returnType": "void"
+        },
+        "unlock": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock",
+          "returnType": "void"
+        },
+        "remove_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_vote",
+          "returnType": "void"
+        },
+        "remove_other_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_other_vote",
+          "returnType": "void"
+        },
+        "blacklist": {
+          "required": [],
+          "optional": [],
+          "description": "Call blacklist",
+          "returnType": "void"
+        },
+        "cancel_proposal": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_proposal",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        }
+      },
+      "Treasury": {
+        "propose_spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose_spend",
+          "returnType": "void"
+        },
+        "reject_proposal": {
+          "required": [],
+          "optional": [],
+          "description": "Call reject_proposal",
+          "returnType": "void"
+        },
+        "approve_proposal": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_proposal",
+          "returnType": "void"
+        }
+      },
+      "CommunityTreasury": {
+        "propose_spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose_spend",
+          "returnType": "void"
+        },
+        "reject_proposal": {
+          "required": [],
+          "optional": [],
+          "description": "Call reject_proposal",
+          "returnType": "void"
+        },
+        "approve_proposal": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_proposal",
+          "returnType": "void"
+        }
+      },
+      "CollectiveProxy": {
+        "execute_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_call",
+          "returnType": "void"
+        }
+      },
+      "SafeMode": {
+        "enter": {
+          "required": [],
+          "optional": [],
+          "description": "Call enter",
+          "returnType": "void"
+        },
+        "force_enter": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_enter",
+          "returnType": "void"
+        },
+        "extend": {
+          "required": [],
+          "optional": [],
+          "description": "Call extend",
+          "returnType": "void"
+        },
+        "force_extend": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_extend",
+          "returnType": "void"
+        },
+        "force_exit": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_exit",
+          "returnType": "void"
+        },
+        "force_slash_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_slash_deposit",
+          "returnType": "void"
+        },
+        "release_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call release_deposit",
+          "returnType": "void"
+        },
+        "force_release_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_release_deposit",
+          "returnType": "void"
+        }
+      },
+      "TxPause": {
+        "pause": {
+          "required": [],
+          "optional": [],
+          "description": "Call pause",
+          "returnType": "void"
+        },
+        "unpause": {
+          "required": [],
+          "optional": [],
+          "description": "Call unpause",
+          "returnType": "void"
+        }
+      },
+      "MultiBlockMigrations": {
+        "force_set_cursor": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_cursor",
+          "returnType": "void"
+        },
+        "force_set_active_cursor": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_active_cursor",
+          "returnType": "void"
+        },
+        "force_onboard_mbms": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_onboard_mbms",
+          "returnType": "void"
+        },
+        "clear_historic": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_historic",
+          "returnType": "void"
+        }
+      }
+    }
+  },
+  "bifrost": {
+    "pallets": {
+      "System": {
+        "remark": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call remark",
+          "returnType": "void"
+        },
+        "set_heap_pages": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_heap_pages",
+          "returnType": "void"
+        },
+        "set_code": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call set_code",
+          "returnType": "void"
+        },
+        "set_code_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_without_checks",
+          "returnType": "void"
+        },
+        "set_storage": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_storage",
+          "returnType": "void"
+        },
+        "kill_storage": {
+          "required": [
+            "Vec<bytes>"
+          ],
+          "optional": [],
+          "description": "Call kill_storage",
+          "returnType": "void"
+        },
+        "kill_prefix": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_prefix",
+          "returnType": "void"
+        },
+        "remark_with_event": {
+          "required": [],
+          "optional": [],
+          "description": "Call remark_with_event",
+          "returnType": "void"
+        },
+        "authorize_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade",
+          "returnType": "void"
+        },
+        "authorize_upgrade_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade_without_checks",
+          "returnType": "void"
+        },
+        "apply_authorized_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_authorized_upgrade",
+          "returnType": "void"
+        }
+      },
+      "Timestamp": {
+        "set": {
+          "required": [],
+          "optional": [],
+          "description": "Call set",
+          "returnType": "void"
+        }
+      },
+      "Indices": {
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "free": {
+          "required": [],
+          "optional": [],
+          "description": "Call free",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "freeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "ParachainSystem": {
+        "set_validation_data": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_data",
+          "returnType": "void"
+        },
+        "sudo_send_upward_message": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_send_upward_message",
+          "returnType": "void"
+        }
+      },
+      "TxPause": {
+        "pause": {
+          "required": [],
+          "optional": [],
+          "description": "Call pause",
+          "returnType": "void"
+        },
+        "unpause": {
+          "required": [],
+          "optional": [],
+          "description": "Call unpause",
+          "returnType": "void"
+        }
+      },
+      "MultiBlockMigrations": {
+        "force_set_cursor": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_cursor",
+          "returnType": "void"
+        },
+        "force_set_active_cursor": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_active_cursor",
+          "returnType": "void"
+        },
+        "force_onboard_mbms": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_onboard_mbms",
+          "returnType": "void"
+        },
+        "clear_historic": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_historic",
+          "returnType": "void"
+        }
+      },
+      "Balances": {
+        "transfer_allow_death": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_allow_death",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [
+            "AccountId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "force_unreserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unreserve",
+          "returnType": "void"
+        },
+        "upgrade_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call upgrade_accounts",
+          "returnType": "void"
+        },
+        "force_set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_balance",
+          "returnType": "void"
+        },
+        "force_adjust_total_issuance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_adjust_total_issuance",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        }
+      },
+      "Session": {
+        "set_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_keys",
+          "returnType": "void"
+        },
+        "purge_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call purge_keys",
+          "returnType": "void"
+        }
+      },
+      "ParachainStaking": {
+        "set_staking_expectations": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_staking_expectations",
+          "returnType": "void"
+        },
+        "set_inflation": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_inflation",
+          "returnType": "void"
+        },
+        "set_parachain_bond_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_parachain_bond_account",
+          "returnType": "void"
+        },
+        "set_parachain_bond_reserve_percent": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_parachain_bond_reserve_percent",
+          "returnType": "void"
+        },
+        "set_total_selected": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_total_selected",
+          "returnType": "void"
+        },
+        "set_collator_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_collator_commission",
+          "returnType": "void"
+        },
+        "set_blocks_per_round": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_blocks_per_round",
+          "returnType": "void"
+        },
+        "join_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call join_candidates",
+          "returnType": "void"
+        },
+        "schedule_leave_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_leave_candidates",
+          "returnType": "void"
+        },
+        "execute_leave_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_leave_candidates",
+          "returnType": "void"
+        },
+        "cancel_leave_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_leave_candidates",
+          "returnType": "void"
+        },
+        "go_offline": {
+          "required": [],
+          "optional": [],
+          "description": "Call go_offline",
+          "returnType": "void"
+        },
+        "go_online": {
+          "required": [],
+          "optional": [],
+          "description": "Call go_online",
+          "returnType": "void"
+        },
+        "candidate_bond_more": {
+          "required": [],
+          "optional": [],
+          "description": "Call candidate_bond_more",
+          "returnType": "void"
+        },
+        "schedule_candidate_bond_less": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_candidate_bond_less",
+          "returnType": "void"
+        },
+        "execute_candidate_bond_less": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_candidate_bond_less",
+          "returnType": "void"
+        },
+        "cancel_candidate_bond_less": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_candidate_bond_less",
+          "returnType": "void"
+        },
+        "delegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate",
+          "returnType": "void"
+        },
+        "schedule_leave_delegators": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_leave_delegators",
+          "returnType": "void"
+        },
+        "execute_leave_delegators": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_leave_delegators",
+          "returnType": "void"
+        },
+        "cancel_leave_delegators": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_leave_delegators",
+          "returnType": "void"
+        },
+        "schedule_revoke_delegation": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_revoke_delegation",
+          "returnType": "void"
+        },
+        "delegator_bond_more": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegator_bond_more",
+          "returnType": "void"
+        },
+        "schedule_delegator_bond_less": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_delegator_bond_less",
+          "returnType": "void"
+        },
+        "execute_delegation_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_delegation_request",
+          "returnType": "void"
+        },
+        "cancel_delegation_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_delegation_request",
+          "returnType": "void"
+        },
+        "hotfix_remove_delegation_requests_exited_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call hotfix_remove_delegation_requests_exited_candidates",
+          "returnType": "void"
+        }
+      },
+      "ConvictionVoting": {
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "delegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate",
+          "returnType": "void"
+        },
+        "undelegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call undelegate",
+          "returnType": "void"
+        },
+        "unlock": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock",
+          "returnType": "void"
+        },
+        "remove_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_vote",
+          "returnType": "void"
+        },
+        "remove_other_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_other_vote",
+          "returnType": "void"
+        }
+      },
+      "Referenda": {
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "place_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_decision_deposit",
+          "returnType": "void"
+        },
+        "refund_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_decision_deposit",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "nudge_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call nudge_referendum",
+          "returnType": "void"
+        },
+        "one_fewer_deciding": {
+          "required": [],
+          "optional": [],
+          "description": "Call one_fewer_deciding",
+          "returnType": "void"
+        },
+        "refund_submission_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_submission_deposit",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        }
+      },
+      "Whitelist": {
+        "whitelist_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call whitelist_call",
+          "returnType": "void"
+        },
+        "remove_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call_with_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call_with_preimage",
+          "returnType": "void"
+        }
+      },
+      "XcmpQueue": {
+        "suspend_xcm_execution": {
+          "required": [],
+          "optional": [],
+          "description": "Call suspend_xcm_execution",
+          "returnType": "void"
+        },
+        "resume_xcm_execution": {
+          "required": [],
+          "optional": [],
+          "description": "Call resume_xcm_execution",
+          "returnType": "void"
+        },
+        "update_suspend_threshold": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_suspend_threshold",
+          "returnType": "void"
+        },
+        "update_drop_threshold": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_drop_threshold",
+          "returnType": "void"
+        },
+        "update_resume_threshold": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_resume_threshold",
+          "returnType": "void"
+        }
+      },
+      "PolkadotXcm": {
+        "send": {
+          "required": [],
+          "optional": [],
+          "description": "Call send",
+          "returnType": "void"
+        },
+        "teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call teleport_assets",
+          "returnType": "void"
+        },
+        "reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "force_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_xcm_version",
+          "returnType": "void"
+        },
+        "force_default_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_default_xcm_version",
+          "returnType": "void"
+        },
+        "force_subscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_subscribe_version_notify",
+          "returnType": "void"
+        },
+        "force_unsubscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unsubscribe_version_notify",
+          "returnType": "void"
+        },
+        "limited_reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "limited_teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_teleport_assets",
+          "returnType": "void"
+        },
+        "force_suspension": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_suspension",
+          "returnType": "void"
+        },
+        "transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets",
+          "returnType": "void"
+        },
+        "claim_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_assets",
+          "returnType": "void"
+        },
+        "transfer_assets_using_type_and_then": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets_using_type_and_then",
+          "returnType": "void"
+        },
+        "add_authorized_alias": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_authorized_alias",
+          "returnType": "void"
+        },
+        "remove_authorized_alias": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_authorized_alias",
+          "returnType": "void"
+        },
+        "remove_all_authorized_aliases": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_all_authorized_aliases",
+          "returnType": "void"
+        }
+      },
+      "MessageQueue": {
+        "reap_page": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_page",
+          "returnType": "void"
+        },
+        "execute_overweight": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_overweight",
+          "returnType": "void"
+        }
+      },
+      "Utility": {
+        "batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch",
+          "returnType": "void"
+        },
+        "as_derivative": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_derivative",
+          "returnType": "void"
+        },
+        "batch_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch_all",
+          "returnType": "void"
+        },
+        "dispatch_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as",
+          "returnType": "void"
+        },
+        "force_batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_batch",
+          "returnType": "void"
+        },
+        "with_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call with_weight",
+          "returnType": "void"
+        },
+        "if_else": {
+          "required": [],
+          "optional": [],
+          "description": "Call if_else",
+          "returnType": "void"
+        },
+        "dispatch_as_fallible": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as_fallible",
+          "returnType": "void"
+        }
+      },
+      "Scheduler": {
+        "schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "schedule_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named",
+          "returnType": "void"
+        },
+        "cancel_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_named",
+          "returnType": "void"
+        },
+        "schedule_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_after",
+          "returnType": "void"
+        },
+        "schedule_named_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named_after",
+          "returnType": "void"
+        },
+        "set_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry",
+          "returnType": "void"
+        },
+        "set_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry_named",
+          "returnType": "void"
+        },
+        "cancel_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry",
+          "returnType": "void"
+        },
+        "cancel_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry_named",
+          "returnType": "void"
+        }
+      },
+      "Proxy": {
+        "proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy",
+          "returnType": "void"
+        },
+        "add_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_proxy",
+          "returnType": "void"
+        },
+        "remove_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxy",
+          "returnType": "void"
+        },
+        "remove_proxies": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxies",
+          "returnType": "void"
+        },
+        "create_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pure",
+          "returnType": "void"
+        },
+        "kill_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_pure",
+          "returnType": "void"
+        },
+        "announce": {
+          "required": [],
+          "optional": [],
+          "description": "Call announce",
+          "returnType": "void"
+        },
+        "remove_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_announcement",
+          "returnType": "void"
+        },
+        "reject_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call reject_announcement",
+          "returnType": "void"
+        },
+        "proxy_announced": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy_announced",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Multisig": {
+        "as_multi_threshold_1": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi_threshold_1",
+          "returnType": "void"
+        },
+        "as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi",
+          "returnType": "void"
+        },
+        "approve_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_as_multi",
+          "returnType": "void"
+        },
+        "cancel_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_as_multi",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Identity": {
+        "add_registrar": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_registrar",
+          "returnType": "void"
+        },
+        "set_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_identity",
+          "returnType": "void"
+        },
+        "set_subs": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_subs",
+          "returnType": "void"
+        },
+        "clear_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_identity",
+          "returnType": "void"
+        },
+        "request_judgement": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_judgement",
+          "returnType": "void"
+        },
+        "cancel_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_request",
+          "returnType": "void"
+        },
+        "set_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fee",
+          "returnType": "void"
+        },
+        "set_account_id": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_account_id",
+          "returnType": "void"
+        },
+        "set_fields": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fields",
+          "returnType": "void"
+        },
+        "provide_judgement": {
+          "required": [],
+          "optional": [],
+          "description": "Call provide_judgement",
+          "returnType": "void"
+        },
+        "kill_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_identity",
+          "returnType": "void"
+        },
+        "add_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_sub",
+          "returnType": "void"
+        },
+        "rename_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call rename_sub",
+          "returnType": "void"
+        },
+        "remove_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_sub",
+          "returnType": "void"
+        },
+        "quit_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call quit_sub",
+          "returnType": "void"
+        },
+        "add_username_authority": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_username_authority",
+          "returnType": "void"
+        },
+        "remove_username_authority": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_username_authority",
+          "returnType": "void"
+        },
+        "set_username_for": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_username_for",
+          "returnType": "void"
+        },
+        "accept_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call accept_username",
+          "returnType": "void"
+        },
+        "remove_expired_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_expired_approval",
+          "returnType": "void"
+        },
+        "set_primary_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_primary_username",
+          "returnType": "void"
+        },
+        "unbind_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call unbind_username",
+          "returnType": "void"
+        },
+        "remove_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_username",
+          "returnType": "void"
+        },
+        "kill_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_username",
+          "returnType": "void"
+        }
+      },
+      "Vesting": {
+        "vest": {
+          "required": [],
+          "optional": [],
+          "description": "Call vest",
+          "returnType": "void"
+        },
+        "vest_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call vest_other",
+          "returnType": "void"
+        },
+        "vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call vested_transfer",
+          "returnType": "void"
+        },
+        "force_vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_vested_transfer",
+          "returnType": "void"
+        },
+        "init_vesting_start_at": {
+          "required": [],
+          "optional": [],
+          "description": "Call init_vesting_start_at",
+          "returnType": "void"
+        },
+        "set_vesting_per_block": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_vesting_per_block",
+          "returnType": "void"
+        },
+        "force_set_cliff": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_cliff",
+          "returnType": "void"
+        },
+        "merge_schedules": {
+          "required": [],
+          "optional": [],
+          "description": "Call merge_schedules",
+          "returnType": "void"
+        }
+      },
+      "Treasury": {
+        "spend_local": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend_local",
+          "returnType": "void"
+        },
+        "remove_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_approval",
+          "returnType": "void"
+        },
+        "spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend",
+          "returnType": "void"
+        },
+        "payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout",
+          "returnType": "void"
+        },
+        "check_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call check_status",
+          "returnType": "void"
+        },
+        "void_spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call void_spend",
+          "returnType": "void"
+        }
+      },
+      "Preimage": {
+        "note_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_preimage",
+          "returnType": "void"
+        },
+        "unnote_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unnote_preimage",
+          "returnType": "void"
+        },
+        "request_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_preimage",
+          "returnType": "void"
+        },
+        "unrequest_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unrequest_preimage",
+          "returnType": "void"
+        },
+        "ensure_updated": {
+          "required": [],
+          "optional": [],
+          "description": "Call ensure_updated",
+          "returnType": "void"
+        }
+      },
+      "Ethereum": {
+        "transact": {
+          "required": [],
+          "optional": [],
+          "description": "Call transact",
+          "returnType": "void"
+        }
+      },
+      "EVM": {
+        "withdraw": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw",
+          "returnType": "void"
+        },
+        "call": {
+          "required": [],
+          "optional": [],
+          "description": "Call call",
+          "returnType": "void"
+        },
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "create2": {
+          "required": [],
+          "optional": [],
+          "description": "Call create2",
+          "returnType": "void"
+        }
+      },
+      "DynamicFee": {
+        "note_min_gas_price_target": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_min_gas_price_target",
+          "returnType": "void"
+        }
+      },
+      "EVMAccounts": {
+        "bind_evm_address": {
+          "required": [],
+          "optional": [],
+          "description": "Call bind_evm_address",
+          "returnType": "void"
+        },
+        "add_contract_deployer": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_contract_deployer",
+          "returnType": "void"
+        },
+        "remove_contract_deployer": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_contract_deployer",
+          "returnType": "void"
+        },
+        "renounce_contract_deployer": {
+          "required": [],
+          "optional": [],
+          "description": "Call renounce_contract_deployer",
+          "returnType": "void"
+        }
+      },
+      "XTokens": {
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "transfer_multiasset": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_multiasset",
+          "returnType": "void"
+        },
+        "transfer_with_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_with_fee",
+          "returnType": "void"
+        },
+        "transfer_multiasset_with_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_multiasset_with_fee",
+          "returnType": "void"
+        },
+        "transfer_multicurrencies": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_multicurrencies",
+          "returnType": "void"
+        },
+        "transfer_multiassets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_multiassets",
+          "returnType": "void"
+        }
+      },
+      "Tokens": {
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_balance",
+          "returnType": "void"
+        }
+      },
+      "OrmlXcm": {
+        "send_as_sovereign": {
+          "required": [],
+          "optional": [],
+          "description": "Call send_as_sovereign",
+          "returnType": "void"
+        }
+      },
+      "ZenlinkProtocol": {
+        "set_fee_receiver": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fee_receiver",
+          "returnType": "void"
+        },
+        "set_fee_point": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fee_point",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "create_pair": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pair",
+          "returnType": "void"
+        },
+        "add_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity",
+          "returnType": "void"
+        },
+        "remove_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_liquidity",
+          "returnType": "void"
+        },
+        "swap_exact_assets_for_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap_exact_assets_for_assets",
+          "returnType": "void"
+        },
+        "swap_assets_for_exact_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap_assets_for_exact_assets",
+          "returnType": "void"
+        },
+        "bootstrap_create": {
+          "required": [],
+          "optional": [],
+          "description": "Call bootstrap_create",
+          "returnType": "void"
+        },
+        "bootstrap_contribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call bootstrap_contribute",
+          "returnType": "void"
+        },
+        "bootstrap_claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call bootstrap_claim",
+          "returnType": "void"
+        },
+        "bootstrap_end": {
+          "required": [],
+          "optional": [],
+          "description": "Call bootstrap_end",
+          "returnType": "void"
+        },
+        "bootstrap_update": {
+          "required": [],
+          "optional": [],
+          "description": "Call bootstrap_update",
+          "returnType": "void"
+        },
+        "bootstrap_refund": {
+          "required": [],
+          "optional": [],
+          "description": "Call bootstrap_refund",
+          "returnType": "void"
+        },
+        "bootstrap_charge_reward": {
+          "required": [],
+          "optional": [],
+          "description": "Call bootstrap_charge_reward",
+          "returnType": "void"
+        },
+        "bootstrap_withdraw_reward": {
+          "required": [],
+          "optional": [],
+          "description": "Call bootstrap_withdraw_reward",
+          "returnType": "void"
+        },
+        "set_new_fee_receiver": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_new_fee_receiver",
+          "returnType": "void"
+        }
+      },
+      "Ismp": {
+        "handle_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call handle_unsigned",
+          "returnType": "void"
+        },
+        "create_consensus_client": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_consensus_client",
+          "returnType": "void"
+        },
+        "update_consensus_state": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_consensus_state",
+          "returnType": "void"
+        },
+        "fund_message": {
+          "required": [],
+          "optional": [],
+          "description": "Call fund_message",
+          "returnType": "void"
+        }
+      },
+      "IsmpParachain": {
+        "update_parachain_consensus": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_parachain_consensus",
+          "returnType": "void"
+        },
+        "add_parachain": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_parachain",
+          "returnType": "void"
+        },
+        "remove_parachain": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_parachain",
+          "returnType": "void"
+        }
+      },
+      "TokenGateway": {
+        "teleport": {
+          "required": [],
+          "optional": [],
+          "description": "Call teleport",
+          "returnType": "void"
+        },
+        "set_token_gateway_addresses": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_token_gateway_addresses",
+          "returnType": "void"
+        },
+        "create_erc6160_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_erc6160_asset",
+          "returnType": "void"
+        },
+        "update_erc6160_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_erc6160_asset",
+          "returnType": "void"
+        },
+        "set_whitelist_addresses": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_whitelist_addresses",
+          "returnType": "void"
+        }
+      },
+      "FlexibleFee": {
+        "set_user_default_fee_currency": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_user_default_fee_currency",
+          "returnType": "void"
+        },
+        "set_default_fee_currency_list": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_default_fee_currency_list",
+          "returnType": "void"
+        },
+        "set_extra_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_extra_fee",
+          "returnType": "void"
+        },
+        "dispatch_permit": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_permit",
+          "returnType": "void"
+        }
+      },
+      "Salp": {
+        "fund_retire": {
+          "required": [],
+          "optional": [],
+          "description": "Call fund_retire",
+          "returnType": "void"
+        },
+        "fund_end": {
+          "required": [],
+          "optional": [],
+          "description": "Call fund_end",
+          "returnType": "void"
+        },
+        "edit": {
+          "required": [],
+          "optional": [],
+          "description": "Call edit",
+          "returnType": "void"
+        },
+        "withdraw": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw",
+          "returnType": "void"
+        },
+        "refund": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund",
+          "returnType": "void"
+        },
+        "redeem": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeem",
+          "returnType": "void"
+        },
+        "dissolve_refunded": {
+          "required": [],
+          "optional": [],
+          "description": "Call dissolve_refunded",
+          "returnType": "void"
+        },
+        "dissolve": {
+          "required": [],
+          "optional": [],
+          "description": "Call dissolve",
+          "returnType": "void"
+        },
+        "buyback_vstoken_by_stable_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call buyback_vstoken_by_stable_pool",
+          "returnType": "void"
+        }
+      },
+      "AssetRegistry": {
+        "register_token_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_token_metadata",
+          "returnType": "void"
+        },
+        "register_vtoken_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_vtoken_metadata",
+          "returnType": "void"
+        },
+        "register_location": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_location",
+          "returnType": "void"
+        },
+        "force_set_location": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_location",
+          "returnType": "void"
+        },
+        "update_currency_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_currency_metadata",
+          "returnType": "void"
+        }
+      },
+      "VtokenMinting": {
+        "mint": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint",
+          "returnType": "void"
+        },
+        "redeem": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeem",
+          "returnType": "void"
+        },
+        "rebond": {
+          "required": [],
+          "optional": [],
+          "description": "Call rebond",
+          "returnType": "void"
+        },
+        "rebond_by_unlock_id": {
+          "required": [],
+          "optional": [],
+          "description": "Call rebond_by_unlock_id",
+          "returnType": "void"
+        },
+        "set_unlock_duration": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_unlock_duration",
+          "returnType": "void"
+        },
+        "set_minimum_mint": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_mint",
+          "returnType": "void"
+        },
+        "set_minimum_redeem": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_redeem",
+          "returnType": "void"
+        },
+        "add_support_rebond_token": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_support_rebond_token",
+          "returnType": "void"
+        },
+        "remove_support_rebond_token": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_support_rebond_token",
+          "returnType": "void"
+        },
+        "set_fees": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fees",
+          "returnType": "void"
+        },
+        "set_hook_iteration_limit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hook_iteration_limit",
+          "returnType": "void"
+        },
+        "set_unlocking_total": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_unlocking_total",
+          "returnType": "void"
+        },
+        "set_min_time_unit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_min_time_unit",
+          "returnType": "void"
+        },
+        "set_ongoing_time_unit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_ongoing_time_unit",
+          "returnType": "void"
+        },
+        "mint_with_lock": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint_with_lock",
+          "returnType": "void"
+        },
+        "unlock_incentive_minted_vtoken": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock_incentive_minted_vtoken",
+          "returnType": "void"
+        },
+        "set_incentive_coef": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_incentive_coef",
+          "returnType": "void"
+        },
+        "set_vtoken_incentive_lock_blocks": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_vtoken_incentive_lock_blocks",
+          "returnType": "void"
+        },
+        "set_supported_eth": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_supported_eth",
+          "returnType": "void"
+        },
+        "set_v_currency_issuance": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_v_currency_issuance",
+          "returnType": "void"
+        }
+      },
+      "Slp": {
+        "initialize_delegator": {
+          "required": [],
+          "optional": [],
+          "description": "Call initialize_delegator",
+          "returnType": "void"
+        },
+        "bond": {
+          "required": [],
+          "optional": [],
+          "description": "Call bond",
+          "returnType": "void"
+        },
+        "bond_extra": {
+          "required": [],
+          "optional": [],
+          "description": "Call bond_extra",
+          "returnType": "void"
+        },
+        "unbond": {
+          "required": [],
+          "optional": [],
+          "description": "Call unbond",
+          "returnType": "void"
+        },
+        "unbond_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call unbond_all",
+          "returnType": "void"
+        },
+        "rebond": {
+          "required": [],
+          "optional": [],
+          "description": "Call rebond",
+          "returnType": "void"
+        },
+        "delegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate",
+          "returnType": "void"
+        },
+        "undelegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call undelegate",
+          "returnType": "void"
+        },
+        "redelegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call redelegate",
+          "returnType": "void"
+        },
+        "payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout",
+          "returnType": "void"
+        },
+        "liquidize": {
+          "required": [],
+          "optional": [],
+          "description": "Call liquidize",
+          "returnType": "void"
+        },
+        "chill": {
+          "required": [],
+          "optional": [],
+          "description": "Call chill",
+          "returnType": "void"
+        },
+        "transfer_back": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_back",
+          "returnType": "void"
+        },
+        "transfer_to": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_to",
+          "returnType": "void"
+        },
+        "convert_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call convert_asset",
+          "returnType": "void"
+        },
+        "increase_token_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call increase_token_pool",
+          "returnType": "void"
+        },
+        "decrease_token_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call decrease_token_pool",
+          "returnType": "void"
+        },
+        "update_ongoing_time_unit": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_ongoing_time_unit",
+          "returnType": "void"
+        },
+        "refund_currency_due_unbond": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_currency_due_unbond",
+          "returnType": "void"
+        },
+        "supplement_fee_reserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call supplement_fee_reserve",
+          "returnType": "void"
+        },
+        "charge_host_fee_and_tune_vtoken_exchange_rate": {
+          "required": [],
+          "optional": [],
+          "description": "Call charge_host_fee_and_tune_vtoken_exchange_rate",
+          "returnType": "void"
+        },
+        "set_operate_origin": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_operate_origin",
+          "returnType": "void"
+        },
+        "set_fee_source": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fee_source",
+          "returnType": "void"
+        },
+        "add_delegator": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_delegator",
+          "returnType": "void"
+        },
+        "remove_delegator": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_delegator",
+          "returnType": "void"
+        },
+        "add_validator": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_validator",
+          "returnType": "void"
+        },
+        "remove_validator": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_validator",
+          "returnType": "void"
+        },
+        "set_validators_by_delegator": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validators_by_delegator",
+          "returnType": "void"
+        },
+        "set_delegator_ledger": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_delegator_ledger",
+          "returnType": "void"
+        },
+        "set_minimums_and_maximums": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimums_and_maximums",
+          "returnType": "void"
+        },
+        "set_currency_delays": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_currency_delays",
+          "returnType": "void"
+        },
+        "set_hosting_fees": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hosting_fees",
+          "returnType": "void"
+        },
+        "set_currency_tune_exchange_rate_limit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_currency_tune_exchange_rate_limit",
+          "returnType": "void"
+        },
+        "set_ongoing_time_unit_update_interval": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_ongoing_time_unit_update_interval",
+          "returnType": "void"
+        },
+        "add_supplement_fee_account_to_whitelist": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_supplement_fee_account_to_whitelist",
+          "returnType": "void"
+        },
+        "remove_supplement_fee_account_from_whitelist": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_supplement_fee_account_from_whitelist",
+          "returnType": "void"
+        },
+        "confirm_delegator_ledger_query_response": {
+          "required": [],
+          "optional": [],
+          "description": "Call confirm_delegator_ledger_query_response",
+          "returnType": "void"
+        },
+        "fail_delegator_ledger_query_response": {
+          "required": [],
+          "optional": [],
+          "description": "Call fail_delegator_ledger_query_response",
+          "returnType": "void"
+        },
+        "confirm_validators_by_delegator_query_response": {
+          "required": [],
+          "optional": [],
+          "description": "Call confirm_validators_by_delegator_query_response",
+          "returnType": "void"
+        },
+        "fail_validators_by_delegator_query_response": {
+          "required": [],
+          "optional": [],
+          "description": "Call fail_validators_by_delegator_query_response",
+          "returnType": "void"
+        },
+        "confirm_delegator_ledger": {
+          "required": [],
+          "optional": [],
+          "description": "Call confirm_delegator_ledger",
+          "returnType": "void"
+        },
+        "confirm_validators_by_delegator": {
+          "required": [],
+          "optional": [],
+          "description": "Call confirm_validators_by_delegator",
+          "returnType": "void"
+        },
+        "reset_validators": {
+          "required": [],
+          "optional": [],
+          "description": "Call reset_validators",
+          "returnType": "void"
+        },
+        "set_validator_boost_list": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validator_boost_list",
+          "returnType": "void"
+        },
+        "add_to_validator_boost_list": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_to_validator_boost_list",
+          "returnType": "void"
+        },
+        "remove_from_validator_boot_list": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_from_validator_boot_list",
+          "returnType": "void"
+        },
+        "convert_treasury_vtoken": {
+          "required": [],
+          "optional": [],
+          "description": "Call convert_treasury_vtoken",
+          "returnType": "void"
+        },
+        "clean_outdated_validator_boost_list": {
+          "required": [],
+          "optional": [],
+          "description": "Call clean_outdated_validator_boost_list",
+          "returnType": "void"
+        }
+      },
+      "XcmInterface": {
+        "update_xcm_dest_weight_and_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_xcm_dest_weight_and_fee",
+          "returnType": "void"
+        },
+        "transfer_ethereum_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_ethereum_assets",
+          "returnType": "void"
+        }
+      },
+      "TokenConversion": {
+        "vsbond_convert_to_vstoken": {
+          "required": [],
+          "optional": [],
+          "description": "Call vsbond_convert_to_vstoken",
+          "returnType": "void"
+        },
+        "vstoken_convert_to_vsbond": {
+          "required": [],
+          "optional": [],
+          "description": "Call vstoken_convert_to_vsbond",
+          "returnType": "void"
+        },
+        "set_exchange_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_exchange_fee",
+          "returnType": "void"
+        },
+        "set_exchange_rate": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_exchange_rate",
+          "returnType": "void"
+        },
+        "set_relaychain_lease": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_relaychain_lease",
+          "returnType": "void"
+        }
+      },
+      "Farming": {
+        "create_farming_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_farming_pool",
+          "returnType": "void"
+        },
+        "charge": {
+          "required": [],
+          "optional": [],
+          "description": "Call charge",
+          "returnType": "void"
+        },
+        "deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call deposit",
+          "returnType": "void"
+        },
+        "withdraw": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw",
+          "returnType": "void"
+        },
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        },
+        "withdraw_claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_claim",
+          "returnType": "void"
+        },
+        "force_retire_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_retire_pool",
+          "returnType": "void"
+        },
+        "set_retire_limit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retire_limit",
+          "returnType": "void"
+        },
+        "close_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call close_pool",
+          "returnType": "void"
+        },
+        "reset_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call reset_pool",
+          "returnType": "void"
+        },
+        "kill_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_pool",
+          "returnType": "void"
+        },
+        "edit_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call edit_pool",
+          "returnType": "void"
+        },
+        "force_gauge_claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_gauge_claim",
+          "returnType": "void"
+        },
+        "add_boost_pool_whitelist": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_boost_pool_whitelist",
+          "returnType": "void"
+        },
+        "set_next_round_whitelist": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_next_round_whitelist",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "start_boost_round": {
+          "required": [],
+          "optional": [],
+          "description": "Call start_boost_round",
+          "returnType": "void"
+        },
+        "end_boost_round": {
+          "required": [],
+          "optional": [],
+          "description": "Call end_boost_round",
+          "returnType": "void"
+        },
+        "charge_boost": {
+          "required": [],
+          "optional": [],
+          "description": "Call charge_boost",
+          "returnType": "void"
+        },
+        "refresh": {
+          "required": [],
+          "optional": [],
+          "description": "Call refresh",
+          "returnType": "void"
+        }
+      },
+      "SystemStaking": {
+        "token_config": {
+          "required": [],
+          "optional": [],
+          "description": "Call token_config",
+          "returnType": "void"
+        },
+        "delete_token": {
+          "required": [],
+          "optional": [],
+          "description": "Call delete_token",
+          "returnType": "void"
+        },
+        "refresh_token_info": {
+          "required": [],
+          "optional": [],
+          "description": "Call refresh_token_info",
+          "returnType": "void"
+        },
+        "payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout",
+          "returnType": "void"
+        }
+      },
+      "FeeShare": {
+        "create_distribution": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_distribution",
+          "returnType": "void"
+        },
+        "edit_distribution": {
+          "required": [],
+          "optional": [],
+          "description": "Call edit_distribution",
+          "returnType": "void"
+        },
+        "set_era_length": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_era_length",
+          "returnType": "void"
+        },
+        "execute_distribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_distribute",
+          "returnType": "void"
+        },
+        "delete_distribution": {
+          "required": [],
+          "optional": [],
+          "description": "Call delete_distribution",
+          "returnType": "void"
+        },
+        "set_usd_config": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_usd_config",
+          "returnType": "void"
+        }
+      },
+      "CrossInOut": {
+        "cross_out": {
+          "required": [],
+          "optional": [],
+          "description": "Call cross_out",
+          "returnType": "void"
+        },
+        "register_linked_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_linked_account",
+          "returnType": "void"
+        },
+        "change_outer_linked_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call change_outer_linked_account",
+          "returnType": "void"
+        },
+        "deregister_currency_for_cross_in_out": {
+          "required": [],
+          "optional": [],
+          "description": "Call deregister_currency_for_cross_in_out",
+          "returnType": "void"
+        },
+        "add_to_register_whitelist": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_to_register_whitelist",
+          "returnType": "void"
+        },
+        "remove_from_register_whitelist": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_from_register_whitelist",
+          "returnType": "void"
+        },
+        "set_crossing_minimum_amount": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_crossing_minimum_amount",
+          "returnType": "void"
+        }
+      },
+      "BbBNC": {
+        "set_config": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_config",
+          "returnType": "void"
+        },
+        "create_lock": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_lock",
+          "returnType": "void"
+        },
+        "increase_amount": {
+          "required": [],
+          "optional": [],
+          "description": "Call increase_amount",
+          "returnType": "void"
+        },
+        "increase_unlock_time": {
+          "required": [],
+          "optional": [],
+          "description": "Call increase_unlock_time",
+          "returnType": "void"
+        },
+        "withdraw": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw",
+          "returnType": "void"
+        },
+        "notify_rewards": {
+          "required": [],
+          "optional": [],
+          "description": "Call notify_rewards",
+          "returnType": "void"
+        },
+        "get_rewards": {
+          "required": [],
+          "optional": [],
+          "description": "Call get_rewards",
+          "returnType": "void"
+        },
+        "redeem_unlock": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeem_unlock",
+          "returnType": "void"
+        },
+        "set_markup_coefficient": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_markup_coefficient",
+          "returnType": "void"
+        },
+        "deposit_markup": {
+          "required": [],
+          "optional": [],
+          "description": "Call deposit_markup",
+          "returnType": "void"
+        },
+        "withdraw_markup": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_markup",
+          "returnType": "void"
+        },
+        "refresh": {
+          "required": [],
+          "optional": [],
+          "description": "Call refresh",
+          "returnType": "void"
+        }
+      },
+      "Slpx": {
+        "mint": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint",
+          "returnType": "void"
+        },
+        "redeem": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeem",
+          "returnType": "void"
+        },
+        "add_whitelist": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_whitelist",
+          "returnType": "void"
+        },
+        "remove_whitelist": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_whitelist",
+          "returnType": "void"
+        },
+        "set_execution_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_execution_fee",
+          "returnType": "void"
+        },
+        "set_transfer_to_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_transfer_to_fee",
+          "returnType": "void"
+        },
+        "support_xcm_oracle": {
+          "required": [],
+          "optional": [],
+          "description": "Call support_xcm_oracle",
+          "returnType": "void"
+        },
+        "set_xcm_oracle_configuration": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_xcm_oracle_configuration",
+          "returnType": "void"
+        },
+        "set_currency_support_xcm_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_currency_support_xcm_fee",
+          "returnType": "void"
+        },
+        "set_delay_block": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_delay_block",
+          "returnType": "void"
+        },
+        "force_add_order": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_add_order",
+          "returnType": "void"
+        },
+        "mint_with_channel_id": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint_with_channel_id",
+          "returnType": "void"
+        },
+        "evm_create_order": {
+          "required": [],
+          "optional": [],
+          "description": "Call evm_create_order",
+          "returnType": "void"
+        },
+        "set_hyperbridge_oracle": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hyperbridge_oracle",
+          "returnType": "void"
+        },
+        "set_hydration_oracle": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hydration_oracle",
+          "returnType": "void"
+        },
+        "async_mint": {
+          "required": [],
+          "optional": [],
+          "description": "Call async_mint",
+          "returnType": "void"
+        },
+        "update_async_mint_config": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_async_mint_config",
+          "returnType": "void"
+        },
+        "force_increase_hyperbridge_reserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_increase_hyperbridge_reserve",
+          "returnType": "void"
+        },
+        "set_hyperbridge_fee_exempt_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hyperbridge_fee_exempt_accounts",
+          "returnType": "void"
+        }
+      },
+      "FellowshipCollective": {
+        "add_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_member",
+          "returnType": "void"
+        },
+        "promote_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call promote_member",
+          "returnType": "void"
+        },
+        "demote_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call demote_member",
+          "returnType": "void"
+        },
+        "remove_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_member",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "cleanup_poll": {
+          "required": [],
+          "optional": [],
+          "description": "Call cleanup_poll",
+          "returnType": "void"
+        },
+        "exchange_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call exchange_member",
+          "returnType": "void"
+        }
+      },
+      "FellowshipReferenda": {
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "place_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_decision_deposit",
+          "returnType": "void"
+        },
+        "refund_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_decision_deposit",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "nudge_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call nudge_referendum",
+          "returnType": "void"
+        },
+        "one_fewer_deciding": {
+          "required": [],
+          "optional": [],
+          "description": "Call one_fewer_deciding",
+          "returnType": "void"
+        },
+        "refund_submission_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_submission_deposit",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        }
+      },
+      "StablePool": {
+        "create_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pool",
+          "returnType": "void"
+        },
+        "add_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity",
+          "returnType": "void"
+        },
+        "swap": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap",
+          "returnType": "void"
+        },
+        "redeem_proportion": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeem_proportion",
+          "returnType": "void"
+        },
+        "redeem_single": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeem_single",
+          "returnType": "void"
+        },
+        "redeem_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeem_multi",
+          "returnType": "void"
+        },
+        "modify_a": {
+          "required": [],
+          "optional": [],
+          "description": "Call modify_a",
+          "returnType": "void"
+        },
+        "modify_fees": {
+          "required": [],
+          "optional": [],
+          "description": "Call modify_fees",
+          "returnType": "void"
+        },
+        "modify_recipients": {
+          "required": [],
+          "optional": [],
+          "description": "Call modify_recipients",
+          "returnType": "void"
+        },
+        "edit_token_rate": {
+          "required": [],
+          "optional": [],
+          "description": "Call edit_token_rate",
+          "returnType": "void"
+        },
+        "config_vtoken_auto_refresh": {
+          "required": [],
+          "optional": [],
+          "description": "Call config_vtoken_auto_refresh",
+          "returnType": "void"
+        },
+        "remove_vtoken_auto_refresh": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_vtoken_auto_refresh",
+          "returnType": "void"
+        }
+      },
+      "VtokenVoting": {
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "unlock": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock",
+          "returnType": "void"
+        },
+        "remove_delegator_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_delegator_vote",
+          "returnType": "void"
+        },
+        "kill_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_referendum",
+          "returnType": "void"
+        },
+        "add_delegator": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_delegator",
+          "returnType": "void"
+        },
+        "set_referendum_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_referendum_status",
+          "returnType": "void"
+        },
+        "set_vote_locking_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_vote_locking_period",
+          "returnType": "void"
+        },
+        "set_undeciding_timeout": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_undeciding_timeout",
+          "returnType": "void"
+        },
+        "notify_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call notify_vote",
+          "returnType": "void"
+        },
+        "notify_remove_delegator_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call notify_remove_delegator_vote",
+          "returnType": "void"
+        },
+        "set_vote_cap_ratio": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_vote_cap_ratio",
+          "returnType": "void"
+        },
+        "update_referendum_vote_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_referendum_vote_status",
+          "returnType": "void"
+        },
+        "delegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate",
+          "returnType": "void"
+        },
+        "undelegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call undelegate",
+          "returnType": "void"
+        },
+        "delegate_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate_vote",
+          "returnType": "void"
+        }
+      },
+      "LendMarket": {
+        "add_market": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_market",
+          "returnType": "void"
+        },
+        "activate_market": {
+          "required": [],
+          "optional": [],
+          "description": "Call activate_market",
+          "returnType": "void"
+        },
+        "update_rate_model": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_rate_model",
+          "returnType": "void"
+        },
+        "update_market": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_market",
+          "returnType": "void"
+        },
+        "force_update_market": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_update_market",
+          "returnType": "void"
+        },
+        "add_reward": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_reward",
+          "returnType": "void"
+        },
+        "withdraw_missing_reward": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_missing_reward",
+          "returnType": "void"
+        },
+        "update_market_reward_speed": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_market_reward_speed",
+          "returnType": "void"
+        },
+        "claim_reward": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_reward",
+          "returnType": "void"
+        },
+        "claim_reward_for_market": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_reward_for_market",
+          "returnType": "void"
+        },
+        "mint": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint",
+          "returnType": "void"
+        },
+        "redeem": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeem",
+          "returnType": "void"
+        },
+        "redeem_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeem_all",
+          "returnType": "void"
+        },
+        "borrow": {
+          "required": [],
+          "optional": [],
+          "description": "Call borrow",
+          "returnType": "void"
+        },
+        "repay_borrow": {
+          "required": [],
+          "optional": [],
+          "description": "Call repay_borrow",
+          "returnType": "void"
+        },
+        "repay_borrow_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call repay_borrow_all",
+          "returnType": "void"
+        },
+        "collateral_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call collateral_asset",
+          "returnType": "void"
+        },
+        "liquidate_borrow": {
+          "required": [],
+          "optional": [],
+          "description": "Call liquidate_borrow",
+          "returnType": "void"
+        },
+        "add_reserves": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_reserves",
+          "returnType": "void"
+        },
+        "reduce_reserves": {
+          "required": [],
+          "optional": [],
+          "description": "Call reduce_reserves",
+          "returnType": "void"
+        },
+        "reduce_incentive_reserves": {
+          "required": [],
+          "optional": [],
+          "description": "Call reduce_incentive_reserves",
+          "returnType": "void"
+        },
+        "update_liquidation_free_collateral": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_liquidation_free_collateral",
+          "returnType": "void"
+        },
+        "add_market_bond": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_market_bond",
+          "returnType": "void"
+        }
+      },
+      "Prices": {
+        "set_price": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_price",
+          "returnType": "void"
+        },
+        "reset_price": {
+          "required": [],
+          "optional": [],
+          "description": "Call reset_price",
+          "returnType": "void"
+        },
+        "set_foreign_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_foreign_asset",
+          "returnType": "void"
+        }
+      },
+      "Oracle": {
+        "feed_values": {
+          "required": [],
+          "optional": [],
+          "description": "Call feed_values",
+          "returnType": "void"
+        }
+      },
+      "OracleMembership": {
+        "add_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_member",
+          "returnType": "void"
+        },
+        "remove_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_member",
+          "returnType": "void"
+        },
+        "swap_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap_member",
+          "returnType": "void"
+        },
+        "reset_members": {
+          "required": [],
+          "optional": [],
+          "description": "Call reset_members",
+          "returnType": "void"
+        },
+        "change_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call change_key",
+          "returnType": "void"
+        },
+        "set_prime": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_prime",
+          "returnType": "void"
+        },
+        "clear_prime": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_prime",
+          "returnType": "void"
+        }
+      },
+      "LeverageStaking": {
+        "flash_loan_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call flash_loan_deposit",
+          "returnType": "void"
+        }
+      },
+      "ChannelCommission": {
+        "register_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_channel",
+          "returnType": "void"
+        },
+        "remove_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_channel",
+          "returnType": "void"
+        },
+        "update_channel_receive_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_channel_receive_account",
+          "returnType": "void"
+        },
+        "set_channel_commission_token": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_channel_commission_token",
+          "returnType": "void"
+        },
+        "set_commission_tokens": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission_tokens",
+          "returnType": "void"
+        },
+        "claim_commissions": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_commissions",
+          "returnType": "void"
+        },
+        "set_channel_vtoken_shares": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_channel_vtoken_shares",
+          "returnType": "void"
+        }
+      },
+      "CloudsConvert": {
+        "clouds_to_vebnc": {
+          "required": [],
+          "optional": [],
+          "description": "Call clouds_to_vebnc",
+          "returnType": "void"
+        },
+        "charge_vbnc": {
+          "required": [],
+          "optional": [],
+          "description": "Call charge_vbnc",
+          "returnType": "void"
+        }
+      },
+      "BuyBack": {
+        "set_vtoken": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_vtoken",
+          "returnType": "void"
+        },
+        "charge": {
+          "required": [],
+          "optional": [],
+          "description": "Call charge",
+          "returnType": "void"
+        },
+        "remove_vtoken": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_vtoken",
+          "returnType": "void"
+        }
+      },
+      "SlpV2": {
+        "set_protocol_configuration": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_protocol_configuration",
+          "returnType": "void"
+        },
+        "add_delegator": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_delegator",
+          "returnType": "void"
+        },
+        "remove_delegator": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_delegator",
+          "returnType": "void"
+        },
+        "add_validator": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_validator",
+          "returnType": "void"
+        },
+        "remove_validator": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_validator",
+          "returnType": "void"
+        },
+        "set_ledger": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_ledger",
+          "returnType": "void"
+        },
+        "transfer_to": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_to",
+          "returnType": "void"
+        },
+        "transfer_back": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_back",
+          "returnType": "void"
+        },
+        "update_ongoing_time_unit": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_ongoing_time_unit",
+          "returnType": "void"
+        },
+        "update_token_exchange_rate": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_token_exchange_rate",
+          "returnType": "void"
+        },
+        "astar_dapp_staking": {
+          "required": [],
+          "optional": [],
+          "description": "Call astar_dapp_staking",
+          "returnType": "void"
+        },
+        "notify_astar_dapp_staking": {
+          "required": [],
+          "optional": [],
+          "description": "Call notify_astar_dapp_staking",
+          "returnType": "void"
+        },
+        "ethereum_staking": {
+          "required": [],
+          "optional": [],
+          "description": "Call ethereum_staking",
+          "returnType": "void"
+        }
+      }
+    }
+  },
+  "hydration": {
+    "pallets": {
+      "System": {
+        "remark": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call remark",
+          "returnType": "void"
+        },
+        "set_heap_pages": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_heap_pages",
+          "returnType": "void"
+        },
+        "set_code": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call set_code",
+          "returnType": "void"
+        },
+        "set_code_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_without_checks",
+          "returnType": "void"
+        },
+        "set_storage": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_storage",
+          "returnType": "void"
+        },
+        "kill_storage": {
+          "required": [
+            "Vec<bytes>"
+          ],
+          "optional": [],
+          "description": "Call kill_storage",
+          "returnType": "void"
+        },
+        "kill_prefix": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_prefix",
+          "returnType": "void"
+        },
+        "remark_with_event": {
+          "required": [],
+          "optional": [],
+          "description": "Call remark_with_event",
+          "returnType": "void"
+        },
+        "authorize_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade",
+          "returnType": "void"
+        },
+        "authorize_upgrade_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade_without_checks",
+          "returnType": "void"
+        },
+        "apply_authorized_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_authorized_upgrade",
+          "returnType": "void"
+        }
+      },
+      "Timestamp": {
+        "set": {
+          "required": [],
+          "optional": [],
+          "description": "Call set",
+          "returnType": "void"
+        }
+      },
+      "Balances": {
+        "transfer_allow_death": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_allow_death",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [
+            "AccountId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "force_unreserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unreserve",
+          "returnType": "void"
+        },
+        "upgrade_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call upgrade_accounts",
+          "returnType": "void"
+        },
+        "force_set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_balance",
+          "returnType": "void"
+        },
+        "force_adjust_total_issuance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_adjust_total_issuance",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        }
+      },
+      "MultiTransactionPayment": {
+        "set_currency": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_currency",
+          "returnType": "void"
+        },
+        "add_currency": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_currency",
+          "returnType": "void"
+        },
+        "remove_currency": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_currency",
+          "returnType": "void"
+        },
+        "reset_payment_currency": {
+          "required": [],
+          "optional": [],
+          "description": "Call reset_payment_currency",
+          "returnType": "void"
+        },
+        "dispatch_permit": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_permit",
+          "returnType": "void"
+        }
+      },
+      "Treasury": {
+        "spend_local": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend_local",
+          "returnType": "void"
+        },
+        "remove_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_approval",
+          "returnType": "void"
+        },
+        "spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend",
+          "returnType": "void"
+        },
+        "payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout",
+          "returnType": "void"
+        },
+        "check_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call check_status",
+          "returnType": "void"
+        },
+        "void_spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call void_spend",
+          "returnType": "void"
+        }
+      },
+      "Utility": {
+        "batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch",
+          "returnType": "void"
+        },
+        "as_derivative": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_derivative",
+          "returnType": "void"
+        },
+        "batch_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch_all",
+          "returnType": "void"
+        },
+        "dispatch_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as",
+          "returnType": "void"
+        },
+        "force_batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_batch",
+          "returnType": "void"
+        },
+        "with_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call with_weight",
+          "returnType": "void"
+        }
+      },
+      "Preimage": {
+        "note_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_preimage",
+          "returnType": "void"
+        },
+        "unnote_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unnote_preimage",
+          "returnType": "void"
+        },
+        "request_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_preimage",
+          "returnType": "void"
+        },
+        "unrequest_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unrequest_preimage",
+          "returnType": "void"
+        },
+        "ensure_updated": {
+          "required": [],
+          "optional": [],
+          "description": "Call ensure_updated",
+          "returnType": "void"
+        }
+      },
+      "Identity": {
+        "add_registrar": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_registrar",
+          "returnType": "void"
+        },
+        "set_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_identity",
+          "returnType": "void"
+        },
+        "set_subs": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_subs",
+          "returnType": "void"
+        },
+        "clear_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_identity",
+          "returnType": "void"
+        },
+        "request_judgement": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_judgement",
+          "returnType": "void"
+        },
+        "cancel_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_request",
+          "returnType": "void"
+        },
+        "set_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fee",
+          "returnType": "void"
+        },
+        "set_account_id": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_account_id",
+          "returnType": "void"
+        },
+        "set_fields": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fields",
+          "returnType": "void"
+        },
+        "provide_judgement": {
+          "required": [],
+          "optional": [],
+          "description": "Call provide_judgement",
+          "returnType": "void"
+        },
+        "kill_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_identity",
+          "returnType": "void"
+        },
+        "add_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_sub",
+          "returnType": "void"
+        },
+        "rename_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call rename_sub",
+          "returnType": "void"
+        },
+        "remove_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_sub",
+          "returnType": "void"
+        },
+        "quit_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call quit_sub",
+          "returnType": "void"
+        },
+        "add_username_authority": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_username_authority",
+          "returnType": "void"
+        },
+        "remove_username_authority": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_username_authority",
+          "returnType": "void"
+        },
+        "set_username_for": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_username_for",
+          "returnType": "void"
+        },
+        "accept_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call accept_username",
+          "returnType": "void"
+        },
+        "remove_expired_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_expired_approval",
+          "returnType": "void"
+        },
+        "set_primary_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_primary_username",
+          "returnType": "void"
+        },
+        "remove_dangling_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_dangling_username",
+          "returnType": "void"
+        }
+      },
+      "Democracy": {
+        "propose": {
+          "required": [
+            "Hash",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call propose",
+          "returnType": "void"
+        },
+        "second": {
+          "required": [
+            "u32",
+            "u32"
+          ],
+          "optional": [],
+          "description": "Call second",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [
+            "u32",
+            "AccountVote"
+          ],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "emergency_cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call emergency_cancel",
+          "returnType": "void"
+        },
+        "external_propose": {
+          "required": [],
+          "optional": [],
+          "description": "Call external_propose",
+          "returnType": "void"
+        },
+        "external_propose_majority": {
+          "required": [],
+          "optional": [],
+          "description": "Call external_propose_majority",
+          "returnType": "void"
+        },
+        "external_propose_default": {
+          "required": [],
+          "optional": [],
+          "description": "Call external_propose_default",
+          "returnType": "void"
+        },
+        "fast_track": {
+          "required": [],
+          "optional": [],
+          "description": "Call fast_track",
+          "returnType": "void"
+        },
+        "veto_external": {
+          "required": [],
+          "optional": [],
+          "description": "Call veto_external",
+          "returnType": "void"
+        },
+        "cancel_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_referendum",
+          "returnType": "void"
+        },
+        "delegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate",
+          "returnType": "void"
+        },
+        "undelegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call undelegate",
+          "returnType": "void"
+        },
+        "clear_public_proposals": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_public_proposals",
+          "returnType": "void"
+        },
+        "unlock": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock",
+          "returnType": "void"
+        },
+        "remove_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_vote",
+          "returnType": "void"
+        },
+        "remove_other_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_other_vote",
+          "returnType": "void"
+        },
+        "blacklist": {
+          "required": [],
+          "optional": [],
+          "description": "Call blacklist",
+          "returnType": "void"
+        },
+        "cancel_proposal": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_proposal",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        },
+        "force_remove_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_remove_vote",
+          "returnType": "void"
+        }
+      },
+      "TechnicalCommittee": {
+        "set_members": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_members",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "propose": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "disapprove_proposal": {
+          "required": [],
+          "optional": [],
+          "description": "Call disapprove_proposal",
+          "returnType": "void"
+        },
+        "close": {
+          "required": [],
+          "optional": [],
+          "description": "Call close",
+          "returnType": "void"
+        }
+      },
+      "Proxy": {
+        "proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy",
+          "returnType": "void"
+        },
+        "add_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_proxy",
+          "returnType": "void"
+        },
+        "remove_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxy",
+          "returnType": "void"
+        },
+        "remove_proxies": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxies",
+          "returnType": "void"
+        },
+        "create_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pure",
+          "returnType": "void"
+        },
+        "kill_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_pure",
+          "returnType": "void"
+        },
+        "announce": {
+          "required": [],
+          "optional": [],
+          "description": "Call announce",
+          "returnType": "void"
+        },
+        "remove_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_announcement",
+          "returnType": "void"
+        },
+        "reject_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call reject_announcement",
+          "returnType": "void"
+        },
+        "proxy_announced": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy_announced",
+          "returnType": "void"
+        }
+      },
+      "Multisig": {
+        "as_multi_threshold_1": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi_threshold_1",
+          "returnType": "void"
+        },
+        "as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi",
+          "returnType": "void"
+        },
+        "approve_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_as_multi",
+          "returnType": "void"
+        },
+        "cancel_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_as_multi",
+          "returnType": "void"
+        }
+      },
+      "Uniques": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "force_create": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_create",
+          "returnType": "void"
+        },
+        "destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy",
+          "returnType": "void"
+        },
+        "mint": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "redeposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeposit",
+          "returnType": "void"
+        },
+        "freeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze",
+          "returnType": "void"
+        },
+        "thaw": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw",
+          "returnType": "void"
+        },
+        "freeze_collection": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze_collection",
+          "returnType": "void"
+        },
+        "thaw_collection": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw_collection",
+          "returnType": "void"
+        },
+        "transfer_ownership": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_ownership",
+          "returnType": "void"
+        },
+        "set_team": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_team",
+          "returnType": "void"
+        },
+        "approve_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_transfer",
+          "returnType": "void"
+        },
+        "cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_approval",
+          "returnType": "void"
+        },
+        "force_item_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_item_status",
+          "returnType": "void"
+        },
+        "set_attribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_attribute",
+          "returnType": "void"
+        },
+        "clear_attribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_attribute",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        },
+        "clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_metadata",
+          "returnType": "void"
+        },
+        "set_collection_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_collection_metadata",
+          "returnType": "void"
+        },
+        "clear_collection_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_collection_metadata",
+          "returnType": "void"
+        },
+        "set_accept_ownership": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_accept_ownership",
+          "returnType": "void"
+        },
+        "set_collection_max_supply": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_collection_max_supply",
+          "returnType": "void"
+        },
+        "set_price": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_price",
+          "returnType": "void"
+        },
+        "buy_item": {
+          "required": [],
+          "optional": [],
+          "description": "Call buy_item",
+          "returnType": "void"
+        }
+      },
+      "StateTrieMigration": {
+        "control_auto_migration": {
+          "required": [],
+          "optional": [],
+          "description": "Call control_auto_migration",
+          "returnType": "void"
+        },
+        "continue_migrate": {
+          "required": [],
+          "optional": [],
+          "description": "Call continue_migrate",
+          "returnType": "void"
+        },
+        "migrate_custom_top": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_custom_top",
+          "returnType": "void"
+        },
+        "migrate_custom_child": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_custom_child",
+          "returnType": "void"
+        },
+        "set_signed_max_limits": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_signed_max_limits",
+          "returnType": "void"
+        },
+        "force_set_progress": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_progress",
+          "returnType": "void"
+        }
+      },
+      "ConvictionVoting": {
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "delegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate",
+          "returnType": "void"
+        },
+        "undelegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call undelegate",
+          "returnType": "void"
+        },
+        "unlock": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock",
+          "returnType": "void"
+        },
+        "remove_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_vote",
+          "returnType": "void"
+        },
+        "remove_other_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_other_vote",
+          "returnType": "void"
+        },
+        "force_remove_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_remove_vote",
+          "returnType": "void"
+        }
+      },
+      "Referenda": {
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "place_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_decision_deposit",
+          "returnType": "void"
+        },
+        "refund_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_decision_deposit",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "nudge_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call nudge_referendum",
+          "returnType": "void"
+        },
+        "one_fewer_deciding": {
+          "required": [],
+          "optional": [],
+          "description": "Call one_fewer_deciding",
+          "returnType": "void"
+        },
+        "refund_submission_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_submission_deposit",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        }
+      },
+      "Whitelist": {
+        "whitelist_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call whitelist_call",
+          "returnType": "void"
+        },
+        "remove_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call_with_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call_with_preimage",
+          "returnType": "void"
+        }
+      },
+      "Dispatcher": {
+        "dispatch_as_treasury": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as_treasury",
+          "returnType": "void"
+        },
+        "dispatch_as_aave_manager": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as_aave_manager",
+          "returnType": "void"
+        },
+        "note_aave_manager": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_aave_manager",
+          "returnType": "void"
+        },
+        "dispatch_with_extra_gas": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_with_extra_gas",
+          "returnType": "void"
+        }
+      },
+      "AssetRegistry": {
+        "register": {
+          "required": [],
+          "optional": [],
+          "description": "Call register",
+          "returnType": "void"
+        },
+        "update": {
+          "required": [],
+          "optional": [],
+          "description": "Call update",
+          "returnType": "void"
+        },
+        "register_external": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_external",
+          "returnType": "void"
+        },
+        "ban_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call ban_asset",
+          "returnType": "void"
+        },
+        "unban_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call unban_asset",
+          "returnType": "void"
+        }
+      },
+      "Claims": {
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        }
+      },
+      "Omnipool": {
+        "add_token": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_token",
+          "returnType": "void"
+        },
+        "add_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity",
+          "returnType": "void"
+        },
+        "add_liquidity_with_limit": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity_with_limit",
+          "returnType": "void"
+        },
+        "remove_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_liquidity",
+          "returnType": "void"
+        },
+        "remove_liquidity_with_limit": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_liquidity_with_limit",
+          "returnType": "void"
+        },
+        "sacrifice_position": {
+          "required": [],
+          "optional": [],
+          "description": "Call sacrifice_position",
+          "returnType": "void"
+        },
+        "sell": {
+          "required": [],
+          "optional": [],
+          "description": "Call sell",
+          "returnType": "void"
+        },
+        "buy": {
+          "required": [],
+          "optional": [],
+          "description": "Call buy",
+          "returnType": "void"
+        },
+        "set_asset_tradable_state": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_asset_tradable_state",
+          "returnType": "void"
+        },
+        "refund_refused_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_refused_asset",
+          "returnType": "void"
+        },
+        "set_asset_weight_cap": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_asset_weight_cap",
+          "returnType": "void"
+        },
+        "withdraw_protocol_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_protocol_liquidity",
+          "returnType": "void"
+        },
+        "remove_token": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_token",
+          "returnType": "void"
+        }
+      },
+      "TransactionPause": {
+        "pause_transaction": {
+          "required": [],
+          "optional": [],
+          "description": "Call pause_transaction",
+          "returnType": "void"
+        },
+        "unpause_transaction": {
+          "required": [],
+          "optional": [],
+          "description": "Call unpause_transaction",
+          "returnType": "void"
+        }
+      },
+      "Duster": {
+        "dust_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call dust_account",
+          "returnType": "void"
+        },
+        "add_nondustable_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_nondustable_account",
+          "returnType": "void"
+        },
+        "remove_nondustable_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_nondustable_account",
+          "returnType": "void"
+        }
+      },
+      "OmnipoolLiquidityMining": {
+        "create_global_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_global_farm",
+          "returnType": "void"
+        },
+        "terminate_global_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call terminate_global_farm",
+          "returnType": "void"
+        },
+        "create_yield_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_yield_farm",
+          "returnType": "void"
+        },
+        "update_yield_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_yield_farm",
+          "returnType": "void"
+        },
+        "stop_yield_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call stop_yield_farm",
+          "returnType": "void"
+        },
+        "resume_yield_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call resume_yield_farm",
+          "returnType": "void"
+        },
+        "terminate_yield_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call terminate_yield_farm",
+          "returnType": "void"
+        },
+        "deposit_shares": {
+          "required": [],
+          "optional": [],
+          "description": "Call deposit_shares",
+          "returnType": "void"
+        },
+        "redeposit_shares": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeposit_shares",
+          "returnType": "void"
+        },
+        "claim_rewards": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_rewards",
+          "returnType": "void"
+        },
+        "withdraw_shares": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_shares",
+          "returnType": "void"
+        },
+        "update_global_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_global_farm",
+          "returnType": "void"
+        },
+        "join_farms": {
+          "required": [],
+          "optional": [],
+          "description": "Call join_farms",
+          "returnType": "void"
+        },
+        "add_liquidity_and_join_farms": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity_and_join_farms",
+          "returnType": "void"
+        },
+        "exit_farms": {
+          "required": [],
+          "optional": [],
+          "description": "Call exit_farms",
+          "returnType": "void"
+        },
+        "add_liquidity_stableswap_omnipool_and_join_farms": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity_stableswap_omnipool_and_join_farms",
+          "returnType": "void"
+        }
+      },
+      "OTC": {
+        "place_order": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_order",
+          "returnType": "void"
+        },
+        "partial_fill_order": {
+          "required": [],
+          "optional": [],
+          "description": "Call partial_fill_order",
+          "returnType": "void"
+        },
+        "fill_order": {
+          "required": [],
+          "optional": [],
+          "description": "Call fill_order",
+          "returnType": "void"
+        },
+        "cancel_order": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_order",
+          "returnType": "void"
+        }
+      },
+      "CircuitBreaker": {
+        "set_trade_volume_limit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_trade_volume_limit",
+          "returnType": "void"
+        },
+        "set_add_liquidity_limit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_add_liquidity_limit",
+          "returnType": "void"
+        },
+        "set_remove_liquidity_limit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_remove_liquidity_limit",
+          "returnType": "void"
+        },
+        "lockdown_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call lockdown_asset",
+          "returnType": "void"
+        },
+        "force_lift_lockdown": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_lift_lockdown",
+          "returnType": "void"
+        },
+        "release_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call release_deposit",
+          "returnType": "void"
+        }
+      },
+      "Router": {
+        "sell": {
+          "required": [],
+          "optional": [],
+          "description": "Call sell",
+          "returnType": "void"
+        },
+        "buy": {
+          "required": [],
+          "optional": [],
+          "description": "Call buy",
+          "returnType": "void"
+        },
+        "set_route": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_route",
+          "returnType": "void"
+        },
+        "force_insert_route": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_insert_route",
+          "returnType": "void"
+        },
+        "sell_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call sell_all",
+          "returnType": "void"
+        }
+      },
+      "DynamicFees": {
+        "set_asset_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_asset_fee",
+          "returnType": "void"
+        },
+        "remove_asset_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_asset_fee",
+          "returnType": "void"
+        }
+      },
+      "Staking": {
+        "initialize_staking": {
+          "required": [],
+          "optional": [],
+          "description": "Call initialize_staking",
+          "returnType": "void"
+        },
+        "stake": {
+          "required": [],
+          "optional": [],
+          "description": "Call stake",
+          "returnType": "void"
+        },
+        "increase_stake": {
+          "required": [],
+          "optional": [],
+          "description": "Call increase_stake",
+          "returnType": "void"
+        },
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        },
+        "unstake": {
+          "required": [],
+          "optional": [],
+          "description": "Call unstake",
+          "returnType": "void"
+        }
+      },
+      "Stableswap": {
+        "create_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pool",
+          "returnType": "void"
+        },
+        "update_pool_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_pool_fee",
+          "returnType": "void"
+        },
+        "update_amplification": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_amplification",
+          "returnType": "void"
+        },
+        "add_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity",
+          "returnType": "void"
+        },
+        "add_liquidity_shares": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity_shares",
+          "returnType": "void"
+        },
+        "remove_liquidity_one_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_liquidity_one_asset",
+          "returnType": "void"
+        },
+        "withdraw_asset_amount": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_asset_amount",
+          "returnType": "void"
+        },
+        "sell": {
+          "required": [],
+          "optional": [],
+          "description": "Call sell",
+          "returnType": "void"
+        },
+        "buy": {
+          "required": [],
+          "optional": [],
+          "description": "Call buy",
+          "returnType": "void"
+        },
+        "set_asset_tradable_state": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_asset_tradable_state",
+          "returnType": "void"
+        },
+        "remove_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_liquidity",
+          "returnType": "void"
+        },
+        "create_pool_with_pegs": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pool_with_pegs",
+          "returnType": "void"
+        },
+        "add_assets_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_assets_liquidity",
+          "returnType": "void"
+        },
+        "update_asset_peg_source": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_asset_peg_source",
+          "returnType": "void"
+        },
+        "update_pool_max_peg_update": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_pool_max_peg_update",
+          "returnType": "void"
+        }
+      },
+      "Bonds": {
+        "issue": {
+          "required": [],
+          "optional": [],
+          "description": "Call issue",
+          "returnType": "void"
+        },
+        "redeem": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeem",
+          "returnType": "void"
+        }
+      },
+      "OtcSettlements": {
+        "settle_otc_order": {
+          "required": [],
+          "optional": [],
+          "description": "Call settle_otc_order",
+          "returnType": "void"
+        }
+      },
+      "LBP": {
+        "create_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pool",
+          "returnType": "void"
+        },
+        "update_pool_data": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_pool_data",
+          "returnType": "void"
+        },
+        "add_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity",
+          "returnType": "void"
+        },
+        "remove_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_liquidity",
+          "returnType": "void"
+        },
+        "sell": {
+          "required": [],
+          "optional": [],
+          "description": "Call sell",
+          "returnType": "void"
+        },
+        "buy": {
+          "required": [],
+          "optional": [],
+          "description": "Call buy",
+          "returnType": "void"
+        }
+      },
+      "XYK": {
+        "create_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pool",
+          "returnType": "void"
+        },
+        "add_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity",
+          "returnType": "void"
+        },
+        "add_liquidity_with_limits": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity_with_limits",
+          "returnType": "void"
+        },
+        "remove_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_liquidity",
+          "returnType": "void"
+        },
+        "remove_liquidity_with_limits": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_liquidity_with_limits",
+          "returnType": "void"
+        },
+        "sell": {
+          "required": [],
+          "optional": [],
+          "description": "Call sell",
+          "returnType": "void"
+        },
+        "buy": {
+          "required": [],
+          "optional": [],
+          "description": "Call buy",
+          "returnType": "void"
+        }
+      },
+      "Referrals": {
+        "register_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_code",
+          "returnType": "void"
+        },
+        "link_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call link_code",
+          "returnType": "void"
+        },
+        "convert": {
+          "required": [],
+          "optional": [],
+          "description": "Call convert",
+          "returnType": "void"
+        },
+        "claim_rewards": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_rewards",
+          "returnType": "void"
+        },
+        "set_reward_percentage": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_reward_percentage",
+          "returnType": "void"
+        }
+      },
+      "Liquidation": {
+        "liquidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call liquidate",
+          "returnType": "void"
+        },
+        "set_borrowing_contract": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_borrowing_contract",
+          "returnType": "void"
+        }
+      },
+      "HSM": {
+        "add_collateral_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_collateral_asset",
+          "returnType": "void"
+        },
+        "remove_collateral_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_collateral_asset",
+          "returnType": "void"
+        },
+        "update_collateral_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_collateral_asset",
+          "returnType": "void"
+        },
+        "sell": {
+          "required": [],
+          "optional": [],
+          "description": "Call sell",
+          "returnType": "void"
+        },
+        "buy": {
+          "required": [],
+          "optional": [],
+          "description": "Call buy",
+          "returnType": "void"
+        },
+        "execute_arbitrage": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_arbitrage",
+          "returnType": "void"
+        },
+        "set_flash_minter": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_flash_minter",
+          "returnType": "void"
+        }
+      },
+      "Tokens": {
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_balance",
+          "returnType": "void"
+        }
+      },
+      "Currencies": {
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "transfer_native_currency": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_native_currency",
+          "returnType": "void"
+        },
+        "update_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_balance",
+          "returnType": "void"
+        }
+      },
+      "Vesting": {
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        },
+        "vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call vested_transfer",
+          "returnType": "void"
+        },
+        "update_vesting_schedules": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_vesting_schedules",
+          "returnType": "void"
+        },
+        "claim_for": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_for",
+          "returnType": "void"
+        }
+      },
+      "EVM": {
+        "withdraw": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw",
+          "returnType": "void"
+        },
+        "call": {
+          "required": [],
+          "optional": [],
+          "description": "Call call",
+          "returnType": "void"
+        },
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "create2": {
+          "required": [],
+          "optional": [],
+          "description": "Call create2",
+          "returnType": "void"
+        }
+      },
+      "Ethereum": {
+        "transact": {
+          "required": [],
+          "optional": [],
+          "description": "Call transact",
+          "returnType": "void"
+        }
+      },
+      "EVMAccounts": {
+        "bind_evm_address": {
+          "required": [],
+          "optional": [],
+          "description": "Call bind_evm_address",
+          "returnType": "void"
+        },
+        "add_contract_deployer": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_contract_deployer",
+          "returnType": "void"
+        },
+        "remove_contract_deployer": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_contract_deployer",
+          "returnType": "void"
+        },
+        "renounce_contract_deployer": {
+          "required": [],
+          "optional": [],
+          "description": "Call renounce_contract_deployer",
+          "returnType": "void"
+        },
+        "approve_contract": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_contract",
+          "returnType": "void"
+        },
+        "disapprove_contract": {
+          "required": [],
+          "optional": [],
+          "description": "Call disapprove_contract",
+          "returnType": "void"
+        }
+      },
+      "XYKLiquidityMining": {
+        "create_global_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_global_farm",
+          "returnType": "void"
+        },
+        "update_global_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_global_farm",
+          "returnType": "void"
+        },
+        "terminate_global_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call terminate_global_farm",
+          "returnType": "void"
+        },
+        "create_yield_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_yield_farm",
+          "returnType": "void"
+        },
+        "update_yield_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_yield_farm",
+          "returnType": "void"
+        },
+        "stop_yield_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call stop_yield_farm",
+          "returnType": "void"
+        },
+        "resume_yield_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call resume_yield_farm",
+          "returnType": "void"
+        },
+        "terminate_yield_farm": {
+          "required": [],
+          "optional": [],
+          "description": "Call terminate_yield_farm",
+          "returnType": "void"
+        },
+        "deposit_shares": {
+          "required": [],
+          "optional": [],
+          "description": "Call deposit_shares",
+          "returnType": "void"
+        },
+        "join_farms": {
+          "required": [],
+          "optional": [],
+          "description": "Call join_farms",
+          "returnType": "void"
+        },
+        "add_liquidity_and_join_farms": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity_and_join_farms",
+          "returnType": "void"
+        },
+        "redeposit_shares": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeposit_shares",
+          "returnType": "void"
+        },
+        "claim_rewards": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_rewards",
+          "returnType": "void"
+        },
+        "withdraw_shares": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_shares",
+          "returnType": "void"
+        },
+        "exit_farms": {
+          "required": [],
+          "optional": [],
+          "description": "Call exit_farms",
+          "returnType": "void"
+        }
+      },
+      "DCA": {
+        "schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule",
+          "returnType": "void"
+        },
+        "terminate": {
+          "required": [],
+          "optional": [],
+          "description": "Call terminate",
+          "returnType": "void"
+        },
+        "unlock_reserves": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock_reserves",
+          "returnType": "void"
+        }
+      },
+      "Scheduler": {
+        "schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "schedule_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named",
+          "returnType": "void"
+        },
+        "cancel_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_named",
+          "returnType": "void"
+        },
+        "schedule_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_after",
+          "returnType": "void"
+        },
+        "schedule_named_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named_after",
+          "returnType": "void"
+        },
+        "set_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry",
+          "returnType": "void"
+        },
+        "set_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry_named",
+          "returnType": "void"
+        },
+        "cancel_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry",
+          "returnType": "void"
+        },
+        "cancel_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry_named",
+          "returnType": "void"
+        }
+      },
+      "ParachainSystem": {
+        "set_validation_data": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_data",
+          "returnType": "void"
+        },
+        "sudo_send_upward_message": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_send_upward_message",
+          "returnType": "void"
+        }
+      },
+      "PolkadotXcm": {
+        "send": {
+          "required": [],
+          "optional": [],
+          "description": "Call send",
+          "returnType": "void"
+        },
+        "teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call teleport_assets",
+          "returnType": "void"
+        },
+        "reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "force_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_xcm_version",
+          "returnType": "void"
+        },
+        "force_default_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_default_xcm_version",
+          "returnType": "void"
+        },
+        "force_subscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_subscribe_version_notify",
+          "returnType": "void"
+        },
+        "force_unsubscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unsubscribe_version_notify",
+          "returnType": "void"
+        },
+        "limited_reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "limited_teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_teleport_assets",
+          "returnType": "void"
+        },
+        "force_suspension": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_suspension",
+          "returnType": "void"
+        },
+        "transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets",
+          "returnType": "void"
+        },
+        "claim_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_assets",
+          "returnType": "void"
+        },
+        "transfer_assets_using_type_and_then": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets_using_type_and_then",
+          "returnType": "void"
+        }
+      },
+      "MessageQueue": {
+        "reap_page": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_page",
+          "returnType": "void"
+        },
+        "execute_overweight": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_overweight",
+          "returnType": "void"
+        }
+      },
+      "OrmlXcm": {
+        "send_as_sovereign": {
+          "required": [],
+          "optional": [],
+          "description": "Call send_as_sovereign",
+          "returnType": "void"
+        }
+      },
+      "XTokens": {
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "transfer_multiasset": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_multiasset",
+          "returnType": "void"
+        },
+        "transfer_with_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_with_fee",
+          "returnType": "void"
+        },
+        "transfer_multiasset_with_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_multiasset_with_fee",
+          "returnType": "void"
+        },
+        "transfer_multicurrencies": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_multicurrencies",
+          "returnType": "void"
+        },
+        "transfer_multiassets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_multiassets",
+          "returnType": "void"
+        }
+      },
+      "CollatorSelection": {
+        "set_invulnerables": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_invulnerables",
+          "returnType": "void"
+        },
+        "set_desired_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_desired_candidates",
+          "returnType": "void"
+        },
+        "set_candidacy_bond": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_candidacy_bond",
+          "returnType": "void"
+        },
+        "register_as_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_as_candidate",
+          "returnType": "void"
+        },
+        "leave_intent": {
+          "required": [],
+          "optional": [],
+          "description": "Call leave_intent",
+          "returnType": "void"
+        },
+        "add_invulnerable": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_invulnerable",
+          "returnType": "void"
+        },
+        "remove_invulnerable": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_invulnerable",
+          "returnType": "void"
+        },
+        "update_bond": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_bond",
+          "returnType": "void"
+        },
+        "take_candidate_slot": {
+          "required": [],
+          "optional": [],
+          "description": "Call take_candidate_slot",
+          "returnType": "void"
+        }
+      },
+      "Session": {
+        "set_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_keys",
+          "returnType": "void"
+        },
+        "purge_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call purge_keys",
+          "returnType": "void"
+        }
+      },
+      "EmaOracle": {
+        "add_oracle": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_oracle",
+          "returnType": "void"
+        },
+        "remove_oracle": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_oracle",
+          "returnType": "void"
+        },
+        "update_bifrost_oracle": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_bifrost_oracle",
+          "returnType": "void"
+        }
+      }
+    }
+  },
+  "kusama": {
+    "pallets": {
+      "System": {
+        "remark": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call remark",
+          "returnType": "void"
+        },
+        "set_heap_pages": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_heap_pages",
+          "returnType": "void"
+        },
+        "set_code": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call set_code",
+          "returnType": "void"
+        },
+        "set_code_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_without_checks",
+          "returnType": "void"
+        },
+        "set_storage": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_storage",
+          "returnType": "void"
+        },
+        "kill_storage": {
+          "required": [
+            "Vec<bytes>"
+          ],
+          "optional": [],
+          "description": "Call kill_storage",
+          "returnType": "void"
+        },
+        "kill_prefix": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_prefix",
+          "returnType": "void"
+        },
+        "remark_with_event": {
+          "required": [],
+          "optional": [],
+          "description": "Call remark_with_event",
+          "returnType": "void"
+        },
+        "authorize_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade",
+          "returnType": "void"
+        },
+        "authorize_upgrade_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade_without_checks",
+          "returnType": "void"
+        },
+        "apply_authorized_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_authorized_upgrade",
+          "returnType": "void"
+        }
+      },
+      "Babe": {
+        "report_equivocation": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation",
+          "returnType": "void"
+        },
+        "report_equivocation_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation_unsigned",
+          "returnType": "void"
+        },
+        "plan_config_change": {
+          "required": [],
+          "optional": [],
+          "description": "Call plan_config_change",
+          "returnType": "void"
+        }
+      },
+      "Timestamp": {
+        "set": {
+          "required": [],
+          "optional": [],
+          "description": "Call set",
+          "returnType": "void"
+        }
+      },
+      "Indices": {
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "free": {
+          "required": [],
+          "optional": [],
+          "description": "Call free",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "freeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Balances": {
+        "transfer_allow_death": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_allow_death",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [
+            "AccountId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "force_unreserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unreserve",
+          "returnType": "void"
+        },
+        "upgrade_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call upgrade_accounts",
+          "returnType": "void"
+        },
+        "force_set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_balance",
+          "returnType": "void"
+        },
+        "force_adjust_total_issuance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_adjust_total_issuance",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        }
+      },
+      "Staking": {
+        "bond": {
+          "required": [
+            "AccountId",
+            "Balance",
+            "RewardDestination"
+          ],
+          "optional": [],
+          "description": "Call bond",
+          "returnType": "void"
+        },
+        "bond_extra": {
+          "required": [],
+          "optional": [],
+          "description": "Call bond_extra",
+          "returnType": "void"
+        },
+        "unbond": {
+          "required": [
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call unbond",
+          "returnType": "void"
+        },
+        "withdraw_unbonded": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_unbonded",
+          "returnType": "void"
+        },
+        "validate": {
+          "required": [
+            "ValidatorPrefs"
+          ],
+          "optional": [],
+          "description": "Call validate",
+          "returnType": "void"
+        },
+        "nominate": {
+          "required": [
+            "Vec<AccountId>"
+          ],
+          "optional": [],
+          "description": "Call nominate",
+          "returnType": "void"
+        },
+        "chill": {
+          "required": [],
+          "optional": [],
+          "description": "Call chill",
+          "returnType": "void"
+        },
+        "set_payee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_payee",
+          "returnType": "void"
+        },
+        "set_controller": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_controller",
+          "returnType": "void"
+        },
+        "set_validator_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validator_count",
+          "returnType": "void"
+        },
+        "increase_validator_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call increase_validator_count",
+          "returnType": "void"
+        },
+        "scale_validator_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call scale_validator_count",
+          "returnType": "void"
+        },
+        "force_no_eras": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_no_eras",
+          "returnType": "void"
+        },
+        "force_new_era": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_new_era",
+          "returnType": "void"
+        },
+        "set_invulnerables": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_invulnerables",
+          "returnType": "void"
+        },
+        "force_unstake": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unstake",
+          "returnType": "void"
+        },
+        "force_new_era_always": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_new_era_always",
+          "returnType": "void"
+        },
+        "cancel_deferred_slash": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_deferred_slash",
+          "returnType": "void"
+        },
+        "payout_stakers": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout_stakers",
+          "returnType": "void"
+        },
+        "rebond": {
+          "required": [],
+          "optional": [],
+          "description": "Call rebond",
+          "returnType": "void"
+        },
+        "reap_stash": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_stash",
+          "returnType": "void"
+        },
+        "kick": {
+          "required": [],
+          "optional": [],
+          "description": "Call kick",
+          "returnType": "void"
+        },
+        "set_staking_configs": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_staking_configs",
+          "returnType": "void"
+        },
+        "chill_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call chill_other",
+          "returnType": "void"
+        },
+        "force_apply_min_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_apply_min_commission",
+          "returnType": "void"
+        },
+        "set_min_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_min_commission",
+          "returnType": "void"
+        },
+        "payout_stakers_by_page": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout_stakers_by_page",
+          "returnType": "void"
+        },
+        "update_payee": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_payee",
+          "returnType": "void"
+        },
+        "deprecate_controller_batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call deprecate_controller_batch",
+          "returnType": "void"
+        },
+        "restore_ledger": {
+          "required": [],
+          "optional": [],
+          "description": "Call restore_ledger",
+          "returnType": "void"
+        },
+        "migrate_currency": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_currency",
+          "returnType": "void"
+        },
+        "manual_slash": {
+          "required": [],
+          "optional": [],
+          "description": "Call manual_slash",
+          "returnType": "void"
+        }
+      },
+      "Session": {
+        "set_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_keys",
+          "returnType": "void"
+        },
+        "purge_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call purge_keys",
+          "returnType": "void"
+        }
+      },
+      "Grandpa": {
+        "report_equivocation": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation",
+          "returnType": "void"
+        },
+        "report_equivocation_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation_unsigned",
+          "returnType": "void"
+        },
+        "note_stalled": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_stalled",
+          "returnType": "void"
+        }
+      },
+      "Treasury": {
+        "spend_local": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend_local",
+          "returnType": "void"
+        },
+        "remove_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_approval",
+          "returnType": "void"
+        },
+        "spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend",
+          "returnType": "void"
+        },
+        "payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout",
+          "returnType": "void"
+        },
+        "check_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call check_status",
+          "returnType": "void"
+        },
+        "void_spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call void_spend",
+          "returnType": "void"
+        }
+      },
+      "ConvictionVoting": {
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "delegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate",
+          "returnType": "void"
+        },
+        "undelegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call undelegate",
+          "returnType": "void"
+        },
+        "unlock": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock",
+          "returnType": "void"
+        },
+        "remove_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_vote",
+          "returnType": "void"
+        },
+        "remove_other_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_other_vote",
+          "returnType": "void"
+        }
+      },
+      "Referenda": {
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "place_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_decision_deposit",
+          "returnType": "void"
+        },
+        "refund_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_decision_deposit",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "nudge_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call nudge_referendum",
+          "returnType": "void"
+        },
+        "one_fewer_deciding": {
+          "required": [],
+          "optional": [],
+          "description": "Call one_fewer_deciding",
+          "returnType": "void"
+        },
+        "refund_submission_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_submission_deposit",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        }
+      },
+      "FellowshipCollective": {
+        "add_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_member",
+          "returnType": "void"
+        },
+        "promote_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call promote_member",
+          "returnType": "void"
+        },
+        "demote_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call demote_member",
+          "returnType": "void"
+        },
+        "remove_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_member",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "cleanup_poll": {
+          "required": [],
+          "optional": [],
+          "description": "Call cleanup_poll",
+          "returnType": "void"
+        },
+        "exchange_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call exchange_member",
+          "returnType": "void"
+        }
+      },
+      "FellowshipReferenda": {
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "place_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_decision_deposit",
+          "returnType": "void"
+        },
+        "refund_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_decision_deposit",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "nudge_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call nudge_referendum",
+          "returnType": "void"
+        },
+        "one_fewer_deciding": {
+          "required": [],
+          "optional": [],
+          "description": "Call one_fewer_deciding",
+          "returnType": "void"
+        },
+        "refund_submission_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_submission_deposit",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        }
+      },
+      "Whitelist": {
+        "whitelist_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call whitelist_call",
+          "returnType": "void"
+        },
+        "remove_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call_with_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call_with_preimage",
+          "returnType": "void"
+        }
+      },
+      "Parameters": {
+        "set_parameter": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_parameter",
+          "returnType": "void"
+        }
+      },
+      "Claims": {
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        },
+        "mint_claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint_claim",
+          "returnType": "void"
+        },
+        "claim_attest": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_attest",
+          "returnType": "void"
+        },
+        "attest": {
+          "required": [],
+          "optional": [],
+          "description": "Call attest",
+          "returnType": "void"
+        },
+        "move_claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call move_claim",
+          "returnType": "void"
+        }
+      },
+      "Utility": {
+        "batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch",
+          "returnType": "void"
+        },
+        "as_derivative": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_derivative",
+          "returnType": "void"
+        },
+        "batch_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch_all",
+          "returnType": "void"
+        },
+        "dispatch_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as",
+          "returnType": "void"
+        },
+        "force_batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_batch",
+          "returnType": "void"
+        },
+        "with_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call with_weight",
+          "returnType": "void"
+        },
+        "if_else": {
+          "required": [],
+          "optional": [],
+          "description": "Call if_else",
+          "returnType": "void"
+        },
+        "dispatch_as_fallible": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as_fallible",
+          "returnType": "void"
+        }
+      },
+      "Society": {
+        "bid": {
+          "required": [],
+          "optional": [],
+          "description": "Call bid",
+          "returnType": "void"
+        },
+        "unbid": {
+          "required": [],
+          "optional": [],
+          "description": "Call unbid",
+          "returnType": "void"
+        },
+        "vouch": {
+          "required": [],
+          "optional": [],
+          "description": "Call vouch",
+          "returnType": "void"
+        },
+        "unvouch": {
+          "required": [],
+          "optional": [],
+          "description": "Call unvouch",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "defender_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call defender_vote",
+          "returnType": "void"
+        },
+        "payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout",
+          "returnType": "void"
+        },
+        "waive_repay": {
+          "required": [],
+          "optional": [],
+          "description": "Call waive_repay",
+          "returnType": "void"
+        },
+        "found_society": {
+          "required": [],
+          "optional": [],
+          "description": "Call found_society",
+          "returnType": "void"
+        },
+        "dissolve": {
+          "required": [],
+          "optional": [],
+          "description": "Call dissolve",
+          "returnType": "void"
+        },
+        "judge_suspended_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call judge_suspended_member",
+          "returnType": "void"
+        },
+        "set_parameters": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_parameters",
+          "returnType": "void"
+        },
+        "punish_skeptic": {
+          "required": [],
+          "optional": [],
+          "description": "Call punish_skeptic",
+          "returnType": "void"
+        },
+        "claim_membership": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_membership",
+          "returnType": "void"
+        },
+        "bestow_membership": {
+          "required": [],
+          "optional": [],
+          "description": "Call bestow_membership",
+          "returnType": "void"
+        },
+        "kick_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call kick_candidate",
+          "returnType": "void"
+        },
+        "resign_candidacy": {
+          "required": [],
+          "optional": [],
+          "description": "Call resign_candidacy",
+          "returnType": "void"
+        },
+        "drop_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call drop_candidate",
+          "returnType": "void"
+        },
+        "cleanup_candidacy": {
+          "required": [],
+          "optional": [],
+          "description": "Call cleanup_candidacy",
+          "returnType": "void"
+        },
+        "cleanup_challenge": {
+          "required": [],
+          "optional": [],
+          "description": "Call cleanup_challenge",
+          "returnType": "void"
+        }
+      },
+      "Recovery": {
+        "as_recovered": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_recovered",
+          "returnType": "void"
+        },
+        "set_recovered": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_recovered",
+          "returnType": "void"
+        },
+        "create_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_recovery",
+          "returnType": "void"
+        },
+        "initiate_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call initiate_recovery",
+          "returnType": "void"
+        },
+        "vouch_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call vouch_recovery",
+          "returnType": "void"
+        },
+        "claim_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_recovery",
+          "returnType": "void"
+        },
+        "close_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call close_recovery",
+          "returnType": "void"
+        },
+        "remove_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_recovery",
+          "returnType": "void"
+        },
+        "cancel_recovered": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_recovered",
+          "returnType": "void"
+        }
+      },
+      "Vesting": {
+        "vest": {
+          "required": [],
+          "optional": [],
+          "description": "Call vest",
+          "returnType": "void"
+        },
+        "vest_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call vest_other",
+          "returnType": "void"
+        },
+        "vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call vested_transfer",
+          "returnType": "void"
+        },
+        "force_vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_vested_transfer",
+          "returnType": "void"
+        },
+        "merge_schedules": {
+          "required": [],
+          "optional": [],
+          "description": "Call merge_schedules",
+          "returnType": "void"
+        },
+        "force_remove_vesting_schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_remove_vesting_schedule",
+          "returnType": "void"
+        }
+      },
+      "Scheduler": {
+        "schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "schedule_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named",
+          "returnType": "void"
+        },
+        "cancel_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_named",
+          "returnType": "void"
+        },
+        "schedule_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_after",
+          "returnType": "void"
+        },
+        "schedule_named_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named_after",
+          "returnType": "void"
+        },
+        "set_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry",
+          "returnType": "void"
+        },
+        "set_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry_named",
+          "returnType": "void"
+        },
+        "cancel_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry",
+          "returnType": "void"
+        },
+        "cancel_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry_named",
+          "returnType": "void"
+        }
+      },
+      "Proxy": {
+        "proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy",
+          "returnType": "void"
+        },
+        "add_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_proxy",
+          "returnType": "void"
+        },
+        "remove_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxy",
+          "returnType": "void"
+        },
+        "remove_proxies": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxies",
+          "returnType": "void"
+        },
+        "create_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pure",
+          "returnType": "void"
+        },
+        "kill_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_pure",
+          "returnType": "void"
+        },
+        "announce": {
+          "required": [],
+          "optional": [],
+          "description": "Call announce",
+          "returnType": "void"
+        },
+        "remove_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_announcement",
+          "returnType": "void"
+        },
+        "reject_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call reject_announcement",
+          "returnType": "void"
+        },
+        "proxy_announced": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy_announced",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Multisig": {
+        "as_multi_threshold_1": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi_threshold_1",
+          "returnType": "void"
+        },
+        "as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi",
+          "returnType": "void"
+        },
+        "approve_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_as_multi",
+          "returnType": "void"
+        },
+        "cancel_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_as_multi",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Preimage": {
+        "note_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_preimage",
+          "returnType": "void"
+        },
+        "unnote_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unnote_preimage",
+          "returnType": "void"
+        },
+        "request_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_preimage",
+          "returnType": "void"
+        },
+        "unrequest_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unrequest_preimage",
+          "returnType": "void"
+        },
+        "ensure_updated": {
+          "required": [],
+          "optional": [],
+          "description": "Call ensure_updated",
+          "returnType": "void"
+        }
+      },
+      "Bounties": {
+        "propose_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose_bounty",
+          "returnType": "void"
+        },
+        "approve_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_bounty",
+          "returnType": "void"
+        },
+        "propose_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose_curator",
+          "returnType": "void"
+        },
+        "unassign_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call unassign_curator",
+          "returnType": "void"
+        },
+        "accept_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call accept_curator",
+          "returnType": "void"
+        },
+        "award_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call award_bounty",
+          "returnType": "void"
+        },
+        "claim_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_bounty",
+          "returnType": "void"
+        },
+        "close_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call close_bounty",
+          "returnType": "void"
+        },
+        "extend_bounty_expiry": {
+          "required": [],
+          "optional": [],
+          "description": "Call extend_bounty_expiry",
+          "returnType": "void"
+        },
+        "approve_bounty_with_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_bounty_with_curator",
+          "returnType": "void"
+        }
+      },
+      "ChildBounties": {
+        "add_child_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_child_bounty",
+          "returnType": "void"
+        },
+        "propose_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose_curator",
+          "returnType": "void"
+        },
+        "accept_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call accept_curator",
+          "returnType": "void"
+        },
+        "unassign_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call unassign_curator",
+          "returnType": "void"
+        },
+        "award_child_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call award_child_bounty",
+          "returnType": "void"
+        },
+        "claim_child_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_child_bounty",
+          "returnType": "void"
+        },
+        "close_child_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call close_child_bounty",
+          "returnType": "void"
+        }
+      },
+      "ElectionProviderMultiPhase": {
+        "submit_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit_unsigned",
+          "returnType": "void"
+        },
+        "set_minimum_untrusted_score": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_untrusted_score",
+          "returnType": "void"
+        },
+        "set_emergency_election_result": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_emergency_election_result",
+          "returnType": "void"
+        },
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "governance_fallback": {
+          "required": [],
+          "optional": [],
+          "description": "Call governance_fallback",
+          "returnType": "void"
+        }
+      },
+      "Nis": {
+        "place_bid": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_bid",
+          "returnType": "void"
+        },
+        "retract_bid": {
+          "required": [],
+          "optional": [],
+          "description": "Call retract_bid",
+          "returnType": "void"
+        },
+        "fund_deficit": {
+          "required": [],
+          "optional": [],
+          "description": "Call fund_deficit",
+          "returnType": "void"
+        },
+        "thaw_private": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw_private",
+          "returnType": "void"
+        },
+        "thaw_communal": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw_communal",
+          "returnType": "void"
+        },
+        "communify": {
+          "required": [],
+          "optional": [],
+          "description": "Call communify",
+          "returnType": "void"
+        },
+        "privatize": {
+          "required": [],
+          "optional": [],
+          "description": "Call privatize",
+          "returnType": "void"
+        }
+      },
+      "NisCounterpartBalances": {
+        "transfer_allow_death": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_allow_death",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "force_unreserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unreserve",
+          "returnType": "void"
+        },
+        "upgrade_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call upgrade_accounts",
+          "returnType": "void"
+        },
+        "force_set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_balance",
+          "returnType": "void"
+        },
+        "force_adjust_total_issuance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_adjust_total_issuance",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        }
+      },
+      "VoterList": {
+        "rebag": {
+          "required": [],
+          "optional": [],
+          "description": "Call rebag",
+          "returnType": "void"
+        },
+        "put_in_front_of": {
+          "required": [],
+          "optional": [],
+          "description": "Call put_in_front_of",
+          "returnType": "void"
+        },
+        "put_in_front_of_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call put_in_front_of_other",
+          "returnType": "void"
+        }
+      },
+      "NominationPools": {
+        "join": {
+          "required": [],
+          "optional": [],
+          "description": "Call join",
+          "returnType": "void"
+        },
+        "bond_extra": {
+          "required": [],
+          "optional": [],
+          "description": "Call bond_extra",
+          "returnType": "void"
+        },
+        "claim_payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_payout",
+          "returnType": "void"
+        },
+        "unbond": {
+          "required": [],
+          "optional": [],
+          "description": "Call unbond",
+          "returnType": "void"
+        },
+        "pool_withdraw_unbonded": {
+          "required": [],
+          "optional": [],
+          "description": "Call pool_withdraw_unbonded",
+          "returnType": "void"
+        },
+        "withdraw_unbonded": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_unbonded",
+          "returnType": "void"
+        },
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "create_with_pool_id": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_with_pool_id",
+          "returnType": "void"
+        },
+        "nominate": {
+          "required": [],
+          "optional": [],
+          "description": "Call nominate",
+          "returnType": "void"
+        },
+        "set_state": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_state",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        },
+        "set_configs": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_configs",
+          "returnType": "void"
+        },
+        "update_roles": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_roles",
+          "returnType": "void"
+        },
+        "chill": {
+          "required": [],
+          "optional": [],
+          "description": "Call chill",
+          "returnType": "void"
+        },
+        "bond_extra_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call bond_extra_other",
+          "returnType": "void"
+        },
+        "set_claim_permission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_claim_permission",
+          "returnType": "void"
+        },
+        "claim_payout_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_payout_other",
+          "returnType": "void"
+        },
+        "set_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission",
+          "returnType": "void"
+        },
+        "set_commission_max": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission_max",
+          "returnType": "void"
+        },
+        "set_commission_change_rate": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission_change_rate",
+          "returnType": "void"
+        },
+        "claim_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_commission",
+          "returnType": "void"
+        },
+        "adjust_pool_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call adjust_pool_deposit",
+          "returnType": "void"
+        },
+        "set_commission_claim_permission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission_claim_permission",
+          "returnType": "void"
+        },
+        "apply_slash": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_slash",
+          "returnType": "void"
+        },
+        "migrate_delegation": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_delegation",
+          "returnType": "void"
+        },
+        "migrate_pool_to_delegate_stake": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_pool_to_delegate_stake",
+          "returnType": "void"
+        }
+      },
+      "FastUnstake": {
+        "register_fast_unstake": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_fast_unstake",
+          "returnType": "void"
+        },
+        "deregister": {
+          "required": [],
+          "optional": [],
+          "description": "Call deregister",
+          "returnType": "void"
+        },
+        "control": {
+          "required": [],
+          "optional": [],
+          "description": "Call control",
+          "returnType": "void"
+        }
+      },
+      "Configuration": {
+        "set_validation_upgrade_cooldown": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_upgrade_cooldown",
+          "returnType": "void"
+        },
+        "set_validation_upgrade_delay": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_upgrade_delay",
+          "returnType": "void"
+        },
+        "set_code_retention_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_retention_period",
+          "returnType": "void"
+        },
+        "set_max_code_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_code_size",
+          "returnType": "void"
+        },
+        "set_max_pov_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_pov_size",
+          "returnType": "void"
+        },
+        "set_max_head_data_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_head_data_size",
+          "returnType": "void"
+        },
+        "set_coretime_cores": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_coretime_cores",
+          "returnType": "void"
+        },
+        "set_group_rotation_frequency": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_group_rotation_frequency",
+          "returnType": "void"
+        },
+        "set_paras_availability_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_paras_availability_period",
+          "returnType": "void"
+        },
+        "set_scheduling_lookahead": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_scheduling_lookahead",
+          "returnType": "void"
+        },
+        "set_max_validators_per_core": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_validators_per_core",
+          "returnType": "void"
+        },
+        "set_max_validators": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_validators",
+          "returnType": "void"
+        },
+        "set_dispute_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_dispute_period",
+          "returnType": "void"
+        },
+        "set_dispute_post_conclusion_acceptance_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_dispute_post_conclusion_acceptance_period",
+          "returnType": "void"
+        },
+        "set_no_show_slots": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_no_show_slots",
+          "returnType": "void"
+        },
+        "set_n_delay_tranches": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_n_delay_tranches",
+          "returnType": "void"
+        },
+        "set_zeroth_delay_tranche_width": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_zeroth_delay_tranche_width",
+          "returnType": "void"
+        },
+        "set_needed_approvals": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_needed_approvals",
+          "returnType": "void"
+        },
+        "set_relay_vrf_modulo_samples": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_relay_vrf_modulo_samples",
+          "returnType": "void"
+        },
+        "set_max_upward_queue_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_queue_count",
+          "returnType": "void"
+        },
+        "set_max_upward_queue_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_queue_size",
+          "returnType": "void"
+        },
+        "set_max_downward_message_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_downward_message_size",
+          "returnType": "void"
+        },
+        "set_max_upward_message_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_message_size",
+          "returnType": "void"
+        },
+        "set_max_upward_message_num_per_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_message_num_per_candidate",
+          "returnType": "void"
+        },
+        "set_hrmp_open_request_ttl": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_open_request_ttl",
+          "returnType": "void"
+        },
+        "set_hrmp_sender_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_sender_deposit",
+          "returnType": "void"
+        },
+        "set_hrmp_recipient_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_recipient_deposit",
+          "returnType": "void"
+        },
+        "set_hrmp_channel_max_capacity": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_channel_max_capacity",
+          "returnType": "void"
+        },
+        "set_hrmp_channel_max_total_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_channel_max_total_size",
+          "returnType": "void"
+        },
+        "set_hrmp_max_parachain_inbound_channels": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_max_parachain_inbound_channels",
+          "returnType": "void"
+        },
+        "set_hrmp_channel_max_message_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_channel_max_message_size",
+          "returnType": "void"
+        },
+        "set_hrmp_max_parachain_outbound_channels": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_max_parachain_outbound_channels",
+          "returnType": "void"
+        },
+        "set_hrmp_max_message_num_per_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_max_message_num_per_candidate",
+          "returnType": "void"
+        },
+        "set_pvf_voting_ttl": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_pvf_voting_ttl",
+          "returnType": "void"
+        },
+        "set_minimum_validation_upgrade_delay": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_validation_upgrade_delay",
+          "returnType": "void"
+        },
+        "set_bypass_consistency_check": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_bypass_consistency_check",
+          "returnType": "void"
+        },
+        "set_async_backing_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_async_backing_params",
+          "returnType": "void"
+        },
+        "set_executor_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_executor_params",
+          "returnType": "void"
+        },
+        "set_on_demand_base_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_base_fee",
+          "returnType": "void"
+        },
+        "set_on_demand_fee_variability": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_fee_variability",
+          "returnType": "void"
+        },
+        "set_on_demand_queue_max_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_queue_max_size",
+          "returnType": "void"
+        },
+        "set_on_demand_target_queue_utilization": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_target_queue_utilization",
+          "returnType": "void"
+        },
+        "set_minimum_backing_votes": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_backing_votes",
+          "returnType": "void"
+        },
+        "set_node_feature": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_node_feature",
+          "returnType": "void"
+        },
+        "set_approval_voting_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_approval_voting_params",
+          "returnType": "void"
+        },
+        "set_scheduler_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_scheduler_params",
+          "returnType": "void"
+        }
+      },
+      "ParaInherent": {
+        "enter": {
+          "required": [],
+          "optional": [],
+          "description": "Call enter",
+          "returnType": "void"
+        }
+      },
+      "Paras": {
+        "force_set_current_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_current_code",
+          "returnType": "void"
+        },
+        "force_set_current_head": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_current_head",
+          "returnType": "void"
+        },
+        "force_schedule_code_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_schedule_code_upgrade",
+          "returnType": "void"
+        },
+        "force_note_new_head": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_note_new_head",
+          "returnType": "void"
+        },
+        "force_queue_action": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_queue_action",
+          "returnType": "void"
+        },
+        "add_trusted_validation_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_trusted_validation_code",
+          "returnType": "void"
+        },
+        "poke_unused_validation_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_unused_validation_code",
+          "returnType": "void"
+        },
+        "include_pvf_check_statement": {
+          "required": [],
+          "optional": [],
+          "description": "Call include_pvf_check_statement",
+          "returnType": "void"
+        },
+        "force_set_most_recent_context": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_most_recent_context",
+          "returnType": "void"
+        }
+      },
+      "Initializer": {
+        "force_approve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_approve",
+          "returnType": "void"
+        }
+      },
+      "Hrmp": {
+        "hrmp_init_open_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_init_open_channel",
+          "returnType": "void"
+        },
+        "hrmp_accept_open_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_accept_open_channel",
+          "returnType": "void"
+        },
+        "hrmp_close_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_close_channel",
+          "returnType": "void"
+        },
+        "force_clean_hrmp": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_clean_hrmp",
+          "returnType": "void"
+        },
+        "force_process_hrmp_open": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_process_hrmp_open",
+          "returnType": "void"
+        },
+        "force_process_hrmp_close": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_process_hrmp_close",
+          "returnType": "void"
+        },
+        "hrmp_cancel_open_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_cancel_open_request",
+          "returnType": "void"
+        },
+        "force_open_hrmp_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_open_hrmp_channel",
+          "returnType": "void"
+        },
+        "establish_system_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call establish_system_channel",
+          "returnType": "void"
+        },
+        "poke_channel_deposits": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_channel_deposits",
+          "returnType": "void"
+        },
+        "establish_channel_with_system": {
+          "required": [],
+          "optional": [],
+          "description": "Call establish_channel_with_system",
+          "returnType": "void"
+        }
+      },
+      "ParasDisputes": {
+        "force_unfreeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unfreeze",
+          "returnType": "void"
+        }
+      },
+      "ParasSlashing": {
+        "report_dispute_lost_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_dispute_lost_unsigned",
+          "returnType": "void"
+        }
+      },
+      "OnDemandAssignmentProvider": {
+        "place_order_allow_death": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_order_allow_death",
+          "returnType": "void"
+        },
+        "place_order_keep_alive": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_order_keep_alive",
+          "returnType": "void"
+        },
+        "place_order_with_credits": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_order_with_credits",
+          "returnType": "void"
+        }
+      },
+      "Registrar": {
+        "register": {
+          "required": [],
+          "optional": [],
+          "description": "Call register",
+          "returnType": "void"
+        },
+        "force_register": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_register",
+          "returnType": "void"
+        },
+        "deregister": {
+          "required": [],
+          "optional": [],
+          "description": "Call deregister",
+          "returnType": "void"
+        },
+        "swap": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap",
+          "returnType": "void"
+        },
+        "remove_lock": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_lock",
+          "returnType": "void"
+        },
+        "reserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve",
+          "returnType": "void"
+        },
+        "add_lock": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_lock",
+          "returnType": "void"
+        },
+        "schedule_code_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_code_upgrade",
+          "returnType": "void"
+        },
+        "set_current_head": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_current_head",
+          "returnType": "void"
+        }
+      },
+      "Slots": {
+        "force_lease": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_lease",
+          "returnType": "void"
+        },
+        "clear_all_leases": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_all_leases",
+          "returnType": "void"
+        },
+        "trigger_onboard": {
+          "required": [],
+          "optional": [],
+          "description": "Call trigger_onboard",
+          "returnType": "void"
+        }
+      },
+      "Auctions": {
+        "new_auction": {
+          "required": [],
+          "optional": [],
+          "description": "Call new_auction",
+          "returnType": "void"
+        },
+        "bid": {
+          "required": [],
+          "optional": [],
+          "description": "Call bid",
+          "returnType": "void"
+        },
+        "cancel_auction": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_auction",
+          "returnType": "void"
+        }
+      },
+      "Crowdloan": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "contribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call contribute",
+          "returnType": "void"
+        },
+        "withdraw": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw",
+          "returnType": "void"
+        },
+        "refund": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund",
+          "returnType": "void"
+        },
+        "dissolve": {
+          "required": [],
+          "optional": [],
+          "description": "Call dissolve",
+          "returnType": "void"
+        },
+        "edit": {
+          "required": [],
+          "optional": [],
+          "description": "Call edit",
+          "returnType": "void"
+        },
+        "add_memo": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_memo",
+          "returnType": "void"
+        },
+        "poke": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke",
+          "returnType": "void"
+        },
+        "contribute_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call contribute_all",
+          "returnType": "void"
+        }
+      },
+      "Coretime": {
+        "request_core_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_core_count",
+          "returnType": "void"
+        },
+        "request_revenue_at": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_revenue_at",
+          "returnType": "void"
+        },
+        "credit_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call credit_account",
+          "returnType": "void"
+        },
+        "assign_core": {
+          "required": [],
+          "optional": [],
+          "description": "Call assign_core",
+          "returnType": "void"
+        }
+      },
+      "XcmPallet": {
+        "send": {
+          "required": [],
+          "optional": [],
+          "description": "Call send",
+          "returnType": "void"
+        },
+        "teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call teleport_assets",
+          "returnType": "void"
+        },
+        "reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "force_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_xcm_version",
+          "returnType": "void"
+        },
+        "force_default_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_default_xcm_version",
+          "returnType": "void"
+        },
+        "force_subscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_subscribe_version_notify",
+          "returnType": "void"
+        },
+        "force_unsubscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unsubscribe_version_notify",
+          "returnType": "void"
+        },
+        "limited_reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "limited_teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_teleport_assets",
+          "returnType": "void"
+        },
+        "force_suspension": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_suspension",
+          "returnType": "void"
+        },
+        "transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets",
+          "returnType": "void"
+        },
+        "claim_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_assets",
+          "returnType": "void"
+        },
+        "transfer_assets_using_type_and_then": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets_using_type_and_then",
+          "returnType": "void"
+        },
+        "add_authorized_alias": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_authorized_alias",
+          "returnType": "void"
+        },
+        "remove_authorized_alias": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_authorized_alias",
+          "returnType": "void"
+        },
+        "remove_all_authorized_aliases": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_all_authorized_aliases",
+          "returnType": "void"
+        }
+      },
+      "MessageQueue": {
+        "reap_page": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_page",
+          "returnType": "void"
+        },
+        "execute_overweight": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_overweight",
+          "returnType": "void"
+        }
+      },
+      "AssetRate": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "update": {
+          "required": [],
+          "optional": [],
+          "description": "Call update",
+          "returnType": "void"
+        },
+        "remove": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove",
+          "returnType": "void"
+        }
+      },
+      "Beefy": {
+        "report_double_voting": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_double_voting",
+          "returnType": "void"
+        },
+        "report_double_voting_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_double_voting_unsigned",
+          "returnType": "void"
+        },
+        "set_new_genesis": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_new_genesis",
+          "returnType": "void"
+        },
+        "report_fork_voting": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_fork_voting",
+          "returnType": "void"
+        },
+        "report_fork_voting_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_fork_voting_unsigned",
+          "returnType": "void"
+        },
+        "report_future_block_voting": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_future_block_voting",
+          "returnType": "void"
+        },
+        "report_future_block_voting_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_future_block_voting_unsigned",
+          "returnType": "void"
+        }
+      }
+    }
+  },
+  "moonbeam": {
+    "pallets": {
+      "System": {
+        "remark": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call remark",
+          "returnType": "void"
+        },
+        "set_heap_pages": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_heap_pages",
+          "returnType": "void"
+        },
+        "set_code": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call set_code",
+          "returnType": "void"
+        },
+        "set_code_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_without_checks",
+          "returnType": "void"
+        },
+        "set_storage": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_storage",
+          "returnType": "void"
+        },
+        "kill_storage": {
+          "required": [
+            "Vec<bytes>"
+          ],
+          "optional": [],
+          "description": "Call kill_storage",
+          "returnType": "void"
+        },
+        "kill_prefix": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_prefix",
+          "returnType": "void"
+        },
+        "remark_with_event": {
+          "required": [],
+          "optional": [],
+          "description": "Call remark_with_event",
+          "returnType": "void"
+        },
+        "authorize_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade",
+          "returnType": "void"
+        },
+        "authorize_upgrade_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade_without_checks",
+          "returnType": "void"
+        },
+        "apply_authorized_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_authorized_upgrade",
+          "returnType": "void"
+        }
+      },
+      "ParachainSystem": {
+        "set_validation_data": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_data",
+          "returnType": "void"
+        },
+        "sudo_send_upward_message": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_send_upward_message",
+          "returnType": "void"
+        }
+      },
+      "Timestamp": {
+        "set": {
+          "required": [],
+          "optional": [],
+          "description": "Call set",
+          "returnType": "void"
+        }
+      },
+      "RootTesting": {
+        "fill_block": {
+          "required": [],
+          "optional": [],
+          "description": "Call fill_block",
+          "returnType": "void"
+        },
+        "trigger_defensive": {
+          "required": [],
+          "optional": [],
+          "description": "Call trigger_defensive",
+          "returnType": "void"
+        }
+      },
+      "Balances": {
+        "transfer_allow_death": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_allow_death",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [
+            "AccountId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "force_unreserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unreserve",
+          "returnType": "void"
+        },
+        "upgrade_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call upgrade_accounts",
+          "returnType": "void"
+        },
+        "force_set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_balance",
+          "returnType": "void"
+        },
+        "force_adjust_total_issuance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_adjust_total_issuance",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        }
+      },
+      "ParachainStaking": {
+        "set_staking_expectations": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_staking_expectations",
+          "returnType": "void"
+        },
+        "set_inflation": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_inflation",
+          "returnType": "void"
+        },
+        "set_parachain_bond_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_parachain_bond_account",
+          "returnType": "void"
+        },
+        "set_parachain_bond_reserve_percent": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_parachain_bond_reserve_percent",
+          "returnType": "void"
+        },
+        "set_total_selected": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_total_selected",
+          "returnType": "void"
+        },
+        "set_collator_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_collator_commission",
+          "returnType": "void"
+        },
+        "set_blocks_per_round": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_blocks_per_round",
+          "returnType": "void"
+        },
+        "join_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call join_candidates",
+          "returnType": "void"
+        },
+        "schedule_leave_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_leave_candidates",
+          "returnType": "void"
+        },
+        "execute_leave_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_leave_candidates",
+          "returnType": "void"
+        },
+        "cancel_leave_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_leave_candidates",
+          "returnType": "void"
+        },
+        "go_offline": {
+          "required": [],
+          "optional": [],
+          "description": "Call go_offline",
+          "returnType": "void"
+        },
+        "go_online": {
+          "required": [],
+          "optional": [],
+          "description": "Call go_online",
+          "returnType": "void"
+        },
+        "candidate_bond_more": {
+          "required": [],
+          "optional": [],
+          "description": "Call candidate_bond_more",
+          "returnType": "void"
+        },
+        "schedule_candidate_bond_less": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_candidate_bond_less",
+          "returnType": "void"
+        },
+        "execute_candidate_bond_less": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_candidate_bond_less",
+          "returnType": "void"
+        },
+        "cancel_candidate_bond_less": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_candidate_bond_less",
+          "returnType": "void"
+        },
+        "delegate_with_auto_compound": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate_with_auto_compound",
+          "returnType": "void"
+        },
+        "schedule_revoke_delegation": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_revoke_delegation",
+          "returnType": "void"
+        },
+        "delegator_bond_more": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegator_bond_more",
+          "returnType": "void"
+        },
+        "schedule_delegator_bond_less": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_delegator_bond_less",
+          "returnType": "void"
+        },
+        "execute_delegation_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_delegation_request",
+          "returnType": "void"
+        },
+        "cancel_delegation_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_delegation_request",
+          "returnType": "void"
+        },
+        "set_auto_compound": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_auto_compound",
+          "returnType": "void"
+        },
+        "hotfix_remove_delegation_requests_exited_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call hotfix_remove_delegation_requests_exited_candidates",
+          "returnType": "void"
+        },
+        "notify_inactive_collator": {
+          "required": [],
+          "optional": [],
+          "description": "Call notify_inactive_collator",
+          "returnType": "void"
+        },
+        "enable_marking_offline": {
+          "required": [],
+          "optional": [],
+          "description": "Call enable_marking_offline",
+          "returnType": "void"
+        },
+        "force_join_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_join_candidates",
+          "returnType": "void"
+        },
+        "set_inflation_distribution_config": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_inflation_distribution_config",
+          "returnType": "void"
+        }
+      },
+      "AuthorInherent": {
+        "kick_off_authorship_validation": {
+          "required": [],
+          "optional": [],
+          "description": "Call kick_off_authorship_validation",
+          "returnType": "void"
+        }
+      },
+      "AuthorFilter": {
+        "set_eligible": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_eligible",
+          "returnType": "void"
+        }
+      },
+      "AuthorMapping": {
+        "add_association": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_association",
+          "returnType": "void"
+        },
+        "update_association": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_association",
+          "returnType": "void"
+        },
+        "clear_association": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_association",
+          "returnType": "void"
+        },
+        "remove_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_keys",
+          "returnType": "void"
+        },
+        "set_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_keys",
+          "returnType": "void"
+        }
+      },
+      "MoonbeamOrbiters": {
+        "collator_add_orbiter": {
+          "required": [],
+          "optional": [],
+          "description": "Call collator_add_orbiter",
+          "returnType": "void"
+        },
+        "collator_remove_orbiter": {
+          "required": [],
+          "optional": [],
+          "description": "Call collator_remove_orbiter",
+          "returnType": "void"
+        },
+        "orbiter_leave_collator_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call orbiter_leave_collator_pool",
+          "returnType": "void"
+        },
+        "orbiter_register": {
+          "required": [],
+          "optional": [],
+          "description": "Call orbiter_register",
+          "returnType": "void"
+        },
+        "orbiter_unregister": {
+          "required": [],
+          "optional": [],
+          "description": "Call orbiter_unregister",
+          "returnType": "void"
+        },
+        "add_collator": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_collator",
+          "returnType": "void"
+        },
+        "remove_collator": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_collator",
+          "returnType": "void"
+        }
+      },
+      "Utility": {
+        "batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch",
+          "returnType": "void"
+        },
+        "as_derivative": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_derivative",
+          "returnType": "void"
+        },
+        "batch_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch_all",
+          "returnType": "void"
+        },
+        "dispatch_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as",
+          "returnType": "void"
+        },
+        "force_batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_batch",
+          "returnType": "void"
+        },
+        "with_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call with_weight",
+          "returnType": "void"
+        }
+      },
+      "Proxy": {
+        "proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy",
+          "returnType": "void"
+        },
+        "add_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_proxy",
+          "returnType": "void"
+        },
+        "remove_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxy",
+          "returnType": "void"
+        },
+        "remove_proxies": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxies",
+          "returnType": "void"
+        },
+        "create_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pure",
+          "returnType": "void"
+        },
+        "kill_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_pure",
+          "returnType": "void"
+        },
+        "announce": {
+          "required": [],
+          "optional": [],
+          "description": "Call announce",
+          "returnType": "void"
+        },
+        "remove_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_announcement",
+          "returnType": "void"
+        },
+        "reject_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call reject_announcement",
+          "returnType": "void"
+        },
+        "proxy_announced": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy_announced",
+          "returnType": "void"
+        }
+      },
+      "MaintenanceMode": {
+        "enter_maintenance_mode": {
+          "required": [],
+          "optional": [],
+          "description": "Call enter_maintenance_mode",
+          "returnType": "void"
+        },
+        "resume_normal_operation": {
+          "required": [],
+          "optional": [],
+          "description": "Call resume_normal_operation",
+          "returnType": "void"
+        }
+      },
+      "Identity": {
+        "add_registrar": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_registrar",
+          "returnType": "void"
+        },
+        "set_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_identity",
+          "returnType": "void"
+        },
+        "set_subs": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_subs",
+          "returnType": "void"
+        },
+        "clear_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_identity",
+          "returnType": "void"
+        },
+        "request_judgement": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_judgement",
+          "returnType": "void"
+        },
+        "cancel_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_request",
+          "returnType": "void"
+        },
+        "set_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fee",
+          "returnType": "void"
+        },
+        "set_account_id": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_account_id",
+          "returnType": "void"
+        },
+        "set_fields": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fields",
+          "returnType": "void"
+        },
+        "provide_judgement": {
+          "required": [],
+          "optional": [],
+          "description": "Call provide_judgement",
+          "returnType": "void"
+        },
+        "kill_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_identity",
+          "returnType": "void"
+        },
+        "add_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_sub",
+          "returnType": "void"
+        },
+        "rename_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call rename_sub",
+          "returnType": "void"
+        },
+        "remove_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_sub",
+          "returnType": "void"
+        },
+        "quit_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call quit_sub",
+          "returnType": "void"
+        },
+        "add_username_authority": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_username_authority",
+          "returnType": "void"
+        },
+        "remove_username_authority": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_username_authority",
+          "returnType": "void"
+        },
+        "set_username_for": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_username_for",
+          "returnType": "void"
+        },
+        "accept_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call accept_username",
+          "returnType": "void"
+        },
+        "remove_expired_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_expired_approval",
+          "returnType": "void"
+        },
+        "set_primary_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_primary_username",
+          "returnType": "void"
+        },
+        "unbind_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call unbind_username",
+          "returnType": "void"
+        },
+        "remove_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_username",
+          "returnType": "void"
+        },
+        "kill_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_username",
+          "returnType": "void"
+        }
+      },
+      "Multisig": {
+        "as_multi_threshold_1": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi_threshold_1",
+          "returnType": "void"
+        },
+        "as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi",
+          "returnType": "void"
+        },
+        "approve_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_as_multi",
+          "returnType": "void"
+        },
+        "cancel_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_as_multi",
+          "returnType": "void"
+        }
+      },
+      "MoonbeamLazyMigrations": {
+        "create_contract_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_contract_metadata",
+          "returnType": "void"
+        }
+      },
+      "Parameters": {
+        "set_parameter": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_parameter",
+          "returnType": "void"
+        }
+      },
+      "EVM": {
+        "withdraw": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw",
+          "returnType": "void"
+        },
+        "call": {
+          "required": [],
+          "optional": [],
+          "description": "Call call",
+          "returnType": "void"
+        },
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "create2": {
+          "required": [],
+          "optional": [],
+          "description": "Call create2",
+          "returnType": "void"
+        }
+      },
+      "Ethereum": {
+        "transact": {
+          "required": [],
+          "optional": [],
+          "description": "Call transact",
+          "returnType": "void"
+        }
+      },
+      "Scheduler": {
+        "schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "schedule_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named",
+          "returnType": "void"
+        },
+        "cancel_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_named",
+          "returnType": "void"
+        },
+        "schedule_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_after",
+          "returnType": "void"
+        },
+        "schedule_named_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named_after",
+          "returnType": "void"
+        },
+        "set_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry",
+          "returnType": "void"
+        },
+        "set_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry_named",
+          "returnType": "void"
+        },
+        "cancel_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry",
+          "returnType": "void"
+        },
+        "cancel_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry_named",
+          "returnType": "void"
+        }
+      },
+      "Preimage": {
+        "note_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_preimage",
+          "returnType": "void"
+        },
+        "unnote_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unnote_preimage",
+          "returnType": "void"
+        },
+        "request_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_preimage",
+          "returnType": "void"
+        },
+        "unrequest_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unrequest_preimage",
+          "returnType": "void"
+        },
+        "ensure_updated": {
+          "required": [],
+          "optional": [],
+          "description": "Call ensure_updated",
+          "returnType": "void"
+        }
+      },
+      "ConvictionVoting": {
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "delegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate",
+          "returnType": "void"
+        },
+        "undelegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call undelegate",
+          "returnType": "void"
+        },
+        "unlock": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock",
+          "returnType": "void"
+        },
+        "remove_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_vote",
+          "returnType": "void"
+        },
+        "remove_other_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_other_vote",
+          "returnType": "void"
+        }
+      },
+      "Referenda": {
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "place_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_decision_deposit",
+          "returnType": "void"
+        },
+        "refund_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_decision_deposit",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "nudge_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call nudge_referendum",
+          "returnType": "void"
+        },
+        "one_fewer_deciding": {
+          "required": [],
+          "optional": [],
+          "description": "Call one_fewer_deciding",
+          "returnType": "void"
+        },
+        "refund_submission_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_submission_deposit",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        }
+      },
+      "Whitelist": {
+        "whitelist_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call whitelist_call",
+          "returnType": "void"
+        },
+        "remove_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call_with_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call_with_preimage",
+          "returnType": "void"
+        }
+      },
+      "TreasuryCouncilCollective": {
+        "set_members": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_members",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "propose": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "disapprove_proposal": {
+          "required": [],
+          "optional": [],
+          "description": "Call disapprove_proposal",
+          "returnType": "void"
+        },
+        "close": {
+          "required": [],
+          "optional": [],
+          "description": "Call close",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "release_proposal_cost": {
+          "required": [],
+          "optional": [],
+          "description": "Call release_proposal_cost",
+          "returnType": "void"
+        }
+      },
+      "OpenTechCommitteeCollective": {
+        "set_members": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_members",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "propose": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "disapprove_proposal": {
+          "required": [],
+          "optional": [],
+          "description": "Call disapprove_proposal",
+          "returnType": "void"
+        },
+        "close": {
+          "required": [],
+          "optional": [],
+          "description": "Call close",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "release_proposal_cost": {
+          "required": [],
+          "optional": [],
+          "description": "Call release_proposal_cost",
+          "returnType": "void"
+        }
+      },
+      "Treasury": {
+        "spend_local": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend_local",
+          "returnType": "void"
+        },
+        "remove_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_approval",
+          "returnType": "void"
+        },
+        "spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend",
+          "returnType": "void"
+        },
+        "payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout",
+          "returnType": "void"
+        },
+        "check_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call check_status",
+          "returnType": "void"
+        },
+        "void_spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call void_spend",
+          "returnType": "void"
+        }
+      },
+      "CrowdloanRewards": {
+        "associate_native_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call associate_native_identity",
+          "returnType": "void"
+        },
+        "change_association_with_relay_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call change_association_with_relay_keys",
+          "returnType": "void"
+        },
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        },
+        "update_reward_address": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_reward_address",
+          "returnType": "void"
+        },
+        "complete_initialization": {
+          "required": [],
+          "optional": [],
+          "description": "Call complete_initialization",
+          "returnType": "void"
+        },
+        "initialize_reward_vec": {
+          "required": [],
+          "optional": [],
+          "description": "Call initialize_reward_vec",
+          "returnType": "void"
+        }
+      },
+      "PolkadotXcm": {
+        "send": {
+          "required": [],
+          "optional": [],
+          "description": "Call send",
+          "returnType": "void"
+        },
+        "teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call teleport_assets",
+          "returnType": "void"
+        },
+        "reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "force_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_xcm_version",
+          "returnType": "void"
+        },
+        "force_default_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_default_xcm_version",
+          "returnType": "void"
+        },
+        "force_subscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_subscribe_version_notify",
+          "returnType": "void"
+        },
+        "force_unsubscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unsubscribe_version_notify",
+          "returnType": "void"
+        },
+        "limited_reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "limited_teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_teleport_assets",
+          "returnType": "void"
+        },
+        "force_suspension": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_suspension",
+          "returnType": "void"
+        },
+        "transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets",
+          "returnType": "void"
+        },
+        "claim_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_assets",
+          "returnType": "void"
+        },
+        "transfer_assets_using_type_and_then": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets_using_type_and_then",
+          "returnType": "void"
+        }
+      },
+      "Assets": {
+        "create": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "force_create": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_create",
+          "returnType": "void"
+        },
+        "start_destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call start_destroy",
+          "returnType": "void"
+        },
+        "destroy_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy_accounts",
+          "returnType": "void"
+        },
+        "destroy_approvals": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy_approvals",
+          "returnType": "void"
+        },
+        "finish_destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call finish_destroy",
+          "returnType": "void"
+        },
+        "mint": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call mint",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "freeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze",
+          "returnType": "void"
+        },
+        "thaw": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw",
+          "returnType": "void"
+        },
+        "freeze_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze_asset",
+          "returnType": "void"
+        },
+        "thaw_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw_asset",
+          "returnType": "void"
+        },
+        "transfer_ownership": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_ownership",
+          "returnType": "void"
+        },
+        "set_team": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_team",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        },
+        "clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_metadata",
+          "returnType": "void"
+        },
+        "force_set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_metadata",
+          "returnType": "void"
+        },
+        "force_clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_clear_metadata",
+          "returnType": "void"
+        },
+        "force_asset_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_asset_status",
+          "returnType": "void"
+        },
+        "approve_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_transfer",
+          "returnType": "void"
+        },
+        "cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_approval",
+          "returnType": "void"
+        },
+        "force_cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_cancel_approval",
+          "returnType": "void"
+        },
+        "transfer_approved": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_approved",
+          "returnType": "void"
+        },
+        "touch": {
+          "required": [],
+          "optional": [],
+          "description": "Call touch",
+          "returnType": "void"
+        },
+        "refund": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund",
+          "returnType": "void"
+        },
+        "set_min_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_min_balance",
+          "returnType": "void"
+        },
+        "touch_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call touch_other",
+          "returnType": "void"
+        },
+        "refund_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_other",
+          "returnType": "void"
+        },
+        "block": {
+          "required": [],
+          "optional": [],
+          "description": "Call block",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        }
+      },
+      "AssetManager": {
+        "register_foreign_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_foreign_asset",
+          "returnType": "void"
+        },
+        "change_existing_asset_type": {
+          "required": [],
+          "optional": [],
+          "description": "Call change_existing_asset_type",
+          "returnType": "void"
+        },
+        "remove_existing_asset_type": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_existing_asset_type",
+          "returnType": "void"
+        },
+        "destroy_foreign_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy_foreign_asset",
+          "returnType": "void"
+        }
+      },
+      "XcmTransactor": {
+        "register": {
+          "required": [],
+          "optional": [],
+          "description": "Call register",
+          "returnType": "void"
+        },
+        "deregister": {
+          "required": [],
+          "optional": [],
+          "description": "Call deregister",
+          "returnType": "void"
+        },
+        "transact_through_derivative": {
+          "required": [],
+          "optional": [],
+          "description": "Call transact_through_derivative",
+          "returnType": "void"
+        },
+        "transact_through_sovereign": {
+          "required": [],
+          "optional": [],
+          "description": "Call transact_through_sovereign",
+          "returnType": "void"
+        },
+        "set_transact_info": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_transact_info",
+          "returnType": "void"
+        },
+        "remove_transact_info": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_transact_info",
+          "returnType": "void"
+        },
+        "transact_through_signed": {
+          "required": [],
+          "optional": [],
+          "description": "Call transact_through_signed",
+          "returnType": "void"
+        },
+        "set_fee_per_second": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fee_per_second",
+          "returnType": "void"
+        },
+        "remove_fee_per_second": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_fee_per_second",
+          "returnType": "void"
+        },
+        "hrmp_manage": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_manage",
+          "returnType": "void"
+        }
+      },
+      "EthereumXcm": {
+        "transact": {
+          "required": [],
+          "optional": [],
+          "description": "Call transact",
+          "returnType": "void"
+        },
+        "transact_through_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call transact_through_proxy",
+          "returnType": "void"
+        },
+        "suspend_ethereum_xcm_execution": {
+          "required": [],
+          "optional": [],
+          "description": "Call suspend_ethereum_xcm_execution",
+          "returnType": "void"
+        },
+        "resume_ethereum_xcm_execution": {
+          "required": [],
+          "optional": [],
+          "description": "Call resume_ethereum_xcm_execution",
+          "returnType": "void"
+        },
+        "force_transact_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transact_as",
+          "returnType": "void"
+        }
+      },
+      "MessageQueue": {
+        "reap_page": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_page",
+          "returnType": "void"
+        },
+        "execute_overweight": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_overweight",
+          "returnType": "void"
+        }
+      },
+      "EvmForeignAssets": {
+        "create_foreign_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_foreign_asset",
+          "returnType": "void"
+        },
+        "change_xcm_location": {
+          "required": [],
+          "optional": [],
+          "description": "Call change_xcm_location",
+          "returnType": "void"
+        },
+        "freeze_foreign_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze_foreign_asset",
+          "returnType": "void"
+        },
+        "unfreeze_foreign_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call unfreeze_foreign_asset",
+          "returnType": "void"
+        }
+      },
+      "XcmWeightTrader": {
+        "add_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_asset",
+          "returnType": "void"
+        },
+        "edit_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call edit_asset",
+          "returnType": "void"
+        },
+        "pause_asset_support": {
+          "required": [],
+          "optional": [],
+          "description": "Call pause_asset_support",
+          "returnType": "void"
+        },
+        "resume_asset_support": {
+          "required": [],
+          "optional": [],
+          "description": "Call resume_asset_support",
+          "returnType": "void"
+        },
+        "remove_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_asset",
+          "returnType": "void"
+        }
+      },
+      "EmergencyParaXcm": {
+        "paused_to_normal": {
+          "required": [],
+          "optional": [],
+          "description": "Call paused_to_normal",
+          "returnType": "void"
+        },
+        "fast_authorize_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call fast_authorize_upgrade",
+          "returnType": "void"
+        }
+      },
+      "MultiBlockMigrations": {
+        "force_set_cursor": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_cursor",
+          "returnType": "void"
+        },
+        "force_set_active_cursor": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_active_cursor",
+          "returnType": "void"
+        },
+        "force_onboard_mbms": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_onboard_mbms",
+          "returnType": "void"
+        },
+        "clear_historic": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_historic",
+          "returnType": "void"
+        }
+      },
+      "Randomness": {
+        "set_babe_randomness_results": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_babe_randomness_results",
+          "returnType": "void"
+        }
+      },
+      "BridgeKusamaGrandpa": {
+        "submit_finality_proof": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit_finality_proof",
+          "returnType": "void"
+        },
+        "initialize": {
+          "required": [],
+          "optional": [],
+          "description": "Call initialize",
+          "returnType": "void"
+        },
+        "set_owner": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_owner",
+          "returnType": "void"
+        },
+        "set_operating_mode": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_operating_mode",
+          "returnType": "void"
+        },
+        "submit_finality_proof_ex": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit_finality_proof_ex",
+          "returnType": "void"
+        },
+        "force_set_pallet_state": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_pallet_state",
+          "returnType": "void"
+        }
+      },
+      "BridgeKusamaParachains": {
+        "submit_parachain_heads": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit_parachain_heads",
+          "returnType": "void"
+        },
+        "set_owner": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_owner",
+          "returnType": "void"
+        },
+        "set_operating_mode": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_operating_mode",
+          "returnType": "void"
+        },
+        "submit_parachain_heads_ex": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit_parachain_heads_ex",
+          "returnType": "void"
+        }
+      },
+      "BridgeKusamaMessages": {
+        "set_owner": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_owner",
+          "returnType": "void"
+        },
+        "set_operating_mode": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_operating_mode",
+          "returnType": "void"
+        },
+        "receive_messages_proof": {
+          "required": [],
+          "optional": [],
+          "description": "Call receive_messages_proof",
+          "returnType": "void"
+        },
+        "receive_messages_delivery_proof": {
+          "required": [],
+          "optional": [],
+          "description": "Call receive_messages_delivery_proof",
+          "returnType": "void"
+        }
+      },
+      "BridgeXcmOverMoonriver": {
+        "open_bridge": {
+          "required": [],
+          "optional": [],
+          "description": "Call open_bridge",
+          "returnType": "void"
+        },
+        "close_bridge": {
+          "required": [],
+          "optional": [],
+          "description": "Call close_bridge",
+          "returnType": "void"
+        }
+      }
+    }
+  },
+  "paseo_asset_hub": {
+    "pallets": {
+      "System": {
+        "remark": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call remark",
+          "returnType": "void"
+        },
+        "set_heap_pages": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_heap_pages",
+          "returnType": "void"
+        },
+        "set_code": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call set_code",
+          "returnType": "void"
+        },
+        "set_code_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_without_checks",
+          "returnType": "void"
+        },
+        "set_storage": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_storage",
+          "returnType": "void"
+        },
+        "kill_storage": {
+          "required": [
+            "Vec<bytes>"
+          ],
+          "optional": [],
+          "description": "Call kill_storage",
+          "returnType": "void"
+        },
+        "kill_prefix": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_prefix",
+          "returnType": "void"
+        },
+        "remark_with_event": {
+          "required": [],
+          "optional": [],
+          "description": "Call remark_with_event",
+          "returnType": "void"
+        },
+        "authorize_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade",
+          "returnType": "void"
+        },
+        "authorize_upgrade_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade_without_checks",
+          "returnType": "void"
+        },
+        "apply_authorized_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_authorized_upgrade",
+          "returnType": "void"
+        }
+      },
+      "ParachainSystem": {
+        "set_validation_data": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_data",
+          "returnType": "void"
+        },
+        "sudo_send_upward_message": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_send_upward_message",
+          "returnType": "void"
+        }
+      },
+      "Timestamp": {
+        "set": {
+          "required": [],
+          "optional": [],
+          "description": "Call set",
+          "returnType": "void"
+        }
+      },
+      "MultiBlockMigrations": {
+        "force_set_cursor": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_cursor",
+          "returnType": "void"
+        },
+        "force_set_active_cursor": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_active_cursor",
+          "returnType": "void"
+        },
+        "force_onboard_mbms": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_onboard_mbms",
+          "returnType": "void"
+        },
+        "clear_historic": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_historic",
+          "returnType": "void"
+        }
+      },
+      "Balances": {
+        "transfer_allow_death": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_allow_death",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [
+            "AccountId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "force_unreserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unreserve",
+          "returnType": "void"
+        },
+        "upgrade_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call upgrade_accounts",
+          "returnType": "void"
+        },
+        "force_set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_balance",
+          "returnType": "void"
+        },
+        "force_adjust_total_issuance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_adjust_total_issuance",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        }
+      },
+      "CollatorSelection": {
+        "set_invulnerables": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_invulnerables",
+          "returnType": "void"
+        },
+        "set_desired_candidates": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_desired_candidates",
+          "returnType": "void"
+        },
+        "set_candidacy_bond": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_candidacy_bond",
+          "returnType": "void"
+        },
+        "register_as_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_as_candidate",
+          "returnType": "void"
+        },
+        "leave_intent": {
+          "required": [],
+          "optional": [],
+          "description": "Call leave_intent",
+          "returnType": "void"
+        },
+        "add_invulnerable": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_invulnerable",
+          "returnType": "void"
+        },
+        "remove_invulnerable": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_invulnerable",
+          "returnType": "void"
+        },
+        "update_bond": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_bond",
+          "returnType": "void"
+        },
+        "take_candidate_slot": {
+          "required": [],
+          "optional": [],
+          "description": "Call take_candidate_slot",
+          "returnType": "void"
+        }
+      },
+      "Session": {
+        "set_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_keys",
+          "returnType": "void"
+        },
+        "purge_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call purge_keys",
+          "returnType": "void"
+        }
+      },
+      "XcmpQueue": {
+        "suspend_xcm_execution": {
+          "required": [],
+          "optional": [],
+          "description": "Call suspend_xcm_execution",
+          "returnType": "void"
+        },
+        "resume_xcm_execution": {
+          "required": [],
+          "optional": [],
+          "description": "Call resume_xcm_execution",
+          "returnType": "void"
+        },
+        "update_suspend_threshold": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_suspend_threshold",
+          "returnType": "void"
+        },
+        "update_drop_threshold": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_drop_threshold",
+          "returnType": "void"
+        },
+        "update_resume_threshold": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_resume_threshold",
+          "returnType": "void"
+        }
+      },
+      "PolkadotXcm": {
+        "send": {
+          "required": [],
+          "optional": [],
+          "description": "Call send",
+          "returnType": "void"
+        },
+        "teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call teleport_assets",
+          "returnType": "void"
+        },
+        "reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "force_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_xcm_version",
+          "returnType": "void"
+        },
+        "force_default_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_default_xcm_version",
+          "returnType": "void"
+        },
+        "force_subscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_subscribe_version_notify",
+          "returnType": "void"
+        },
+        "force_unsubscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unsubscribe_version_notify",
+          "returnType": "void"
+        },
+        "limited_reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "limited_teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_teleport_assets",
+          "returnType": "void"
+        },
+        "force_suspension": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_suspension",
+          "returnType": "void"
+        },
+        "transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets",
+          "returnType": "void"
+        },
+        "claim_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_assets",
+          "returnType": "void"
+        },
+        "transfer_assets_using_type_and_then": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets_using_type_and_then",
+          "returnType": "void"
+        },
+        "add_authorized_alias": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_authorized_alias",
+          "returnType": "void"
+        },
+        "remove_authorized_alias": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_authorized_alias",
+          "returnType": "void"
+        },
+        "remove_all_authorized_aliases": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_all_authorized_aliases",
+          "returnType": "void"
+        }
+      },
+      "ToRococoXcmRouter": {
+        "report_bridge_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_bridge_status",
+          "returnType": "void"
+        }
+      },
+      "MessageQueue": {
+        "reap_page": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_page",
+          "returnType": "void"
+        },
+        "execute_overweight": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_overweight",
+          "returnType": "void"
+        }
+      },
+      "SnowbridgeSystemFrontend": {
+        "set_operating_mode": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_operating_mode",
+          "returnType": "void"
+        },
+        "register_token": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_token",
+          "returnType": "void"
+        },
+        "add_tip": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_tip",
+          "returnType": "void"
+        }
+      },
+      "Utility": {
+        "batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch",
+          "returnType": "void"
+        },
+        "as_derivative": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_derivative",
+          "returnType": "void"
+        },
+        "batch_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch_all",
+          "returnType": "void"
+        },
+        "dispatch_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as",
+          "returnType": "void"
+        },
+        "force_batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_batch",
+          "returnType": "void"
+        },
+        "with_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call with_weight",
+          "returnType": "void"
+        },
+        "if_else": {
+          "required": [],
+          "optional": [],
+          "description": "Call if_else",
+          "returnType": "void"
+        },
+        "dispatch_as_fallible": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as_fallible",
+          "returnType": "void"
+        }
+      },
+      "Multisig": {
+        "as_multi_threshold_1": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi_threshold_1",
+          "returnType": "void"
+        },
+        "as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi",
+          "returnType": "void"
+        },
+        "approve_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_as_multi",
+          "returnType": "void"
+        },
+        "cancel_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_as_multi",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Proxy": {
+        "proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy",
+          "returnType": "void"
+        },
+        "add_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_proxy",
+          "returnType": "void"
+        },
+        "remove_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxy",
+          "returnType": "void"
+        },
+        "remove_proxies": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxies",
+          "returnType": "void"
+        },
+        "create_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pure",
+          "returnType": "void"
+        },
+        "kill_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_pure",
+          "returnType": "void"
+        },
+        "announce": {
+          "required": [],
+          "optional": [],
+          "description": "Call announce",
+          "returnType": "void"
+        },
+        "remove_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_announcement",
+          "returnType": "void"
+        },
+        "reject_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call reject_announcement",
+          "returnType": "void"
+        },
+        "proxy_announced": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy_announced",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Assets": {
+        "create": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "force_create": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_create",
+          "returnType": "void"
+        },
+        "start_destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call start_destroy",
+          "returnType": "void"
+        },
+        "destroy_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy_accounts",
+          "returnType": "void"
+        },
+        "destroy_approvals": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy_approvals",
+          "returnType": "void"
+        },
+        "finish_destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call finish_destroy",
+          "returnType": "void"
+        },
+        "mint": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call mint",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "freeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze",
+          "returnType": "void"
+        },
+        "thaw": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw",
+          "returnType": "void"
+        },
+        "freeze_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze_asset",
+          "returnType": "void"
+        },
+        "thaw_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw_asset",
+          "returnType": "void"
+        },
+        "transfer_ownership": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_ownership",
+          "returnType": "void"
+        },
+        "set_team": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_team",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        },
+        "clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_metadata",
+          "returnType": "void"
+        },
+        "force_set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_metadata",
+          "returnType": "void"
+        },
+        "force_clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_clear_metadata",
+          "returnType": "void"
+        },
+        "force_asset_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_asset_status",
+          "returnType": "void"
+        },
+        "approve_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_transfer",
+          "returnType": "void"
+        },
+        "cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_approval",
+          "returnType": "void"
+        },
+        "force_cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_cancel_approval",
+          "returnType": "void"
+        },
+        "transfer_approved": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_approved",
+          "returnType": "void"
+        },
+        "touch": {
+          "required": [],
+          "optional": [],
+          "description": "Call touch",
+          "returnType": "void"
+        },
+        "refund": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund",
+          "returnType": "void"
+        },
+        "set_min_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_min_balance",
+          "returnType": "void"
+        },
+        "touch_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call touch_other",
+          "returnType": "void"
+        },
+        "refund_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_other",
+          "returnType": "void"
+        },
+        "block": {
+          "required": [],
+          "optional": [],
+          "description": "Call block",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        }
+      },
+      "Uniques": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "force_create": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_create",
+          "returnType": "void"
+        },
+        "destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy",
+          "returnType": "void"
+        },
+        "mint": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "redeposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeposit",
+          "returnType": "void"
+        },
+        "freeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze",
+          "returnType": "void"
+        },
+        "thaw": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw",
+          "returnType": "void"
+        },
+        "freeze_collection": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze_collection",
+          "returnType": "void"
+        },
+        "thaw_collection": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw_collection",
+          "returnType": "void"
+        },
+        "transfer_ownership": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_ownership",
+          "returnType": "void"
+        },
+        "set_team": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_team",
+          "returnType": "void"
+        },
+        "approve_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_transfer",
+          "returnType": "void"
+        },
+        "cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_approval",
+          "returnType": "void"
+        },
+        "force_item_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_item_status",
+          "returnType": "void"
+        },
+        "set_attribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_attribute",
+          "returnType": "void"
+        },
+        "clear_attribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_attribute",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        },
+        "clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_metadata",
+          "returnType": "void"
+        },
+        "set_collection_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_collection_metadata",
+          "returnType": "void"
+        },
+        "clear_collection_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_collection_metadata",
+          "returnType": "void"
+        },
+        "set_accept_ownership": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_accept_ownership",
+          "returnType": "void"
+        },
+        "set_collection_max_supply": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_collection_max_supply",
+          "returnType": "void"
+        },
+        "set_price": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_price",
+          "returnType": "void"
+        },
+        "buy_item": {
+          "required": [],
+          "optional": [],
+          "description": "Call buy_item",
+          "returnType": "void"
+        }
+      },
+      "Nfts": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "force_create": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_create",
+          "returnType": "void"
+        },
+        "destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy",
+          "returnType": "void"
+        },
+        "mint": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint",
+          "returnType": "void"
+        },
+        "force_mint": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_mint",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "redeposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call redeposit",
+          "returnType": "void"
+        },
+        "lock_item_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call lock_item_transfer",
+          "returnType": "void"
+        },
+        "unlock_item_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock_item_transfer",
+          "returnType": "void"
+        },
+        "lock_collection": {
+          "required": [],
+          "optional": [],
+          "description": "Call lock_collection",
+          "returnType": "void"
+        },
+        "transfer_ownership": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_ownership",
+          "returnType": "void"
+        },
+        "set_team": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_team",
+          "returnType": "void"
+        },
+        "force_collection_owner": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_collection_owner",
+          "returnType": "void"
+        },
+        "force_collection_config": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_collection_config",
+          "returnType": "void"
+        },
+        "approve_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_transfer",
+          "returnType": "void"
+        },
+        "cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_approval",
+          "returnType": "void"
+        },
+        "clear_all_transfer_approvals": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_all_transfer_approvals",
+          "returnType": "void"
+        },
+        "lock_item_properties": {
+          "required": [],
+          "optional": [],
+          "description": "Call lock_item_properties",
+          "returnType": "void"
+        },
+        "set_attribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_attribute",
+          "returnType": "void"
+        },
+        "force_set_attribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_attribute",
+          "returnType": "void"
+        },
+        "clear_attribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_attribute",
+          "returnType": "void"
+        },
+        "approve_item_attributes": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_item_attributes",
+          "returnType": "void"
+        },
+        "cancel_item_attributes_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_item_attributes_approval",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        },
+        "clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_metadata",
+          "returnType": "void"
+        },
+        "set_collection_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_collection_metadata",
+          "returnType": "void"
+        },
+        "clear_collection_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_collection_metadata",
+          "returnType": "void"
+        },
+        "set_accept_ownership": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_accept_ownership",
+          "returnType": "void"
+        },
+        "set_collection_max_supply": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_collection_max_supply",
+          "returnType": "void"
+        },
+        "update_mint_settings": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_mint_settings",
+          "returnType": "void"
+        },
+        "set_price": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_price",
+          "returnType": "void"
+        },
+        "buy_item": {
+          "required": [],
+          "optional": [],
+          "description": "Call buy_item",
+          "returnType": "void"
+        },
+        "pay_tips": {
+          "required": [],
+          "optional": [],
+          "description": "Call pay_tips",
+          "returnType": "void"
+        },
+        "create_swap": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_swap",
+          "returnType": "void"
+        },
+        "cancel_swap": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_swap",
+          "returnType": "void"
+        },
+        "claim_swap": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_swap",
+          "returnType": "void"
+        },
+        "mint_pre_signed": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint_pre_signed",
+          "returnType": "void"
+        },
+        "set_attributes_pre_signed": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_attributes_pre_signed",
+          "returnType": "void"
+        }
+      },
+      "ForeignAssets": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "force_create": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_create",
+          "returnType": "void"
+        },
+        "start_destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call start_destroy",
+          "returnType": "void"
+        },
+        "destroy_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy_accounts",
+          "returnType": "void"
+        },
+        "destroy_approvals": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy_approvals",
+          "returnType": "void"
+        },
+        "finish_destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call finish_destroy",
+          "returnType": "void"
+        },
+        "mint": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "freeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze",
+          "returnType": "void"
+        },
+        "thaw": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw",
+          "returnType": "void"
+        },
+        "freeze_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze_asset",
+          "returnType": "void"
+        },
+        "thaw_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw_asset",
+          "returnType": "void"
+        },
+        "transfer_ownership": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_ownership",
+          "returnType": "void"
+        },
+        "set_team": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_team",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        },
+        "clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_metadata",
+          "returnType": "void"
+        },
+        "force_set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_metadata",
+          "returnType": "void"
+        },
+        "force_clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_clear_metadata",
+          "returnType": "void"
+        },
+        "force_asset_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_asset_status",
+          "returnType": "void"
+        },
+        "approve_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_transfer",
+          "returnType": "void"
+        },
+        "cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_approval",
+          "returnType": "void"
+        },
+        "force_cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_cancel_approval",
+          "returnType": "void"
+        },
+        "transfer_approved": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_approved",
+          "returnType": "void"
+        },
+        "touch": {
+          "required": [],
+          "optional": [],
+          "description": "Call touch",
+          "returnType": "void"
+        },
+        "refund": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund",
+          "returnType": "void"
+        },
+        "set_min_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_min_balance",
+          "returnType": "void"
+        },
+        "touch_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call touch_other",
+          "returnType": "void"
+        },
+        "refund_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_other",
+          "returnType": "void"
+        },
+        "block": {
+          "required": [],
+          "optional": [],
+          "description": "Call block",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        }
+      },
+      "NftFractionalization": {
+        "fractionalize": {
+          "required": [],
+          "optional": [],
+          "description": "Call fractionalize",
+          "returnType": "void"
+        },
+        "unify": {
+          "required": [],
+          "optional": [],
+          "description": "Call unify",
+          "returnType": "void"
+        }
+      },
+      "PoolAssets": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "force_create": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_create",
+          "returnType": "void"
+        },
+        "start_destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call start_destroy",
+          "returnType": "void"
+        },
+        "destroy_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy_accounts",
+          "returnType": "void"
+        },
+        "destroy_approvals": {
+          "required": [],
+          "optional": [],
+          "description": "Call destroy_approvals",
+          "returnType": "void"
+        },
+        "finish_destroy": {
+          "required": [],
+          "optional": [],
+          "description": "Call finish_destroy",
+          "returnType": "void"
+        },
+        "mint": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "freeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze",
+          "returnType": "void"
+        },
+        "thaw": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw",
+          "returnType": "void"
+        },
+        "freeze_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze_asset",
+          "returnType": "void"
+        },
+        "thaw_asset": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw_asset",
+          "returnType": "void"
+        },
+        "transfer_ownership": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_ownership",
+          "returnType": "void"
+        },
+        "set_team": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_team",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        },
+        "clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_metadata",
+          "returnType": "void"
+        },
+        "force_set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_metadata",
+          "returnType": "void"
+        },
+        "force_clear_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_clear_metadata",
+          "returnType": "void"
+        },
+        "force_asset_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_asset_status",
+          "returnType": "void"
+        },
+        "approve_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_transfer",
+          "returnType": "void"
+        },
+        "cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_approval",
+          "returnType": "void"
+        },
+        "force_cancel_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_cancel_approval",
+          "returnType": "void"
+        },
+        "transfer_approved": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_approved",
+          "returnType": "void"
+        },
+        "touch": {
+          "required": [],
+          "optional": [],
+          "description": "Call touch",
+          "returnType": "void"
+        },
+        "refund": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund",
+          "returnType": "void"
+        },
+        "set_min_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_min_balance",
+          "returnType": "void"
+        },
+        "touch_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call touch_other",
+          "returnType": "void"
+        },
+        "refund_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_other",
+          "returnType": "void"
+        },
+        "block": {
+          "required": [],
+          "optional": [],
+          "description": "Call block",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        }
+      },
+      "AssetConversion": {
+        "create_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pool",
+          "returnType": "void"
+        },
+        "add_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_liquidity",
+          "returnType": "void"
+        },
+        "remove_liquidity": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_liquidity",
+          "returnType": "void"
+        },
+        "swap_exact_tokens_for_tokens": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap_exact_tokens_for_tokens",
+          "returnType": "void"
+        },
+        "swap_tokens_for_exact_tokens": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap_tokens_for_exact_tokens",
+          "returnType": "void"
+        },
+        "touch": {
+          "required": [],
+          "optional": [],
+          "description": "Call touch",
+          "returnType": "void"
+        }
+      },
+      "Revive": {
+        "eth_transact": {
+          "required": [],
+          "optional": [],
+          "description": "Call eth_transact",
+          "returnType": "void"
+        },
+        "call": {
+          "required": [],
+          "optional": [],
+          "description": "Call call",
+          "returnType": "void"
+        },
+        "instantiate": {
+          "required": [],
+          "optional": [],
+          "description": "Call instantiate",
+          "returnType": "void"
+        },
+        "instantiate_with_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call instantiate_with_code",
+          "returnType": "void"
+        },
+        "eth_instantiate_with_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call eth_instantiate_with_code",
+          "returnType": "void"
+        },
+        "eth_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call eth_call",
+          "returnType": "void"
+        },
+        "upload_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call upload_code",
+          "returnType": "void"
+        },
+        "remove_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_code",
+          "returnType": "void"
+        },
+        "set_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code",
+          "returnType": "void"
+        },
+        "map_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call map_account",
+          "returnType": "void"
+        },
+        "unmap_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call unmap_account",
+          "returnType": "void"
+        },
+        "dispatch_as_fallback_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as_fallback_account",
+          "returnType": "void"
+        }
+      },
+      "AssetRewards": {
+        "create_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pool",
+          "returnType": "void"
+        },
+        "stake": {
+          "required": [],
+          "optional": [],
+          "description": "Call stake",
+          "returnType": "void"
+        },
+        "unstake": {
+          "required": [],
+          "optional": [],
+          "description": "Call unstake",
+          "returnType": "void"
+        },
+        "harvest_rewards": {
+          "required": [],
+          "optional": [],
+          "description": "Call harvest_rewards",
+          "returnType": "void"
+        },
+        "set_pool_reward_rate_per_block": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_pool_reward_rate_per_block",
+          "returnType": "void"
+        },
+        "set_pool_admin": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_pool_admin",
+          "returnType": "void"
+        },
+        "set_pool_expiry_block": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_pool_expiry_block",
+          "returnType": "void"
+        },
+        "deposit_reward_tokens": {
+          "required": [],
+          "optional": [],
+          "description": "Call deposit_reward_tokens",
+          "returnType": "void"
+        },
+        "cleanup_pool": {
+          "required": [],
+          "optional": [],
+          "description": "Call cleanup_pool",
+          "returnType": "void"
+        }
+      },
+      "StateTrieMigration": {
+        "control_auto_migration": {
+          "required": [],
+          "optional": [],
+          "description": "Call control_auto_migration",
+          "returnType": "void"
+        },
+        "continue_migrate": {
+          "required": [],
+          "optional": [],
+          "description": "Call continue_migrate",
+          "returnType": "void"
+        },
+        "migrate_custom_top": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_custom_top",
+          "returnType": "void"
+        },
+        "migrate_custom_child": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_custom_child",
+          "returnType": "void"
+        },
+        "set_signed_max_limits": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_signed_max_limits",
+          "returnType": "void"
+        },
+        "force_set_progress": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_progress",
+          "returnType": "void"
+        }
+      },
+      "AssetConversionMigration": {
+        "migrate_to_new_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_to_new_account",
+          "returnType": "void"
+        }
+      },
+      "Sudo": {
+        "sudo": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo",
+          "returnType": "void"
+        },
+        "sudo_unchecked_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_unchecked_weight",
+          "returnType": "void"
+        },
+        "set_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_key",
+          "returnType": "void"
+        },
+        "sudo_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_as",
+          "returnType": "void"
+        },
+        "remove_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_key",
+          "returnType": "void"
+        }
+      }
+    }
+  },
+  "polkadot": {
+    "pallets": {
+      "System": {
+        "remark": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call remark",
+          "returnType": "void"
+        },
+        "set_heap_pages": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_heap_pages",
+          "returnType": "void"
+        },
+        "set_code": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call set_code",
+          "returnType": "void"
+        },
+        "set_code_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_without_checks",
+          "returnType": "void"
+        },
+        "set_storage": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_storage",
+          "returnType": "void"
+        },
+        "kill_storage": {
+          "required": [
+            "Vec<bytes>"
+          ],
+          "optional": [],
+          "description": "Call kill_storage",
+          "returnType": "void"
+        },
+        "kill_prefix": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_prefix",
+          "returnType": "void"
+        },
+        "remark_with_event": {
+          "required": [],
+          "optional": [],
+          "description": "Call remark_with_event",
+          "returnType": "void"
+        },
+        "authorize_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade",
+          "returnType": "void"
+        },
+        "authorize_upgrade_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade_without_checks",
+          "returnType": "void"
+        },
+        "apply_authorized_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_authorized_upgrade",
+          "returnType": "void"
+        }
+      },
+      "Scheduler": {
+        "schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "schedule_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named",
+          "returnType": "void"
+        },
+        "cancel_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_named",
+          "returnType": "void"
+        },
+        "schedule_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_after",
+          "returnType": "void"
+        },
+        "schedule_named_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named_after",
+          "returnType": "void"
+        },
+        "set_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry",
+          "returnType": "void"
+        },
+        "set_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry_named",
+          "returnType": "void"
+        },
+        "cancel_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry",
+          "returnType": "void"
+        },
+        "cancel_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry_named",
+          "returnType": "void"
+        }
+      },
+      "Preimage": {
+        "note_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_preimage",
+          "returnType": "void"
+        },
+        "unnote_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unnote_preimage",
+          "returnType": "void"
+        },
+        "request_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_preimage",
+          "returnType": "void"
+        },
+        "unrequest_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unrequest_preimage",
+          "returnType": "void"
+        },
+        "ensure_updated": {
+          "required": [],
+          "optional": [],
+          "description": "Call ensure_updated",
+          "returnType": "void"
+        }
+      },
+      "Babe": {
+        "report_equivocation": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation",
+          "returnType": "void"
+        },
+        "report_equivocation_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation_unsigned",
+          "returnType": "void"
+        },
+        "plan_config_change": {
+          "required": [],
+          "optional": [],
+          "description": "Call plan_config_change",
+          "returnType": "void"
+        }
+      },
+      "Timestamp": {
+        "set": {
+          "required": [],
+          "optional": [],
+          "description": "Call set",
+          "returnType": "void"
+        }
+      },
+      "Indices": {
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "free": {
+          "required": [],
+          "optional": [],
+          "description": "Call free",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "freeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Balances": {
+        "transfer_allow_death": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_allow_death",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [
+            "AccountId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "force_unreserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unreserve",
+          "returnType": "void"
+        },
+        "upgrade_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call upgrade_accounts",
+          "returnType": "void"
+        },
+        "force_set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_balance",
+          "returnType": "void"
+        },
+        "force_adjust_total_issuance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_adjust_total_issuance",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        }
+      },
+      "Staking": {
+        "bond": {
+          "required": [
+            "AccountId",
+            "Balance",
+            "RewardDestination"
+          ],
+          "optional": [],
+          "description": "Call bond",
+          "returnType": "void"
+        },
+        "bond_extra": {
+          "required": [],
+          "optional": [],
+          "description": "Call bond_extra",
+          "returnType": "void"
+        },
+        "unbond": {
+          "required": [
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call unbond",
+          "returnType": "void"
+        },
+        "withdraw_unbonded": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_unbonded",
+          "returnType": "void"
+        },
+        "validate": {
+          "required": [
+            "ValidatorPrefs"
+          ],
+          "optional": [],
+          "description": "Call validate",
+          "returnType": "void"
+        },
+        "nominate": {
+          "required": [
+            "Vec<AccountId>"
+          ],
+          "optional": [],
+          "description": "Call nominate",
+          "returnType": "void"
+        },
+        "chill": {
+          "required": [],
+          "optional": [],
+          "description": "Call chill",
+          "returnType": "void"
+        },
+        "set_payee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_payee",
+          "returnType": "void"
+        },
+        "set_controller": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_controller",
+          "returnType": "void"
+        },
+        "set_validator_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validator_count",
+          "returnType": "void"
+        },
+        "increase_validator_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call increase_validator_count",
+          "returnType": "void"
+        },
+        "scale_validator_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call scale_validator_count",
+          "returnType": "void"
+        },
+        "force_no_eras": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_no_eras",
+          "returnType": "void"
+        },
+        "force_new_era": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_new_era",
+          "returnType": "void"
+        },
+        "set_invulnerables": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_invulnerables",
+          "returnType": "void"
+        },
+        "force_unstake": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unstake",
+          "returnType": "void"
+        },
+        "force_new_era_always": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_new_era_always",
+          "returnType": "void"
+        },
+        "cancel_deferred_slash": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_deferred_slash",
+          "returnType": "void"
+        },
+        "payout_stakers": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout_stakers",
+          "returnType": "void"
+        },
+        "rebond": {
+          "required": [],
+          "optional": [],
+          "description": "Call rebond",
+          "returnType": "void"
+        },
+        "reap_stash": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_stash",
+          "returnType": "void"
+        },
+        "kick": {
+          "required": [],
+          "optional": [],
+          "description": "Call kick",
+          "returnType": "void"
+        },
+        "set_staking_configs": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_staking_configs",
+          "returnType": "void"
+        },
+        "chill_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call chill_other",
+          "returnType": "void"
+        },
+        "force_apply_min_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_apply_min_commission",
+          "returnType": "void"
+        },
+        "set_min_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_min_commission",
+          "returnType": "void"
+        },
+        "payout_stakers_by_page": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout_stakers_by_page",
+          "returnType": "void"
+        },
+        "update_payee": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_payee",
+          "returnType": "void"
+        },
+        "deprecate_controller_batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call deprecate_controller_batch",
+          "returnType": "void"
+        },
+        "restore_ledger": {
+          "required": [],
+          "optional": [],
+          "description": "Call restore_ledger",
+          "returnType": "void"
+        },
+        "migrate_currency": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_currency",
+          "returnType": "void"
+        },
+        "manual_slash": {
+          "required": [],
+          "optional": [],
+          "description": "Call manual_slash",
+          "returnType": "void"
+        }
+      },
+      "Session": {
+        "set_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_keys",
+          "returnType": "void"
+        },
+        "purge_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call purge_keys",
+          "returnType": "void"
+        }
+      },
+      "Grandpa": {
+        "report_equivocation": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation",
+          "returnType": "void"
+        },
+        "report_equivocation_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation_unsigned",
+          "returnType": "void"
+        },
+        "note_stalled": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_stalled",
+          "returnType": "void"
+        }
+      },
+      "Treasury": {
+        "spend_local": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend_local",
+          "returnType": "void"
+        },
+        "remove_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_approval",
+          "returnType": "void"
+        },
+        "spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend",
+          "returnType": "void"
+        },
+        "payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout",
+          "returnType": "void"
+        },
+        "check_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call check_status",
+          "returnType": "void"
+        },
+        "void_spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call void_spend",
+          "returnType": "void"
+        }
+      },
+      "ConvictionVoting": {
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "delegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate",
+          "returnType": "void"
+        },
+        "undelegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call undelegate",
+          "returnType": "void"
+        },
+        "unlock": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock",
+          "returnType": "void"
+        },
+        "remove_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_vote",
+          "returnType": "void"
+        },
+        "remove_other_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_other_vote",
+          "returnType": "void"
+        }
+      },
+      "Referenda": {
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "place_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_decision_deposit",
+          "returnType": "void"
+        },
+        "refund_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_decision_deposit",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "nudge_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call nudge_referendum",
+          "returnType": "void"
+        },
+        "one_fewer_deciding": {
+          "required": [],
+          "optional": [],
+          "description": "Call one_fewer_deciding",
+          "returnType": "void"
+        },
+        "refund_submission_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_submission_deposit",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        }
+      },
+      "Whitelist": {
+        "whitelist_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call whitelist_call",
+          "returnType": "void"
+        },
+        "remove_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call_with_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call_with_preimage",
+          "returnType": "void"
+        }
+      },
+      "Claims": {
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        },
+        "mint_claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint_claim",
+          "returnType": "void"
+        },
+        "claim_attest": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_attest",
+          "returnType": "void"
+        },
+        "attest": {
+          "required": [],
+          "optional": [],
+          "description": "Call attest",
+          "returnType": "void"
+        },
+        "move_claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call move_claim",
+          "returnType": "void"
+        }
+      },
+      "Vesting": {
+        "vest": {
+          "required": [],
+          "optional": [],
+          "description": "Call vest",
+          "returnType": "void"
+        },
+        "vest_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call vest_other",
+          "returnType": "void"
+        },
+        "vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call vested_transfer",
+          "returnType": "void"
+        },
+        "force_vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_vested_transfer",
+          "returnType": "void"
+        },
+        "merge_schedules": {
+          "required": [],
+          "optional": [],
+          "description": "Call merge_schedules",
+          "returnType": "void"
+        },
+        "force_remove_vesting_schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_remove_vesting_schedule",
+          "returnType": "void"
+        }
+      },
+      "Utility": {
+        "batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch",
+          "returnType": "void"
+        },
+        "as_derivative": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_derivative",
+          "returnType": "void"
+        },
+        "batch_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch_all",
+          "returnType": "void"
+        },
+        "dispatch_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as",
+          "returnType": "void"
+        },
+        "force_batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_batch",
+          "returnType": "void"
+        },
+        "with_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call with_weight",
+          "returnType": "void"
+        },
+        "if_else": {
+          "required": [],
+          "optional": [],
+          "description": "Call if_else",
+          "returnType": "void"
+        },
+        "dispatch_as_fallible": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as_fallible",
+          "returnType": "void"
+        }
+      },
+      "Proxy": {
+        "proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy",
+          "returnType": "void"
+        },
+        "add_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_proxy",
+          "returnType": "void"
+        },
+        "remove_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxy",
+          "returnType": "void"
+        },
+        "remove_proxies": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxies",
+          "returnType": "void"
+        },
+        "create_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pure",
+          "returnType": "void"
+        },
+        "kill_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_pure",
+          "returnType": "void"
+        },
+        "announce": {
+          "required": [],
+          "optional": [],
+          "description": "Call announce",
+          "returnType": "void"
+        },
+        "remove_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_announcement",
+          "returnType": "void"
+        },
+        "reject_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call reject_announcement",
+          "returnType": "void"
+        },
+        "proxy_announced": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy_announced",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Multisig": {
+        "as_multi_threshold_1": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi_threshold_1",
+          "returnType": "void"
+        },
+        "as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi",
+          "returnType": "void"
+        },
+        "approve_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_as_multi",
+          "returnType": "void"
+        },
+        "cancel_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_as_multi",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Bounties": {
+        "propose_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose_bounty",
+          "returnType": "void"
+        },
+        "approve_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_bounty",
+          "returnType": "void"
+        },
+        "propose_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose_curator",
+          "returnType": "void"
+        },
+        "unassign_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call unassign_curator",
+          "returnType": "void"
+        },
+        "accept_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call accept_curator",
+          "returnType": "void"
+        },
+        "award_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call award_bounty",
+          "returnType": "void"
+        },
+        "claim_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_bounty",
+          "returnType": "void"
+        },
+        "close_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call close_bounty",
+          "returnType": "void"
+        },
+        "extend_bounty_expiry": {
+          "required": [],
+          "optional": [],
+          "description": "Call extend_bounty_expiry",
+          "returnType": "void"
+        },
+        "approve_bounty_with_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_bounty_with_curator",
+          "returnType": "void"
+        }
+      },
+      "ChildBounties": {
+        "add_child_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_child_bounty",
+          "returnType": "void"
+        },
+        "propose_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose_curator",
+          "returnType": "void"
+        },
+        "accept_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call accept_curator",
+          "returnType": "void"
+        },
+        "unassign_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call unassign_curator",
+          "returnType": "void"
+        },
+        "award_child_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call award_child_bounty",
+          "returnType": "void"
+        },
+        "claim_child_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_child_bounty",
+          "returnType": "void"
+        },
+        "close_child_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call close_child_bounty",
+          "returnType": "void"
+        }
+      },
+      "ElectionProviderMultiPhase": {
+        "submit_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit_unsigned",
+          "returnType": "void"
+        },
+        "set_minimum_untrusted_score": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_untrusted_score",
+          "returnType": "void"
+        },
+        "set_emergency_election_result": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_emergency_election_result",
+          "returnType": "void"
+        },
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "governance_fallback": {
+          "required": [],
+          "optional": [],
+          "description": "Call governance_fallback",
+          "returnType": "void"
+        }
+      },
+      "VoterList": {
+        "rebag": {
+          "required": [],
+          "optional": [],
+          "description": "Call rebag",
+          "returnType": "void"
+        },
+        "put_in_front_of": {
+          "required": [],
+          "optional": [],
+          "description": "Call put_in_front_of",
+          "returnType": "void"
+        },
+        "put_in_front_of_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call put_in_front_of_other",
+          "returnType": "void"
+        }
+      },
+      "NominationPools": {
+        "join": {
+          "required": [],
+          "optional": [],
+          "description": "Call join",
+          "returnType": "void"
+        },
+        "bond_extra": {
+          "required": [],
+          "optional": [],
+          "description": "Call bond_extra",
+          "returnType": "void"
+        },
+        "claim_payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_payout",
+          "returnType": "void"
+        },
+        "unbond": {
+          "required": [],
+          "optional": [],
+          "description": "Call unbond",
+          "returnType": "void"
+        },
+        "pool_withdraw_unbonded": {
+          "required": [],
+          "optional": [],
+          "description": "Call pool_withdraw_unbonded",
+          "returnType": "void"
+        },
+        "withdraw_unbonded": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_unbonded",
+          "returnType": "void"
+        },
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "create_with_pool_id": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_with_pool_id",
+          "returnType": "void"
+        },
+        "nominate": {
+          "required": [],
+          "optional": [],
+          "description": "Call nominate",
+          "returnType": "void"
+        },
+        "set_state": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_state",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        },
+        "set_configs": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_configs",
+          "returnType": "void"
+        },
+        "update_roles": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_roles",
+          "returnType": "void"
+        },
+        "chill": {
+          "required": [],
+          "optional": [],
+          "description": "Call chill",
+          "returnType": "void"
+        },
+        "bond_extra_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call bond_extra_other",
+          "returnType": "void"
+        },
+        "set_claim_permission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_claim_permission",
+          "returnType": "void"
+        },
+        "claim_payout_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_payout_other",
+          "returnType": "void"
+        },
+        "set_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission",
+          "returnType": "void"
+        },
+        "set_commission_max": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission_max",
+          "returnType": "void"
+        },
+        "set_commission_change_rate": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission_change_rate",
+          "returnType": "void"
+        },
+        "claim_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_commission",
+          "returnType": "void"
+        },
+        "adjust_pool_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call adjust_pool_deposit",
+          "returnType": "void"
+        },
+        "set_commission_claim_permission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission_claim_permission",
+          "returnType": "void"
+        },
+        "apply_slash": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_slash",
+          "returnType": "void"
+        },
+        "migrate_delegation": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_delegation",
+          "returnType": "void"
+        },
+        "migrate_pool_to_delegate_stake": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_pool_to_delegate_stake",
+          "returnType": "void"
+        }
+      },
+      "FastUnstake": {
+        "register_fast_unstake": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_fast_unstake",
+          "returnType": "void"
+        },
+        "deregister": {
+          "required": [],
+          "optional": [],
+          "description": "Call deregister",
+          "returnType": "void"
+        },
+        "control": {
+          "required": [],
+          "optional": [],
+          "description": "Call control",
+          "returnType": "void"
+        }
+      },
+      "Configuration": {
+        "set_validation_upgrade_cooldown": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_upgrade_cooldown",
+          "returnType": "void"
+        },
+        "set_validation_upgrade_delay": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_upgrade_delay",
+          "returnType": "void"
+        },
+        "set_code_retention_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_retention_period",
+          "returnType": "void"
+        },
+        "set_max_code_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_code_size",
+          "returnType": "void"
+        },
+        "set_max_pov_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_pov_size",
+          "returnType": "void"
+        },
+        "set_max_head_data_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_head_data_size",
+          "returnType": "void"
+        },
+        "set_coretime_cores": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_coretime_cores",
+          "returnType": "void"
+        },
+        "set_group_rotation_frequency": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_group_rotation_frequency",
+          "returnType": "void"
+        },
+        "set_paras_availability_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_paras_availability_period",
+          "returnType": "void"
+        },
+        "set_scheduling_lookahead": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_scheduling_lookahead",
+          "returnType": "void"
+        },
+        "set_max_validators_per_core": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_validators_per_core",
+          "returnType": "void"
+        },
+        "set_max_validators": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_validators",
+          "returnType": "void"
+        },
+        "set_dispute_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_dispute_period",
+          "returnType": "void"
+        },
+        "set_dispute_post_conclusion_acceptance_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_dispute_post_conclusion_acceptance_period",
+          "returnType": "void"
+        },
+        "set_no_show_slots": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_no_show_slots",
+          "returnType": "void"
+        },
+        "set_n_delay_tranches": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_n_delay_tranches",
+          "returnType": "void"
+        },
+        "set_zeroth_delay_tranche_width": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_zeroth_delay_tranche_width",
+          "returnType": "void"
+        },
+        "set_needed_approvals": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_needed_approvals",
+          "returnType": "void"
+        },
+        "set_relay_vrf_modulo_samples": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_relay_vrf_modulo_samples",
+          "returnType": "void"
+        },
+        "set_max_upward_queue_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_queue_count",
+          "returnType": "void"
+        },
+        "set_max_upward_queue_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_queue_size",
+          "returnType": "void"
+        },
+        "set_max_downward_message_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_downward_message_size",
+          "returnType": "void"
+        },
+        "set_max_upward_message_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_message_size",
+          "returnType": "void"
+        },
+        "set_max_upward_message_num_per_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_message_num_per_candidate",
+          "returnType": "void"
+        },
+        "set_hrmp_open_request_ttl": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_open_request_ttl",
+          "returnType": "void"
+        },
+        "set_hrmp_sender_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_sender_deposit",
+          "returnType": "void"
+        },
+        "set_hrmp_recipient_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_recipient_deposit",
+          "returnType": "void"
+        },
+        "set_hrmp_channel_max_capacity": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_channel_max_capacity",
+          "returnType": "void"
+        },
+        "set_hrmp_channel_max_total_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_channel_max_total_size",
+          "returnType": "void"
+        },
+        "set_hrmp_max_parachain_inbound_channels": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_max_parachain_inbound_channels",
+          "returnType": "void"
+        },
+        "set_hrmp_channel_max_message_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_channel_max_message_size",
+          "returnType": "void"
+        },
+        "set_hrmp_max_parachain_outbound_channels": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_max_parachain_outbound_channels",
+          "returnType": "void"
+        },
+        "set_hrmp_max_message_num_per_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_max_message_num_per_candidate",
+          "returnType": "void"
+        },
+        "set_pvf_voting_ttl": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_pvf_voting_ttl",
+          "returnType": "void"
+        },
+        "set_minimum_validation_upgrade_delay": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_validation_upgrade_delay",
+          "returnType": "void"
+        },
+        "set_bypass_consistency_check": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_bypass_consistency_check",
+          "returnType": "void"
+        },
+        "set_async_backing_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_async_backing_params",
+          "returnType": "void"
+        },
+        "set_executor_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_executor_params",
+          "returnType": "void"
+        },
+        "set_on_demand_base_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_base_fee",
+          "returnType": "void"
+        },
+        "set_on_demand_fee_variability": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_fee_variability",
+          "returnType": "void"
+        },
+        "set_on_demand_queue_max_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_queue_max_size",
+          "returnType": "void"
+        },
+        "set_on_demand_target_queue_utilization": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_target_queue_utilization",
+          "returnType": "void"
+        },
+        "set_minimum_backing_votes": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_backing_votes",
+          "returnType": "void"
+        },
+        "set_node_feature": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_node_feature",
+          "returnType": "void"
+        },
+        "set_approval_voting_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_approval_voting_params",
+          "returnType": "void"
+        },
+        "set_scheduler_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_scheduler_params",
+          "returnType": "void"
+        }
+      },
+      "ParaInherent": {
+        "enter": {
+          "required": [],
+          "optional": [],
+          "description": "Call enter",
+          "returnType": "void"
+        }
+      },
+      "Paras": {
+        "force_set_current_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_current_code",
+          "returnType": "void"
+        },
+        "force_set_current_head": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_current_head",
+          "returnType": "void"
+        },
+        "force_schedule_code_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_schedule_code_upgrade",
+          "returnType": "void"
+        },
+        "force_note_new_head": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_note_new_head",
+          "returnType": "void"
+        },
+        "force_queue_action": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_queue_action",
+          "returnType": "void"
+        },
+        "add_trusted_validation_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_trusted_validation_code",
+          "returnType": "void"
+        },
+        "poke_unused_validation_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_unused_validation_code",
+          "returnType": "void"
+        },
+        "include_pvf_check_statement": {
+          "required": [],
+          "optional": [],
+          "description": "Call include_pvf_check_statement",
+          "returnType": "void"
+        },
+        "force_set_most_recent_context": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_most_recent_context",
+          "returnType": "void"
+        }
+      },
+      "Initializer": {
+        "force_approve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_approve",
+          "returnType": "void"
+        }
+      },
+      "Hrmp": {
+        "hrmp_init_open_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_init_open_channel",
+          "returnType": "void"
+        },
+        "hrmp_accept_open_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_accept_open_channel",
+          "returnType": "void"
+        },
+        "hrmp_close_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_close_channel",
+          "returnType": "void"
+        },
+        "force_clean_hrmp": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_clean_hrmp",
+          "returnType": "void"
+        },
+        "force_process_hrmp_open": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_process_hrmp_open",
+          "returnType": "void"
+        },
+        "force_process_hrmp_close": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_process_hrmp_close",
+          "returnType": "void"
+        },
+        "hrmp_cancel_open_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_cancel_open_request",
+          "returnType": "void"
+        },
+        "force_open_hrmp_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_open_hrmp_channel",
+          "returnType": "void"
+        },
+        "establish_system_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call establish_system_channel",
+          "returnType": "void"
+        },
+        "poke_channel_deposits": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_channel_deposits",
+          "returnType": "void"
+        },
+        "establish_channel_with_system": {
+          "required": [],
+          "optional": [],
+          "description": "Call establish_channel_with_system",
+          "returnType": "void"
+        }
+      },
+      "ParasDisputes": {
+        "force_unfreeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unfreeze",
+          "returnType": "void"
+        }
+      },
+      "ParasSlashing": {
+        "report_dispute_lost_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_dispute_lost_unsigned",
+          "returnType": "void"
+        }
+      },
+      "OnDemand": {
+        "place_order_allow_death": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_order_allow_death",
+          "returnType": "void"
+        },
+        "place_order_keep_alive": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_order_keep_alive",
+          "returnType": "void"
+        },
+        "place_order_with_credits": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_order_with_credits",
+          "returnType": "void"
+        }
+      },
+      "Registrar": {
+        "register": {
+          "required": [],
+          "optional": [],
+          "description": "Call register",
+          "returnType": "void"
+        },
+        "force_register": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_register",
+          "returnType": "void"
+        },
+        "deregister": {
+          "required": [],
+          "optional": [],
+          "description": "Call deregister",
+          "returnType": "void"
+        },
+        "swap": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap",
+          "returnType": "void"
+        },
+        "remove_lock": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_lock",
+          "returnType": "void"
+        },
+        "reserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve",
+          "returnType": "void"
+        },
+        "add_lock": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_lock",
+          "returnType": "void"
+        },
+        "schedule_code_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_code_upgrade",
+          "returnType": "void"
+        },
+        "set_current_head": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_current_head",
+          "returnType": "void"
+        }
+      },
+      "Slots": {
+        "force_lease": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_lease",
+          "returnType": "void"
+        },
+        "clear_all_leases": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_all_leases",
+          "returnType": "void"
+        },
+        "trigger_onboard": {
+          "required": [],
+          "optional": [],
+          "description": "Call trigger_onboard",
+          "returnType": "void"
+        }
+      },
+      "Auctions": {
+        "new_auction": {
+          "required": [],
+          "optional": [],
+          "description": "Call new_auction",
+          "returnType": "void"
+        },
+        "bid": {
+          "required": [],
+          "optional": [],
+          "description": "Call bid",
+          "returnType": "void"
+        },
+        "cancel_auction": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_auction",
+          "returnType": "void"
+        }
+      },
+      "Crowdloan": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "contribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call contribute",
+          "returnType": "void"
+        },
+        "withdraw": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw",
+          "returnType": "void"
+        },
+        "refund": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund",
+          "returnType": "void"
+        },
+        "dissolve": {
+          "required": [],
+          "optional": [],
+          "description": "Call dissolve",
+          "returnType": "void"
+        },
+        "edit": {
+          "required": [],
+          "optional": [],
+          "description": "Call edit",
+          "returnType": "void"
+        },
+        "add_memo": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_memo",
+          "returnType": "void"
+        },
+        "poke": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke",
+          "returnType": "void"
+        },
+        "contribute_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call contribute_all",
+          "returnType": "void"
+        }
+      },
+      "Coretime": {
+        "request_core_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_core_count",
+          "returnType": "void"
+        },
+        "request_revenue_at": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_revenue_at",
+          "returnType": "void"
+        },
+        "credit_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call credit_account",
+          "returnType": "void"
+        },
+        "assign_core": {
+          "required": [],
+          "optional": [],
+          "description": "Call assign_core",
+          "returnType": "void"
+        }
+      },
+      "StateTrieMigration": {
+        "control_auto_migration": {
+          "required": [],
+          "optional": [],
+          "description": "Call control_auto_migration",
+          "returnType": "void"
+        },
+        "continue_migrate": {
+          "required": [],
+          "optional": [],
+          "description": "Call continue_migrate",
+          "returnType": "void"
+        },
+        "migrate_custom_top": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_custom_top",
+          "returnType": "void"
+        },
+        "migrate_custom_child": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_custom_child",
+          "returnType": "void"
+        },
+        "set_signed_max_limits": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_signed_max_limits",
+          "returnType": "void"
+        },
+        "force_set_progress": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_progress",
+          "returnType": "void"
+        }
+      },
+      "XcmPallet": {
+        "send": {
+          "required": [],
+          "optional": [],
+          "description": "Call send",
+          "returnType": "void"
+        },
+        "teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call teleport_assets",
+          "returnType": "void"
+        },
+        "reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "force_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_xcm_version",
+          "returnType": "void"
+        },
+        "force_default_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_default_xcm_version",
+          "returnType": "void"
+        },
+        "force_subscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_subscribe_version_notify",
+          "returnType": "void"
+        },
+        "force_unsubscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unsubscribe_version_notify",
+          "returnType": "void"
+        },
+        "limited_reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "limited_teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_teleport_assets",
+          "returnType": "void"
+        },
+        "force_suspension": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_suspension",
+          "returnType": "void"
+        },
+        "transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets",
+          "returnType": "void"
+        },
+        "claim_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_assets",
+          "returnType": "void"
+        },
+        "transfer_assets_using_type_and_then": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets_using_type_and_then",
+          "returnType": "void"
+        },
+        "add_authorized_alias": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_authorized_alias",
+          "returnType": "void"
+        },
+        "remove_authorized_alias": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_authorized_alias",
+          "returnType": "void"
+        },
+        "remove_all_authorized_aliases": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_all_authorized_aliases",
+          "returnType": "void"
+        }
+      },
+      "MessageQueue": {
+        "reap_page": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_page",
+          "returnType": "void"
+        },
+        "execute_overweight": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_overweight",
+          "returnType": "void"
+        }
+      },
+      "AssetRate": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "update": {
+          "required": [],
+          "optional": [],
+          "description": "Call update",
+          "returnType": "void"
+        },
+        "remove": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove",
+          "returnType": "void"
+        }
+      },
+      "Beefy": {
+        "report_double_voting": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_double_voting",
+          "returnType": "void"
+        },
+        "report_double_voting_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_double_voting_unsigned",
+          "returnType": "void"
+        },
+        "set_new_genesis": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_new_genesis",
+          "returnType": "void"
+        },
+        "report_fork_voting": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_fork_voting",
+          "returnType": "void"
+        },
+        "report_fork_voting_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_fork_voting_unsigned",
+          "returnType": "void"
+        },
+        "report_future_block_voting": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_future_block_voting",
+          "returnType": "void"
+        },
+        "report_future_block_voting_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_future_block_voting_unsigned",
+          "returnType": "void"
+        }
+      }
+    }
+  },
+  "rococo": {
+    "pallets": {
+      "System": {
+        "remark": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call remark",
+          "returnType": "void"
+        },
+        "set_heap_pages": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_heap_pages",
+          "returnType": "void"
+        },
+        "set_code": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call set_code",
+          "returnType": "void"
+        },
+        "set_code_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_without_checks",
+          "returnType": "void"
+        },
+        "set_storage": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_storage",
+          "returnType": "void"
+        },
+        "kill_storage": {
+          "required": [
+            "Vec<bytes>"
+          ],
+          "optional": [],
+          "description": "Call kill_storage",
+          "returnType": "void"
+        },
+        "kill_prefix": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_prefix",
+          "returnType": "void"
+        },
+        "remark_with_event": {
+          "required": [],
+          "optional": [],
+          "description": "Call remark_with_event",
+          "returnType": "void"
+        },
+        "authorize_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade",
+          "returnType": "void"
+        },
+        "authorize_upgrade_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade_without_checks",
+          "returnType": "void"
+        },
+        "apply_authorized_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_authorized_upgrade",
+          "returnType": "void"
+        }
+      },
+      "Babe": {
+        "report_equivocation": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation",
+          "returnType": "void"
+        },
+        "report_equivocation_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation_unsigned",
+          "returnType": "void"
+        },
+        "plan_config_change": {
+          "required": [],
+          "optional": [],
+          "description": "Call plan_config_change",
+          "returnType": "void"
+        }
+      },
+      "Timestamp": {
+        "set": {
+          "required": [],
+          "optional": [],
+          "description": "Call set",
+          "returnType": "void"
+        }
+      },
+      "Indices": {
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "free": {
+          "required": [],
+          "optional": [],
+          "description": "Call free",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "freeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze",
+          "returnType": "void"
+        }
+      },
+      "Balances": {
+        "transfer_allow_death": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_allow_death",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [
+            "AccountId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "force_unreserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unreserve",
+          "returnType": "void"
+        },
+        "upgrade_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call upgrade_accounts",
+          "returnType": "void"
+        },
+        "force_set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_balance",
+          "returnType": "void"
+        },
+        "force_adjust_total_issuance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_adjust_total_issuance",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        }
+      },
+      "Parameters": {
+        "set_parameter": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_parameter",
+          "returnType": "void"
+        }
+      },
+      "Session": {
+        "set_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_keys",
+          "returnType": "void"
+        },
+        "purge_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call purge_keys",
+          "returnType": "void"
+        }
+      },
+      "Grandpa": {
+        "report_equivocation": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation",
+          "returnType": "void"
+        },
+        "report_equivocation_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation_unsigned",
+          "returnType": "void"
+        },
+        "note_stalled": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_stalled",
+          "returnType": "void"
+        }
+      },
+      "Treasury": {
+        "spend_local": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend_local",
+          "returnType": "void"
+        },
+        "remove_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_approval",
+          "returnType": "void"
+        },
+        "spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend",
+          "returnType": "void"
+        },
+        "payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout",
+          "returnType": "void"
+        },
+        "check_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call check_status",
+          "returnType": "void"
+        },
+        "void_spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call void_spend",
+          "returnType": "void"
+        }
+      },
+      "ConvictionVoting": {
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "delegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate",
+          "returnType": "void"
+        },
+        "undelegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call undelegate",
+          "returnType": "void"
+        },
+        "unlock": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock",
+          "returnType": "void"
+        },
+        "remove_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_vote",
+          "returnType": "void"
+        },
+        "remove_other_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_other_vote",
+          "returnType": "void"
+        }
+      },
+      "Referenda": {
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "place_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_decision_deposit",
+          "returnType": "void"
+        },
+        "refund_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_decision_deposit",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "nudge_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call nudge_referendum",
+          "returnType": "void"
+        },
+        "one_fewer_deciding": {
+          "required": [],
+          "optional": [],
+          "description": "Call one_fewer_deciding",
+          "returnType": "void"
+        },
+        "refund_submission_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_submission_deposit",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        }
+      },
+      "FellowshipCollective": {
+        "add_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_member",
+          "returnType": "void"
+        },
+        "promote_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call promote_member",
+          "returnType": "void"
+        },
+        "demote_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call demote_member",
+          "returnType": "void"
+        },
+        "remove_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_member",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "cleanup_poll": {
+          "required": [],
+          "optional": [],
+          "description": "Call cleanup_poll",
+          "returnType": "void"
+        },
+        "exchange_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call exchange_member",
+          "returnType": "void"
+        }
+      },
+      "FellowshipReferenda": {
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "place_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_decision_deposit",
+          "returnType": "void"
+        },
+        "refund_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_decision_deposit",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "nudge_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call nudge_referendum",
+          "returnType": "void"
+        },
+        "one_fewer_deciding": {
+          "required": [],
+          "optional": [],
+          "description": "Call one_fewer_deciding",
+          "returnType": "void"
+        },
+        "refund_submission_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_submission_deposit",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        }
+      },
+      "Whitelist": {
+        "whitelist_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call whitelist_call",
+          "returnType": "void"
+        },
+        "remove_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call_with_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call_with_preimage",
+          "returnType": "void"
+        }
+      },
+      "Claims": {
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        },
+        "mint_claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call mint_claim",
+          "returnType": "void"
+        },
+        "claim_attest": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_attest",
+          "returnType": "void"
+        },
+        "attest": {
+          "required": [],
+          "optional": [],
+          "description": "Call attest",
+          "returnType": "void"
+        },
+        "move_claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call move_claim",
+          "returnType": "void"
+        }
+      },
+      "Utility": {
+        "batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch",
+          "returnType": "void"
+        },
+        "as_derivative": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_derivative",
+          "returnType": "void"
+        },
+        "batch_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch_all",
+          "returnType": "void"
+        },
+        "dispatch_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as",
+          "returnType": "void"
+        },
+        "force_batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_batch",
+          "returnType": "void"
+        },
+        "with_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call with_weight",
+          "returnType": "void"
+        }
+      },
+      "Identity": {
+        "add_registrar": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_registrar",
+          "returnType": "void"
+        },
+        "set_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_identity",
+          "returnType": "void"
+        },
+        "set_subs": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_subs",
+          "returnType": "void"
+        },
+        "clear_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_identity",
+          "returnType": "void"
+        },
+        "request_judgement": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_judgement",
+          "returnType": "void"
+        },
+        "cancel_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_request",
+          "returnType": "void"
+        },
+        "set_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fee",
+          "returnType": "void"
+        },
+        "set_account_id": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_account_id",
+          "returnType": "void"
+        },
+        "set_fields": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fields",
+          "returnType": "void"
+        },
+        "provide_judgement": {
+          "required": [],
+          "optional": [],
+          "description": "Call provide_judgement",
+          "returnType": "void"
+        },
+        "kill_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_identity",
+          "returnType": "void"
+        },
+        "add_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_sub",
+          "returnType": "void"
+        },
+        "rename_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call rename_sub",
+          "returnType": "void"
+        },
+        "remove_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_sub",
+          "returnType": "void"
+        },
+        "quit_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call quit_sub",
+          "returnType": "void"
+        },
+        "add_username_authority": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_username_authority",
+          "returnType": "void"
+        },
+        "remove_username_authority": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_username_authority",
+          "returnType": "void"
+        },
+        "set_username_for": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_username_for",
+          "returnType": "void"
+        },
+        "accept_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call accept_username",
+          "returnType": "void"
+        },
+        "remove_expired_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_expired_approval",
+          "returnType": "void"
+        },
+        "set_primary_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_primary_username",
+          "returnType": "void"
+        },
+        "remove_dangling_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_dangling_username",
+          "returnType": "void"
+        }
+      },
+      "Society": {
+        "bid": {
+          "required": [],
+          "optional": [],
+          "description": "Call bid",
+          "returnType": "void"
+        },
+        "unbid": {
+          "required": [],
+          "optional": [],
+          "description": "Call unbid",
+          "returnType": "void"
+        },
+        "vouch": {
+          "required": [],
+          "optional": [],
+          "description": "Call vouch",
+          "returnType": "void"
+        },
+        "unvouch": {
+          "required": [],
+          "optional": [],
+          "description": "Call unvouch",
+          "returnType": "void"
+        },
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "defender_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call defender_vote",
+          "returnType": "void"
+        },
+        "payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout",
+          "returnType": "void"
+        },
+        "waive_repay": {
+          "required": [],
+          "optional": [],
+          "description": "Call waive_repay",
+          "returnType": "void"
+        },
+        "found_society": {
+          "required": [],
+          "optional": [],
+          "description": "Call found_society",
+          "returnType": "void"
+        },
+        "dissolve": {
+          "required": [],
+          "optional": [],
+          "description": "Call dissolve",
+          "returnType": "void"
+        },
+        "judge_suspended_member": {
+          "required": [],
+          "optional": [],
+          "description": "Call judge_suspended_member",
+          "returnType": "void"
+        },
+        "set_parameters": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_parameters",
+          "returnType": "void"
+        },
+        "punish_skeptic": {
+          "required": [],
+          "optional": [],
+          "description": "Call punish_skeptic",
+          "returnType": "void"
+        },
+        "claim_membership": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_membership",
+          "returnType": "void"
+        },
+        "bestow_membership": {
+          "required": [],
+          "optional": [],
+          "description": "Call bestow_membership",
+          "returnType": "void"
+        },
+        "kick_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call kick_candidate",
+          "returnType": "void"
+        },
+        "resign_candidacy": {
+          "required": [],
+          "optional": [],
+          "description": "Call resign_candidacy",
+          "returnType": "void"
+        },
+        "drop_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call drop_candidate",
+          "returnType": "void"
+        },
+        "cleanup_candidacy": {
+          "required": [],
+          "optional": [],
+          "description": "Call cleanup_candidacy",
+          "returnType": "void"
+        },
+        "cleanup_challenge": {
+          "required": [],
+          "optional": [],
+          "description": "Call cleanup_challenge",
+          "returnType": "void"
+        }
+      },
+      "Recovery": {
+        "as_recovered": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_recovered",
+          "returnType": "void"
+        },
+        "set_recovered": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_recovered",
+          "returnType": "void"
+        },
+        "create_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_recovery",
+          "returnType": "void"
+        },
+        "initiate_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call initiate_recovery",
+          "returnType": "void"
+        },
+        "vouch_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call vouch_recovery",
+          "returnType": "void"
+        },
+        "claim_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_recovery",
+          "returnType": "void"
+        },
+        "close_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call close_recovery",
+          "returnType": "void"
+        },
+        "remove_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_recovery",
+          "returnType": "void"
+        },
+        "cancel_recovered": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_recovered",
+          "returnType": "void"
+        }
+      },
+      "Vesting": {
+        "vest": {
+          "required": [],
+          "optional": [],
+          "description": "Call vest",
+          "returnType": "void"
+        },
+        "vest_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call vest_other",
+          "returnType": "void"
+        },
+        "vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call vested_transfer",
+          "returnType": "void"
+        },
+        "force_vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_vested_transfer",
+          "returnType": "void"
+        },
+        "merge_schedules": {
+          "required": [],
+          "optional": [],
+          "description": "Call merge_schedules",
+          "returnType": "void"
+        },
+        "force_remove_vesting_schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_remove_vesting_schedule",
+          "returnType": "void"
+        }
+      },
+      "Scheduler": {
+        "schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "schedule_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named",
+          "returnType": "void"
+        },
+        "cancel_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_named",
+          "returnType": "void"
+        },
+        "schedule_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_after",
+          "returnType": "void"
+        },
+        "schedule_named_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named_after",
+          "returnType": "void"
+        },
+        "set_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry",
+          "returnType": "void"
+        },
+        "set_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry_named",
+          "returnType": "void"
+        },
+        "cancel_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry",
+          "returnType": "void"
+        },
+        "cancel_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry_named",
+          "returnType": "void"
+        }
+      },
+      "Proxy": {
+        "proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy",
+          "returnType": "void"
+        },
+        "add_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_proxy",
+          "returnType": "void"
+        },
+        "remove_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxy",
+          "returnType": "void"
+        },
+        "remove_proxies": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxies",
+          "returnType": "void"
+        },
+        "create_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pure",
+          "returnType": "void"
+        },
+        "kill_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_pure",
+          "returnType": "void"
+        },
+        "announce": {
+          "required": [],
+          "optional": [],
+          "description": "Call announce",
+          "returnType": "void"
+        },
+        "remove_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_announcement",
+          "returnType": "void"
+        },
+        "reject_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call reject_announcement",
+          "returnType": "void"
+        },
+        "proxy_announced": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy_announced",
+          "returnType": "void"
+        }
+      },
+      "Multisig": {
+        "as_multi_threshold_1": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi_threshold_1",
+          "returnType": "void"
+        },
+        "as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi",
+          "returnType": "void"
+        },
+        "approve_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_as_multi",
+          "returnType": "void"
+        },
+        "cancel_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_as_multi",
+          "returnType": "void"
+        }
+      },
+      "Preimage": {
+        "note_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_preimage",
+          "returnType": "void"
+        },
+        "unnote_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unnote_preimage",
+          "returnType": "void"
+        },
+        "request_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_preimage",
+          "returnType": "void"
+        },
+        "unrequest_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unrequest_preimage",
+          "returnType": "void"
+        },
+        "ensure_updated": {
+          "required": [],
+          "optional": [],
+          "description": "Call ensure_updated",
+          "returnType": "void"
+        }
+      },
+      "AssetRate": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "update": {
+          "required": [],
+          "optional": [],
+          "description": "Call update",
+          "returnType": "void"
+        },
+        "remove": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove",
+          "returnType": "void"
+        }
+      },
+      "Bounties": {
+        "propose_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose_bounty",
+          "returnType": "void"
+        },
+        "approve_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_bounty",
+          "returnType": "void"
+        },
+        "propose_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose_curator",
+          "returnType": "void"
+        },
+        "unassign_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call unassign_curator",
+          "returnType": "void"
+        },
+        "accept_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call accept_curator",
+          "returnType": "void"
+        },
+        "award_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call award_bounty",
+          "returnType": "void"
+        },
+        "claim_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_bounty",
+          "returnType": "void"
+        },
+        "close_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call close_bounty",
+          "returnType": "void"
+        },
+        "extend_bounty_expiry": {
+          "required": [],
+          "optional": [],
+          "description": "Call extend_bounty_expiry",
+          "returnType": "void"
+        }
+      },
+      "ChildBounties": {
+        "add_child_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_child_bounty",
+          "returnType": "void"
+        },
+        "propose_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call propose_curator",
+          "returnType": "void"
+        },
+        "accept_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call accept_curator",
+          "returnType": "void"
+        },
+        "unassign_curator": {
+          "required": [],
+          "optional": [],
+          "description": "Call unassign_curator",
+          "returnType": "void"
+        },
+        "award_child_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call award_child_bounty",
+          "returnType": "void"
+        },
+        "claim_child_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_child_bounty",
+          "returnType": "void"
+        },
+        "close_child_bounty": {
+          "required": [],
+          "optional": [],
+          "description": "Call close_child_bounty",
+          "returnType": "void"
+        }
+      },
+      "Nis": {
+        "place_bid": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_bid",
+          "returnType": "void"
+        },
+        "retract_bid": {
+          "required": [],
+          "optional": [],
+          "description": "Call retract_bid",
+          "returnType": "void"
+        },
+        "fund_deficit": {
+          "required": [],
+          "optional": [],
+          "description": "Call fund_deficit",
+          "returnType": "void"
+        },
+        "thaw_private": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw_private",
+          "returnType": "void"
+        },
+        "thaw_communal": {
+          "required": [],
+          "optional": [],
+          "description": "Call thaw_communal",
+          "returnType": "void"
+        },
+        "communify": {
+          "required": [],
+          "optional": [],
+          "description": "Call communify",
+          "returnType": "void"
+        },
+        "privatize": {
+          "required": [],
+          "optional": [],
+          "description": "Call privatize",
+          "returnType": "void"
+        }
+      },
+      "NisCounterpartBalances": {
+        "transfer_allow_death": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_allow_death",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "force_unreserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unreserve",
+          "returnType": "void"
+        },
+        "upgrade_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call upgrade_accounts",
+          "returnType": "void"
+        },
+        "force_set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_balance",
+          "returnType": "void"
+        },
+        "force_adjust_total_issuance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_adjust_total_issuance",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        }
+      },
+      "Configuration": {
+        "set_validation_upgrade_cooldown": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_upgrade_cooldown",
+          "returnType": "void"
+        },
+        "set_validation_upgrade_delay": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_upgrade_delay",
+          "returnType": "void"
+        },
+        "set_code_retention_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_retention_period",
+          "returnType": "void"
+        },
+        "set_max_code_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_code_size",
+          "returnType": "void"
+        },
+        "set_max_pov_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_pov_size",
+          "returnType": "void"
+        },
+        "set_max_head_data_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_head_data_size",
+          "returnType": "void"
+        },
+        "set_coretime_cores": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_coretime_cores",
+          "returnType": "void"
+        },
+        "set_max_availability_timeouts": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_availability_timeouts",
+          "returnType": "void"
+        },
+        "set_group_rotation_frequency": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_group_rotation_frequency",
+          "returnType": "void"
+        },
+        "set_paras_availability_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_paras_availability_period",
+          "returnType": "void"
+        },
+        "set_scheduling_lookahead": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_scheduling_lookahead",
+          "returnType": "void"
+        },
+        "set_max_validators_per_core": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_validators_per_core",
+          "returnType": "void"
+        },
+        "set_max_validators": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_validators",
+          "returnType": "void"
+        },
+        "set_dispute_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_dispute_period",
+          "returnType": "void"
+        },
+        "set_dispute_post_conclusion_acceptance_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_dispute_post_conclusion_acceptance_period",
+          "returnType": "void"
+        },
+        "set_no_show_slots": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_no_show_slots",
+          "returnType": "void"
+        },
+        "set_n_delay_tranches": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_n_delay_tranches",
+          "returnType": "void"
+        },
+        "set_zeroth_delay_tranche_width": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_zeroth_delay_tranche_width",
+          "returnType": "void"
+        },
+        "set_needed_approvals": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_needed_approvals",
+          "returnType": "void"
+        },
+        "set_relay_vrf_modulo_samples": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_relay_vrf_modulo_samples",
+          "returnType": "void"
+        },
+        "set_max_upward_queue_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_queue_count",
+          "returnType": "void"
+        },
+        "set_max_upward_queue_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_queue_size",
+          "returnType": "void"
+        },
+        "set_max_downward_message_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_downward_message_size",
+          "returnType": "void"
+        },
+        "set_max_upward_message_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_message_size",
+          "returnType": "void"
+        },
+        "set_max_upward_message_num_per_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_message_num_per_candidate",
+          "returnType": "void"
+        },
+        "set_hrmp_open_request_ttl": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_open_request_ttl",
+          "returnType": "void"
+        },
+        "set_hrmp_sender_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_sender_deposit",
+          "returnType": "void"
+        },
+        "set_hrmp_recipient_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_recipient_deposit",
+          "returnType": "void"
+        },
+        "set_hrmp_channel_max_capacity": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_channel_max_capacity",
+          "returnType": "void"
+        },
+        "set_hrmp_channel_max_total_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_channel_max_total_size",
+          "returnType": "void"
+        },
+        "set_hrmp_max_parachain_inbound_channels": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_max_parachain_inbound_channels",
+          "returnType": "void"
+        },
+        "set_hrmp_channel_max_message_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_channel_max_message_size",
+          "returnType": "void"
+        },
+        "set_hrmp_max_parachain_outbound_channels": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_max_parachain_outbound_channels",
+          "returnType": "void"
+        },
+        "set_hrmp_max_message_num_per_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_max_message_num_per_candidate",
+          "returnType": "void"
+        },
+        "set_pvf_voting_ttl": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_pvf_voting_ttl",
+          "returnType": "void"
+        },
+        "set_minimum_validation_upgrade_delay": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_validation_upgrade_delay",
+          "returnType": "void"
+        },
+        "set_bypass_consistency_check": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_bypass_consistency_check",
+          "returnType": "void"
+        },
+        "set_async_backing_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_async_backing_params",
+          "returnType": "void"
+        },
+        "set_executor_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_executor_params",
+          "returnType": "void"
+        },
+        "set_on_demand_base_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_base_fee",
+          "returnType": "void"
+        },
+        "set_on_demand_fee_variability": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_fee_variability",
+          "returnType": "void"
+        },
+        "set_on_demand_queue_max_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_queue_max_size",
+          "returnType": "void"
+        },
+        "set_on_demand_target_queue_utilization": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_target_queue_utilization",
+          "returnType": "void"
+        },
+        "set_on_demand_ttl": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_ttl",
+          "returnType": "void"
+        },
+        "set_minimum_backing_votes": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_backing_votes",
+          "returnType": "void"
+        },
+        "set_node_feature": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_node_feature",
+          "returnType": "void"
+        },
+        "set_approval_voting_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_approval_voting_params",
+          "returnType": "void"
+        },
+        "set_scheduler_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_scheduler_params",
+          "returnType": "void"
+        }
+      },
+      "ParaInherent": {
+        "enter": {
+          "required": [],
+          "optional": [],
+          "description": "Call enter",
+          "returnType": "void"
+        }
+      },
+      "Paras": {
+        "force_set_current_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_current_code",
+          "returnType": "void"
+        },
+        "force_set_current_head": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_current_head",
+          "returnType": "void"
+        },
+        "force_schedule_code_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_schedule_code_upgrade",
+          "returnType": "void"
+        },
+        "force_note_new_head": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_note_new_head",
+          "returnType": "void"
+        },
+        "force_queue_action": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_queue_action",
+          "returnType": "void"
+        },
+        "add_trusted_validation_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_trusted_validation_code",
+          "returnType": "void"
+        },
+        "poke_unused_validation_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_unused_validation_code",
+          "returnType": "void"
+        },
+        "include_pvf_check_statement": {
+          "required": [],
+          "optional": [],
+          "description": "Call include_pvf_check_statement",
+          "returnType": "void"
+        },
+        "force_set_most_recent_context": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_most_recent_context",
+          "returnType": "void"
+        }
+      },
+      "Initializer": {
+        "force_approve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_approve",
+          "returnType": "void"
+        }
+      },
+      "Hrmp": {
+        "hrmp_init_open_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_init_open_channel",
+          "returnType": "void"
+        },
+        "hrmp_accept_open_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_accept_open_channel",
+          "returnType": "void"
+        },
+        "hrmp_close_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_close_channel",
+          "returnType": "void"
+        },
+        "force_clean_hrmp": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_clean_hrmp",
+          "returnType": "void"
+        },
+        "force_process_hrmp_open": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_process_hrmp_open",
+          "returnType": "void"
+        },
+        "force_process_hrmp_close": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_process_hrmp_close",
+          "returnType": "void"
+        },
+        "hrmp_cancel_open_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_cancel_open_request",
+          "returnType": "void"
+        },
+        "force_open_hrmp_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_open_hrmp_channel",
+          "returnType": "void"
+        },
+        "establish_system_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call establish_system_channel",
+          "returnType": "void"
+        },
+        "poke_channel_deposits": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_channel_deposits",
+          "returnType": "void"
+        },
+        "establish_channel_with_system": {
+          "required": [],
+          "optional": [],
+          "description": "Call establish_channel_with_system",
+          "returnType": "void"
+        }
+      },
+      "ParasDisputes": {
+        "force_unfreeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unfreeze",
+          "returnType": "void"
+        }
+      },
+      "ParasSlashing": {
+        "report_dispute_lost_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_dispute_lost_unsigned",
+          "returnType": "void"
+        }
+      },
+      "MessageQueue": {
+        "reap_page": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_page",
+          "returnType": "void"
+        },
+        "execute_overweight": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_overweight",
+          "returnType": "void"
+        }
+      },
+      "OnDemandAssignmentProvider": {
+        "place_order_allow_death": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_order_allow_death",
+          "returnType": "void"
+        },
+        "place_order_keep_alive": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_order_keep_alive",
+          "returnType": "void"
+        }
+      },
+      "Registrar": {
+        "register": {
+          "required": [],
+          "optional": [],
+          "description": "Call register",
+          "returnType": "void"
+        },
+        "force_register": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_register",
+          "returnType": "void"
+        },
+        "deregister": {
+          "required": [],
+          "optional": [],
+          "description": "Call deregister",
+          "returnType": "void"
+        },
+        "swap": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap",
+          "returnType": "void"
+        },
+        "remove_lock": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_lock",
+          "returnType": "void"
+        },
+        "reserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve",
+          "returnType": "void"
+        },
+        "add_lock": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_lock",
+          "returnType": "void"
+        },
+        "schedule_code_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_code_upgrade",
+          "returnType": "void"
+        },
+        "set_current_head": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_current_head",
+          "returnType": "void"
+        }
+      },
+      "Slots": {
+        "force_lease": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_lease",
+          "returnType": "void"
+        },
+        "clear_all_leases": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_all_leases",
+          "returnType": "void"
+        },
+        "trigger_onboard": {
+          "required": [],
+          "optional": [],
+          "description": "Call trigger_onboard",
+          "returnType": "void"
+        }
+      },
+      "Auctions": {
+        "new_auction": {
+          "required": [],
+          "optional": [],
+          "description": "Call new_auction",
+          "returnType": "void"
+        },
+        "bid": {
+          "required": [],
+          "optional": [],
+          "description": "Call bid",
+          "returnType": "void"
+        },
+        "cancel_auction": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_auction",
+          "returnType": "void"
+        }
+      },
+      "Crowdloan": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "contribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call contribute",
+          "returnType": "void"
+        },
+        "withdraw": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw",
+          "returnType": "void"
+        },
+        "refund": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund",
+          "returnType": "void"
+        },
+        "dissolve": {
+          "required": [],
+          "optional": [],
+          "description": "Call dissolve",
+          "returnType": "void"
+        },
+        "edit": {
+          "required": [],
+          "optional": [],
+          "description": "Call edit",
+          "returnType": "void"
+        },
+        "add_memo": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_memo",
+          "returnType": "void"
+        },
+        "poke": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke",
+          "returnType": "void"
+        },
+        "contribute_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call contribute_all",
+          "returnType": "void"
+        }
+      },
+      "Coretime": {
+        "request_core_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_core_count",
+          "returnType": "void"
+        },
+        "request_revenue_at": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_revenue_at",
+          "returnType": "void"
+        },
+        "assign_core": {
+          "required": [],
+          "optional": [],
+          "description": "Call assign_core",
+          "returnType": "void"
+        }
+      },
+      "XcmPallet": {
+        "send": {
+          "required": [],
+          "optional": [],
+          "description": "Call send",
+          "returnType": "void"
+        },
+        "teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call teleport_assets",
+          "returnType": "void"
+        },
+        "reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "force_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_xcm_version",
+          "returnType": "void"
+        },
+        "force_default_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_default_xcm_version",
+          "returnType": "void"
+        },
+        "force_subscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_subscribe_version_notify",
+          "returnType": "void"
+        },
+        "force_unsubscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unsubscribe_version_notify",
+          "returnType": "void"
+        },
+        "limited_reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "limited_teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_teleport_assets",
+          "returnType": "void"
+        },
+        "force_suspension": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_suspension",
+          "returnType": "void"
+        },
+        "transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets",
+          "returnType": "void"
+        },
+        "claim_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_assets",
+          "returnType": "void"
+        },
+        "transfer_assets_using_type_and_then": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets_using_type_and_then",
+          "returnType": "void"
+        }
+      },
+      "Beefy": {
+        "report_double_voting": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_double_voting",
+          "returnType": "void"
+        },
+        "report_double_voting_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_double_voting_unsigned",
+          "returnType": "void"
+        },
+        "set_new_genesis": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_new_genesis",
+          "returnType": "void"
+        },
+        "report_fork_voting": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_fork_voting",
+          "returnType": "void"
+        },
+        "report_fork_voting_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_fork_voting_unsigned",
+          "returnType": "void"
+        },
+        "report_future_block_voting": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_future_block_voting",
+          "returnType": "void"
+        },
+        "report_future_block_voting_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_future_block_voting_unsigned",
+          "returnType": "void"
+        }
+      },
+      "IdentityMigrator": {
+        "reap_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_identity",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "ParasSudoWrapper": {
+        "sudo_schedule_para_initialize": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_schedule_para_initialize",
+          "returnType": "void"
+        },
+        "sudo_schedule_para_cleanup": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_schedule_para_cleanup",
+          "returnType": "void"
+        },
+        "sudo_schedule_parathread_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_schedule_parathread_upgrade",
+          "returnType": "void"
+        },
+        "sudo_schedule_parachain_downgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_schedule_parachain_downgrade",
+          "returnType": "void"
+        },
+        "sudo_queue_downward_xcm": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_queue_downward_xcm",
+          "returnType": "void"
+        },
+        "sudo_establish_hrmp_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_establish_hrmp_channel",
+          "returnType": "void"
+        }
+      },
+      "AssignedSlots": {
+        "assign_perm_parachain_slot": {
+          "required": [],
+          "optional": [],
+          "description": "Call assign_perm_parachain_slot",
+          "returnType": "void"
+        },
+        "assign_temp_parachain_slot": {
+          "required": [],
+          "optional": [],
+          "description": "Call assign_temp_parachain_slot",
+          "returnType": "void"
+        },
+        "unassign_parachain_slot": {
+          "required": [],
+          "optional": [],
+          "description": "Call unassign_parachain_slot",
+          "returnType": "void"
+        },
+        "set_max_permanent_slots": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_permanent_slots",
+          "returnType": "void"
+        },
+        "set_max_temporary_slots": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_temporary_slots",
+          "returnType": "void"
+        }
+      },
+      "ValidatorManager": {
+        "register_validators": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_validators",
+          "returnType": "void"
+        },
+        "deregister_validators": {
+          "required": [],
+          "optional": [],
+          "description": "Call deregister_validators",
+          "returnType": "void"
+        }
+      },
+      "StateTrieMigration": {
+        "control_auto_migration": {
+          "required": [],
+          "optional": [],
+          "description": "Call control_auto_migration",
+          "returnType": "void"
+        },
+        "continue_migrate": {
+          "required": [],
+          "optional": [],
+          "description": "Call continue_migrate",
+          "returnType": "void"
+        },
+        "migrate_custom_top": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_custom_top",
+          "returnType": "void"
+        },
+        "migrate_custom_child": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_custom_child",
+          "returnType": "void"
+        },
+        "set_signed_max_limits": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_signed_max_limits",
+          "returnType": "void"
+        },
+        "force_set_progress": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_progress",
+          "returnType": "void"
+        }
+      },
+      "RootTesting": {
+        "fill_block": {
+          "required": [],
+          "optional": [],
+          "description": "Call fill_block",
+          "returnType": "void"
+        },
+        "trigger_defensive": {
+          "required": [],
+          "optional": [],
+          "description": "Call trigger_defensive",
+          "returnType": "void"
+        }
+      },
+      "Sudo": {
+        "sudo": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo",
+          "returnType": "void"
+        },
+        "sudo_unchecked_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_unchecked_weight",
+          "returnType": "void"
+        },
+        "set_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_key",
+          "returnType": "void"
+        },
+        "sudo_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_as",
+          "returnType": "void"
+        },
+        "remove_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_key",
+          "returnType": "void"
+        }
+      }
+    }
+  },
+  "westend": {
+    "pallets": {
+      "System": {
+        "remark": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call remark",
+          "returnType": "void"
+        },
+        "set_heap_pages": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_heap_pages",
+          "returnType": "void"
+        },
+        "set_code": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Call set_code",
+          "returnType": "void"
+        },
+        "set_code_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_without_checks",
+          "returnType": "void"
+        },
+        "set_storage": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_storage",
+          "returnType": "void"
+        },
+        "kill_storage": {
+          "required": [
+            "Vec<bytes>"
+          ],
+          "optional": [],
+          "description": "Call kill_storage",
+          "returnType": "void"
+        },
+        "kill_prefix": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_prefix",
+          "returnType": "void"
+        },
+        "remark_with_event": {
+          "required": [],
+          "optional": [],
+          "description": "Call remark_with_event",
+          "returnType": "void"
+        },
+        "authorize_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade",
+          "returnType": "void"
+        },
+        "authorize_upgrade_without_checks": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_upgrade_without_checks",
+          "returnType": "void"
+        },
+        "apply_authorized_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_authorized_upgrade",
+          "returnType": "void"
+        }
+      },
+      "Babe": {
+        "report_equivocation": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation",
+          "returnType": "void"
+        },
+        "report_equivocation_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation_unsigned",
+          "returnType": "void"
+        },
+        "plan_config_change": {
+          "required": [],
+          "optional": [],
+          "description": "Call plan_config_change",
+          "returnType": "void"
+        }
+      },
+      "Timestamp": {
+        "set": {
+          "required": [],
+          "optional": [],
+          "description": "Call set",
+          "returnType": "void"
+        }
+      },
+      "Indices": {
+        "claim": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim",
+          "returnType": "void"
+        },
+        "transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer",
+          "returnType": "void"
+        },
+        "free": {
+          "required": [],
+          "optional": [],
+          "description": "Call free",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "freeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call freeze",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Balances": {
+        "transfer_allow_death": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_allow_death",
+          "returnType": "void"
+        },
+        "force_transfer": {
+          "required": [
+            "AccountId",
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call force_transfer",
+          "returnType": "void"
+        },
+        "transfer_keep_alive": {
+          "required": [
+            "AccountId",
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call transfer_keep_alive",
+          "returnType": "void"
+        },
+        "transfer_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_all",
+          "returnType": "void"
+        },
+        "force_unreserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unreserve",
+          "returnType": "void"
+        },
+        "upgrade_accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Call upgrade_accounts",
+          "returnType": "void"
+        },
+        "force_set_balance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_balance",
+          "returnType": "void"
+        },
+        "force_adjust_total_issuance": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_adjust_total_issuance",
+          "returnType": "void"
+        },
+        "burn": {
+          "required": [],
+          "optional": [],
+          "description": "Call burn",
+          "returnType": "void"
+        }
+      },
+      "Staking": {
+        "bond": {
+          "required": [
+            "AccountId",
+            "Balance",
+            "RewardDestination"
+          ],
+          "optional": [],
+          "description": "Call bond",
+          "returnType": "void"
+        },
+        "bond_extra": {
+          "required": [],
+          "optional": [],
+          "description": "Call bond_extra",
+          "returnType": "void"
+        },
+        "unbond": {
+          "required": [
+            "Balance"
+          ],
+          "optional": [],
+          "description": "Call unbond",
+          "returnType": "void"
+        },
+        "withdraw_unbonded": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_unbonded",
+          "returnType": "void"
+        },
+        "validate": {
+          "required": [
+            "ValidatorPrefs"
+          ],
+          "optional": [],
+          "description": "Call validate",
+          "returnType": "void"
+        },
+        "nominate": {
+          "required": [
+            "Vec<AccountId>"
+          ],
+          "optional": [],
+          "description": "Call nominate",
+          "returnType": "void"
+        },
+        "chill": {
+          "required": [],
+          "optional": [],
+          "description": "Call chill",
+          "returnType": "void"
+        },
+        "set_payee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_payee",
+          "returnType": "void"
+        },
+        "set_controller": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_controller",
+          "returnType": "void"
+        },
+        "set_validator_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validator_count",
+          "returnType": "void"
+        },
+        "increase_validator_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call increase_validator_count",
+          "returnType": "void"
+        },
+        "scale_validator_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call scale_validator_count",
+          "returnType": "void"
+        },
+        "force_no_eras": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_no_eras",
+          "returnType": "void"
+        },
+        "force_new_era": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_new_era",
+          "returnType": "void"
+        },
+        "set_invulnerables": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_invulnerables",
+          "returnType": "void"
+        },
+        "force_unstake": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unstake",
+          "returnType": "void"
+        },
+        "force_new_era_always": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_new_era_always",
+          "returnType": "void"
+        },
+        "cancel_deferred_slash": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_deferred_slash",
+          "returnType": "void"
+        },
+        "payout_stakers": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout_stakers",
+          "returnType": "void"
+        },
+        "rebond": {
+          "required": [],
+          "optional": [],
+          "description": "Call rebond",
+          "returnType": "void"
+        },
+        "reap_stash": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_stash",
+          "returnType": "void"
+        },
+        "kick": {
+          "required": [],
+          "optional": [],
+          "description": "Call kick",
+          "returnType": "void"
+        },
+        "set_staking_configs": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_staking_configs",
+          "returnType": "void"
+        },
+        "chill_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call chill_other",
+          "returnType": "void"
+        },
+        "force_apply_min_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_apply_min_commission",
+          "returnType": "void"
+        },
+        "set_min_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_min_commission",
+          "returnType": "void"
+        },
+        "payout_stakers_by_page": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout_stakers_by_page",
+          "returnType": "void"
+        },
+        "update_payee": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_payee",
+          "returnType": "void"
+        },
+        "deprecate_controller_batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call deprecate_controller_batch",
+          "returnType": "void"
+        },
+        "restore_ledger": {
+          "required": [],
+          "optional": [],
+          "description": "Call restore_ledger",
+          "returnType": "void"
+        },
+        "migrate_currency": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_currency",
+          "returnType": "void"
+        },
+        "manual_slash": {
+          "required": [],
+          "optional": [],
+          "description": "Call manual_slash",
+          "returnType": "void"
+        }
+      },
+      "Parameters": {
+        "set_parameter": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_parameter",
+          "returnType": "void"
+        }
+      },
+      "Session": {
+        "set_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_keys",
+          "returnType": "void"
+        },
+        "purge_keys": {
+          "required": [],
+          "optional": [],
+          "description": "Call purge_keys",
+          "returnType": "void"
+        }
+      },
+      "Grandpa": {
+        "report_equivocation": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation",
+          "returnType": "void"
+        },
+        "report_equivocation_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_equivocation_unsigned",
+          "returnType": "void"
+        },
+        "note_stalled": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_stalled",
+          "returnType": "void"
+        }
+      },
+      "Utility": {
+        "batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch",
+          "returnType": "void"
+        },
+        "as_derivative": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_derivative",
+          "returnType": "void"
+        },
+        "batch_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call batch_all",
+          "returnType": "void"
+        },
+        "dispatch_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as",
+          "returnType": "void"
+        },
+        "force_batch": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_batch",
+          "returnType": "void"
+        },
+        "with_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call with_weight",
+          "returnType": "void"
+        },
+        "if_else": {
+          "required": [],
+          "optional": [],
+          "description": "Call if_else",
+          "returnType": "void"
+        },
+        "dispatch_as_fallible": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_as_fallible",
+          "returnType": "void"
+        }
+      },
+      "Identity": {
+        "add_registrar": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_registrar",
+          "returnType": "void"
+        },
+        "set_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_identity",
+          "returnType": "void"
+        },
+        "set_subs": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_subs",
+          "returnType": "void"
+        },
+        "clear_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_identity",
+          "returnType": "void"
+        },
+        "request_judgement": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_judgement",
+          "returnType": "void"
+        },
+        "cancel_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_request",
+          "returnType": "void"
+        },
+        "set_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fee",
+          "returnType": "void"
+        },
+        "set_account_id": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_account_id",
+          "returnType": "void"
+        },
+        "set_fields": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_fields",
+          "returnType": "void"
+        },
+        "provide_judgement": {
+          "required": [],
+          "optional": [],
+          "description": "Call provide_judgement",
+          "returnType": "void"
+        },
+        "kill_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_identity",
+          "returnType": "void"
+        },
+        "add_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_sub",
+          "returnType": "void"
+        },
+        "rename_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call rename_sub",
+          "returnType": "void"
+        },
+        "remove_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_sub",
+          "returnType": "void"
+        },
+        "quit_sub": {
+          "required": [],
+          "optional": [],
+          "description": "Call quit_sub",
+          "returnType": "void"
+        },
+        "add_username_authority": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_username_authority",
+          "returnType": "void"
+        },
+        "remove_username_authority": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_username_authority",
+          "returnType": "void"
+        },
+        "set_username_for": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_username_for",
+          "returnType": "void"
+        },
+        "accept_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call accept_username",
+          "returnType": "void"
+        },
+        "remove_expired_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_expired_approval",
+          "returnType": "void"
+        },
+        "set_primary_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_primary_username",
+          "returnType": "void"
+        },
+        "unbind_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call unbind_username",
+          "returnType": "void"
+        },
+        "remove_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_username",
+          "returnType": "void"
+        },
+        "kill_username": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_username",
+          "returnType": "void"
+        }
+      },
+      "Recovery": {
+        "as_recovered": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_recovered",
+          "returnType": "void"
+        },
+        "set_recovered": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_recovered",
+          "returnType": "void"
+        },
+        "create_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_recovery",
+          "returnType": "void"
+        },
+        "initiate_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call initiate_recovery",
+          "returnType": "void"
+        },
+        "vouch_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call vouch_recovery",
+          "returnType": "void"
+        },
+        "claim_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_recovery",
+          "returnType": "void"
+        },
+        "close_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call close_recovery",
+          "returnType": "void"
+        },
+        "remove_recovery": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_recovery",
+          "returnType": "void"
+        },
+        "cancel_recovered": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_recovered",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Vesting": {
+        "vest": {
+          "required": [],
+          "optional": [],
+          "description": "Call vest",
+          "returnType": "void"
+        },
+        "vest_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call vest_other",
+          "returnType": "void"
+        },
+        "vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call vested_transfer",
+          "returnType": "void"
+        },
+        "force_vested_transfer": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_vested_transfer",
+          "returnType": "void"
+        },
+        "merge_schedules": {
+          "required": [],
+          "optional": [],
+          "description": "Call merge_schedules",
+          "returnType": "void"
+        },
+        "force_remove_vesting_schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_remove_vesting_schedule",
+          "returnType": "void"
+        }
+      },
+      "Scheduler": {
+        "schedule": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "schedule_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named",
+          "returnType": "void"
+        },
+        "cancel_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_named",
+          "returnType": "void"
+        },
+        "schedule_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_after",
+          "returnType": "void"
+        },
+        "schedule_named_after": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_named_after",
+          "returnType": "void"
+        },
+        "set_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry",
+          "returnType": "void"
+        },
+        "set_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_retry_named",
+          "returnType": "void"
+        },
+        "cancel_retry": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry",
+          "returnType": "void"
+        },
+        "cancel_retry_named": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_retry_named",
+          "returnType": "void"
+        }
+      },
+      "Preimage": {
+        "note_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call note_preimage",
+          "returnType": "void"
+        },
+        "unnote_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unnote_preimage",
+          "returnType": "void"
+        },
+        "request_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_preimage",
+          "returnType": "void"
+        },
+        "unrequest_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call unrequest_preimage",
+          "returnType": "void"
+        },
+        "ensure_updated": {
+          "required": [],
+          "optional": [],
+          "description": "Call ensure_updated",
+          "returnType": "void"
+        }
+      },
+      "Sudo": {
+        "sudo": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo",
+          "returnType": "void"
+        },
+        "sudo_unchecked_weight": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_unchecked_weight",
+          "returnType": "void"
+        },
+        "set_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_key",
+          "returnType": "void"
+        },
+        "sudo_as": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_as",
+          "returnType": "void"
+        },
+        "remove_key": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_key",
+          "returnType": "void"
+        }
+      },
+      "Proxy": {
+        "proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy",
+          "returnType": "void"
+        },
+        "add_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_proxy",
+          "returnType": "void"
+        },
+        "remove_proxy": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxy",
+          "returnType": "void"
+        },
+        "remove_proxies": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_proxies",
+          "returnType": "void"
+        },
+        "create_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_pure",
+          "returnType": "void"
+        },
+        "kill_pure": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill_pure",
+          "returnType": "void"
+        },
+        "announce": {
+          "required": [],
+          "optional": [],
+          "description": "Call announce",
+          "returnType": "void"
+        },
+        "remove_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_announcement",
+          "returnType": "void"
+        },
+        "reject_announcement": {
+          "required": [],
+          "optional": [],
+          "description": "Call reject_announcement",
+          "returnType": "void"
+        },
+        "proxy_announced": {
+          "required": [],
+          "optional": [],
+          "description": "Call proxy_announced",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "Multisig": {
+        "as_multi_threshold_1": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi_threshold_1",
+          "returnType": "void"
+        },
+        "as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call as_multi",
+          "returnType": "void"
+        },
+        "approve_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call approve_as_multi",
+          "returnType": "void"
+        },
+        "cancel_as_multi": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_as_multi",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      },
+      "ElectionProviderMultiPhase": {
+        "submit_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit_unsigned",
+          "returnType": "void"
+        },
+        "set_minimum_untrusted_score": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_untrusted_score",
+          "returnType": "void"
+        },
+        "set_emergency_election_result": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_emergency_election_result",
+          "returnType": "void"
+        },
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "governance_fallback": {
+          "required": [],
+          "optional": [],
+          "description": "Call governance_fallback",
+          "returnType": "void"
+        }
+      },
+      "VoterList": {
+        "rebag": {
+          "required": [],
+          "optional": [],
+          "description": "Call rebag",
+          "returnType": "void"
+        },
+        "put_in_front_of": {
+          "required": [],
+          "optional": [],
+          "description": "Call put_in_front_of",
+          "returnType": "void"
+        },
+        "put_in_front_of_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call put_in_front_of_other",
+          "returnType": "void"
+        }
+      },
+      "NominationPools": {
+        "join": {
+          "required": [],
+          "optional": [],
+          "description": "Call join",
+          "returnType": "void"
+        },
+        "bond_extra": {
+          "required": [],
+          "optional": [],
+          "description": "Call bond_extra",
+          "returnType": "void"
+        },
+        "claim_payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_payout",
+          "returnType": "void"
+        },
+        "unbond": {
+          "required": [],
+          "optional": [],
+          "description": "Call unbond",
+          "returnType": "void"
+        },
+        "pool_withdraw_unbonded": {
+          "required": [],
+          "optional": [],
+          "description": "Call pool_withdraw_unbonded",
+          "returnType": "void"
+        },
+        "withdraw_unbonded": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw_unbonded",
+          "returnType": "void"
+        },
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "create_with_pool_id": {
+          "required": [],
+          "optional": [],
+          "description": "Call create_with_pool_id",
+          "returnType": "void"
+        },
+        "nominate": {
+          "required": [],
+          "optional": [],
+          "description": "Call nominate",
+          "returnType": "void"
+        },
+        "set_state": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_state",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        },
+        "set_configs": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_configs",
+          "returnType": "void"
+        },
+        "update_roles": {
+          "required": [],
+          "optional": [],
+          "description": "Call update_roles",
+          "returnType": "void"
+        },
+        "chill": {
+          "required": [],
+          "optional": [],
+          "description": "Call chill",
+          "returnType": "void"
+        },
+        "bond_extra_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call bond_extra_other",
+          "returnType": "void"
+        },
+        "set_claim_permission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_claim_permission",
+          "returnType": "void"
+        },
+        "claim_payout_other": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_payout_other",
+          "returnType": "void"
+        },
+        "set_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission",
+          "returnType": "void"
+        },
+        "set_commission_max": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission_max",
+          "returnType": "void"
+        },
+        "set_commission_change_rate": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission_change_rate",
+          "returnType": "void"
+        },
+        "claim_commission": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_commission",
+          "returnType": "void"
+        },
+        "adjust_pool_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call adjust_pool_deposit",
+          "returnType": "void"
+        },
+        "set_commission_claim_permission": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_commission_claim_permission",
+          "returnType": "void"
+        },
+        "apply_slash": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_slash",
+          "returnType": "void"
+        },
+        "migrate_delegation": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_delegation",
+          "returnType": "void"
+        },
+        "migrate_pool_to_delegate_stake": {
+          "required": [],
+          "optional": [],
+          "description": "Call migrate_pool_to_delegate_stake",
+          "returnType": "void"
+        }
+      },
+      "FastUnstake": {
+        "register_fast_unstake": {
+          "required": [],
+          "optional": [],
+          "description": "Call register_fast_unstake",
+          "returnType": "void"
+        },
+        "deregister": {
+          "required": [],
+          "optional": [],
+          "description": "Call deregister",
+          "returnType": "void"
+        },
+        "control": {
+          "required": [],
+          "optional": [],
+          "description": "Call control",
+          "returnType": "void"
+        }
+      },
+      "ConvictionVoting": {
+        "vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call vote",
+          "returnType": "void"
+        },
+        "delegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call delegate",
+          "returnType": "void"
+        },
+        "undelegate": {
+          "required": [],
+          "optional": [],
+          "description": "Call undelegate",
+          "returnType": "void"
+        },
+        "unlock": {
+          "required": [],
+          "optional": [],
+          "description": "Call unlock",
+          "returnType": "void"
+        },
+        "remove_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_vote",
+          "returnType": "void"
+        },
+        "remove_other_vote": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_other_vote",
+          "returnType": "void"
+        }
+      },
+      "Referenda": {
+        "submit": {
+          "required": [],
+          "optional": [],
+          "description": "Call submit",
+          "returnType": "void"
+        },
+        "place_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_decision_deposit",
+          "returnType": "void"
+        },
+        "refund_decision_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_decision_deposit",
+          "returnType": "void"
+        },
+        "cancel": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel",
+          "returnType": "void"
+        },
+        "kill": {
+          "required": [],
+          "optional": [],
+          "description": "Call kill",
+          "returnType": "void"
+        },
+        "nudge_referendum": {
+          "required": [],
+          "optional": [],
+          "description": "Call nudge_referendum",
+          "returnType": "void"
+        },
+        "one_fewer_deciding": {
+          "required": [],
+          "optional": [],
+          "description": "Call one_fewer_deciding",
+          "returnType": "void"
+        },
+        "refund_submission_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund_submission_deposit",
+          "returnType": "void"
+        },
+        "set_metadata": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_metadata",
+          "returnType": "void"
+        }
+      },
+      "Whitelist": {
+        "whitelist_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call whitelist_call",
+          "returnType": "void"
+        },
+        "remove_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call",
+          "returnType": "void"
+        },
+        "dispatch_whitelisted_call_with_preimage": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch_whitelisted_call_with_preimage",
+          "returnType": "void"
+        }
+      },
+      "Treasury": {
+        "spend_local": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend_local",
+          "returnType": "void"
+        },
+        "remove_approval": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_approval",
+          "returnType": "void"
+        },
+        "spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call spend",
+          "returnType": "void"
+        },
+        "payout": {
+          "required": [],
+          "optional": [],
+          "description": "Call payout",
+          "returnType": "void"
+        },
+        "check_status": {
+          "required": [],
+          "optional": [],
+          "description": "Call check_status",
+          "returnType": "void"
+        },
+        "void_spend": {
+          "required": [],
+          "optional": [],
+          "description": "Call void_spend",
+          "returnType": "void"
+        }
+      },
+      "Configuration": {
+        "set_validation_upgrade_cooldown": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_upgrade_cooldown",
+          "returnType": "void"
+        },
+        "set_validation_upgrade_delay": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_validation_upgrade_delay",
+          "returnType": "void"
+        },
+        "set_code_retention_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_code_retention_period",
+          "returnType": "void"
+        },
+        "set_max_code_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_code_size",
+          "returnType": "void"
+        },
+        "set_max_pov_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_pov_size",
+          "returnType": "void"
+        },
+        "set_max_head_data_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_head_data_size",
+          "returnType": "void"
+        },
+        "set_coretime_cores": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_coretime_cores",
+          "returnType": "void"
+        },
+        "set_group_rotation_frequency": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_group_rotation_frequency",
+          "returnType": "void"
+        },
+        "set_paras_availability_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_paras_availability_period",
+          "returnType": "void"
+        },
+        "set_scheduling_lookahead": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_scheduling_lookahead",
+          "returnType": "void"
+        },
+        "set_max_validators_per_core": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_validators_per_core",
+          "returnType": "void"
+        },
+        "set_max_validators": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_validators",
+          "returnType": "void"
+        },
+        "set_dispute_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_dispute_period",
+          "returnType": "void"
+        },
+        "set_dispute_post_conclusion_acceptance_period": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_dispute_post_conclusion_acceptance_period",
+          "returnType": "void"
+        },
+        "set_no_show_slots": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_no_show_slots",
+          "returnType": "void"
+        },
+        "set_n_delay_tranches": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_n_delay_tranches",
+          "returnType": "void"
+        },
+        "set_zeroth_delay_tranche_width": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_zeroth_delay_tranche_width",
+          "returnType": "void"
+        },
+        "set_needed_approvals": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_needed_approvals",
+          "returnType": "void"
+        },
+        "set_relay_vrf_modulo_samples": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_relay_vrf_modulo_samples",
+          "returnType": "void"
+        },
+        "set_max_upward_queue_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_queue_count",
+          "returnType": "void"
+        },
+        "set_max_upward_queue_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_queue_size",
+          "returnType": "void"
+        },
+        "set_max_downward_message_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_downward_message_size",
+          "returnType": "void"
+        },
+        "set_max_upward_message_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_message_size",
+          "returnType": "void"
+        },
+        "set_max_upward_message_num_per_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_upward_message_num_per_candidate",
+          "returnType": "void"
+        },
+        "set_hrmp_open_request_ttl": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_open_request_ttl",
+          "returnType": "void"
+        },
+        "set_hrmp_sender_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_sender_deposit",
+          "returnType": "void"
+        },
+        "set_hrmp_recipient_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_recipient_deposit",
+          "returnType": "void"
+        },
+        "set_hrmp_channel_max_capacity": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_channel_max_capacity",
+          "returnType": "void"
+        },
+        "set_hrmp_channel_max_total_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_channel_max_total_size",
+          "returnType": "void"
+        },
+        "set_hrmp_max_parachain_inbound_channels": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_max_parachain_inbound_channels",
+          "returnType": "void"
+        },
+        "set_hrmp_channel_max_message_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_channel_max_message_size",
+          "returnType": "void"
+        },
+        "set_hrmp_max_parachain_outbound_channels": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_max_parachain_outbound_channels",
+          "returnType": "void"
+        },
+        "set_hrmp_max_message_num_per_candidate": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_hrmp_max_message_num_per_candidate",
+          "returnType": "void"
+        },
+        "set_pvf_voting_ttl": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_pvf_voting_ttl",
+          "returnType": "void"
+        },
+        "set_minimum_validation_upgrade_delay": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_validation_upgrade_delay",
+          "returnType": "void"
+        },
+        "set_bypass_consistency_check": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_bypass_consistency_check",
+          "returnType": "void"
+        },
+        "set_async_backing_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_async_backing_params",
+          "returnType": "void"
+        },
+        "set_executor_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_executor_params",
+          "returnType": "void"
+        },
+        "set_on_demand_base_fee": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_base_fee",
+          "returnType": "void"
+        },
+        "set_on_demand_fee_variability": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_fee_variability",
+          "returnType": "void"
+        },
+        "set_on_demand_queue_max_size": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_queue_max_size",
+          "returnType": "void"
+        },
+        "set_on_demand_target_queue_utilization": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_on_demand_target_queue_utilization",
+          "returnType": "void"
+        },
+        "set_minimum_backing_votes": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_minimum_backing_votes",
+          "returnType": "void"
+        },
+        "set_node_feature": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_node_feature",
+          "returnType": "void"
+        },
+        "set_approval_voting_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_approval_voting_params",
+          "returnType": "void"
+        },
+        "set_scheduler_params": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_scheduler_params",
+          "returnType": "void"
+        }
+      },
+      "ParaInherent": {
+        "enter": {
+          "required": [],
+          "optional": [],
+          "description": "Call enter",
+          "returnType": "void"
+        }
+      },
+      "Paras": {
+        "force_set_current_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_current_code",
+          "returnType": "void"
+        },
+        "force_set_current_head": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_current_head",
+          "returnType": "void"
+        },
+        "force_schedule_code_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_schedule_code_upgrade",
+          "returnType": "void"
+        },
+        "force_note_new_head": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_note_new_head",
+          "returnType": "void"
+        },
+        "force_queue_action": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_queue_action",
+          "returnType": "void"
+        },
+        "add_trusted_validation_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_trusted_validation_code",
+          "returnType": "void"
+        },
+        "poke_unused_validation_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_unused_validation_code",
+          "returnType": "void"
+        },
+        "include_pvf_check_statement": {
+          "required": [],
+          "optional": [],
+          "description": "Call include_pvf_check_statement",
+          "returnType": "void"
+        },
+        "force_set_most_recent_context": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_most_recent_context",
+          "returnType": "void"
+        },
+        "remove_upgrade_cooldown": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_upgrade_cooldown",
+          "returnType": "void"
+        },
+        "authorize_force_set_current_code_hash": {
+          "required": [],
+          "optional": [],
+          "description": "Call authorize_force_set_current_code_hash",
+          "returnType": "void"
+        },
+        "apply_authorized_force_set_current_code": {
+          "required": [],
+          "optional": [],
+          "description": "Call apply_authorized_force_set_current_code",
+          "returnType": "void"
+        }
+      },
+      "Initializer": {
+        "force_approve": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_approve",
+          "returnType": "void"
+        }
+      },
+      "Hrmp": {
+        "hrmp_init_open_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_init_open_channel",
+          "returnType": "void"
+        },
+        "hrmp_accept_open_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_accept_open_channel",
+          "returnType": "void"
+        },
+        "hrmp_close_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_close_channel",
+          "returnType": "void"
+        },
+        "force_clean_hrmp": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_clean_hrmp",
+          "returnType": "void"
+        },
+        "force_process_hrmp_open": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_process_hrmp_open",
+          "returnType": "void"
+        },
+        "force_process_hrmp_close": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_process_hrmp_close",
+          "returnType": "void"
+        },
+        "hrmp_cancel_open_request": {
+          "required": [],
+          "optional": [],
+          "description": "Call hrmp_cancel_open_request",
+          "returnType": "void"
+        },
+        "force_open_hrmp_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_open_hrmp_channel",
+          "returnType": "void"
+        },
+        "establish_system_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call establish_system_channel",
+          "returnType": "void"
+        },
+        "poke_channel_deposits": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_channel_deposits",
+          "returnType": "void"
+        },
+        "establish_channel_with_system": {
+          "required": [],
+          "optional": [],
+          "description": "Call establish_channel_with_system",
+          "returnType": "void"
+        }
+      },
+      "ParasDisputes": {
+        "force_unfreeze": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unfreeze",
+          "returnType": "void"
+        }
+      },
+      "ParasSlashing": {
+        "report_dispute_lost_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_dispute_lost_unsigned",
+          "returnType": "void"
+        }
+      },
+      "OnDemandAssignmentProvider": {
+        "place_order_allow_death": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_order_allow_death",
+          "returnType": "void"
+        },
+        "place_order_keep_alive": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_order_keep_alive",
+          "returnType": "void"
+        },
+        "place_order_with_credits": {
+          "required": [],
+          "optional": [],
+          "description": "Call place_order_with_credits",
+          "returnType": "void"
+        }
+      },
+      "Registrar": {
+        "register": {
+          "required": [],
+          "optional": [],
+          "description": "Call register",
+          "returnType": "void"
+        },
+        "force_register": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_register",
+          "returnType": "void"
+        },
+        "deregister": {
+          "required": [],
+          "optional": [],
+          "description": "Call deregister",
+          "returnType": "void"
+        },
+        "swap": {
+          "required": [],
+          "optional": [],
+          "description": "Call swap",
+          "returnType": "void"
+        },
+        "remove_lock": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_lock",
+          "returnType": "void"
+        },
+        "reserve": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve",
+          "returnType": "void"
+        },
+        "add_lock": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_lock",
+          "returnType": "void"
+        },
+        "schedule_code_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call schedule_code_upgrade",
+          "returnType": "void"
+        },
+        "set_current_head": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_current_head",
+          "returnType": "void"
+        }
+      },
+      "Slots": {
+        "force_lease": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_lease",
+          "returnType": "void"
+        },
+        "clear_all_leases": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_all_leases",
+          "returnType": "void"
+        },
+        "trigger_onboard": {
+          "required": [],
+          "optional": [],
+          "description": "Call trigger_onboard",
+          "returnType": "void"
+        }
+      },
+      "ParasSudoWrapper": {
+        "sudo_schedule_para_initialize": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_schedule_para_initialize",
+          "returnType": "void"
+        },
+        "sudo_schedule_para_cleanup": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_schedule_para_cleanup",
+          "returnType": "void"
+        },
+        "sudo_schedule_parathread_upgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_schedule_parathread_upgrade",
+          "returnType": "void"
+        },
+        "sudo_schedule_parachain_downgrade": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_schedule_parachain_downgrade",
+          "returnType": "void"
+        },
+        "sudo_queue_downward_xcm": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_queue_downward_xcm",
+          "returnType": "void"
+        },
+        "sudo_establish_hrmp_channel": {
+          "required": [],
+          "optional": [],
+          "description": "Call sudo_establish_hrmp_channel",
+          "returnType": "void"
+        }
+      },
+      "Auctions": {
+        "new_auction": {
+          "required": [],
+          "optional": [],
+          "description": "Call new_auction",
+          "returnType": "void"
+        },
+        "bid": {
+          "required": [],
+          "optional": [],
+          "description": "Call bid",
+          "returnType": "void"
+        },
+        "cancel_auction": {
+          "required": [],
+          "optional": [],
+          "description": "Call cancel_auction",
+          "returnType": "void"
+        }
+      },
+      "Crowdloan": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "contribute": {
+          "required": [],
+          "optional": [],
+          "description": "Call contribute",
+          "returnType": "void"
+        },
+        "withdraw": {
+          "required": [],
+          "optional": [],
+          "description": "Call withdraw",
+          "returnType": "void"
+        },
+        "refund": {
+          "required": [],
+          "optional": [],
+          "description": "Call refund",
+          "returnType": "void"
+        },
+        "dissolve": {
+          "required": [],
+          "optional": [],
+          "description": "Call dissolve",
+          "returnType": "void"
+        },
+        "edit": {
+          "required": [],
+          "optional": [],
+          "description": "Call edit",
+          "returnType": "void"
+        },
+        "add_memo": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_memo",
+          "returnType": "void"
+        },
+        "poke": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke",
+          "returnType": "void"
+        },
+        "contribute_all": {
+          "required": [],
+          "optional": [],
+          "description": "Call contribute_all",
+          "returnType": "void"
+        }
+      },
+      "AssignedSlots": {
+        "assign_perm_parachain_slot": {
+          "required": [],
+          "optional": [],
+          "description": "Call assign_perm_parachain_slot",
+          "returnType": "void"
+        },
+        "assign_temp_parachain_slot": {
+          "required": [],
+          "optional": [],
+          "description": "Call assign_temp_parachain_slot",
+          "returnType": "void"
+        },
+        "unassign_parachain_slot": {
+          "required": [],
+          "optional": [],
+          "description": "Call unassign_parachain_slot",
+          "returnType": "void"
+        },
+        "set_max_permanent_slots": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_permanent_slots",
+          "returnType": "void"
+        },
+        "set_max_temporary_slots": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_max_temporary_slots",
+          "returnType": "void"
+        }
+      },
+      "Coretime": {
+        "request_core_count": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_core_count",
+          "returnType": "void"
+        },
+        "request_revenue_at": {
+          "required": [],
+          "optional": [],
+          "description": "Call request_revenue_at",
+          "returnType": "void"
+        },
+        "credit_account": {
+          "required": [],
+          "optional": [],
+          "description": "Call credit_account",
+          "returnType": "void"
+        },
+        "assign_core": {
+          "required": [],
+          "optional": [],
+          "description": "Call assign_core",
+          "returnType": "void"
+        }
+      },
+      "StakingAhClient": {
+        "validator_set": {
+          "required": [],
+          "optional": [],
+          "description": "Call validator_set",
+          "returnType": "void"
+        },
+        "set_mode": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_mode",
+          "returnType": "void"
+        },
+        "force_on_migration_end": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_on_migration_end",
+          "returnType": "void"
+        }
+      },
+      "MultiBlockMigrations": {
+        "force_set_cursor": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_cursor",
+          "returnType": "void"
+        },
+        "force_set_active_cursor": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_set_active_cursor",
+          "returnType": "void"
+        },
+        "force_onboard_mbms": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_onboard_mbms",
+          "returnType": "void"
+        },
+        "clear_historic": {
+          "required": [],
+          "optional": [],
+          "description": "Call clear_historic",
+          "returnType": "void"
+        }
+      },
+      "XcmPallet": {
+        "send": {
+          "required": [],
+          "optional": [],
+          "description": "Call send",
+          "returnType": "void"
+        },
+        "teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call teleport_assets",
+          "returnType": "void"
+        },
+        "reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "execute": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute",
+          "returnType": "void"
+        },
+        "force_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_xcm_version",
+          "returnType": "void"
+        },
+        "force_default_xcm_version": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_default_xcm_version",
+          "returnType": "void"
+        },
+        "force_subscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_subscribe_version_notify",
+          "returnType": "void"
+        },
+        "force_unsubscribe_version_notify": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_unsubscribe_version_notify",
+          "returnType": "void"
+        },
+        "limited_reserve_transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_reserve_transfer_assets",
+          "returnType": "void"
+        },
+        "limited_teleport_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call limited_teleport_assets",
+          "returnType": "void"
+        },
+        "force_suspension": {
+          "required": [],
+          "optional": [],
+          "description": "Call force_suspension",
+          "returnType": "void"
+        },
+        "transfer_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets",
+          "returnType": "void"
+        },
+        "claim_assets": {
+          "required": [],
+          "optional": [],
+          "description": "Call claim_assets",
+          "returnType": "void"
+        },
+        "transfer_assets_using_type_and_then": {
+          "required": [],
+          "optional": [],
+          "description": "Call transfer_assets_using_type_and_then",
+          "returnType": "void"
+        },
+        "add_authorized_alias": {
+          "required": [],
+          "optional": [],
+          "description": "Call add_authorized_alias",
+          "returnType": "void"
+        },
+        "remove_authorized_alias": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_authorized_alias",
+          "returnType": "void"
+        },
+        "remove_all_authorized_aliases": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove_all_authorized_aliases",
+          "returnType": "void"
+        }
+      },
+      "MessageQueue": {
+        "reap_page": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_page",
+          "returnType": "void"
+        },
+        "execute_overweight": {
+          "required": [],
+          "optional": [],
+          "description": "Call execute_overweight",
+          "returnType": "void"
+        }
+      },
+      "AssetRate": {
+        "create": {
+          "required": [],
+          "optional": [],
+          "description": "Call create",
+          "returnType": "void"
+        },
+        "update": {
+          "required": [],
+          "optional": [],
+          "description": "Call update",
+          "returnType": "void"
+        },
+        "remove": {
+          "required": [],
+          "optional": [],
+          "description": "Call remove",
+          "returnType": "void"
+        }
+      },
+      "RootTesting": {
+        "fill_block": {
+          "required": [],
+          "optional": [],
+          "description": "Call fill_block",
+          "returnType": "void"
+        },
+        "trigger_defensive": {
+          "required": [],
+          "optional": [],
+          "description": "Call trigger_defensive",
+          "returnType": "void"
+        }
+      },
+      "MetaTx": {
+        "dispatch": {
+          "required": [],
+          "optional": [],
+          "description": "Call dispatch",
+          "returnType": "void"
+        }
+      },
+      "Beefy": {
+        "report_double_voting": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_double_voting",
+          "returnType": "void"
+        },
+        "report_double_voting_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_double_voting_unsigned",
+          "returnType": "void"
+        },
+        "set_new_genesis": {
+          "required": [],
+          "optional": [],
+          "description": "Call set_new_genesis",
+          "returnType": "void"
+        },
+        "report_fork_voting": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_fork_voting",
+          "returnType": "void"
+        },
+        "report_fork_voting_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_fork_voting_unsigned",
+          "returnType": "void"
+        },
+        "report_future_block_voting": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_future_block_voting",
+          "returnType": "void"
+        },
+        "report_future_block_voting_unsigned": {
+          "required": [],
+          "optional": [],
+          "description": "Call report_future_block_voting_unsigned",
+          "returnType": "void"
+        }
+      },
+      "IdentityMigrator": {
+        "reap_identity": {
+          "required": [],
+          "optional": [],
+          "description": "Call reap_identity",
+          "returnType": "void"
+        },
+        "poke_deposit": {
+          "required": [],
+          "optional": [],
+          "description": "Call poke_deposit",
+          "returnType": "void"
+        }
+      }
+    }
+  }
+};
+
+/**
+ * Get call parameters for a specific chain, pallet, and call
+ */
+export function getCallParameters(chainKey: string, pallet: string, call: string): string[] {
+  return callMetadata[chainKey]?.pallets?.[pallet]?.[call]?.required || [];
+}
+
+/**
+ * Check if a call exists
+ */
+export function hasCall(chainKey: string, pallet: string, call: string): boolean {
+  return !!(callMetadata[chainKey]?.pallets?.[pallet]?.[call]);
+}
+
+/**
+ * Get all supported chains
+ */
+export function getSupportedChains(): string[] {
+  return Object.keys(callMetadata);
+}
+
+/**
+ * Get all supported pallets for a chain
+ */
+export function getSupportedPallets(chainKey: string): string[] {
+  return Object.keys(callMetadata[chainKey]?.pallets || {});
+}
+
+/**
+ * Get all supported calls for a pallet
+ */
+export function getSupportedCalls(chainKey: string, pallet: string): string[] {
+  return Object.keys(callMetadata[chainKey]?.pallets?.[pallet] || {});
+}
+
+/**
+ * Get return type for a call
+ */
+export function getCallReturnType(chainKey: string, pallet: string, call: string): string {
+  return callMetadata[chainKey]?.pallets?.[pallet]?.[call]?.returnType || 'void';
+}
+
+
+/**
+ * Get description for a call
+ */
+export function getCallDescription(chainKey: string, pallet: string, call: string): string {
+  return callMetadata[chainKey]?.pallets?.[pallet]?.[call]?.description || `Call ${pallet}.${call}`;
+}

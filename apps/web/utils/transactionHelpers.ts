@@ -14,6 +14,12 @@ import {
   generateStorageParamValues,
   decodeStorageResult,
 } from "./storageHelpers";
+import {
+  getAllCallParameters,
+  generateCallParamValues,
+  formatTransactionResult,
+  getCallDescription,
+} from "./callHelpers";
 import { createCleanLogger, QueryResult } from "./cleanLogger";
 import { getDescriptorForChain } from "@workspace/core/descriptors";
 
@@ -44,6 +50,18 @@ function getStorageParameters(chainKey: string, pallet: string, storageName: str
     // Use the new getAllStorageParameters function which returns both required and optional
     const paramInfo = getAllStorageParameters(pallet, storageName, chainKey);
 
+    return paramInfo;
+  } catch (error) {
+    // Fallback that returns empty arrays
+    return { required: [], optional: [] };
+  }
+}
+
+// Helper function to get call parameters using the new dynamic detection system
+function getCallParameters(chainKey: string, pallet: string, callName: string): { required: string[], optional: string[] } {
+  try {
+    // Use the new getAllCallParameters function which returns both required and optional
+    const paramInfo = getAllCallParameters(pallet, callName, chainKey);
 
     return paramInfo;
   } catch (error) {
@@ -64,10 +82,27 @@ export async function executeRealTransaction(
   const { pallet, call } = selectedCall;
 
   try {
+    // Get call parameter information using the new detection system
+    const paramInfo = getCallParameters(chainKey, pallet, call.name);
+    const description = getCallDescription(pallet, call.name, chainKey);
+
     setConsoleOutput((prev) => [
       ...prev,
       `🚀 Executing ${pallet}.${call.name} transaction...`,
     ]);
+
+    // Log call information
+    if (description !== `Call ${pallet}.${call.name}`) {
+      setConsoleOutput((prev) => [...prev, `📝 ${description}`]);
+    }
+
+    if (paramInfo.required.length > 0) {
+      const paramValues = generateCallParamValues(formData, paramInfo.required);
+      const serializedParams = JSON.stringify(paramValues, (key, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      );
+      setConsoleOutput((prev) => [...prev, `🔧 Parameters: ${serializedParams}`]);
+    }
 
     // Use the existing executeTransactionWithSteps function from core
     const result = await executeTransactionWithSteps(
@@ -133,6 +168,23 @@ export async function executeMultipleTransactions(
     ]);
 
     try {
+      // Get call parameter information using the new detection system
+      const paramInfo = getCallParameters(chainKey, method.pallet, method.call.name);
+      const description = getCallDescription(method.pallet, method.call.name, chainKey);
+
+      // Log call information
+      if (description !== `Call ${method.pallet}.${method.call.name}`) {
+        setConsoleOutput((prev) => [...prev, `  📝 ${description}`]);
+      }
+
+      if (paramInfo.required.length > 0) {
+        const paramValues = generateCallParamValues(method.formData, paramInfo.required);
+        const serializedParams = JSON.stringify(paramValues, (key, value) =>
+          typeof value === 'bigint' ? value.toString() : value
+        );
+        setConsoleOutput((prev) => [...prev, `  🔧 Parameters: ${serializedParams}`]);
+      }
+
       const result = await executeTransactionWithSteps(
         { pallet: method.pallet, call: method.call },
         method.formData,
