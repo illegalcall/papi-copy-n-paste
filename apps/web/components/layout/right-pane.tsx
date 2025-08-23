@@ -118,6 +118,16 @@ export function RightPane({
         description: "Hydration parachain",
         keyName: "hydration",
       },
+      paseo: {
+        wellKnown: "paseo",
+        description: "Paseo testnet",
+        keyName: "paseo",
+      },
+      paseo_asset_hub: {
+        wsUrl: "wss://asset-hub-paseo-rpc.dwellir.com",
+        description: "Paseo Asset Hub",
+        keyName: "paseo_asset_hub",
+      },
     };
 
     const config = chainConfigs[chainKey] || chainConfigs.polkadot;
