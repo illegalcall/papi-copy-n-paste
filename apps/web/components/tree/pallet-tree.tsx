@@ -10,7 +10,6 @@ import {
   Calendar,
   Settings,
   AlertTriangle,
-  Code,
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { PalletInfo, PalletCall, PalletConstant, PalletError, PalletEvent } from "@workspace/core";
@@ -19,7 +18,7 @@ interface PalletTreeProps {
   pallets: PalletInfo[];
   searchQuery: string;
   onCallSelect: (pallet: string, call: PalletCall) => void;
-  onStorageSelect: (pallet: string, storage: any) => void;
+  onStorageSelect: (pallet: string, storage: unknown) => void;
   onConstantSelect?: (pallet: string, constant: PalletConstant) => void;
   onErrorSelect?: (pallet: string, error: PalletError) => void;
   onEventSelect?: (pallet: string, event: PalletEvent) => void;
@@ -63,7 +62,7 @@ export function PalletTree({
   };
 
   // Enhanced filtering that searches in method arguments and descriptions
-  const enhancedFilterItems = <T extends { name: string; args?: any[] }>(
+  const enhancedFilterItems = <T extends { name: string; args?: unknown[] }>(
     items: T[],
     query: string,
   ): T[] => {
@@ -148,7 +147,7 @@ export function PalletTree({
     onCallSelect(pallet.name, call);
   };
 
-  const handleStorageClick = (pallet: PalletInfo, storage: any) => {
+  const handleStorageClick = (pallet: PalletInfo, storage: unknown) => {
     onStorageSelect(pallet.name, storage);
   };
 

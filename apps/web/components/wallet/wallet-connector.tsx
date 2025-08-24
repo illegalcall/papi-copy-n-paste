@@ -38,7 +38,7 @@ export function WalletConnector() {
     try {
       setShowError(false);
       await connect();
-    } catch (err) {
+    } catch {
       setShowError(true);
     }
   };

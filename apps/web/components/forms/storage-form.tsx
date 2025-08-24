@@ -29,7 +29,7 @@ import { CallSignature } from "@/components/type-display";
 
 interface StorageFormProps {
   pallet: string;
-  storage: any;
+  storage: unknown;
   chainKey: string;
   onQueryTypeChange: (queryType: string) => void;
   onParamsChange: StorageParamsChangeHandler;
@@ -408,7 +408,7 @@ console.log('Result:', result);`;
     if (onValidationChange) {
       onValidationChange(validation.isValid, validation.errors);
     }
-  }, [localParams, hasRequiredParams, validateParams, onValidationChange]);
+  }, [localParams, hasRequiredParams, validateParams, onValidationChange, onParamsChange]);
 
   const handleParamChange = useCallback((paramType: string, value: string) => {
     setLocalParams((prev) => ({ ...prev, [paramType.toLowerCase()]: value }));

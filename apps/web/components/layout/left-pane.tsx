@@ -11,7 +11,7 @@ interface LeftPaneProps {
   onClose: () => void;
   pallets: PalletInfo[];
   onCallSelect: (pallet: string, call: PalletCall) => void;
-  onStorageSelect: (pallet: string, storage: any) => void;
+  onStorageSelect: (pallet: string, storage: unknown) => void;
   onConstantSelect?: (pallet: string, constant: PalletConstant) => void;
   onErrorSelect?: (pallet: string, error: PalletError) => void;
   onEventSelect?: (pallet: string, event: PalletEvent) => void;

@@ -13,6 +13,7 @@ import { Play, Square, Plus, X, List, Eye, EyeOff, Wallet } from "lucide-react";
 import { useWallet } from "../../hooks/useWallet";
 import { EnhancedCallForm } from "@/components/forms/enhanced-call-form";
 import { StorageForm } from "@/components/forms/storage-form";
+import type { StorageInfo } from "@/types/components";
 import { ConstantForm } from "@/components/forms/constant-form";
 import { ErrorForm } from "@/components/forms/error-form";
 import { EventForm } from "@/components/forms/event-form";
@@ -22,24 +23,24 @@ interface CenterPaneProps {
   chainStatus: "connecting" | "ready" | "error";
   selectedChain: string;
   selectedCall?: { pallet: string; call: PalletCall };
-  selectedStorage?: { pallet: string; storage: any };
+  selectedStorage?: { pallet: string; storage: StorageInfo };
   selectedConstant?: { pallet: string; constant: PalletConstant };
   selectedError?: { pallet: string; error: PalletError };
   selectedEvent?: { pallet: string; event: PalletEvent };
   methodQueue: Array<{
     pallet: string;
     call: PalletCall;
-    formData: Record<string, any>;
+    formData: Record<string, unknown>;
     id: string;
   }>;
   storageQueue: Array<{
     pallet: string;
-    storage: any;
+    storage: StorageInfo;
     queryType: string;
-    storageParams: Record<string, any>;
+    storageParams: Record<string, unknown>;
     id: string;
   }>;
-  onFormChange: (formData: Record<string, any>) => void;
+  onFormChange: (formData: Record<string, unknown>) => void;
   onValidChange: (isValid: boolean) => void;
   onRunClick: () => void;
   onWalletSignAndExecute?: () => void;

@@ -162,8 +162,27 @@
   }
   html {
     font-size: 14px; /* Reduced from default 16px */
+    /* Prevent mobile scrolling */
+    overflow: hidden;
+    height: 100%;
   }
   body {
     @apply bg-background text-foreground;
+    /* Prevent mobile scrolling */
+    overflow: hidden;
+    height: 100%;
+    /* Prevent touch scrolling on mobile */
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Additional mobile scroll prevention */
+  @media (max-width: 1024px) {
+    html, body {
+      overflow: hidden !important;
+      position: fixed !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
   }
 }

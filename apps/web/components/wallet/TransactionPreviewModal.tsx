@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -16,13 +16,12 @@ import { Separator } from "@workspace/ui/components/separator";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Loader2, AlertTriangle, Shield, DollarSign, Clock, CheckCircle, Wallet } from "lucide-react";
 import { useWallet } from "../../hooks/useWallet";
-import { getDescriptorName } from "../../utils/chainConfig";
 
 interface TransactionInfo {
   pallet: string;
   call: string;
   args: Record<string, any>;
-  method?: any; // The actual method object for fee estimation
+  method?: unknown; // The actual method object for fee estimation
 }
 
 interface TransactionPreviewModalProps {
@@ -33,7 +32,7 @@ interface TransactionPreviewModalProps {
   transactions: TransactionInfo[];
   isTestnet?: boolean;
   chainName: string;
-  api?: any; // The API instance for fee estimation
+  api?: unknown; // The API instance for fee estimation
 }
 
 interface FeeEstimate {
@@ -61,34 +60,19 @@ export function TransactionPreviewModal({
   const [balance, setBalance] = useState<string | null>(null);
   const [isLoadingBalance, setIsLoadingBalance] = useState(false);
 
-  // Reset state when modal opens/closes
-  useEffect(() => {
-    if (isOpen) {
-      setUserConfirmed(false);
-      setFeeEstimates([]);
-      setBalance(null);
-      estimateFees();
-      fetchBalance();
-    }
-  }, [isOpen]);
-
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     if (!api || !selectedAccount) return;
 
     setIsLoadingBalance(true);
     try {
-      console.log('🔍 Fetching balance using PAPI typed API for:', selectedAccount.address);
-
       // Import descriptor helper at runtime
       const { getTypedApiForChain } = await import('@workspace/core/descriptors');
 
       // Get typed API for the current chain (no switching)
       const typedApi = getTypedApiForChain(api, chainName.toLowerCase());
-      console.log('🔍 Created typed API for chain:', chainName.toLowerCase());
 
       // Use PAPI pattern: typedApi.query.System.Account.getValue()
       const accountData = await typedApi.query.System.Account.getValue(selectedAccount.address);
-      console.log('🔍 Account data from typed API:', accountData);
 
       if (!accountData) {
         setBalance("Account not found");
@@ -99,14 +83,6 @@ export function TransactionPreviewModal({
       // Extract balance using PAPI account structure
       const { data } = accountData;
       const freeBalance = data.free;
-      const reserved = data.reserved;
-      const total = freeBalance + reserved;
-
-      console.log('🔍 Balance details:', {
-        free: freeBalance.toString(),
-        reserved: reserved.toString(),
-        total: total.toString()
-      });
 
       // Get decimals from chain spec data (papi-console-main approach)
       const chainSpecData = await api.getChainSpecData();
@@ -116,21 +92,12 @@ export function TransactionPreviewModal({
 
       if (properties && typeof properties === 'object' && 'tokenDecimals' in properties) {
         decimals = Number(properties.tokenDecimals);
-        console.log('🔍 Got decimals from chain spec:', decimals);
-      } else {
-        console.log('🔍 Using default decimals for Paseo Asset Hub:', decimals);
       }
 
       const divisor = BigInt(10 ** decimals);
 
       // Convert to readable format with chain spec decimals
       const balanceFormatted = (Number(freeBalance) / Number(divisor)).toFixed(4);
-
-      console.log('🔍 Chain:', chainName);
-      console.log('🔍 Decimals from chain spec:', decimals);
-      console.log('🔍 Raw balance:', freeBalance.toString());
-      console.log('🔍 Divisor:', divisor.toString());
-      console.log('🔍 Formatted balance:', balanceFormatted);
       setBalance(balanceFormatted);
 
     } catch (error) {
@@ -138,22 +105,16 @@ export function TransactionPreviewModal({
       setBalance("Error fetching balance");
     }
     setIsLoadingBalance(false);
-  };
+  }, [api, selectedAccount, chainName]);
 
-  const estimateFees = async () => {
+  const estimateFees = useCallback(async () => {
     if (!api || !selectedAccount || transactions.length === 0) return;
 
     setIsEstimatingFees(true);
     const estimates: FeeEstimate[] = [];
 
     try {
-      console.log('🔍 Estimating fees using PAPI typed API...');
-
-      // Import descriptor helper at runtime
-      const { getTypedApiForChain } = await import('@workspace/core/descriptors');
-
-      // Get typed API for the current chain (no switching)
-      const typedApi = getTypedApiForChain(api, chainName.toLowerCase());
+      // Fee estimation disabled for compatibility
 
       for (const tx of transactions) {
         try {
@@ -167,39 +128,7 @@ export function TransactionPreviewModal({
               error: "Fee estimation disabled for paseo_asset_hub compatibility"
             });
           } else {
-            // Create transaction using PAPI typed API with proper argument structure
-            let method;
-
-            if (tx.pallet === "Balances" && tx.call === "transfer_allow_death") {
-              // For balance transfers, PAPI expects { dest, value }
-              let destAddress = tx.args.dest;
-
-              // Handle special cases like //Alice and //Bob for Asset Hub
-              if (destAddress === "//Alice") {
-                // For Asset Hub testing, use connected account for self-transfer
-                destAddress = selectedAccount.address;
-              } else if (destAddress === "//Bob") {
-                // For Asset Hub testing, also use connected account
-                destAddress = selectedAccount.address;
-              }
-
-              const valueAsBigInt = BigInt(tx.args.value || tx.args.amount || "0");
-
-              // Use papi-console approach for fee estimation too
-              const callData = typedApi.tx.Balances.transfer_allow_death({
-                dest: destAddress,
-                value: valueAsBigInt
-              });
-
-              // Use getEstimatedFees method instead of creating full transaction
-              method = callData;
-            } else {
-              // For other calls, pass the args object directly
-              method = typedApi.tx[tx.pallet][tx.call](tx.args);
-            }
-
             // Temporarily disable fee estimation to avoid paseo_asset_hub encoding issues
-            // const paymentInfo = await method.getEstimatedFees(selectedAccount.address);
             estimates.push({
               partialFee: "0", // Set to 0 temporarily
               weight: "0",
@@ -223,7 +152,18 @@ export function TransactionPreviewModal({
 
     setFeeEstimates(estimates);
     setIsEstimatingFees(false);
-  };
+  }, [api, selectedAccount, transactions]);
+
+  // Reset state when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setUserConfirmed(false);
+      setFeeEstimates([]);
+      setBalance(null);
+      estimateFees();
+      fetchBalance();
+    }
+  }, [isOpen, estimateFees, fetchBalance]);
 
   const handleConfirm = async () => {
     if (!userConfirmed) return;

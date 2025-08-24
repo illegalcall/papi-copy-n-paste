@@ -6,7 +6,7 @@ interface ResultDisplayProps {
   queryType: string;
   pallet: string;
   storage: string;
-  result: any;
+  result: unknown;
   status: 'success' | 'error' | 'loading';
   error?: string;
 }
@@ -21,7 +21,7 @@ export function ResultDisplay({
 }: ResultDisplayProps) {
   const [copied, setCopied] = useState(false);
 
-  const formatResult = (value: any): string => {
+  const formatResult = (value: unknown): string => {
     if (value === null || value === undefined) {
       return 'null';
     }

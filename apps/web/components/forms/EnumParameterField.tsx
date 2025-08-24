@@ -15,8 +15,8 @@ import { cn } from '@workspace/ui/lib/utils'
 
 interface EnumParameterFieldProps {
   parameter: ParameterInfo
-  value?: any
-  onChange: (value: any) => void
+  value?: unknown
+  onChange: (value: unknown) => void
   className?: string
 }
 
@@ -27,7 +27,7 @@ export function EnumParameterField({
   className
 }: EnumParameterFieldProps) {
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null)
-  const [variantData, setVariantData] = useState<any>(null)
+  const [variantData, setVariantData] = useState<unknown>(null)
 
   // Initialize from value
   useEffect(() => {
@@ -67,7 +67,7 @@ export function EnumParameterField({
     }
   }
 
-  const handleDataChange = (newData: any) => {
+  const handleDataChange = (newData: unknown) => {
     setVariantData(newData)
     onChange({
       type: selectedVariant,
@@ -138,7 +138,7 @@ export function EnumParameterField({
 /**
  * Render appropriate input for variant data type
  */
-function renderDataInput(variant: EnumVariant, value: any, onChange: (value: any) => void) {
+function renderDataInput(variant: EnumVariant, value: unknown, onChange: (value: unknown) => void) {
   const dataType = variant.dataType || 'unknown'
 
   // Handle different data types
@@ -225,7 +225,7 @@ function renderDataInput(variant: EnumVariant, value: any, onChange: (value: any
 /**
  * Get default value for variant data type
  */
-function getDefaultValueForVariant(variant: EnumVariant): any {
+function getDefaultValueForVariant(variant: EnumVariant): unknown {
   const dataType = variant.dataType || 'unknown'
 
   if (dataType.includes('AccountId')) return ''

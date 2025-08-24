@@ -40,7 +40,7 @@ export function SyntaxHighlighter({
 
   let highlightedCode: string;
   try {
-    highlightedCode = Prism.highlight(code, grammar as any, language);
+    highlightedCode = Prism.highlight(code, grammar as Prism.Grammar, language);
   } catch {
     // Fallback to plain text if highlighting fails
     highlightedCode = code;

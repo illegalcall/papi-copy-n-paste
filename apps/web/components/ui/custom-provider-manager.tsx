@@ -113,7 +113,7 @@ export function CustomProviderManager({ chainKey, onProviderSelect, selectedProv
 
   const handleTestConnection = async (id: string) => {
     setTestingProviderId(id);
-    const success = await retestCustomProvider(id);
+    await retestCustomProvider(id);
     setCustomProviders(getCustomProvidersForChain(chainKey));
     setTestingProviderId(null);
   };
@@ -265,7 +265,7 @@ export function CustomProviderManager({ chainKey, onProviderSelect, selectedProv
           <Card>
             <CardContent className="pt-6">
               <div className="text-center text-sm text-muted-foreground">
-                No custom providers added for {chainKey} yet. Click "Add Provider" to get started.
+                No custom providers added for {chainKey} yet. Click &quot;Add Provider&quot; to get started.
               </div>
             </CardContent>
           </Card>

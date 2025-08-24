@@ -68,7 +68,6 @@ export class MetadataAnalyzer {
    * Extract complete extrinsic information from metadata using proper PAPI substrate-bindings
    */
   extractExtrinsicInfo(): ExtrinsicInfo {
-    console.log('🔍 Extracting extrinsic information from metadata...')
 
     const extrinsicInfo: ExtrinsicInfo = {
       pallets: [],
@@ -78,21 +77,17 @@ export class MetadataAnalyzer {
 
     try {
       // Use the properly unified metadata's pallets array
-      console.log(`📋 Found ${this.metadata.pallets.length} pallets in unified metadata`)
 
       this.metadata.pallets.forEach((pallet) => {
         // Only process pallets that have calls
         if (!pallet.calls) {
-          console.log(`⏭️ Skipping ${pallet.name} - no calls defined`)
           return
         }
 
-        console.log(`📦 Processing pallet: ${pallet.name}`)
 
         // Get the call type from the pallet
         const callType = this.lookup(pallet.calls.type)
         if (!callType || callType.type !== 'enum' || !callType.value) {
-          console.log(`  ⚠️ Invalid call type for ${pallet.name}`)
           return
         }
 
@@ -104,11 +99,9 @@ export class MetadataAnalyzer {
           extrinsicInfo.calls[pallet.name] = calls
           extrinsicInfo.totalCalls += calls.length
 
-          console.log(`  ⚡ Found ${calls.length} calls in ${pallet.name}`)
         }
       })
 
-      console.log(`✅ Extraction complete: ${extrinsicInfo.pallets.length} pallets, ${extrinsicInfo.totalCalls} calls`)
       return extrinsicInfo
 
     } catch (error) {

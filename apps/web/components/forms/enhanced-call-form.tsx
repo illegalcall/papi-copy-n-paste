@@ -13,7 +13,6 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Loader2, AlertCircle, ChevronDown, ChevronUp } from "lucide-react";
-import { cn } from "@workspace/ui/lib/utils";
 import { EnumParameterField } from "./EnumParameterField";
 import { OptionalParameterField } from "./OptionalParameterField";
 import { getCallParameterInfo } from "@/utils/callParameterDetection";
@@ -99,12 +98,10 @@ export function EnhancedCallForm({
     return () => {
       isCancelled = true;
     };
-  }, [chainKey, pallet, callName]);
+  }, [chainKey, pallet, callName, selectedCall?.call?.args]);
 
   // Notify parent of form changes
   useEffect(() => {
-    console.log('🔍 [FORM] Sending form data:', formData);
-    console.log('🔍 [FORM] Parameter info:', parameterInfo?.required?.map(p => p.name) || []);
     onFormChange(formData);
 
     // Validate form data
@@ -112,7 +109,7 @@ export function EnhancedCallForm({
     onValidChange(isValid);
   }, [formData, parameterInfo, onFormChange, onValidChange]);
 
-  const handleFieldChange = (paramName: string, value: any) => {
+  const handleFieldChange = (paramName: string, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       [paramName]: value
@@ -244,10 +241,10 @@ export function EnhancedCallForm({
  */
 function renderParameterField(
   param: ParameterInfo,
-  value: any,
-  onChange: (paramName: string, value: any) => void
+  value: unknown,
+  onChange: (paramName: string, value: unknown) => void
 ) {
-  const handleChange = (newValue: any) => onChange(param.name, newValue);
+  const handleChange = (newValue: unknown) => onChange(param.name, newValue);
 
   // Handle enum parameters
   if (param.enumVariants && param.enumVariants.length > 0) {
@@ -274,8 +271,8 @@ function renderParameterField(
  */
 function renderComplexParameterField(
   param: ParameterInfo,
-  value: any,
-  onChange: (value: any) => void
+  value: unknown,
+  onChange: (value: unknown) => void
 ) {
   const fieldType = getFieldTypeFromParameterType(param.type);
 
@@ -331,8 +328,8 @@ function renderComplexParameterField(
  */
 function renderSimpleParameterField(
   param: ParameterInfo,
-  value: any,
-  onChange: (value: any) => void
+  value: unknown,
+  onChange: (value: unknown) => void
 ) {
   const fieldType = getFieldTypeFromParameterType(param.type);
 

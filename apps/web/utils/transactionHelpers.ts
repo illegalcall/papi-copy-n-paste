@@ -541,8 +541,6 @@ async function executeRawGetValue(
 
     // Now attempt the proper PAPI integration
     try {
-      // Get the correct descriptor based on chain
-      const descriptors = typeof window !== 'undefined' ? (window as any).papiDescriptors || {} : {};
       const descriptorName = getDescriptorName(chainKey);
 
       // Check if descriptor is available for this chain
@@ -551,10 +549,8 @@ async function executeRawGetValue(
         return;
       }
 
-      if (!descriptors[descriptorName]) {
-
-        // Get the descriptor using the helper function
-        const descriptor = getDescriptorForChain(chainKey);
+      // Get the descriptor using the helper function
+      const descriptor = getDescriptorForChain(chainKey);
 
         const typedApi = client.getTypedApi(descriptor);
         const palletQueries = typedApi.query[palletName];
@@ -608,8 +604,6 @@ async function executeRawGetValue(
         } else {
           logger.error(`Storage ${palletName}.${storageName} not found`);
         }
-
-      }
 
     } catch (integrationError) {
       const errorMessage = integrationError instanceof Error ? integrationError.message : "Unknown error";
@@ -671,7 +665,7 @@ async function executeGetValueAt(
 // Watch for storage value changes using modern PAPI architecture with manual control
 async function executeWatchValue(
   client: any,
-  storageKey: string | undefined, // Legacy parameter, now unused
+  storageKey: string | undefined,
   palletName: string,
   storageName: string,
   logger: any,

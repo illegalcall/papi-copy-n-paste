@@ -12,7 +12,7 @@ import type { ParameterInfo } from '@/utils/metadataAnalyzer'
 interface OptionalParameterFieldProps {
   parameter: ParameterInfo
   children: React.ReactNode
-  value?: any
+  value?: unknown
   onToggle?: (enabled: boolean) => void
   className?: string
 }
