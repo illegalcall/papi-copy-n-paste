@@ -24,7 +24,7 @@ export function getChainSpecImport(chainKey: string): string {
   }
 
   // For parachains, we need to connect via RPC (no built-in chainSpec)
-  return `// Note: ${chainKey} connects directly via RPC endpoint`;
+  return `// ${chainKey} connects via RPC endpoint`;
 }
 
 export function getDescriptorImport(chainKey: string): string {

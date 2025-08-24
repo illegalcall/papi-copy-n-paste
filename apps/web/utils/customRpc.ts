@@ -12,7 +12,7 @@ export interface CustomProvider {
 const CUSTOM_PROVIDERS_STORAGE_KEY = 'papi-custom-providers';
 const LEGACY_CUSTOM_RPC_STORAGE_KEY = 'papi-custom-rpcs'; // For backward compatibility
 
-// Legacy interface for backward compatibility
+// Legacy interface
 export interface CustomRPC {
   id: string;
   name: string;

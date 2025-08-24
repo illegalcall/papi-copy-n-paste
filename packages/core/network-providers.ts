@@ -303,7 +303,7 @@ export const networkConfigs: NetworkConfig[] = [
     chainSpecPath: undefined, // Hydration is not a built-in chain, uses RPC
     genesisHash:
       "0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d",
-    defaultProvider: "hydration-rpc", // Fixed: Use RPC as default since Smoldot requires chain spec
+    defaultProvider: "hydration-rpc",
     providers: [
       {
         id: "hydration-rpc",
