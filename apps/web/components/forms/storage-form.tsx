@@ -5,6 +5,7 @@ import type { StorageParams, StorageParamsChangeHandler } from "../../types/form
 import { Badge } from "@workspace/ui/components/badge";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
+import { Button } from "@workspace/ui/components/button";
 import {
   Database,
   HelpCircle,
@@ -12,7 +13,9 @@ import {
   ChevronDown,
   ChevronUp,
   AlertCircle,
+  Wallet,
 } from "lucide-react";
+import { useWallet } from "../../hooks/useWallet";
 import { useStorageValidation } from "../../hooks/useStorageValidation";
 import { EnhancedQuerySelector } from "./enhanced-query-selector";
 import {
@@ -305,6 +308,9 @@ export function StorageForm({
   const [showTypeInfo, setShowTypeInfo] = useState(true);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
+  // Wallet connection
+  const { isConnected: isWalletConnected, selectedAccount } = useWallet();
+
   // Get ACTUAL type information from PAPI descriptors - no fallbacks
   let actualTypeInfo;
   let parameterInfo: {
@@ -408,6 +414,13 @@ console.log('Result:', result);`;
     setLocalParams((prev) => ({ ...prev, [paramType.toLowerCase()]: value }));
   }, []);
 
+  // Handle using connected wallet account
+  const handleUseWalletAccount = useCallback((paramType: string) => {
+    if (isWalletConnected && selectedAccount) {
+      handleParamChange(paramType, selectedAccount.address);
+    }
+  }, [isWalletConnected, selectedAccount, handleParamChange]);
+
   const getParameterPlaceholder = (paramType: string) => {
     switch (paramType) {
       case "AccountId":
@@ -509,19 +522,35 @@ console.log('Result:', result);`;
             {allParams.map((paramType) => {
               const fieldKey = paramType.toLowerCase();
               const hasError = validationErrors[fieldKey];
+              const isAccountParam = paramType === "AccountId" || paramType === "SS58String";
 
               return (
                 <div key={paramType} className="space-y-1">
                   <Label htmlFor={paramType} className="text-xs">
                     {paramType}
                   </Label>
-                  <Input
-                    id={paramType}
-                    placeholder={getParameterPlaceholder(paramType)}
-                    value={localParams[fieldKey] || ""}
-                    onChange={(e) => handleParamChange(paramType, e.target.value)}
-                    className={`font-mono text-xs ${hasError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      id={paramType}
+                      placeholder={getParameterPlaceholder(paramType)}
+                      value={localParams[fieldKey] || ""}
+                      onChange={(e) => handleParamChange(paramType, e.target.value)}
+                      className={`font-mono text-xs flex-1 ${hasError ? 'border-red-500 focus-visible:ring-red-500' : ''}`}
+                    />
+                    {isAccountParam && isWalletConnected && selectedAccount && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleUseWalletAccount(paramType)}
+                        className="flex items-center gap-1 px-2 py-1 h-auto text-xs"
+                        title={`Use connected wallet: ${selectedAccount.address}`}
+                      >
+                        <Wallet className="w-3 h-3" />
+                        Use Wallet
+                      </Button>
+                    )}
+                  </div>
                   {hasError && (
                     <div className="flex items-center space-x-1 text-xs text-red-600">
                       <AlertCircle className="w-3 h-3" />
@@ -529,8 +558,16 @@ console.log('Result:', result);`;
                     </div>
                   )}
                   <div className="text-xs text-muted-foreground">
-                    {(paramType === "AccountId" || paramType === "SS58String") &&
-                      "Use test accounts (//Alice, //Bob) or full addresses"}
+                    {isAccountParam && (
+                      <>
+                        Use test accounts (//Alice, //Bob) or full addresses
+                        {isWalletConnected && selectedAccount && (
+                          <div className="text-green-600 mt-1">
+                            💡 Connected wallet: {selectedAccount.meta.name || 'Unnamed'} ({selectedAccount.address.slice(0, 8)}...{selectedAccount.address.slice(-4)})
+                          </div>
+                        )}
+                      </>
+                    )}
                     {paramType === "AssetId" &&
                       "Asset identifier (varies by chain)"}
                     {(paramType === "BlockNumber" || paramType === "number") &&

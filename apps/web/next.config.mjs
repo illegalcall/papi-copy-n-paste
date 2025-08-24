@@ -3,6 +3,8 @@ import path from 'path';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ["@workspace/ui"],
+  skipTrailingSlashRedirect: true,
+  trailingSlash: false,
   webpack: (config) => {
     // Add alias for PAPI descriptors
     config.resolve.alias = {

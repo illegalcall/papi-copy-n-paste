@@ -12,6 +12,10 @@
  * npx papi add astar --wsUrl wss://rpc.astar.network
  * npx papi
  *
+ * KNOWN ISSUE: paseo_asset_hub has fundamental encoding incompatibilities with current PAPI version.
+ * Error: "inner[tag] is not a function" occurs during transaction encoding.
+ * RECOMMENDATION: Use 'polkadot', 'kusama', or other stable chains for transaction testing.
+ * Working chains: polkadot, kusama, moonbeam, bifrost, astar
  */
 
 // Import real generated descriptors following PAPI documentation pattern

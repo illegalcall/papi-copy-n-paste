@@ -38,6 +38,13 @@ export interface RuntimeCall {
 
 // Import comprehensive metadata for enhanced parsing
 import { papiMetadata } from "./generated/papi-metadata";
+import {
+  callMetadata,
+  getSupportedPallets,
+  getSupportedCalls,
+  getCallParameters,
+  getCallDescription
+} from "./generated/call-metadata";
 
 
 /**
@@ -238,9 +245,9 @@ export async function fetchMetadata(
     const cached = getCachedMetadata(chainKey);
     if (cached) {
       console.log(`Using cached metadata for ${chainKey}`);
-      return cached;
+      // Replace calls with generated metadata even for cached data
+      return mergeGeneratedCallsWithLiveMetadata(cached, chainKey);
     }
-
 
     // Use PAPI client's _request method to get raw metadata via JSON-RPC with enhanced retry logic
     let rawMetadata: any;
@@ -251,7 +258,7 @@ export async function fetchMetadata(
 
     try {
       console.log(
-        `🔄 Fetching raw metadata via state_getMetadata (${quickTimeout}ms timeout)...`,
+        `🔄 Fetching live metadata for storage/events/constants/errors (${quickTimeout}ms timeout)...`,
       );
 
       // Single attempt with quick timeout for better UX
@@ -264,7 +271,7 @@ export async function fetchMetadata(
       );
     } catch (error) {
       console.warn(
-        `⚠️ Metadata fetch failed for ${chainKey}:`,
+        `⚠️ Live metadata fetch failed for ${chainKey}:`,
         error instanceof Error ? error.message : "Unknown error",
       );
 
@@ -273,7 +280,14 @@ export async function fetchMetadata(
         console.log(
           "📝 Polkadot initial connection issue detected - this is a known limitation",
         );
-        // Don't retry for Polkadot - fall back immediately
+      }
+
+      // Fall back to generated metadata only
+      console.log(`🔄 Using generated call metadata only for ${chainKey}`);
+      const generatedMetadata = createMetadataFromGeneratedCalls(chainKey);
+      if (generatedMetadata) {
+        console.log(`✅ Using generated call metadata for ${chainKey} with ${generatedMetadata.pallets.length} pallets`);
+        return generatedMetadata;
       }
 
       return getMockMetadataIfEnabled(chainKey);
@@ -281,6 +295,11 @@ export async function fetchMetadata(
 
     if (!rawMetadata) {
       console.warn("No raw metadata returned");
+      // Fall back to generated metadata only
+      const generatedMetadata = createMetadataFromGeneratedCalls(chainKey);
+      if (generatedMetadata) {
+        return generatedMetadata;
+      }
       return getMockMetadataIfEnabled(chainKey);
     }
 
@@ -291,23 +310,188 @@ export async function fetchMetadata(
         : JSON.stringify(rawMetadata);
 
     // Parse the raw metadata
-    const chainMetadata = await parseRawMetadata(rawMetadataString, chainKey);
+    const liveMetadata = await parseRawMetadata(rawMetadataString, chainKey);
+
+    // Merge live metadata (storage/events/constants/errors) with generated calls
+    const mergedMetadata = mergeGeneratedCallsWithLiveMetadata(liveMetadata, chainKey);
 
     // Generate hash for cache validation
     const rawMetadataHash = simpleHash(rawMetadataString);
 
-    // Cache the result with hash for validation
-    setCachedMetadata(chainKey, chainMetadata, rawMetadataHash);
+    // Cache the merged result with hash for validation
+    setCachedMetadata(chainKey, mergedMetadata, rawMetadataHash);
 
     console.log(
-      `✅ Successfully fetched and cached metadata for ${chainKey} with ${chainMetadata.pallets.length} pallets`,
+      `✅ Successfully fetched live metadata and merged with generated calls for ${chainKey} with ${mergedMetadata.pallets.length} pallets`,
     );
-    return chainMetadata;
+    return mergedMetadata;
   } catch (error) {
     console.error(`❌ Error fetching metadata for ${chainKey}:`, error);
-    // Check if mock metadata is enabled before returning it
+
+    // First try to use our generated call metadata as fallback
+    console.log(`🔄 Attempting to use generated call metadata for ${chainKey}`);
+    const generatedMetadata = createMetadataFromGeneratedCalls(chainKey);
+    if (generatedMetadata) {
+      console.log(`✅ Using generated call metadata for ${chainKey} with ${generatedMetadata.pallets.length} pallets`);
+      return generatedMetadata;
+    }
+
+    // Fallback to mock metadata if enabled
     console.log(`🆘 Checking if mock metadata is enabled for ${chainKey}`);
     return getMockMetadataIfEnabled(chainKey);
+  }
+}
+
+/**
+ * Merge live metadata (storage/events/constants/errors) with generated call metadata
+ */
+function mergeGeneratedCallsWithLiveMetadata(
+  liveMetadata: ChainMetadata,
+  chainKey: string
+): ChainMetadata {
+  console.log(`🔄 Merging live metadata with generated calls for ${chainKey}`);
+
+  try {
+    // Use the imported generated call metadata
+    if (!callMetadata[chainKey]) {
+      console.warn(`⚠️ No generated call metadata found for ${chainKey}, keeping original calls`);
+      return liveMetadata;
+    }
+
+    // Create a new metadata structure
+    const mergedMetadata: ChainMetadata = {
+      pallets: [],
+      chainHash: liveMetadata.chainHash,
+      specVersion: liveMetadata.specVersion,
+    };
+
+    // Create a map of live pallets for easy lookup
+    const livePalletsMap = new Map<string, PalletInfo>();
+    liveMetadata.pallets.forEach(pallet => {
+      livePalletsMap.set(pallet.name, pallet);
+    });
+
+    // Get generated pallets
+    const generatedPallets = getSupportedPallets(chainKey);
+
+    // Process each generated pallet
+    for (const palletName of generatedPallets) {
+      const livePallet = livePalletsMap.get(palletName);
+
+      // Generate calls from our metadata
+      const generatedCalls: PalletCall[] = [];
+      const supportedCalls = getSupportedCalls(chainKey, palletName);
+
+      for (const callName of supportedCalls) {
+        try {
+          const parameters = getCallParameters(chainKey, palletName, callName);
+          const description = getCallDescription(chainKey, palletName, callName);
+
+          generatedCalls.push({
+            name: callName,
+            args: parameters.map((param: string, index: number) => ({
+              name: `arg${index}`,
+              type: param,
+            })),
+            docs: description !== `Call ${palletName}.${callName}` ? [description] : [],
+          });
+        } catch (error) {
+          console.warn(`⚠️ Error processing generated call ${palletName}.${callName}:`, error);
+        }
+      }
+
+      // Create merged pallet with generated calls but live metadata for everything else
+      const mergedPallet: PalletInfo = {
+        name: palletName,
+        calls: generatedCalls, // Use generated calls
+        storage: livePallet?.storage || [], // Use live storage
+        events: livePallet?.events || [],   // Use live events
+        constants: livePallet?.constants || [], // Use live constants
+        errors: livePallet?.errors || [],   // Use live errors
+      };
+
+      mergedMetadata.pallets.push(mergedPallet);
+    }
+
+    // Add any live pallets that don't exist in generated metadata (keep them unchanged)
+    for (const livePallet of liveMetadata.pallets) {
+      if (!generatedPallets.includes(livePallet.name)) {
+        console.log(`📋 Keeping live pallet '${livePallet.name}' (not in generated metadata)`);
+        mergedMetadata.pallets.push(livePallet);
+      }
+    }
+
+    console.log(`✅ Successfully merged live metadata with generated calls: ${mergedMetadata.pallets.length} total pallets (${generatedPallets.length} with generated calls)`);
+    return mergedMetadata;
+  } catch (error) {
+    console.error(`❌ Error merging metadata for ${chainKey}:`, error);
+    console.log(`🔄 Falling back to original live metadata`);
+    return liveMetadata;
+  }
+}
+
+/**
+ * Create metadata from our generated call metadata as fallback
+ */
+function createMetadataFromGeneratedCalls(chainKey: string): ChainMetadata | null {
+  try {
+    // Use the imported generated call metadata
+    if (!callMetadata[chainKey]) {
+      console.log(`❌ No generated call metadata found for chain: ${chainKey}`);
+      return null;
+    }
+
+    const pallets: PalletInfo[] = [];
+    const supportedPallets = getSupportedPallets(chainKey);
+
+    for (const palletName of supportedPallets) {
+      const calls: PalletCall[] = [];
+      const supportedCalls = getSupportedCalls(chainKey, palletName);
+
+      for (const callName of supportedCalls) {
+        try {
+          const parameters = getCallParameters(chainKey, palletName, callName);
+          const description = getCallDescription(chainKey, palletName, callName);
+
+          calls.push({
+            name: callName,
+            args: parameters.map((param: string, index: number) => ({
+              name: `arg${index}`,
+              type: param,
+            })),
+            docs: description !== `Call ${palletName}.${callName}` ? [description] : [],
+          });
+        } catch (error) {
+          console.warn(`⚠️ Error processing call ${palletName}.${callName}:`, error);
+        }
+      }
+
+      if (calls.length > 0) {
+        pallets.push({
+          name: palletName,
+          calls,
+          storage: [], // Empty for now, could be enhanced later
+          events: [],  // Empty for now, could be enhanced later
+          constants: [], // Empty for now, could be enhanced later
+          errors: [], // Empty for now, could be enhanced later
+        });
+      }
+    }
+
+    if (pallets.length === 0) {
+      console.log(`❌ No pallets found in generated metadata for ${chainKey}`);
+      return null;
+    }
+
+    console.log(`✅ Created metadata from generated calls for ${chainKey}: ${pallets.length} pallets`);
+    return {
+      pallets,
+      chainHash: getChainHash(chainKey),
+      specVersion: getChainSpecVersion(chainKey),
+    };
+  } catch (error) {
+    console.error(`❌ Error creating metadata from generated calls for ${chainKey}:`, error);
+    return null;
   }
 }
 
@@ -2998,9 +3182,23 @@ function parseMetadata(metadata: any, chainKey: string): ChainMetadata {
         errors: [],
       };
 
-      // Parse calls
+      // Parse calls with enhanced metadata integration
       if (pallet.calls) {
         for (const call of pallet.calls.variants || []) {
+          // Try to get enhanced call metadata for better descriptions
+          let enhancedDocs = call.docs || [];
+          try {
+            // Use imported call metadata function
+            const enhancedDescription = getCallDescription(chainKey, pallet.name, call.name);
+
+            // If we have a better description than the default format, add it
+            if (enhancedDescription && enhancedDescription !== `Call ${pallet.name}.${call.name}`) {
+              enhancedDocs = [enhancedDescription, ...enhancedDocs];
+            }
+          } catch (error) {
+            // Silently continue if call metadata not available
+          }
+
           palletInfo.calls.push({
             name: call.name,
             args:
@@ -3008,7 +3206,7 @@ function parseMetadata(metadata: any, chainKey: string): ChainMetadata {
                 name: field.name || `arg${field.index}`,
                 type: field.type || "unknown",
               })) || [],
-            docs: call.docs || [],
+            docs: enhancedDocs,
           });
         }
       }

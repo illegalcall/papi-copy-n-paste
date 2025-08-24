@@ -21,10 +21,10 @@ export const commonParameterEducation: Record<string, ParameterEducation> = {
     tipForBeginners: "Always verify the destination address before sending!"
   },
   value: {
-    description: "Amount in planck units (10^10 planck = 1 DOT)",
+    description: "Amount in planck units (chain-specific decimals)",
     examples: ["10000000000", "5000000000", "100000000000"],
     commonMistakes: ["Sending more than balance"],
-    tipForBeginners: "DOT has 10 decimal places. 1 DOT = 10,000,000,000 planck"
+    tipForBeginners: "Token amounts use planck units - check chain decimals for conversion"
   },
   amount: {
     description: "Quantity for the operation in planck units",
