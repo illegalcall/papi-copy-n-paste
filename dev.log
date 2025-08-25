@@ -1,8 +1,3 @@
 
 > shadcn-ui-monorepo@0.0.1 dev
 > turbo dev
-
-• Packages in scope: @workspace/core, @workspace/eslint-config, @workspace/typescript-config, @workspace/ui, web
-• Running dev in 5 packages
-• Remote caching disabled
-web:dev: cache bypass, force executing 968c3dce875d47c4

@@ -80,13 +80,15 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="p-4 flex-1">
+            <CardContent className="p-0 flex-1">
               <ScrollArea className="h-full bg-muted rounded-md">
-                <SyntaxHighlighter
-                  code={code}
-                  language="typescript"
-                  className="text-xs p-4"
-                />
+                <div className="p-4">
+                  <SyntaxHighlighter
+                    code={code}
+                    language="typescript"
+                    className="text-xs"
+                  />
+                </div>
               </ScrollArea>
             </CardContent>
           </Card>
