@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo, memo } from "react";
 import {
   Tabs,
   TabsContent,
@@ -42,7 +42,7 @@ interface RightPaneProps {
   onClearTransactionHistory?: () => void;
 }
 
-export function RightPane({
+export const RightPane = memo(function RightPane({
   code,
   consoleOutput,
   onClearConsole,
@@ -64,7 +64,7 @@ export function RightPane({
     }
   }, [activeTab]);
 
-  const getSetupCommands = (
+  const getSetupCommands = useMemo(() => (
     chainKey: string,
   ): {
     commands: string[];
@@ -157,9 +157,9 @@ export function RightPane({
         { name: "node-cli", description: "Command-line application" },
       ],
     };
-  };
+  }, []);
 
-  const handleCopyCode = async () => {
+  const handleCopyCode = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(code);
       setShowToast(true);
@@ -168,9 +168,9 @@ export function RightPane({
       // Fallback: show toast anyway to indicate attempt was made
       setShowToast(true);
     }
-  };
+  }, [code]);
 
-  const handleCopyCommand = async (command: string) => {
+  const handleCopyCommand = useCallback(async (command: string) => {
     try {
       await navigator.clipboard.writeText(command);
       setShowToast(true);
@@ -178,9 +178,9 @@ export function RightPane({
       console.error("Failed to copy command:", err);
       setShowToast(true);
     }
-  };
+  }, []);
 
-  const renderConsoleLine = (line: string) => {
+  const renderConsoleLine = useCallback((line: string) => {
     // In basic mode, filter out developer-specific lines
     if (!developerMode) {
       const developerLines = [
@@ -368,7 +368,7 @@ export function RightPane({
       }
       return part;
     });
-  };
+  }, [developerMode]);
 
   return (
     <div className="flex-1 border-l bg-muted/30 flex flex-col min-h-0 max-h-full overflow-hidden">
@@ -685,4 +685,4 @@ export function RightPane({
       />
     </div>
   );
-}
+});

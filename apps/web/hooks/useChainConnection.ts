@@ -12,6 +12,7 @@ import {
   getProvider,
 } from "@workspace/core";
 import { loadChainPreferences, saveChainPreferences } from "../utils/localStorage";
+import { ConnectionStatus, ChainKey } from "../types/enums";
 
 function getInitialChainPreferences(
   defaultChain: string,
@@ -58,20 +59,20 @@ export function useChainConnection(
     provider,
     error,
   } = useEnhancedClient(selectedChain, selectedProvider);
-  const isConnecting = enhancedStatus === "connecting";
-  const hasError = enhancedStatus === "error" || !!error;
+  const isConnecting = enhancedStatus === ConnectionStatus.CONNECTING;
+  const hasError = enhancedStatus === ConnectionStatus.ERROR || !!error;
 
   // Map enhanced client status to legacy status for compatibility
   const chainStatus: "connecting" | "ready" | "error" =
-    enhancedStatus === "connected"
+    enhancedStatus === ConnectionStatus.CONNECTED
       ? "ready"
-      : enhancedStatus === "disconnected"
+      : enhancedStatus === ConnectionStatus.DISCONNECTED
         ? "error"
         : enhancedStatus;
 
   // Enhanced metadata fetching with better state management
   useEffect(() => {
-    if (enhancedStatus === "connected" && api) {
+    if (enhancedStatus === ConnectionStatus.CONNECTED && api) {
       // Clear any previous errors when connection is established
       setMetadataError(null);
       // Add a small delay to ensure client is fully stable
@@ -86,9 +87,17 @@ export function useChainConnection(
               const palletTree = buildPalletTree(metadata);
               setPallets(palletTree);
               setMetadataError(null);
+
+              // Store live metadata globally for fallback detection
+              if (typeof window !== 'undefined') {
+                if (!(window as any).__PAPI_LIVE_METADATA__) {
+                  (window as any).__PAPI_LIVE_METADATA__ = {};
+                }
+                (window as any).__PAPI_LIVE_METADATA__[selectedChain] = metadata;
+              }
             } else {
               setPallets([]);
-              if (selectedChain === "polkadot") {
+              if (selectedChain === ChainKey.POLKADOT) {
                 setMetadataError(
                   "Polkadot initial connection can be slow. Try switching to Kusama first, then back to Polkadot, or wait a moment and refresh.",
                 );
@@ -102,7 +111,7 @@ export function useChainConnection(
             const errorMsg =
               error instanceof Error ? error.message : "Unknown error";
             setPallets([]);
-            if (selectedChain === "polkadot") {
+            if (selectedChain === ChainKey.POLKADOT) {
               setMetadataError(
                 "Polkadot connection timed out. This is a known issue - try switching to Kusama first, then back to Polkadot.",
               );
@@ -115,15 +124,15 @@ export function useChainConnection(
             setIsLoadingMetadata(false);
           }
         },
-        enhancedStatus === "connected" ? 1000 : 0,
+        enhancedStatus === ConnectionStatus.CONNECTED ? 1000 : 0,
       ); // Wait 1 second for client to stabilize
 
       return () => clearTimeout(timeoutId);
-    } else if (enhancedStatus === "connecting") {
+    } else if (enhancedStatus === ConnectionStatus.CONNECTING) {
       setIsLoadingMetadata(true);
       setMetadataError(null);
       setPallets([]);
-    } else if (enhancedStatus === "error") {
+    } else if (enhancedStatus === ConnectionStatus.ERROR) {
       const networkConfig = getNetworkConfig(selectedChain);
       const providerConfig = getProvider(selectedChain, selectedProvider);
       const networkName = networkConfig?.chainName || selectedChain;

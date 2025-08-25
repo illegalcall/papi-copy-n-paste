@@ -1,7 +1,3 @@
-/**
- * Standard form data types used across the application
- * Centralized to ensure consistency and type safety
- */
 
 // Generic form data type for parameter forms
 export type FormData = Record<string, any>;

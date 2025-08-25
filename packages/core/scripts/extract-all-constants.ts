@@ -11,39 +11,37 @@
  *
  * Usage: npm run constants
  *
- * Currently extracts 851 constants from 7 chains:
- * - Polkadot (101 constants) - via smoldot
- * - Kusama (129 constants) - via smoldot
- * - Moonbeam (99 constants) - via WebSocket
- * - Astar (113 constants) - via WebSocket
- * - Westend (116 constants) - via WebSocket
- * - Rococo (108 constants) - via WebSocket
- * - Hydration (185 constants) - via WebSocket
+ * Currently extracts constants from 8 chains (all via WebSocket):
+ * - Polkadot (101 constants)
+ * - Kusama (129 constants)
+ * - Moonbeam (99 constants)
+ * - Astar (113 constants)
+ * - Westend (116 constants)
+ * - Rococo (108 constants)
+ * - Hydration (185 constants)
+ * - Paseo Asset Hub
  */
 
 import { createClient } from 'polkadot-api';
-import { getSmProvider } from 'polkadot-api/sm-provider';
 import { getWsProvider } from 'polkadot-api/ws-provider/web';
-import { start } from 'polkadot-api/smoldot';
-import { chainSpec as polkadotChainSpec } from 'polkadot-api/chains/polkadot';
-import { chainSpec as kusamaChainSpec } from 'polkadot-api/chains/ksmcc3';
+// All chains now use WebSocket connections for better reliability
 import { u8, u16, u32, u64, u128, i8, i16, i32, i64, i128, bool, str, Bytes, compact, decAnyMetadata, unifyMetadata } from '@polkadot-api/substrate-bindings';
 import { getDynamicBuilder, getLookupFn } from '@polkadot-api/metadata-builders';
 import { writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
 import * as descriptors from '../../../.papi/descriptors/dist/index.mjs';
 
-// Chain configuration - using chain specs where available, WebSocket URLs otherwise
+// Chain configuration - using WebSocket URLs for all chains
 const chains = {
   polkadot: {
     name: 'Polkadot',
-    chainSpec: polkadotChainSpec,
-    type: 'smoldot'
+    wsUrl: 'wss://rpc.polkadot.io',
+    type: 'websocket'
   },
   kusama: {
     name: 'Kusama',
-    chainSpec: kusamaChainSpec,
-    type: 'smoldot'
+    wsUrl: 'wss://kusama-rpc.polkadot.io',
+    type: 'websocket'
   },
   moonbeam: {
     name: 'Moonbeam',
@@ -68,6 +66,11 @@ const chains = {
   hydration: {
     name: 'Hydration',
     wsUrl: 'wss://hydration-rpc.n.dwellir.com',
+    type: 'websocket'
+  },
+  paseo_asset_hub: {
+    name: 'Paseo Asset Hub',
+    wsUrl: 'wss://asset-hub-paseo-rpc.dwellir.com',
     type: 'websocket'
   }
 };
@@ -212,22 +215,12 @@ function decodeConstantValue(rawValue: string, type: string): { success: boolean
 async function extractChainConstants(chainKey: string, chainConfig: any): Promise<DecodedConstant[]> {
   console.log(`\n🔍 Connecting to ${chainConfig.name} (${chainConfig.type}) and extracting constants...`);
 
-  let smoldot: any;
   let client: any;
 
   try {
-    // Add timeout for connection
+    // Add timeout for connection - all chains now use WebSocket
     const connectionPromise = (async () => {
-      // Connect based on chain type
-      if (chainConfig.type === 'smoldot') {
-        // Use smoldot for chains with built-in chain specs
-        smoldot = start();
-        const chain = await smoldot.addChain({ chainSpec: chainConfig.chainSpec });
-        return createClient(getSmProvider(chain));
-      } else {
-        // Use WebSocket for other chains
-        return createClient(getWsProvider(chainConfig.wsUrl));
-      }
+      return createClient(getWsProvider(chainConfig.wsUrl));
     })();
 
     // Add 30 second timeout for connection
@@ -424,9 +417,6 @@ async function extractChainConstants(chainKey: string, chainConfig: any): Promis
     try {
       if (client) {
         await client.destroy();
-      }
-      if (smoldot) {
-        smoldot.terminate();
       }
       console.log(`    ℹ️  Cleanup completed for ${chainConfig.name}`);
     } catch (cleanupError) {

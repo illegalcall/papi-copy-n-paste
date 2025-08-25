@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
 import { Label } from "@workspace/ui/components/label";
+import { StorageQueryType } from "../../types/enums";
 
 export interface QueryOption {
-  value: string;
+  value: StorageQueryType | string;
   label: string;
   description: string;
   useCase: string;
@@ -16,7 +17,7 @@ export interface QueryOption {
 
 export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
   {
-    value: "getValue",
+    value: StorageQueryType.GET_VALUE,
     label: "Get Value",
     description: "Get single storage value once",
     useCase:
@@ -26,7 +27,7 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     icon: "",
   },
   {
-    value: "getValueAt",
+    value: StorageQueryType.GET_VALUE_AT,
     label: "Get Value At Block",
     description: "Get value at specific block (finalized/best)",
     useCase:
@@ -36,7 +37,7 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     icon: "",
   },
   {
-    value: "getValues",
+    value: StorageQueryType.GET_VALUES,
     label: "Get Multiple Values",
     description: "Get multiple values with different keys",
     useCase:
@@ -46,7 +47,7 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     icon: "",
   },
   {
-    value: "getEntries",
+    value: StorageQueryType.GET_ENTRIES,
     label: "Get All Entries",
     description: "Get all storage entries or partial matches",
     useCase: "Perfect for: Data export, analysis tools, complete storage dumps",
@@ -55,7 +56,7 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     icon: "",
   },
   {
-    value: "watchValue",
+    value: StorageQueryType.WATCH_VALUE,
     label: "Watch Value",
     description: "Monitor value changes in real-time",
     useCase:
@@ -65,7 +66,7 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     icon: "",
   },
   {
-    value: "watchValueFinalized",
+    value: StorageQueryType.WATCH_VALUE_FINALIZED,
     label: "Watch Value - Finalized",
     description: "Watch value changes on finalized blocks only",
     useCase: "Perfect for: Secure applications, confirmed transactions only",
@@ -74,7 +75,7 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     icon: "",
   },
   {
-    value: "watchValueBest",
+    value: StorageQueryType.WATCH_VALUE_BEST,
     label: "Watch Value - Best",
     description: "Watch value changes on best blocks (faster)",
     useCase: "Perfect for: Fast UIs, immediate feedback, pending transactions",
@@ -83,7 +84,7 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     icon: "",
   },
   {
-    value: "watchEntries",
+    value: StorageQueryType.WATCH_ENTRIES,
     label: "Watch All Entries",
     description: "Watch all entries with deltas",
     useCase: "Perfect for: Monitoring tools, system analysis, change tracking",
@@ -92,7 +93,7 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     icon: "",
   },
   {
-    value: "watchEntriesPartial",
+    value: StorageQueryType.WATCH_ENTRIES_PARTIAL,
     label: "Watch Partial Entries",
     description: "Watch entries with partial key matching",
     useCase: "Perfect for: Filtered monitoring, specific account groups",
@@ -101,7 +102,7 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     icon: "",
   },
   {
-    value: "multiWatch",
+    value: StorageQueryType.MULTI_WATCH,
     label: "Multi-Storage Watch",
     description: "Combine multiple storage observables",
     useCase: "Perfect for: Complex dashboards, correlated data monitoring",
@@ -110,7 +111,7 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     icon: "",
   },
   {
-    value: "conditionalWatch",
+    value: StorageQueryType.CONDITIONAL_WATCH,
     label: "Conditional Watch",
     description: "Watch with filtering and conditions",
     useCase:
@@ -120,7 +121,7 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     icon: "",
   },
   {
-    value: "throttledWatch",
+    value: StorageQueryType.THROTTLED_WATCH,
     label: "Throttled Watch",
     description: "Watch with rate limiting for performance",
     useCase: "Perfect for: High-frequency data, performance optimization",
@@ -129,7 +130,7 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
     icon: "",
   },
   {
-    value: "comprehensive",
+    value: StorageQueryType.COMPREHENSIVE,
     label: "All Patterns",
     description: "Complete example with all query types",
     useCase: "Perfect for: Learning, reference implementation, full examples",
@@ -140,8 +141,8 @@ export const ENHANCED_STORAGE_QUERY_TYPES: QueryOption[] = [
 ];
 
 interface EnhancedQuerySelectorProps {
-  value: string;
-  onValueChange: (value: string) => void;
+  value: StorageQueryType | string;
+  onValueChange: (value: StorageQueryType | string) => void;
   storageName?: string;
 }
 

@@ -2,7 +2,7 @@
  * Hook for managing constant selection
  */
 
-import { useState, useCallback } from "../utils/reactImports";
+import { useState, useCallback } from "react";
 import { PalletConstant } from "@workspace/core";
 
 export function useConstantSelection() {

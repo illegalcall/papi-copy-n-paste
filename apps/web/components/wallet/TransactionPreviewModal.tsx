@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,9 @@ import { Separator } from "@workspace/ui/components/separator";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Loader2, AlertTriangle, Shield, DollarSign, Clock, CheckCircle, Wallet } from "lucide-react";
 import { useWallet } from "../../hooks/useWallet";
+import { useBalanceFetcher } from "../../hooks/useBalanceFetcher";
+import { useFeeEstimator } from "../../hooks/useFeeEstimator";
+import { useTransactionConfirmation } from "../../hooks/useTransactionConfirmation";
 
 interface TransactionInfo {
   pallet: string;
@@ -35,12 +38,6 @@ interface TransactionPreviewModalProps {
   api?: unknown; // The API instance for fee estimation
 }
 
-interface FeeEstimate {
-  partialFee: string;
-  weight: string;
-  class: string;
-  error?: string;
-}
 
 export function TransactionPreviewModal({
   isOpen,
@@ -53,148 +50,37 @@ export function TransactionPreviewModal({
   api
 }: TransactionPreviewModalProps) {
   const { selectedAccount } = useWallet();
-  const [isExecuting, setIsExecuting] = useState(false);
-  const [feeEstimates, setFeeEstimates] = useState<FeeEstimate[]>([]);
-  const [isEstimatingFees, setIsEstimatingFees] = useState(false);
-  const [userConfirmed, setUserConfirmed] = useState(false);
-  const [balance, setBalance] = useState<string | null>(null);
-  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
 
-  const fetchBalance = useCallback(async () => {
-    if (!api || !selectedAccount) return;
+  // Use custom hooks for business logic
+  const { balance, isLoading: isLoadingBalance, fetchBalance } = useBalanceFetcher();
+  const {
+    feeEstimates,
+    isEstimating: isEstimatingFees,
+    estimateFees,
+    getTotalFee,
+    formatFee
+  } = useFeeEstimator();
+  const {
+    isExecuting,
+    userConfirmed,
+    setUserConfirmed,
+    handleConfirm,
+    resetConfirmation
+  } = useTransactionConfirmation();
 
-    setIsLoadingBalance(true);
-    try {
-      // Import descriptor helper at runtime
-      const { getTypedApiForChain } = await import('@workspace/core/descriptors');
 
-      // Get typed API for the current chain (no switching)
-      const typedApi = getTypedApiForChain(api, chainName.toLowerCase());
 
-      // Use PAPI pattern: typedApi.query.System.Account.getValue()
-      const accountData = await typedApi.query.System.Account.getValue(selectedAccount.address);
-
-      if (!accountData) {
-        setBalance("Account not found");
-        setIsLoadingBalance(false);
-        return;
-      }
-
-      // Extract balance using PAPI account structure
-      const { data } = accountData;
-      const freeBalance = data.free;
-
-      // Get decimals from chain spec data (papi-console-main approach)
-      const chainSpecData = await api.getChainSpecData();
-      const properties = chainSpecData.properties;
-
-      let decimals = 10; // Default for Paseo Asset Hub
-
-      if (properties && typeof properties === 'object' && 'tokenDecimals' in properties) {
-        decimals = Number(properties.tokenDecimals);
-      }
-
-      const divisor = BigInt(10 ** decimals);
-
-      // Convert to readable format with chain spec decimals
-      const balanceFormatted = (Number(freeBalance) / Number(divisor)).toFixed(4);
-      setBalance(balanceFormatted);
-
-    } catch (error) {
-      console.error('Failed to fetch balance:', error);
-      setBalance("Error fetching balance");
-    }
-    setIsLoadingBalance(false);
-  }, [api, selectedAccount, chainName]);
-
-  const estimateFees = useCallback(async () => {
-    if (!api || !selectedAccount || transactions.length === 0) return;
-
-    setIsEstimatingFees(true);
-    const estimates: FeeEstimate[] = [];
-
-    try {
-      // Fee estimation disabled for compatibility
-
-      for (const tx of transactions) {
-        try {
-          if (tx.method) {
-            // Temporarily disable fee estimation to avoid paseo_asset_hub encoding issues
-            // const paymentInfo = await tx.method.getEstimatedFees(selectedAccount.address);
-            estimates.push({
-              partialFee: "0", // Set to 0 temporarily
-              weight: "0",
-              class: "normal",
-              error: "Fee estimation disabled for paseo_asset_hub compatibility"
-            });
-          } else {
-            // Temporarily disable fee estimation to avoid paseo_asset_hub encoding issues
-            estimates.push({
-              partialFee: "0", // Set to 0 temporarily
-              weight: "0",
-              class: "normal",
-              error: "Fee estimation disabled for paseo_asset_hub compatibility"
-            });
-          }
-        } catch (error) {
-          console.warn(`Fee estimation failed for ${tx.pallet}.${tx.call}:`, error);
-          estimates.push({
-            partialFee: "0",
-            weight: "0",
-            class: "unknown",
-            error: error instanceof Error ? error.message : "Fee estimation failed"
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Fee estimation error:', error);
-    }
-
-    setFeeEstimates(estimates);
-    setIsEstimatingFees(false);
-  }, [api, selectedAccount, transactions]);
-
-  // Reset state when modal opens/closes
+  // Reset state when modal opens/closes and fetch data
   useEffect(() => {
-    if (isOpen) {
-      setUserConfirmed(false);
-      setFeeEstimates([]);
-      setBalance(null);
-      estimateFees();
-      fetchBalance();
+    if (isOpen && api && selectedAccount) {
+      resetConfirmation();
+      estimateFees(api, selectedAccount.address, transactions);
+      fetchBalance(api, selectedAccount.address, chainName);
     }
-  }, [isOpen, estimateFees, fetchBalance]);
+  }, [isOpen, api, selectedAccount, transactions, chainName, resetConfirmation, estimateFees, fetchBalance]);
 
-  const handleConfirm = async () => {
-    if (!userConfirmed) return;
-
-    setIsExecuting(true);
-
-    // Switch to console tab immediately when transaction starts
-    if (onTabSwitch) {
-      onTabSwitch("console");
-    }
-
-    try {
-      await onConfirm();
-      onClose();
-    } catch (error) {
-      console.error('Transaction execution failed:', error);
-    } finally {
-      setIsExecuting(false);
-    }
-  };
-
-  const totalFee = feeEstimates.reduce((sum, estimate) => {
-    return sum + (estimate.error ? 0 : parseInt(estimate.partialFee) || 0);
-  }, 0);
-
-  const formatFee = (fee: string) => {
-    const num = parseInt(fee);
-    if (num === 0) return "0";
-    // Convert from planck to decimal (assuming 12 decimal places for most chains)
-    return (num / Math.pow(10, 12)).toFixed(6);
-  };
+  // Get total fee from hook
+  const totalFee = getTotalFee();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -347,7 +233,7 @@ export function TransactionPreviewModal({
             Cancel
           </Button>
           <Button
-            onClick={handleConfirm}
+            onClick={() => handleConfirm(onConfirm, onTabSwitch, onClose)}
             disabled={!userConfirmed || isExecuting}
             className="bg-green-600 hover:bg-green-700"
           >

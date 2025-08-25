@@ -113,9 +113,9 @@ export function ConstantForm({ pallet, constant, chainKey }: ConstantFormProps) 
     }
 
     // Handle objects with toNumber method (PAPI Codec types)
-    if (value && typeof value === 'object' && typeof value.toNumber === 'function') {
+    if (value && typeof value === 'object' && 'toNumber' in value && typeof (value as any).toNumber === 'function') {
       try {
-        return value.toNumber().toString();
+        return (value as any).toNumber().toString();
       } catch {
         // If toNumber fails (value too large), try toString
         return value.toString();

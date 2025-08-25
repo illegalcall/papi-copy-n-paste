@@ -14,9 +14,8 @@ import {
   NetworkProvider,
 } from "@workspace/core/network-providers";
 import { Zap, Globe, Settings, Wifi, Plus } from "lucide-react";
-import { useState, useEffect } from "react";
 import { CustomProviderManager } from "@/components/ui/custom-provider-manager";
-import { getCustomProvidersForChain, CustomProvider } from "@/utils/customRpc";
+import { useCustomProviders } from "@/hooks/useCustomProviders";
 
 interface ProviderSelectorProps {
   selectedChain: string;
@@ -57,38 +56,27 @@ export function ProviderSelector({
   onProviderChange,
   disabled = false,
 }: ProviderSelectorProps) {
-  const [customProviders, setCustomProviders] = useState<CustomProvider[]>([]);
-  const [isCustomProviderDialogOpen, setIsCustomProviderDialogOpen] = useState(false);
+  // Use custom hook for provider management
+  const {
+    customProviders,
+    isDialogOpen: isCustomProviderDialogOpen,
+    openDialog,
+    closeDialog,
+    selectProvider,
+    getCurrentCustomProvider,
+  } = useCustomProviders(selectedChain);
 
   const network = networkConfigs.find(
     (config) => config.chain === selectedChain,
   );
   const providers = network?.providers || [];
 
-  // Load custom providers for this chain
-  useEffect(() => {
-    setCustomProviders(getCustomProvidersForChain(selectedChain));
-  }, [selectedChain]);
-
-  // Update custom providers when dialog opens or closes
-  useEffect(() => {
-    setCustomProviders(getCustomProvidersForChain(selectedChain));
-  }, [isCustomProviderDialogOpen, selectedChain]);
-
   // Find current provider (could be standard or custom)
   const currentProvider = providers.find((p) => p.id === selectedProvider);
-  const currentCustomProvider = customProviders.find((p) => p.id === selectedProvider);
+  const currentCustomProvider = getCurrentCustomProvider(selectedProvider);
 
-  // Fallback: if custom provider not found in state, check localStorage directly
-  const fallbackCustomProvider = !currentCustomProvider && selectedProvider.startsWith('custom-')
-    ? getCustomProvidersForChain(selectedChain).find((p) => p.id === selectedProvider)
-    : null;
-
-  const handleCustomProviderSelect = (provider: CustomProvider) => {
-    onProviderChange(provider.id);
-    setIsCustomProviderDialogOpen(false);
-    // Refresh custom providers to ensure the newly selected one is available
-    setCustomProviders(getCustomProvidersForChain(selectedChain));
+  const handleCustomProviderSelect = (provider: any) => {
+    selectProvider(provider, onProviderChange);
   };
 
   return (
@@ -110,18 +98,18 @@ export function ProviderSelector({
               </span>
             </div>
           )}
-          {(currentCustomProvider || fallbackCustomProvider) && (
+          {currentCustomProvider && (
             <div className="flex items-center gap-2">
               <div className="text-blue-500">
                 <Globe className="h-3 w-3" />
               </div>
               <span className="text-sm font-medium truncate">
-                {(currentCustomProvider || fallbackCustomProvider)?.name}
+                {currentCustomProvider?.name}
               </span>
-              {(currentCustomProvider || fallbackCustomProvider)?.isWorking === true && (
+              {currentCustomProvider?.isWorking === true && (
                 <span className="text-green-500 text-xs">✓</span>
               )}
-              {(currentCustomProvider || fallbackCustomProvider)?.isWorking === false && (
+              {currentCustomProvider?.isWorking === false && (
                 <span className="text-red-500 text-xs">✗</span>
               )}
             </div>
@@ -194,7 +182,7 @@ export function ProviderSelector({
           className="flex items-center gap-2 px-2 py-2 text-sm hover:bg-accent cursor-pointer rounded-sm mx-1"
           onClick={(e) => {
             e.stopPropagation();
-            setIsCustomProviderDialogOpen(true);
+            openDialog();
           }}
         >
           <Plus className="w-4 h-4 text-primary" />
@@ -204,7 +192,7 @@ export function ProviderSelector({
     </Select>
 
       {/* Custom Provider Management Dialog */}
-      <Dialog open={isCustomProviderDialogOpen} onOpenChange={setIsCustomProviderDialogOpen}>
+      <Dialog open={isCustomProviderDialogOpen} onOpenChange={(open) => open ? openDialog() : closeDialog()}>
         <DialogContent className="sm:max-w-md">
           <CustomProviderManager
             chainKey={selectedChain}

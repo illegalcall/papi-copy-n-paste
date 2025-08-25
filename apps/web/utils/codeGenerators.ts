@@ -1,25 +1,21 @@
-/**
- * Code generation utilities for PAPI transactions and storage queries
- */
 
 import { PalletCall } from "@workspace/core";
+import { StorageQueryType } from "../types/enums";
 import {
   getDescriptorImport,
   getDescriptorName,
   getChainConnection,
   getParameterDescription,
 } from "./chainConfig";
+import { isBigIntType, isAccountType, isBoolType } from "./typeCheckers";
+import { getStorageParameterInfo } from "./dynamicStorageDetection";
 import {
-  detectStorageParameters,
   generateStorageParams,
-  getAllStorageParameters,
-} from "./storageHelpers";
-import {
   getCallDescription,
-} from "./callHelpers";
+} from "./formatting-utils";
 
 export function generateStorageQueryByType(
-  queryType: string,
+  queryType: StorageQueryType | string,
   pallet: string,
   storageName: string,
   paramString: string,
@@ -29,46 +25,46 @@ export function generateStorageQueryByType(
   const baseQuery = `typedApi.query.${pallet}.${storageName}`;
   const params = hasParams ? `(${paramString})` : "()";
 
-  // Check if this query type needs RxJS
+  const normalizedQueryType = typeof queryType === 'string'
+    ? Object.values(StorageQueryType).find(enumValue => enumValue === queryType) || StorageQueryType.GET_VALUE
+    : queryType;
+
   const needsRxJS = [
-    "watchValue",
-    "watchValueFinalized",
-    "watchValueBest",
-    "watchEntries",
-    "watchEntriesPartial",
-    "combineMultiple",
-    "throttledWatch",
-    "debouncedWatch",
-    "mapValues",
-    "filterChanges",
-    "takeUntilChange",
-    "resilientWatch",
-    "comprehensiveWatch",
-  ].includes(queryType);
+    StorageQueryType.WATCH_VALUE,
+    StorageQueryType.WATCH_VALUE_FINALIZED,
+    StorageQueryType.WATCH_VALUE_BEST,
+    StorageQueryType.WATCH_ENTRIES,
+    StorageQueryType.WATCH_ENTRIES_PARTIAL,
+    StorageQueryType.COMBINE_MULTIPLE,
+    StorageQueryType.THROTTLED_WATCH,
+    StorageQueryType.DEBOUNCED_WATCH,
+    StorageQueryType.MAP_VALUES,
+    StorageQueryType.FILTER_CHANGES,
+    StorageQueryType.TAKE_UNTIL_CHANGE,
+    StorageQueryType.RESILIENT_WATCH,
+    StorageQueryType.COMPREHENSIVE_WATCH,
+  ].includes(normalizedQueryType);
 
   const rxjsImports = needsRxJS
     ? `
 import { combineLatest, throttleTime, debounceTime, map, filter, takeUntil, distinctUntilChanged, retry, startWith } from 'rxjs'`
     : "";
 
-  switch (queryType) {
-    case "getValue":
+  switch (normalizedQueryType) {
+    case StorageQueryType.GET_VALUE:
       if (isSimpleValue) {
         return `${rxjsImports}
 
-// Simple storage value
 const result = await ${baseQuery}.getValue()
 console.log('Storage value:', result)`;
       } else if (hasParams) {
         return `${rxjsImports}
 
-// Get specific entry with provided parameters
 const result = await ${baseQuery}.getValue${params}
 console.log('Specific entry:', result)`;
       } else {
         return `${rxjsImports}
 
-// No parameters provided - getting all entries
 const entries = await ${baseQuery}.getEntries()
 console.log('All entries:', entries)
 
@@ -77,20 +73,18 @@ console.log('All entries:', entries)
 `;
       }
 
-    case "getValueAt":
+    case StorageQueryType.GET_VALUE_AT:
       return `${rxjsImports}
 
-// Get value at specific block states
 const resultFinalized = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ", " : ""}{ at: "finalized" })
 const resultBest = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ", " : ""}{ at: "best" })
 console.log('At finalized block:', resultFinalized)
 console.log('At best block:', resultBest)`;
 
-    case "getEntries":
+    case StorageQueryType.GET_ENTRIES:
       if (hasParams) {
         return `${rxjsImports}
 
-// Get all entries (ignoring provided parameters - this shows all entries)
 const entries = await ${baseQuery}.getEntries()
 console.log('All entries:', entries)
 
@@ -100,38 +94,33 @@ console.log('All entries:', entries)
       } else {
         return `${rxjsImports}
 
-// Get all entries for this storage map
 const entries = await ${baseQuery}.getEntries()
 console.log('All entries:', entries)`;
       }
 
-    case "getValues":
+    case StorageQueryType.GET_VALUES:
       return `${rxjsImports}
 
-// Get multiple values (batch query)
 const keys = [${paramString}, "//Bob", "//Charlie"] // Add more keys as needed
 const results = await ${baseQuery}.getValues(keys)
 console.log('Multiple values:', results)`;
 
-    case "getEntriesPaged":
+    case StorageQueryType.GET_ENTRIES_PAGED:
       if (hasParams) {
         return `${rxjsImports}
 
-// Storage requires parameters
 const entries = await ${baseQuery}.getEntries()
 console.log('Storage entries:', entries)`;
       } else {
         return `${rxjsImports}
 
-// Get entries with pagination
 const entries = await ${baseQuery}.getEntries()
 console.log('Paged entries:', entries)`;
       }
 
-    case "watchValue":
+    case StorageQueryType.WATCH_VALUE:
       return `${rxjsImports}
 
-// Watch for value changes
 const subscription = ${baseQuery}.watchValue${params}.subscribe({
   next: (value) => {
     console.log('Value changed:', value)
@@ -145,10 +134,9 @@ const subscription = ${baseQuery}.watchValue${params}.subscribe({
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "watchValueFinalized":
+    case StorageQueryType.WATCH_VALUE_FINALIZED:
       return `${rxjsImports}
 
-// Watch for value changes at finalized blocks only
 const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ", " : ""}"finalized").subscribe({
   next: (value) => {
     console.log('Finalized value changed:', value)
@@ -162,10 +150,9 @@ const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? 
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "watchValueBest":
+    case StorageQueryType.WATCH_VALUE_BEST:
       return `${rxjsImports}
 
-// Watch for value changes at best blocks
 const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ", " : ""}"best").subscribe({
   next: (value) => {
     console.log('Best block value changed:', value)
@@ -179,10 +166,9 @@ const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? 
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "watchEntries":
+    case StorageQueryType.WATCH_ENTRIES:
       return `${rxjsImports}
 
-// Watch for entry changes across the entire storage map
 const subscription = ${baseQuery}.watchEntries().subscribe({
   next: (entries) => {
     console.log('Entries changed:', entries)
@@ -196,10 +182,9 @@ const subscription = ${baseQuery}.watchEntries().subscribe({
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "watchEntriesPartial":
+    case StorageQueryType.WATCH_ENTRIES_PARTIAL:
       return `${rxjsImports}
 
-// Watch for partial entry changes (useful for large storage maps)
 const subscription = ${baseQuery}.watchEntries().subscribe({
   next: (entries) => {
     console.log('Partial entries changed:', entries)
@@ -213,7 +198,7 @@ const subscription = ${baseQuery}.watchEntries().subscribe({
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "combineMultiple":
+    case StorageQueryType.COMBINE_MULTIPLE:
       return `${rxjsImports}
 
 // Combine multiple storage queries
@@ -241,10 +226,9 @@ const subscription = combined$.subscribe({
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "throttledWatch":
+    case StorageQueryType.THROTTLED_WATCH:
       return `${rxjsImports}
 
-// Watch with throttling (limit update frequency)
 const subscription = ${baseQuery}.watchValue${params}.pipe(
   throttleTime(1000) // Throttle to at most once per second
 ).subscribe({
@@ -260,10 +244,9 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "debouncedWatch":
+    case StorageQueryType.DEBOUNCED_WATCH:
       return `${rxjsImports}
 
-// Watch with debouncing (wait for pause in changes)
 const subscription = ${baseQuery}.watchValue${params}.pipe(
   debounceTime(500) // Wait 500ms after last change
 ).subscribe({
@@ -279,10 +262,9 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "mapValues":
+    case StorageQueryType.MAP_VALUES:
       return `${rxjsImports}
 
-// Watch and transform values
 const subscription = ${baseQuery}.watchValue${params}.pipe(
   map(value => {
     // Transform the value here
@@ -307,10 +289,9 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "filterChanges":
+    case StorageQueryType.FILTER_CHANGES:
       return `${rxjsImports}
 
-// Watch and filter specific changes
 const subscription = ${baseQuery}.watchValue${params}.pipe(
   filter(value => {
     // Add your filter condition here
@@ -333,10 +314,9 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "takeUntilChange":
+    case StorageQueryType.TAKE_UNTIL_CHANGE:
       return `${rxjsImports}
 
-// Watch until a specific condition is met
 const subscription = ${baseQuery}.watchValue${params}.pipe(
   takeUntil(
     // Define your termination condition here
@@ -366,10 +346,9 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "resilientWatch":
+    case StorageQueryType.RESILIENT_WATCH:
       return `${rxjsImports}
 
-// Watch with error recovery and retry logic
 const resilientWatch$ = ${baseQuery}.watchValue${params}.pipe(
   retry({ count: 3, delay: 1000 }), // Retry up to 3 times with 1s delay
   startWith(null) // Start with null value
@@ -388,7 +367,7 @@ const subscription = resilientWatch$.subscribe({
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "comprehensiveWatch":
+    case StorageQueryType.COMPREHENSIVE_WATCH:
       return `${rxjsImports}
 
 // Comprehensive watching with multiple strategies
@@ -502,7 +481,6 @@ ${connectionInfo.connection}
   }
 }
 
-// Execute the query
 queryStorage().then(result => {
   console.log('Query result:', result)
 })`;
@@ -519,8 +497,11 @@ queryStorage().then(result => {
 
     const connectionInfo = getChainConnection(chainKey, providerId);
 
-    // Get parameter information from our new flexible system
-    const paramInfo = getAllStorageParameters(pallet, storage.name, chainKey);
+        const detectedParams = getStorageParameterInfo(chainKey, pallet, storage.name);
+    const paramInfo = {
+      required: detectedParams.required,
+      optional: detectedParams.optional || []
+    };
     const allPossibleParams = [...paramInfo.required, ...paramInfo.optional];
 
     // Check if user provided any parameters
@@ -537,14 +518,12 @@ queryStorage().then(result => {
       ? generateStorageParams(storageParams, allPossibleParams)
       : "";
 
-    // Simple, clean code generation - just the essential query
-    let queryCode;
+        let queryCode;
     if (hasParams) {
       queryCode = `const result = await typedApi.query.${pallet}.${storage.name}.getValue(${paramString})
 console.log('${pallet}.${storage.name}:', result)`;
     } else if (allPossibleParams.length === 0) {
-      // Simple storage item with no parameters
-      queryCode = `const result = await typedApi.query.${pallet}.${storage.name}.getValue()
+            queryCode = `const result = await typedApi.query.${pallet}.${storage.name}.getValue()
 console.log('${pallet}.${storage.name}:', result)`;
     } else {
       // Storage map without parameters - show all entries
@@ -643,13 +622,10 @@ ${connectionInfo.connection}
 console.log('Connected to custom RPC')`;
   }
 
-  // Use basic parameter info from call.args for now
   const paramInfo = { required: call.args.map(arg => arg.name), optional: [] };
-  // Use sync description for now - async descriptions will be handled later
   const description = `Call ${pallet}.${call.name}`;
 
-  // Create mapping from parameter name to type using call.args
-  const paramTypeMap = new Map<string, string>();
+    const paramTypeMap = new Map<string, string>();
   call.args.forEach(arg => {
     paramTypeMap.set(arg.name, arg.type);
   });
@@ -657,8 +633,7 @@ console.log('Connected to custom RPC')`;
   // Generate arguments from form data keys with proper type handling
   const args = Object.entries(formData)
     .map(([paramName, value]) => {
-      // Get the actual parameter type from call.args
-      const paramType = paramTypeMap.get(paramName) || 'unknown';
+            const paramType = paramTypeMap.get(paramName) || 'unknown';
 
       // Extract actual value from form object structure if needed
       if (typeof value === 'object' && value?.type === 'Id' && value?.value) {
@@ -666,7 +641,7 @@ console.log('Connected to custom RPC')`;
       }
 
       // Handle MultiAddress types based on actual parameter type
-      if (paramType.includes("MultiAddress") || paramType.includes("AccountId")) {
+      if (isAccountType(paramType)) {
         if (typeof value === "string" && value.startsWith("//")) {
           const accountMap: Record<string, string> = {
             "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
@@ -683,13 +658,7 @@ console.log('Connected to custom RPC')`;
       }
 
       // Handle numeric types based on actual parameter type
-      if (
-        paramType.includes("u128") ||
-        paramType.includes("u64") ||
-        paramType.includes("u32") ||
-        paramType.includes("Balance") ||
-        paramType.includes("Compact")
-      ) {
+      if (isBigIntType(paramType)) {
         const numValue =
           typeof value === "string" ? value : String(value || "0");
         // Ensure we have a valid number before adding 'n'
@@ -698,7 +667,7 @@ console.log('Connected to custom RPC')`;
       }
 
       // Handle boolean types
-      if (paramType.includes("bool")) {
+      if (isBoolType(paramType)) {
         return `  ${paramName}: ${Boolean(value)}`;
       }
 
@@ -755,26 +724,17 @@ function generateFunctionCode(
   call: PalletCall,
   formData: Record<string, any>,
 ): string {
-  // Get call metadata information
-  let description = `Call ${pallet}.${call.name}`;
-  let paramInfo: { required: string[]; optional: string[] } = { required: [], optional: [] };
+  const description = `Call ${pallet}.${call.name}`;
+  const paramInfo = { required: call.args.map(arg => arg.name), optional: [] };
 
-  // Use sync description for now - async descriptions will be handled later
-  description = `Call ${pallet}.${call.name}`;
-
-  // Use basic parameter info from call.args for now
-  paramInfo = { required: call.args.map(arg => arg.name), optional: [] };
-
-  // Create mapping from parameter name to type using call.args
-  const paramTypeMap = new Map<string, string>();
+    const paramTypeMap = new Map<string, string>();
   call.args.forEach(arg => {
     paramTypeMap.set(arg.name, arg.type);
   });
 
   const args = Object.entries(formData)
     .map(([paramName, value]) => {
-      // Get the actual parameter type from call.args
-      const paramType = paramTypeMap.get(paramName) || 'unknown';
+            const paramType = paramTypeMap.get(paramName) || 'unknown';
 
       // Extract actual value from form object structure if needed
       if (typeof value === 'object' && value?.type === 'Id' && value?.value) {
@@ -782,7 +742,7 @@ function generateFunctionCode(
       }
 
       // Handle MultiAddress types based on actual parameter type
-      if (paramType.includes("MultiAddress") || paramType.includes("AccountId")) {
+      if (isAccountType(paramType)) {
         if (typeof value === "string" && value.startsWith("//")) {
           const accountMap: Record<string, string> = {
             "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
@@ -799,20 +759,14 @@ function generateFunctionCode(
       }
 
       // Handle numeric types based on actual parameter type
-      if (
-        paramType.includes("u128") ||
-        paramType.includes("u64") ||
-        paramType.includes("u32") ||
-        paramType.includes("Balance") ||
-        paramType.includes("Compact")
-      ) {
+      if (isBigIntType(paramType)) {
         const numValue =
           typeof value === "string" ? value : String(value || "0");
         return `    ${paramName}: ${numValue}n`;
       }
 
       // Handle boolean types
-      if (paramType.includes("bool")) {
+      if (isBoolType(paramType)) {
         return `    ${paramName}: ${Boolean(value)}`;
       }
 
@@ -902,7 +856,7 @@ export function generateMultiMethodCode(
           if (
             arg.name === "dest" ||
             arg.name === "target" ||
-            arg.type.includes("MultiAddress")
+            isAccountType(arg.type)
           ) {
             if (typeof value === "string" && value.startsWith("//")) {
               const accountMap: Record<string, string> = {
@@ -943,15 +897,8 @@ export function generateMultiMethodCode(
         })
         .join(",\n");
 
-      // Get call metadata information for this method
-      let description = `Call ${method.pallet}.${method.call.name}`;
-      let paramInfo: { required: string[]; optional: string[] } = { required: [], optional: [] };
-
-      // Use sync description for now - async descriptions will be handled later
-      description = `Call ${method.pallet}.${method.call.name}`;
-
-      // Use basic parameter info from call.args for now
-      paramInfo = { required: method.call.args.map(arg => arg.name), optional: [] };
+      const description = `Call ${method.pallet}.${method.call.name}`;
+      const paramInfo = { required: method.call.args.map(arg => arg.name), optional: [] };
 
       const metadataComment = description !== `Call ${method.pallet}.${method.call.name}`
         ? `\n  // ${description}`
@@ -1035,7 +982,6 @@ ${connectionInfo.connection}
   }
 }
 
-// Execute the query
 getConstant().then(result => {
   console.log('Constant result:', result)
 })`;
@@ -1187,7 +1133,8 @@ export function generateMultiStorageCode(
   // Generate storage queries
   const storageQueries = storageQueue
     .map((storage, index) => {
-      const requiresKeys = detectStorageParameters(storage.pallet, storage.storage.name, chainKey);
+      const detectedParams = getStorageParameterInfo(chainKey, storage.pallet, storage.storage.name);
+      const requiresKeys = detectedParams.required;
       const hasParams = Boolean(
         requiresKeys && Object.keys(storage.storageParams).length > 0,
       );

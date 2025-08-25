@@ -62,31 +62,3 @@ export function loadChainPreferences(): ChainPreferences | null {
   }
 }
 
-/**
- * Clear saved chain preferences
- */
-export function clearChainPreferences(): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    localStorage.removeItem(STORAGE_KEYS.CHAIN_PREFERENCES);
-  } catch (error) {
-    console.warn('Failed to clear chain preferences from localStorage:', error);
-  }
-}
-
-/**
- * Check if localStorage is available
- */
-export function isLocalStorageAvailable(): boolean {
-  if (typeof window === 'undefined') return false;
-
-  try {
-    const test = 'localStorage-test';
-    window.localStorage.setItem(test, test);
-    window.localStorage.removeItem(test);
-    return true;
-  } catch {
-    return false;
-  }
-}

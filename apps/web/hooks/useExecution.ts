@@ -2,7 +2,7 @@
  * Hook for managing execution state and console output
  */
 
-import { useState, useCallback } from "../utils/reactImports";
+import { useState, useCallback } from "react";
 import { QueryResult, ArrayResult } from "../utils/cleanLogger";
 
 export type ConsoleItem = string | QueryResult | ArrayResult;

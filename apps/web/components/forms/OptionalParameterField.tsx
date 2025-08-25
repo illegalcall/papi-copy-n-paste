@@ -1,6 +1,3 @@
-/**
- * OptionalParameterField - Wrapper for optional parameters with show/hide toggle
- */
 
 import React, { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'

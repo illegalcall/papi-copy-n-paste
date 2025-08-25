@@ -5,7 +5,6 @@ import nextDynamic from 'next/dynamic';
 // Force dynamic rendering to avoid SSR issues
 export const dynamic = 'force-dynamic';
 
-// Create a dynamic wrapper without SSR
 const PageContentDynamic = nextDynamic(() => import('./PageContent'), {
   ssr: false,
   loading: () => (

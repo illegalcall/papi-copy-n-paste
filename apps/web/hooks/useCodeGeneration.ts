@@ -2,7 +2,7 @@
  * Hook for managing code generation state and updates
  */
 
-import { useState, useCallback } from "../utils/reactImports";
+import { useState, useCallback } from "react";
 import { PalletCall } from "@workspace/core";
 import {
   generateCodeSnippet,
