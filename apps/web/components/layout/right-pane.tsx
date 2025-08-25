@@ -64,8 +64,8 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
           </TabsList>
         </div>
         
-        <TabsContent value="code" className="flex-1 p-4 m-0">
-          <Card className="h-full">
+        <TabsContent value="code" className="flex-1 p-4 m-0 flex flex-col">
+          <Card className="flex-1 flex flex-col">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm">Generated Code</CardTitle>
@@ -80,22 +80,20 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[calc(100vh-36rem)]">
-                <div className="p-4 bg-muted rounded-md">
-                  <SyntaxHighlighter 
-                    code={code}
-                    language="typescript"
-                    className="text-xs"
-                  />
-                </div>
+            <CardContent className="p-4 flex-1">
+              <ScrollArea className="h-full bg-muted rounded-md">
+                <SyntaxHighlighter
+                  code={code}
+                  language="typescript"
+                  className="text-xs p-4"
+                />
               </ScrollArea>
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="console" className="flex-1 p-4 m-0">
-          <Card className="h-full">
+        <TabsContent value="console" className="flex-1 p-4 m-0 flex flex-col">
+          <Card className="flex-1 flex flex-col">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm flex items-center gap-2">
@@ -113,8 +111,8 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
                 </Button>
               </div>
             </CardHeader>
-            <CardContent className="p-0">
-              <ScrollArea className="h-[calc(100vh-20rem)]">
+            <CardContent className="p-0 flex-1">
+              <ScrollArea className="h-full">
                 <div className="p-4 pr-6 font-mono text-xs space-y-1">
                   {consoleOutput.length === 0 ? (
                     <div className="text-muted-foreground">No output yet...</div>
