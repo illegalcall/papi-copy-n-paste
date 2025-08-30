@@ -320,6 +320,7 @@ function generateStorageQueryCode(chainKey: string, pallet: string, storage: any
   return `import { createClient } from "polkadot-api"
 import { start } from "polkadot-api/smoldot"
 import { getSmProvider } from "polkadot-api/sm-provider"
+// import { ${chainKey} } from "@polkadot-api/descriptors" // Generate this with: papi add ${chainKey}
 
 async function queryStorage() {
   // Initialize smoldot light client
@@ -331,9 +332,18 @@ async function queryStorage() {
   // Create PAPI client
   const client = createClient(getSmProvider(chain))
   
-  // Query storage
+  // Get typed API (PAPI v1.14+ pattern)
+  // const typedApi = client.getTypedApi(${chainKey}) // Uncomment when descriptors are generated
+  
+  // Query storage (current pattern - will be deprecated)
+  // TODO: Replace with typedApi.query.${pallet}.${storage.name}() after generating descriptors
   const result = await client.query.${pallet}.${storage.name}()
   console.log("${pallet}.${storage.name}:", result)
+  
+  /* PROPER PAPI v1.14+ PATTERN (after generating descriptors):
+   * const typedApi = client.getTypedApi(${chainKey})
+   * const result = await typedApi.query.${pallet}.${storage.name}()
+   */
   
   // Cleanup
   smoldot.terminate()
@@ -353,6 +363,7 @@ function generateCodeSnippet(chainKey: string, pallet: string, call: PalletCall,
   return `import { createClient } from "polkadot-api"
 import { start } from "polkadot-api/smoldot"
 import { getSmProvider } from "polkadot-api/sm-provider"
+// import { ${chainKey} } from "@polkadot-api/descriptors" // Generate this with: papi add ${chainKey}
 
 async function main() {
   // Initialize smoldot light client
@@ -364,12 +375,26 @@ async function main() {
   // Create PAPI client
   const client = createClient(getSmProvider(chain))
   
-  // Build the call
+  // Get typed API (PAPI v1.14+ pattern)
+  // const typedApi = client.getTypedApi(${chainKey}) // Uncomment when descriptors are generated
+  
+  // For now, using raw client (will be deprecated):
+  // TODO: Replace with typedApi.tx.${pallet}.${call.name} after generating descriptors
   const call = client.tx.${pallet}.${call.name}({${args ? '\n' + args + '\n' : ''}})
   
   // Sign and submit
   const hash = await call.signAndSubmit("//Alice")
   console.log("Transaction hash:", hash)
+  
+  /* PROPER PAPI v1.14+ PATTERN (after generating descriptors):
+   * 
+   * 1. Generate descriptors: papi add ${chainKey} wss://your-rpc-endpoint
+   * 2. Import: import { ${chainKey} } from "@polkadot-api/descriptors"
+   * 3. Use typed API:
+   *    const typedApi = client.getTypedApi(${chainKey})
+   *    const call = typedApi.tx.${pallet}.${call.name}({${args ? '\n   * ' + args.replace(/\n/g, '\n   * ') + '\n   * ' : ''}})
+   *    const hash = await call.signAndSubmit("//Alice")
+   */
   
   // Cleanup
   smoldot.terminate()
