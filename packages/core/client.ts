@@ -26,6 +26,7 @@ export interface ClientState {
   api: any | null
   error?: string
   chainKey?: string
+  connectionType?: 'smoldot' | 'websocket' | 'public-rpc'
 }
 
 export const chains: ChainConfig[] = chainsData
@@ -47,6 +48,20 @@ const connectionMetrics = new Map<string, {
   errorCount: number
   successCount: number
 }>()
+
+// Public RPC endpoints for fallback when light client fails
+const PUBLIC_RPC_ENDPOINTS = {
+  polkadot: [
+    'wss://rpc.polkadot.io',
+    'wss://polkadot.api.onfinality.io/public-ws',
+    'wss://polkadot-rpc.dwellir.com'
+  ],
+  kusama: [
+    'wss://kusama-rpc.dwellir.com',
+    'wss://kusama.api.onfinality.io/public-ws',
+    'wss://kusama-rpc.polkadot.io'
+  ]
+}
 
 // Preload popular chains for faster switching
 const PRELOAD_CHAINS = ['polkadot', 'kusama']
@@ -83,6 +98,50 @@ function updateMetrics(chainKey: string, success: boolean, connectTime?: number)
     errorCount: success ? existing.errorCount : existing.errorCount + 1,
     successCount: success ? existing.successCount + 1 : existing.successCount
   })
+}
+
+// Check if blockchain data is current (within last 100 blocks)
+async function isDataCurrent(client: any, chainKey: string): Promise<boolean> {
+  try {
+    const finalizedBlock = await client.getFinalizedBlock()
+    const currentTime = Date.now()
+    
+    // If we can't get timestamp, assume data is current if block number is reasonable
+    if (!finalizedBlock.timestamp) {
+      return true
+    }
+    
+    // Check if block timestamp is recent (within last hour)
+    const blockTime = new Date(finalizedBlock.timestamp).getTime()
+    const timeDiff = currentTime - blockTime
+    const oneHour = 60 * 60 * 1000
+    
+    return timeDiff < oneHour
+  } catch (error) {
+    console.warn(`Could not verify data freshness for ${chainKey}:`, error)
+    return false
+  }
+}
+
+// Create WebSocket client with fallback endpoints
+async function createWebSocketClient(chainKey: string, endpoints: string[]): Promise<any> {
+  for (const endpoint of endpoints) {
+    try {
+      console.log(`🔌 Trying WebSocket endpoint: ${endpoint}`)
+      const client = createClient(
+        withPolkadotSdkCompat(getWsProvider(endpoint))
+      )
+      
+      // Test the connection
+      await client._request('system_chain', [])
+      console.log(`✅ WebSocket connection successful: ${endpoint}`)
+      return client
+    } catch (error) {
+      console.warn(`⚠️ WebSocket endpoint failed: ${endpoint}`, error)
+      continue
+    }
+  }
+  throw new Error(`All WebSocket endpoints failed for ${chainKey}`)
 }
 
 // Preload connections for popular chains
@@ -137,37 +196,78 @@ export async function createSmoldotClient(chainKey: string) {
       activeConnections.add(chainKey)
 
       let result: any
+      let connectionType: 'smoldot' | 'websocket' | 'public-rpc' = 'smoldot'
 
-      // Use different connection methods based on chain type
-      if (chainKey === 'polkadot') {
-        console.log(`Loading Polkadot chainspec from @polkadot-api/known-chains`)
-        const smoldot = start()
-        const { chainSpec } = await import('polkadot-api/chains/polkadot')
-        const chain = await smoldot.addChain({ chainSpec })
-        const client = createClient(getSmProvider(chain))
+      // Try smoldot light client first for better decentralization
+      try {
+        if (chainKey === 'polkadot') {
+          console.log(`🔄 Loading Polkadot chainspec from @polkadot-api/known-chains`)
+          const smoldot = start()
+          const { chainSpec } = await import('polkadot-api/chains/polkadot')
+          const chain = await smoldot.addChain({ chainSpec })
+          const client = createClient(getSmProvider(chain))
 
-        console.log(`✓ Successfully connected to ${chainKey} via smoldot`)
-        result = { client, smoldot, chain }
+          // Wait a bit for initial sync and check if data is current
+          console.log(`⏳ Waiting for initial sync...`)
+          await new Promise(resolve => setTimeout(resolve, 5000))
+          
+          if (await isDataCurrent(client, chainKey)) {
+            console.log(`✅ Smoldot light client synced successfully for ${chainKey}`)
+            result = { client, smoldot, chain, connectionType }
+          } else {
+            console.log(`⚠️ Smoldot data is stale, trying WebSocket fallback...`)
+            smoldot.terminate()
+            throw new Error('Data stale')
+          }
 
-      } else if (chainKey === 'kusama') {
-        console.log(`Loading Kusama chainspec from @polkadot-api/known-chains`)
-        const smoldot = start()
-        const { chainSpec } = await import('polkadot-api/chains/ksmcc3')
-        const chain = await smoldot.addChain({ chainSpec })
-        const client = createClient(getSmProvider(chain))
+        } else if (chainKey === 'kusama') {
+          console.log(`🔄 Loading Kusama chainspec from @polkadot-api/known-chains`)
+          const smoldot = start()
+          const { chainSpec } = await import('polkadot-api/chains/ksmcc3')
+          const chain = await smoldot.addChain({ chainSpec })
+          const client = createClient(getSmProvider(chain))
 
-        console.log(`✓ Successfully connected to ${chainKey} via smoldot`)
-        result = { client, smoldot, chain }
+          // Wait a bit for initial sync and check if data is current
+          console.log(`⏳ Waiting for initial sync...`)
+          await new Promise(resolve => setTimeout(resolve, 5000))
+          
+          if (await isDataCurrent(client, chainKey)) {
+            console.log(`✅ Smoldot light client synced successfully for ${chainKey}`)
+            result = { client, smoldot, chain, connectionType }
+          } else {
+            console.log(`⚠️ Smoldot data is stale, trying WebSocket fallback...`)
+            smoldot.terminate()
+            throw new Error('Data stale')
+          }
 
-      } else {
-        // For other chains, use WebSocket connection
-        console.log(`Connecting to ${chainConfig.name} via WebSocket: ${chainConfig.ws}`)
-        const client = createClient(
-          withPolkadotSdkCompat(getWsProvider(chainConfig.ws))
-        )
-
-        console.log(`✓ Successfully connected to ${chainKey} via WebSocket`)
-        result = { client, smoldot: null, chain: null }
+        } else {
+          throw new Error('Chain not supported by smoldot')
+        }
+      } catch (smoldotError) {
+        console.log(`⚠️ Smoldot failed for ${chainKey}, trying WebSocket...`)
+        
+        // Try WebSocket connection as fallback
+        try {
+          if (PUBLIC_RPC_ENDPOINTS[chainKey as keyof typeof PUBLIC_RPC_ENDPOINTS]) {
+            const endpoints = PUBLIC_RPC_ENDPOINTS[chainKey as keyof typeof PUBLIC_RPC_ENDPOINTS]
+            const client = await createWebSocketClient(chainKey, endpoints)
+            connectionType = 'public-rpc'
+            result = { client, smoldot: null, chain: null, connectionType }
+            console.log(`✅ Connected to ${chainKey} via public RPC endpoint`)
+          } else {
+            // Use configured WebSocket endpoint
+            console.log(`Connecting to ${chainConfig.name} via WebSocket: ${chainConfig.ws}`)
+            const client = createClient(
+              withPolkadotSdkCompat(getWsProvider(chainConfig.ws))
+            )
+            connectionType = 'websocket'
+            result = { client, smoldot: null, chain: null, connectionType }
+            console.log(`✅ Connected to ${chainKey} via WebSocket`)
+          }
+        } catch (wsError) {
+          console.error(`❌ Both smoldot and WebSocket failed for ${chainKey}`)
+          throw wsError
+        }
       }
 
       // Cache the successful connection
@@ -175,7 +275,7 @@ export async function createSmoldotClient(chainKey: string) {
       updateConnectionHealth(chainKey, true)
       updateMetrics(chainKey, true, Date.now() - startTime)
 
-      console.log(`🎯 Cached connection for ${chainKey} (${Date.now() - startTime}ms)`)
+      console.log(`🎯 Cached connection for ${chainKey} via ${connectionType} (${Date.now() - startTime}ms)`)
       return result
 
     } catch (error) {
@@ -215,7 +315,7 @@ export function useClient(chainKey: string): ClientState {
         console.log(`🔄 Initializing connection to ${chainKey} (attempt ${initAttempt}/${MAX_INIT_ATTEMPTS})...`)
         setState(prev => ({ ...prev, status: 'connecting', error: undefined }))
 
-        const { client, smoldot, chain } = await createSmoldotClient(chainKey)
+        const { client, smoldot, chain, connectionType } = await createSmoldotClient(chainKey)
 
         if (!mounted) {
           console.log(`⚠️ Component unmounted, cleaning up ${chainKey} connection`)
@@ -243,12 +343,13 @@ export function useClient(chainKey: string): ClientState {
           }
         }
 
-        console.log(`✅ Successfully connected to ${chainKey}`)
+        console.log(`✅ Successfully connected to ${chainKey} via ${connectionType}`)
         setState({
           status: 'ready',
           head: null,
           api: client,
-          chainKey
+          chainKey,
+          connectionType
         })
 
         cleanup = () => {
