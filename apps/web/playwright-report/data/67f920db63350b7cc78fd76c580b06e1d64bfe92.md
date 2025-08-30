@@ -1,0 +1,92 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: Copy‑n‑Paste PAPI
+        - combobox [ref=e6]:
+          - generic:
+            - generic:
+              - img "Polkadot icon"
+              - generic: Polkadot
+          - img
+      - generic [ref=e7]:
+        - button "Toggle theme" [ref=e8]:
+          - img
+          - img
+          - generic [ref=e9]: Toggle theme
+        - link "GitHub" [ref=e10] [cursor=pointer]:
+          - /url: https://github.com/polkadot-api/polkadot-api
+          - img
+          - generic [ref=e11] [cursor=pointer]: GitHub
+        - link "Documentation" [ref=e12] [cursor=pointer]:
+          - /url: https://papi.how
+          - img
+          - generic [ref=e13] [cursor=pointer]: Documentation
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e18]:
+          - img [ref=e19]
+          - textbox "Search pallets..." [ref=e22]
+        - generic [ref=e27]:
+          - button "Balances 2" [ref=e29]:
+            - img
+            - img
+            - generic [ref=e30]: Balances
+            - generic [ref=e31]: "2"
+          - button "System 1" [ref=e33]:
+            - img
+            - img
+            - generic [ref=e34]: System
+            - generic [ref=e35]: "1"
+          - button "Timestamp 1" [ref=e37]:
+            - img
+            - img
+            - generic [ref=e38]: Timestamp
+            - generic [ref=e39]: "1"
+      - generic [ref=e40]:
+        - generic [ref=e44]: Connected to polkadot
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - generic [ref=e47]: Select a Pallet Call or Storage
+            - generic [ref=e48]: Choose a call (to execute transactions) or storage item (to query data) from the left panel
+          - generic [ref=e50]: Select a chain and explore the available pallets
+        - generic [ref=e52]:
+          - button "Run" [disabled]:
+            - img
+            - text: Run
+          - button "Abort" [disabled]:
+            - img
+            - text: Abort
+      - generic [ref=e54]:
+        - tablist [ref=e56]:
+          - tab "Code" [selected] [ref=e57]
+          - tab "Console" [ref=e58]
+        - tabpanel "Code" [ref=e59]:
+          - generic [ref=e60]:
+            - generic [ref=e62]:
+              - generic [ref=e63]: Generated Code
+              - button "Copy" [disabled]:
+                - img
+                - text: Copy
+            - generic [ref=e66]: // Select a pallet call to generate code
+    - generic [ref=e67]:
+      - text: Made with 💖 by
+      - link "illegalcall" [ref=e68] [cursor=pointer]:
+        - /url: https://github.com/illegalcall
+      - text: for Polkadot ecosystem
+  - generic [ref=e73] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e74] [cursor=pointer]:
+      - img [ref=e75] [cursor=pointer]
+    - generic [ref=e78] [cursor=pointer]:
+      - button "Open issues overlay" [ref=e79] [cursor=pointer]:
+        - generic [ref=e80] [cursor=pointer]:
+          - generic [ref=e81] [cursor=pointer]: "0"
+          - generic [ref=e82] [cursor=pointer]: "1"
+        - generic [ref=e83] [cursor=pointer]: Issue
+      - button "Collapse issues badge" [ref=e84] [cursor=pointer]:
+        - img [ref=e85] [cursor=pointer]
+  - alert [ref=e87]
+```

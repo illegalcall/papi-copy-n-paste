@@ -206,10 +206,13 @@ export function useClient(chainKey: string): ClientState {
   useEffect(() => {
     let mounted = true
     let cleanup: (() => void) | undefined
+    let initAttempt = 0
+    const MAX_INIT_ATTEMPTS = 3
 
     async function init() {
+      initAttempt++
       try {
-        console.log(`🔄 Initializing connection to ${chainKey}...`)
+        console.log(`🔄 Initializing connection to ${chainKey} (attempt ${initAttempt}/${MAX_INIT_ATTEMPTS})...`)
         setState(prev => ({ ...prev, status: 'connecting', error: undefined }))
 
         const { client, smoldot, chain } = await createSmoldotClient(chainKey)
@@ -220,6 +223,24 @@ export function useClient(chainKey: string): ClientState {
             smoldot.terminate()
           }
           return
+        }
+
+        // Enhanced stability check - wait for client to be truly ready
+        if (client && client._request) {
+          console.log(`🔍 Verifying ${chainKey} client stability...`)
+          try {
+            // Test the connection with a simple query
+            await client._request('system_chain', [])
+            console.log(`✓ ${chainKey} client verified and stable`)
+          } catch (verifyError) {
+            console.warn(`⚠️ Client verification failed for ${chainKey}:`, verifyError)
+            // If verification fails, retry initialization
+            if (initAttempt < MAX_INIT_ATTEMPTS && mounted) {
+              console.log(`🔄 Retrying initialization for ${chainKey}...`)
+              await new Promise(resolve => setTimeout(resolve, 2000))
+              return init()
+            }
+          }
         }
 
         console.log(`✅ Successfully connected to ${chainKey}`)
@@ -240,7 +261,14 @@ export function useClient(chainKey: string): ClientState {
         if (!mounted) return
 
         const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-        console.error(`❌ Failed to connect to ${chainKey}:`, errorMessage)
+        console.error(`❌ Failed to connect to ${chainKey} (attempt ${initAttempt}):`, errorMessage)
+
+        // Retry logic for initial connection failures
+        if (initAttempt < MAX_INIT_ATTEMPTS && mounted) {
+          console.log(`🔄 Retrying connection to ${chainKey} in 3 seconds...`)
+          await new Promise(resolve => setTimeout(resolve, 3000))
+          return init()
+        }
 
         setState({
           status: 'error',

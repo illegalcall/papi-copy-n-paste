@@ -15,9 +15,11 @@ interface LeftPaneProps {
   onStorageSelect: (pallet: string, storage: any) => void
   selectedCall?: { pallet: string; call: string }
   selectedStorage?: { pallet: string; storage: string }
+  isLoading?: boolean
+  error?: string | null
 }
 
-export function LeftPane({ isOpen, onClose, pallets, onCallSelect, onStorageSelect, selectedCall, selectedStorage }: LeftPaneProps) {
+export function LeftPane({ isOpen, onClose, pallets, onCallSelect, onStorageSelect, selectedCall, selectedStorage, isLoading = false, error = null }: LeftPaneProps) {
   const [searchQuery, setSearchQuery] = useState("")
 
   return (
@@ -36,7 +38,27 @@ export function LeftPane({ isOpen, onClose, pallets, onCallSelect, onStorageSele
       
       <ScrollArea className="flex-1">
         <div className="p-4">
-          {pallets.length === 0 ? (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center space-y-2 py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              <div className="text-sm text-muted-foreground text-center">
+                Loading pallets...
+              </div>
+            </div>
+          ) : error ? (
+            <div className="text-sm text-destructive mb-2 p-3 bg-destructive/10 rounded-md">
+              <div className="font-medium mb-1">⚠️ Connection Issue</div>
+              <div className="text-xs mb-2">{error}</div>
+              {error.includes('Polkadot') && (
+                <div className="text-xs text-muted-foreground bg-muted p-2 rounded mt-2">
+                  <div className="font-medium mb-1">💡 Quick Fix:</div>
+                  <div>1. Switch to Kusama above ↑</div>
+                  <div>2. Wait for it to connect</div>
+                  <div>3. Switch back to Polkadot</div>
+                </div>
+              )}
+            </div>
+          ) : pallets.length === 0 ? (
             <div className="text-sm text-muted-foreground mb-2">
               Connect to a chain to explore pallets
             </div>

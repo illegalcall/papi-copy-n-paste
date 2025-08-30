@@ -22,42 +22,85 @@ export default function Page() {
   const [isRunning, setIsRunning] = useState(false)
   const [canRun, setCanRun] = useState(false)
   const [activeTab, setActiveTab] = useState<"code" | "console">("code")
+  const [isLoadingMetadata, setIsLoadingMetadata] = useState(false)
+  const [metadataError, setMetadataError] = useState<string | null>(null)
   
   const { status: chainStatus, api } = useClient(selectedChain)
 
-  // Fetch metadata when client is ready
+  // Enhanced metadata fetching with better state management
   useEffect(() => {
     console.log('Effect triggered:', { chainStatus, api: !!api, selectedChain })
     
     if (chainStatus === 'ready' && api) {
-      console.log('Fetching metadata for chain:', selectedChain)
-      fetchMetadata(selectedChain, api).then(metadata => {
-        console.log('Metadata fetched:', metadata)
-        if (metadata) {
-          const palletTree = buildPalletTree(metadata)
-          console.log('Pallet tree built:', palletTree)
-          setPallets(palletTree)
-        } else {
-          console.warn('No metadata returned')
+      // Add a small delay to ensure client is fully stable
+      const timeoutId = setTimeout(async () => {
+        console.log(`🔄 Fetching metadata for chain: ${selectedChain}`)
+        setIsLoadingMetadata(true)
+        setMetadataError(null)
+        
+        try {
+          const metadata = await fetchMetadata(selectedChain, api)
+          console.log('Metadata fetched:', metadata)
+          
+          if (metadata && metadata.pallets.length > 0) {
+            const palletTree = buildPalletTree(metadata)
+            console.log(`✅ Pallet tree built with ${palletTree.length} pallets for ${selectedChain}`)
+            setPallets(palletTree)
+            setMetadataError(null)
+          } else {
+            console.warn(`⚠️ No metadata or empty pallets returned for ${selectedChain}`)
+            setPallets([])
+            if (selectedChain === 'polkadot') {
+              setMetadataError('Polkadot initial connection can be slow. Try switching to Kusama first, then back to Polkadot, or wait a moment and refresh.')
+            } else {
+              setMetadataError(`No pallets found for ${selectedChain}. The chain may still be connecting.`)
+            }
+          }
+        } catch (error) {
+          const errorMsg = error instanceof Error ? error.message : 'Unknown error'
+          console.error(`❌ Error in metadata fetch for ${selectedChain}:`, error)
           setPallets([])
+          if (selectedChain === 'polkadot') {
+            setMetadataError('Polkadot connection timed out. This is a known issue - try switching to Kusama first, then back to Polkadot.')
+          } else {
+            setMetadataError(`Failed to load pallets for ${selectedChain}: ${errorMsg}`)
+          }
+        } finally {
+          setIsLoadingMetadata(false)
         }
-      }).catch(error => {
-        console.error('Error in metadata fetch:', error)
-        setPallets([])
-      })
-    } else {
-      console.log('Clearing pallets - not ready or no API')
+      }, chainStatus === 'ready' ? 1000 : 0) // Wait 1 second for client to stabilize
+      
+      return () => clearTimeout(timeoutId)
+    } else if (chainStatus === 'connecting') {
+      console.log(`🔄 Chain connecting: ${selectedChain}`)
+      setIsLoadingMetadata(true)
+      setMetadataError(null)
       setPallets([])
       setSelectedCall(undefined)
+      setSelectedStorage(undefined)
+    } else if (chainStatus === 'error') {
+      console.log(`❌ Chain connection error for: ${selectedChain}`)
+      setIsLoadingMetadata(false)
+      setMetadataError(`Failed to connect to ${selectedChain}`)
+      setPallets([])
+      setSelectedCall(undefined)
+      setSelectedStorage(undefined)
+    } else {
+      console.log(`🧹 Clearing pallets - chainStatus: ${chainStatus}, api: ${!!api}`)
+      setIsLoadingMetadata(false)
+      setPallets([])
+      setSelectedCall(undefined)
+      setSelectedStorage(undefined)
     }
   }, [chainStatus, api, selectedChain])
 
-  const handleCallSelect = (pallet: string, call: PalletCall) => {
+  const handleCallSelect = useCallback((pallet: string, call: PalletCall) => {
+    console.log(`🎯 Selecting call: ${pallet}.${call.name}`)
     setSelectedCall({ pallet, call })
     setSelectedStorage(undefined) // Clear storage selection
     setFormData({})
     setCode("")
-  }
+  }, [])
 
   const handleStorageSelect = (pallet: string, storage: any) => {
     setSelectedStorage({ pallet, storage })
@@ -132,6 +175,8 @@ export default function Page() {
             onStorageSelect={handleStorageSelect}
             selectedCall={selectedCall ? { pallet: selectedCall.pallet, call: selectedCall.call.name } : undefined}
             selectedStorage={selectedStorage ? { pallet: selectedStorage.pallet, storage: selectedStorage.storage.name } : undefined}
+            isLoading={isLoadingMetadata}
+            error={metadataError}
           />
           <CenterPane 
             chainStatus={chainStatus}
@@ -188,6 +233,8 @@ export default function Page() {
               onStorageSelect={handleStorageSelect}
               selectedCall={selectedCall ? { pallet: selectedCall.pallet, call: selectedCall.call.name } : undefined}
               selectedStorage={selectedStorage ? { pallet: selectedStorage.pallet, storage: selectedStorage.storage.name } : undefined}
+              isLoading={isLoadingMetadata}
+              error={metadataError}
             />
           </SheetContent>
         </Sheet>
