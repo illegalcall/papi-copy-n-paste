@@ -2,7 +2,7 @@
 
 import { Button } from "@workspace/ui/components/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from "@workspace/ui/components/navigation-menu"
+// Navigation menu imports removed as not currently used
 import { Moon, Sun, Github, BookOpen } from "lucide-react"
 import { useTheme } from "next-themes"
 import { chains } from "@workspace/core"

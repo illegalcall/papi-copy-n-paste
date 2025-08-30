@@ -36,7 +36,7 @@ export function SyntaxHighlighter({ code, language = "typescript", className = "
   let highlightedCode: string
   try {
     highlightedCode = Prism.highlight(code, grammar as any, language)
-  } catch (error) {
+  } catch {
     // Fallback to plain text if highlighting fails
     highlightedCode = code
   }

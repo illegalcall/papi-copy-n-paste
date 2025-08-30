@@ -2,7 +2,7 @@
 
 import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card"
-import { Badge } from "@workspace/ui/components/badge"
+// Badge import removed as not currently used
 import { Play, Square } from "lucide-react"
 import { SimpleCallForm } from "@/components/forms/simple-call-form"
 import { PalletCall } from "@workspace/core"
