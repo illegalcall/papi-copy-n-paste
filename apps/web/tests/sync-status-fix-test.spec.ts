@@ -189,7 +189,7 @@ test.describe('Blockchain Sync Status Fix Validation', () => {
         
         // Extract potential block number to check if it's stale
         const blockMatch = text.match(/block #(\\d+)/)
-        if (blockMatch) {
+        if (blockMatch && blockMatch[1]) {
           const blockNumber = parseInt(blockMatch[1])
           // If block number is suspiciously low, it's likely stale
           if (blockNumber < 27000000) { // Much older than current mainnet

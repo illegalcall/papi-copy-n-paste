@@ -127,7 +127,7 @@ test.describe('Manual Stale Blockchain Data Test', () => {
       const bestBlockLog = blockchainLogs.find(log => log.includes('Best block #'))
       if (bestBlockLog) {
         const match = bestBlockLog.match(/Best block #(\d+)/)
-        if (match) {
+        if (match && match[1]) {
           const blockNumber = parseInt(match[1])
           console.log(`\n📊 DETECTED BLOCK NUMBER: ${blockNumber}`)
           
