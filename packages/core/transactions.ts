@@ -170,6 +170,16 @@ export class TransactionExecutor {
           throw new Error(`Balances.${callName} not found in chain descriptors. The descriptors may be incomplete or outdated.`)
         }
 
+        // Helper function to safely serialize objects with BigInt values
+        const safeStringify = (obj: any): string => {
+          return JSON.stringify(obj, (key, value) => {
+            if (typeof value === 'bigint') {
+              return value.toString()
+            }
+            return value
+          }, 2)
+        }
+
         // Now using proper PAPI v1.14+ pattern
         const transaction = {
           pallet,
@@ -199,7 +209,7 @@ export class TransactionExecutor {
               })
               
               stepCallback('> ✓ Real transaction object created successfully', 'success')
-              stepCallback(`> Transaction details: ${JSON.stringify(tx.decodedCall, null, 2)}`, 'info')
+              stepCallback(`> Transaction details: ${safeStringify(tx.decodedCall)}`, 'info')
               
               // 3. Stop here - don't actually sign or submit (safety mode)
               stepCallback('> Stopping before signing/submission for safety', 'info')
