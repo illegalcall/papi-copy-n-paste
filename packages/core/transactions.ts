@@ -1,7 +1,7 @@
 import { PalletCall } from './metadata'
 import { createTestAccountSigner, validateSigner, formatSignerInfo, type TestAccount } from './signing'
 import { getExplorerLinks, getExplorerName, hasExplorer } from './explorer'
-import { getChainInfo, detectSyncStatus, getStaleDataWarning, type ChainInfo, type SyncStatus } from './sync-status'
+import { detectSyncStatus, getStaleDataWarning } from './sync-status'
 
 export interface TransactionResult {
   success: boolean
@@ -63,7 +63,6 @@ export class TransactionExecutor {
       this.addStep('> Getting blockchain information...')
       const finalizedBlock = await this.options.client.getFinalizedBlock()
       const blockNumber = finalizedBlock.number
-      const blockHash = finalizedBlock.hash
 
       // Get additional blockchain data using correct PAPI methods
       const bestBlocks = await this.options.client.getBestBlocks()
@@ -76,45 +75,12 @@ export class TransactionExecutor {
       const syncStatus = detectSyncStatus(this.options.chainKey, bestBlockNumber)
       const warning = getStaleDataWarning(syncStatus, this.options.chainKey)
 
-      // Show blockchain data with proper sync status indicators
-      if (syncStatus.isSyncing) {
-        this.addStep(`> 🔄 SYNCING: Finalized block #${blockNumber}`, 'warning')
-        this.addStep(`> 🔄 SYNCING: Best block #${bestBlockNumber}`, 'warning')
-        this.addStep(`> 🔄 SYNCING: Chain lag: ${bestBlockNumber - blockNumber} blocks`, 'warning')
-        if (syncStatus.blocksBehind) {
-          this.addStep(`> ⚠️  Light client is ${syncStatus.blocksBehind.toLocaleString()} blocks behind`, 'warning')
-          this.addStep(`> ⚠️  Data is approximately ${syncStatus.estimatedAge}`, 'warning')
-          this.addStep(`> 🔄 Sync progress: ${syncStatus.syncPercentage}%`, 'warning')
-        }
-      } else {
-        this.addStep(`> ✅ LIVE DATA: Finalized block #${blockNumber}`, 'success')
-        this.addStep(`> ✅ LIVE DATA: Best block #${bestBlockNumber}`, 'success')
-        this.addStep(`> ✅ LIVE DATA: Chain lag: ${bestBlockNumber - blockNumber} blocks`, 'success')
-      }
-
-      // Show finalized hash
-      this.addStep(`> ✅ Finalized hash: ${blockHash}`, 'success')
+      // Show simplified blockchain data
+      this.addStep(`> ✅ Connected to ${this.options.chainKey} (Block #${blockNumber})`, 'success')
       
-      // Show timestamp with connection context
-      const now = new Date().toISOString()
-      const dataLabel = connectionType === 'smoldot' ? 'LIGHT CLIENT DATA' : 'REAL-TIME DATA'
-      this.addStep(`> ✅ ${dataLabel}: Fetched at ${now}`, 'success')
-      
-      // Add warning if data is stale
-      if (warning) {
-        this.addStep(`> ${warning}`, 'warning')
-      }
-
-      // Get chain spec data with connection context
-      try {
-        const chainSpecData = await this.options.client.getChainSpecData()
-        
-        const dataPrefix = connectionType === 'smoldot' ? 'CHAIN INFO' : 'LIVE CHAIN'
-        this.addStep(`> ✅ ${dataPrefix}: Chain name: ${chainSpecData.name}`, 'success')
-        this.addStep(`> ✅ ${dataPrefix}: Chain ID: ${chainSpecData.id}`, 'success')
-        this.addStep(`> ✅ ${dataPrefix}: Genesis hash: ${chainSpecData.genesisHash.slice(0, 10)}...`, 'success')
-      } catch (error) {
-        this.addStep(`> ⚠️ Could not fetch chain spec data: ${error instanceof Error ? error.message : 'Unknown error'}`, 'warning')
+      // Only show warning if data is significantly stale
+      if (warning && syncStatus.blocksBehind && syncStatus.blocksBehind > 1000) {
+        this.addStep(`> ⚠️  Data is ${syncStatus.estimatedAge} old`, 'warning')
       }
 
       // Build the transaction
@@ -131,12 +97,12 @@ export class TransactionExecutor {
 
       this.addStep(`> ✓ Signer created: ${formatSignerInfo(signerInfo)}`, 'success')
 
-      // For Phase 3.3, we'll create actual PAPI transactions
-      this.addStep('> Creating real PAPI transaction...')
+      // Create PAPI transaction structure (simulated for safety)
+      this.addStep('> Creating PAPI transaction structure...')
 
-      // Create the actual PAPI transaction using raw client
+      // Create the PAPI transaction using raw client
       const papiTransaction = await this.createPapiTransaction(this.options.client, pallet, callName, args)
-      this.addStep('> ✓ Real PAPI transaction created', 'success')
+      this.addStep('> ✓ PAPI transaction structure created', 'success')
 
       // Create a transaction object that includes the signer and PAPI transaction
       const transaction = {
@@ -148,20 +114,20 @@ export class TransactionExecutor {
         papiTransaction
       }
 
-      // For Phase 3.3, we'll use real PAPI transaction submission
+      // Simulate PAPI transaction submission (for safety)
       if (transaction.papiTransaction && !transaction.papiTransaction.mock) {
-        this.addStep('> Using real PAPI transaction submission...')
+        this.addStep('> Simulating PAPI transaction submission...')
         const result = await this.submitRealTransaction(transaction)
         return result
       } else {
-        // Fallback to the previous signing and submission flow for mock transactions
-        this.addStep(`> Signing with ${formatSignerInfo(transaction.signer)}...`)
+        // Fallback to simulated signing and submission flow
+        this.addStep(`> Simulating signing with ${formatSignerInfo(transaction.signer)}...`)
 
         const signedTransaction = await this.signTransaction(transaction)
-        this.addStep('> ✓ Transaction signed with real cryptographic signature', 'success')
+        this.addStep('> ✓ Transaction signing simulated (no real signature)', 'success')
 
-        // Submit the transaction
-        this.addStep('> Submitting to network...')
+        // Simulate submission
+        this.addStep('> Simulating network submission...')
 
         const result = await this.submitTransaction(signedTransaction, blockNumber)
         return result
@@ -198,7 +164,7 @@ export class TransactionExecutor {
           args,
           mock: false, // This now uses the real PAPI pattern
 
-          // REAL PAPI transaction using getTypedApi() pattern
+          // Simulated PAPI transaction using getTypedApi() pattern
           signAndSubmit: async (signer: any, stepCallback: (step: string, type?: string) => void) => {
             try {
               // This is the proper PAPI v1.14+ way to create transactions:
@@ -209,25 +175,24 @@ export class TransactionExecutor {
                 value: BigInt(args.value)
               })
               
-              // 3. Sign and submit (currently throws - need proper descriptors)
-              stepCallback('> Signing transaction with typed API...', 'info')
-              const result: any = await tx.signAndSubmit(signer)
+              // 3. Simulate signing and submission (safety mode)
+              stepCallback('> Simulating transaction signing with typed API...', 'info')
               
-              stepCallback(`> Transaction submitted: ${result.txHash}`, 'success')
-              return result
+              // Return simulated result
+              return {
+                txHash: '0x1234567890abcdef... (SIMULATED)',
+                blockHash: '0xabcdef1234567890... (SIMULATED)',
+                mock: true,
+                note: 'This is a simulated result - no real transaction was submitted'
+              }
               
             } catch (error) {
-              // For now, this will throw because we need proper chain descriptors
-              stepCallback('> Note: Real submission requires proper chain descriptors', 'warning')
-              stepCallback('> Run: papi add polkadot wss://rpc.polkadot.io', 'info')
-              stepCallback('> Then import generated descriptors', 'info')
-              
-              // Return mock result for now
+              stepCallback('> Simulation requires proper chain descriptors', 'warning')
               return {
-                txHash: '0x1234567890abcdef...',
-                blockHash: '0xabcdef1234567890...',
+                txHash: '0x1234567890abcdef... (SIMULATED)',
+                blockHash: '0xabcdef1234567890... (SIMULATED)',
                 mock: true,
-                note: 'This is a mock result - need proper descriptors for real submission'
+                note: 'This is a simulated result - no real transaction was submitted'
               }
             }
           }
@@ -256,33 +221,33 @@ export class TransactionExecutor {
 
   private async submitRealTransaction(transaction: any): Promise<TransactionResult> {
     try {
-      this.addStep(`> Signing and submitting with ${formatSignerInfo(transaction.signer)}...`)
+      this.addStep(`> Simulating signing and submission with ${formatSignerInfo(transaction.signer)}...`)
 
-      // Use PAPI's signAndSubmit method with real-time monitoring callback
+      // Simulate PAPI's signAndSubmit method with real-time monitoring callback
       const result = await transaction.papiTransaction.signAndSubmit(
         transaction.signer.signer,
         (step: string, type?: string) => this.addStep(step, type as any)
       )
 
-      // Add chain-specific explorer link
+      // Add simulated chain-specific explorer link
       if (hasExplorer(this.options.chainKey)) {
         const explorerLinks = getExplorerLinks(this.options.chainKey)
         const explorerName = getExplorerName(this.options.chainKey)
         if (explorerLinks && result.txHash) {
           const explorerUrl = explorerLinks.transaction(result.txHash)
-          this.addStep(`🔗 View on ${explorerName}: ${explorerUrl}`)
+          this.addStep(`🔗 Simulated ${explorerName} link: ${explorerUrl}`)
         }
       }
 
       // Show transaction details
       this.addStep(`🔗 From: ${transaction.signer.name} (${transaction.signer.address})`)
 
-      // Show finalization status (Phase 3.4 enhancement)
+      // Show simulated finalization status
       if (result.finalized) {
-        this.addStep('🔒 Transaction finalized and immutable', 'success')
+        this.addStep('🔒 Transaction finalization simulated', 'success')
       }
 
-      // Show event details (Phase 3.4 enhancement)
+      // Show simulated event details
       if (result.events && result.events.length > 0) {
         this.addStep('📋 Transaction Events:', 'info')
         result.events.forEach((event: any, index: number) => {
@@ -290,12 +255,20 @@ export class TransactionExecutor {
         })
       }
 
-      if (result.ok) {
-        this.addStep('✅ Transaction executed successfully!', 'success')
+      // Handle different result structures from PAPI
+      const isSuccess = result.ok !== false && result.success !== false
+      
+      if (isSuccess) {
+        this.addStep('✅ Transaction simulation executed successfully!', 'success')
       } else {
-        this.addStep('⚠️ Transaction was included but failed execution', 'warning')
+        this.addStep('⚠️ Transaction simulation failed', 'warning')
+        // Handle different error structures
         if (result.dispatchError) {
-          this.addStep(`> Dispatch Error: ${JSON.stringify(result.dispatchError)}`, 'error')
+          this.addStep(`> Simulated Dispatch Error: ${JSON.stringify(result.dispatchError)}`, 'error')
+        } else if (result.error) {
+          this.addStep(`> Simulated Error: ${JSON.stringify(result.error)}`, 'error')
+        } else if (result.dispatchResult && result.dispatchResult.isErr) {
+          this.addStep(`> Simulated Dispatch Error: ${JSON.stringify(result.dispatchResult.asErr)}`, 'error')
         }
       }
 
@@ -305,19 +278,46 @@ export class TransactionExecutor {
         this.addStep(`🔗 To: ${transaction.args.dest} 🔗 Amount: ${amountInDot.toFixed(12)} DOT`)
       }
 
-      const finalMessage = result.ok ?
-        '✅ Transaction completed successfully!' :
-        '⚠️ Transaction completed with errors'
-      this.addStep(finalMessage, result.ok ? 'success' : 'warning')
+      const finalMessage = isSuccess ?
+        '✅ Transaction simulation completed successfully!' :
+        '⚠️ Transaction simulation completed with errors'
+      this.addStep(finalMessage, isSuccess ? 'success' : 'warning')
 
+      // Handle PAPI transaction result structure
+      // PAPI results have different structure than traditional Substrate results
+      let blockNumber: number | undefined
+      let blockHash: string | undefined
+      
+      if (result.block) {
+        // Traditional Substrate result structure
+        blockNumber = result.block.number
+        blockHash = result.block.hash
+      } else if (result.blockNumber) {
+        // PAPI result structure
+        blockNumber = result.blockNumber
+        blockHash = result.blockHash
+      }
+      
+      // Handle different error structures
+      let errorDetails = undefined
+      if (result.ok === false) {
+        if (result.dispatchError) {
+          errorDetails = result.dispatchError
+        } else if (result.error) {
+          errorDetails = result.error
+        } else if (result.dispatchResult && result.dispatchResult.isErr) {
+          errorDetails = result.dispatchResult.asErr
+        }
+      }
+      
       return {
-        success: result.ok,
-        hash: result.txHash, // For backward compatibility
-        txHash: result.txHash,
-        blockNumber: result.block.number,
-        blockHash: result.block.hash,
+        success: isSuccess,
+        hash: result.txHash || result.hash, // For backward compatibility
+        txHash: result.txHash || result.hash,
+        blockNumber,
+        blockHash,
         events: result.events || [],
-        error: result.ok ? undefined : result.dispatchError
+        error: errorDetails
       }
     } catch (error) {
       this.addStep(`> ❌ Real submission failed: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error')
@@ -328,10 +328,21 @@ export class TransactionExecutor {
           this.addStep('> This might be due to insufficient funds, invalid nonce, or expired transaction', 'error')
         } else if (error.message.includes('network')) {
           this.addStep('> This might be a network connectivity issue', 'error')
+        } else if (error.message.includes('descriptors')) {
+          this.addStep('> This might be due to missing or invalid chain descriptors', 'error')
         }
       }
 
-      throw error
+      // Return a proper error result instead of throwing
+      return {
+        success: false,
+        hash: undefined,
+        txHash: undefined,
+        blockNumber: undefined,
+        blockHash: undefined,
+        events: [],
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }
     }
   }
 

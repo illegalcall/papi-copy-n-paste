@@ -300,6 +300,117 @@ async function executeRealTransaction(
 
 // simulateTransactionExecution function removed as it's no longer used
 
+function getSetupCommands(chainKey: string): string {
+  const chainConfigs = {
+    polkadot: {
+      wsUrl: "wss://rpc.polkadot.io",
+      description: "Polkadot mainnet"
+    },
+    kusama: {
+      wsUrl: "wss://kusama-rpc.polkadot.io", 
+      description: "Kusama mainnet"
+    },
+    moonbeam: {
+      wsUrl: "wss://wss.api.moonbeam.network",
+      description: "Moonbeam mainnet"
+    },
+    bifrost: {
+      wsUrl: "wss://hk.p.bifrost-rpc.liebi.com/ws",
+      description: "Bifrost mainnet"
+    },
+    astar: {
+      wsUrl: "wss://rpc.astar.network",
+      description: "Astar mainnet"
+    },
+    acala: {
+      wsUrl: "wss://acala-rpc.dwellir.com",
+      description: "Acala mainnet"
+    },
+    hydration: {
+      wsUrl: "wss://rpc.hydration.cloud",
+      description: "Hydration mainnet"
+    }
+  }
+
+  const config = chainConfigs[chainKey as keyof typeof chainConfigs] || chainConfigs.polkadot
+  
+  return `// npm install polkadot-api
+// npx papi add dot -n ${chainKey}
+// npx papi`
+}
+
+function getChainSpecImport(chainKey: string): string {
+  // Only major relay chains have built-in chainSpecs
+  const builtInChainSpecs = {
+    polkadot: "polkadot",
+    kusama: "ksmcc3"
+  }
+  
+  const specName = builtInChainSpecs[chainKey as keyof typeof builtInChainSpecs]
+  if (specName) {
+    return `import { chainSpec } from "polkadot-api/chains/${specName}"`
+  }
+  
+  // For parachains, we need to connect via RPC (no built-in chainSpec)
+  return `// Note: ${chainKey} connects directly via RPC endpoint`
+}
+
+function getDescriptorImport(chainKey: string): string {
+  const descriptorMap = {
+    polkadot: "dot",
+    kusama: "ksm", 
+    moonbeam: "moonbeam",
+    bifrost: "bifrost",
+    astar: "astar",
+    acala: "acala",
+    hydration: "hydration"
+  }
+  
+  const descriptorName = descriptorMap[chainKey as keyof typeof descriptorMap] || "dot"
+  return `import { MultiAddress, ${descriptorName} } from "@polkadot-api/descriptors"`
+}
+
+function getDescriptorName(chainKey: string): string {
+  const descriptorMap = {
+    polkadot: "dot",
+    kusama: "ksm", 
+    moonbeam: "moonbeam",
+    bifrost: "bifrost",
+    astar: "astar",
+    acala: "acala", 
+    hydration: "hydration"
+  }
+  
+  return descriptorMap[chainKey as keyof typeof descriptorMap] || "dot"
+}
+
+function getChainConnection(chainKey: string): { imports: string, connection: string, cleanup?: string } {
+  // Use the correct chainSpec pattern based on the working code
+  const chainConfigs = {
+    polkadot: { wsUrl: "wss://rpc.polkadot.io", chainSpec: "polkadot" },
+    kusama: { wsUrl: "wss://kusama-rpc.polkadot.io", chainSpec: "ksmcc3" },
+    moonbeam: { wsUrl: "wss://wss.api.moonbeam.network", chainSpec: "moonbeam" },
+    bifrost: { wsUrl: "wss://hk.p.bifrost-rpc.liebi.com/ws", chainSpec: "bifrost" },
+    astar: { wsUrl: "wss://rpc.astar.network", chainSpec: "astar" },
+    acala: { wsUrl: "wss://acala-rpc.dwellir.com", chainSpec: "acala" },
+    hydration: { wsUrl: "wss://rpc.hydration.cloud", chainSpec: "hydration" }
+  }
+
+  const config = chainConfigs[chainKey as keyof typeof chainConfigs] || chainConfigs.polkadot
+  
+  return {
+    imports: `import { start } from "polkadot-api/smoldot"
+import { getSmProvider } from "polkadot-api/sm-provider"
+import { chainSpec } from "polkadot-api/chains/${config.chainSpec}"`,
+    connection: `  const smoldot = start()
+  const chain = await smoldot.addChain({ chainSpec })
+  const client = createClient(getSmProvider(chain))`,
+    cleanup: `  
+  // Cleanup
+  smoldot.terminate()`
+  }
+}
+
 function formatTransactionDetails(selectedCall: { pallet: string; call: PalletCall }, formData: Record<string, any>): string {
   if (selectedCall.pallet === 'Balances' && selectedCall.call.name.includes('transfer')) {
     const dest = formData.dest || '//Bob'
@@ -317,36 +428,26 @@ function formatTransactionDetails(selectedCall: { pallet: string; call: PalletCa
 }
 
 function generateStorageQueryCode(chainKey: string, pallet: string, storage: any): string {
-  return `import { createClient } from "polkadot-api"
-import { start } from "polkadot-api/smoldot"
-import { getSmProvider } from "polkadot-api/sm-provider"
-// import { ${chainKey} } from "@polkadot-api/descriptors" // Generate this with: papi add ${chainKey}
+  const setupCommands = getSetupCommands(chainKey)
+  const descriptorImport = getDescriptorImport(chainKey)
+  const descriptorName = getDescriptorName(chainKey)
+  const { imports, connection, cleanup } = getChainConnection(chainKey)
+  
+  return `// SETUP REQUIRED: Run these commands in your project:
+${setupCommands}
+
+import { createClient } from "polkadot-api"
+${imports}
+${descriptorImport}
 
 async function queryStorage() {
-  // Initialize smoldot light client
-  const smoldot = start()
-  const chain = await smoldot.addChain({ 
-    chainSpec: "${chainKey}" 
-  })
+${connection}
+  const typedApi = client.getTypedApi(${descriptorName})
   
-  // Create PAPI client
-  const client = createClient(getSmProvider(chain))
-  
-  // Get typed API (PAPI v1.14+ pattern)
-  // const typedApi = client.getTypedApi(${chainKey}) // Uncomment when descriptors are generated
-  
-  // Query storage (current pattern - will be deprecated)
-  // TODO: Replace with typedApi.query.${pallet}.${storage.name}() after generating descriptors
-  const result = await client.query.${pallet}.${storage.name}()
-  console.log("${pallet}.${storage.name}:", result)
-  
-  /* PROPER PAPI v1.14+ PATTERN (after generating descriptors):
-   * const typedApi = client.getTypedApi(${chainKey})
-   * const result = await typedApi.query.${pallet}.${storage.name}()
-   */
-  
-  // Cleanup
-  smoldot.terminate()
+  const result = await typedApi.query.${pallet}.${storage.name}()
+  console.log("${pallet}.${storage.name}:", JSON.stringify(result, (_key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  ))${cleanup || ''}
   
   return result
 }
@@ -357,47 +458,68 @@ queryStorage().catch(console.error)`
 function generateCodeSnippet(chainKey: string, pallet: string, call: PalletCall, formData: Record<string, any>): string {
   const args = call.args.map(arg => {
     const value = formData[arg.name] || ''
+    
+    // Handle MultiAddress types properly for dest/target fields
+    if (arg.name === 'dest' || arg.name === 'target' || arg.type.includes('MultiAddress')) {
+      // If it's a named account like //Alice, //Bob, convert to proper SS58 address
+      if (typeof value === 'string' && value.startsWith('//')) {
+        const accountMap: Record<string, string> = {
+          '//Alice': '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
+          '//Bob': '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
+          '//Charlie': '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
+        }
+        const address = accountMap[value] || accountMap['//Alice']
+        return `  ${arg.name}: MultiAddress.Id("${address}"), // ${value}`
+      }
+      // If it's already a valid SS58 address, use it directly
+      else if (typeof value === 'string' && value.length > 40) {
+        return `  ${arg.name}: MultiAddress.Id("${value}")`
+      }
+      // Default to Alice for empty values
+      else {
+        return `  ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY") // //Alice`
+      }
+    }
+    
+    // Handle BigInt values properly
+    if (arg.type.includes('u128') || arg.type.includes('u64') || arg.name === 'value' || arg.name === 'amount') {
+      const numValue = typeof value === 'string' ? value : String(value || '0')
+      // Add 'n' suffix for BigInt if it's a large number
+      if (numValue && !numValue.includes('n') && (parseInt(numValue) > Number.MAX_SAFE_INTEGER || numValue.length > 10)) {
+        return `  ${arg.name}: ${numValue}n`
+      }
+      return `  ${arg.name}: ${numValue}n`
+    }
+    
     return `  ${arg.name}: ${JSON.stringify(value)}`
   }).join(',\n')
 
-  return `import { createClient } from "polkadot-api"
-import { start } from "polkadot-api/smoldot"
-import { getSmProvider } from "polkadot-api/sm-provider"
-// import { ${chainKey} } from "@polkadot-api/descriptors" // Generate this with: papi add ${chainKey}
+  const setupCommands = getSetupCommands(chainKey)
+  const descriptorImport = getDescriptorImport(chainKey)
+  const descriptorName = getDescriptorName(chainKey)
+  const { imports, connection, cleanup } = getChainConnection(chainKey)
+
+  return `// SETUP REQUIRED: Run these commands in your project:
+${setupCommands}
+
+import { createClient } from "polkadot-api"
+${imports}
+${descriptorImport}
 
 async function main() {
-  // Initialize smoldot light client
-  const smoldot = start()
-  const chain = await smoldot.addChain({ 
-    chainSpec: "${chainKey}" 
-  })
+${connection}
+  const typedApi = client.getTypedApi(${descriptorName})
   
-  // Create PAPI client
-  const client = createClient(getSmProvider(chain))
+  const call = typedApi.tx.${pallet}.${call.name}({${args ? '\n' + args + '\n' : ''}})
   
-  // Get typed API (PAPI v1.14+ pattern)
-  // const typedApi = client.getTypedApi(${chainKey}) // Uncomment when descriptors are generated
+  // For testing purposes, just create the call (don't actually submit)
+  console.log("Call created:", JSON.stringify(call.decodedCall, (_key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  ));
   
-  // For now, using raw client (will be deprecated):
-  // TODO: Replace with typedApi.tx.${pallet}.${call.name} after generating descriptors
-  const call = client.tx.${pallet}.${call.name}({${args ? '\n' + args + '\n' : ''}})
-  
-  // Sign and submit
-  const hash = await call.signAndSubmit("//Alice")
-  console.log("Transaction hash:", hash)
-  
-  /* PROPER PAPI v1.14+ PATTERN (after generating descriptors):
-   * 
-   * 1. Generate descriptors: papi add ${chainKey} wss://your-rpc-endpoint
-   * 2. Import: import { ${chainKey} } from "@polkadot-api/descriptors"
-   * 3. Use typed API:
-   *    const typedApi = client.getTypedApi(${chainKey})
-   *    const call = typedApi.tx.${pallet}.${call.name}({${args ? '\n   * ' + args.replace(/\n/g, '\n   * ') + '\n   * ' : ''}})
-   *    const hash = await call.signAndSubmit("//Alice")
-   */
-  
-  // Cleanup
-  smoldot.terminate()
+  // To actually submit, you would need a proper signer:
+  // const hash = await call.signAndSubmit(yourSigner)
+  // console.log("Transaction hash:", hash)${cleanup || ''}
 }
 
 main().catch(console.error)`

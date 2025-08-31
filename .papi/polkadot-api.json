@@ -1,0 +1,36 @@
+{
+  "version": 0,
+  "descriptorPath": ".papi/descriptors",
+  "entries": {
+    "polkadot": {
+      "wsUrl": "wss://rpc.polkadot.io",
+      "metadata": ".papi/metadata/polkadot.scale",
+      "genesis": "0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3",
+      "codeHash": "0xe260d17fcfa34f10503c91148a7bc2fd820e356295d2e18f828b5fa4190d47f7"
+    },
+    "moonbeam": {
+      "wsUrl": "wss://wss.api.moonbeam.network",
+      "metadata": ".papi/metadata/moonbeam.scale",
+      "genesis": "0xfe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d",
+      "codeHash": "0x802c6b285502245d97dc73bdb164c128b9c7794637c67a3f23a105327d5566d2"
+    },
+    "bifrost": {
+      "wsUrl": "wss://hk.p.bifrost-rpc.liebi.com/ws",
+      "metadata": ".papi/metadata/bifrost.scale",
+      "genesis": "0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b",
+      "codeHash": "0xee5cec8130a184e5a2c108220b93e10c76a6ab42397b8b6135c9f6260dfdc583"
+    },
+    "astar": {
+      "wsUrl": "wss://rpc.astar.network",
+      "metadata": ".papi/metadata/astar.scale",
+      "genesis": "0x9eb76c5184c4ab8679d2d5d819fdf90b9c001403e9e17da2e14b6d8aec4029c6",
+      "codeHash": "0x464ca763562075276735f14824774423d36e51168f90a8fa89bf67930a89af0c"
+    },
+    "kusama": {
+      "wsUrl": "wss://kusama.api.onfinality.io/public-ws",
+      "metadata": ".papi/metadata/kusama.scale",
+      "genesis": "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
+      "codeHash": "0x4c843d1c1b5ce542fcc0e9cc1439ad3384e5753da24d2747c4aa24162a202449"
+    }
+  }
+}

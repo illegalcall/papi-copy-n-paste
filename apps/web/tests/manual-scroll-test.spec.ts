@@ -16,7 +16,8 @@ test('manual scroll test with generated content', async ({ page }) => {
     if (codeElement) {
       const longCode = 'import { createClient } from "polkadot-api"\n' +
 'import { start } from "polkadot-api/smoldot"\n' +  
-'import { getSmProvider } from "polkadot-api/sm-provider"\n\n' +
+'import { getSmProvider } from "polkadot-api/sm-provider"\n' +
+'import { polkadot } from "@workspace/core/descriptors"\n\n' +
 'async function main() {\n' +
 '  // Initialize smoldot light client\n' +
 '  const smoldot = start()\n' +
@@ -27,12 +28,8 @@ test('manual scroll test with generated content', async ({ page }) => {
 '  // Create PAPI client\n' +
 '  const client = createClient(getSmProvider(chain))\n' +
 '  \n' +
-'  // Get typed API (PAPI v1.14+ pattern)\n' +
-'  // const typedApi = client.getTypedApi(polkadot)\n' +
-'  // const call = typedApi.tx.Balances.transfer_allow_death({\n' +
-'  \n' +
-'  // For now, using deprecated pattern (will be removed):\n' +
-'  const call = client.tx.Balances.transfer_allow_death({\n' +
+'  const typedApi = client.getTypedApi(polkadot)\n' +
+'  const call = typedApi.tx.Balances.transfer_allow_death({\n' +
 '    dest: "//Alice",\n' +
 '    value: ""\n' +
 '  })\n' +

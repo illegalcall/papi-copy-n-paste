@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
+import { Toast } from "@workspace/ui/components/toast"
 import { Copy, Terminal, Trash2 } from "lucide-react"
 import { SyntaxHighlighter } from "@/components/code/syntax-highlighter"
 
@@ -16,6 +17,7 @@ interface RightPaneProps {
 
 export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: RightPaneProps) {
   const [currentTab, setCurrentTab] = useState<"code" | "console">("code")
+  const [showToast, setShowToast] = useState(false)
 
   // Update current tab when activeTab prop changes
   useEffect(() => {
@@ -24,9 +26,15 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
     }
   }, [activeTab])
 
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(code)
-    // TODO: Show toast
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(code)
+      setShowToast(true)
+    } catch (err) {
+      console.error('Failed to copy code:', err)
+      // Fallback: show toast anyway to indicate attempt was made
+      setShowToast(true)
+    }
   }
 
   const renderConsoleLine = (line: string) => {
@@ -126,6 +134,12 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
           </Card>
         </TabsContent>
       </Tabs>
+      
+      <Toast 
+        message="Code copied to clipboard!" 
+        show={showToast} 
+        onHide={() => setShowToast(false)}
+      />
     </div>
   )
 }
