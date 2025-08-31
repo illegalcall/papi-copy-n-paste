@@ -421,10 +421,32 @@ function formatTransactionDetails(selectedCall: { pallet: string; call: PalletCa
   }
   
   if (selectedCall.pallet === 'System' && selectedCall.call.name === 'remark') {
-    return `🔗 Remark: "${formData.remark || 'Hello World'}"`
+    const remarkText = typeof formData.remark === 'string' ? formData.remark : 'Hello World'
+    return `🔗 Remark: "${remarkText}"`
+  }
+
+  if (selectedCall.pallet === 'Timestamp' && selectedCall.call.name === 'set') {
+    const timestamp = formData.now || Date.now()
+    const date = new Date(Number(timestamp)).toISOString()
+    return `🔗 Timestamp: ${timestamp} (${date})`
   }
   
-  return `🔗 Parameters: ${Object.entries(formData).map(([k, v]) => `${k}: ${v}`).join(', ')}`
+  // For other pallets, create a generic parameter display
+  const paramStr = Object.entries(formData)
+    .map(([k, v]) => {
+      // Handle different value types
+      if (typeof v === 'bigint') {
+        return `${k}: ${v.toString()}`
+      } else if (v instanceof Uint8Array) {
+        return `${k}: [${v.length} bytes]`
+      } else if (typeof v === 'object' && v !== null) {
+        return `${k}: ${JSON.stringify(v)}`
+      }
+      return `${k}: ${v}`
+    })
+    .join(', ')
+  
+  return paramStr ? `🔗 Parameters: ${paramStr}` : `🔗 ${selectedCall.pallet}.${selectedCall.call.name} transaction`
 }
 
 function generateStorageQueryCode(chainKey: string, pallet: string, storage: any): string {
