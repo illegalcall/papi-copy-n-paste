@@ -5,18 +5,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/componen
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import { Toast } from "@workspace/ui/components/toast"
-import { Copy, Terminal, Trash2 } from "lucide-react"
+import { Copy, Terminal, Trash2, Settings } from "lucide-react"
 import { SyntaxHighlighter } from "@/components/code/syntax-highlighter"
 
 interface RightPaneProps {
   code: string
   consoleOutput: string[]
   onClearConsole?: () => void
-  activeTab?: "code" | "console"
+  activeTab?: "setup" | "code" | "console"
+  selectedChain?: string
 }
 
-export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: RightPaneProps) {
-  const [currentTab, setCurrentTab] = useState<"code" | "console">("code")
+export function RightPane({ 
+  code, 
+  consoleOutput, 
+  onClearConsole, 
+  activeTab,
+  selectedChain
+}: RightPaneProps) {
+  const [currentTab, setCurrentTab] = useState<"setup" | "code" | "console">("setup")
   const [showToast, setShowToast] = useState(false)
 
   // Update current tab when activeTab prop changes
@@ -25,6 +32,51 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
       setCurrentTab(activeTab)
     }
   }, [activeTab])
+
+  const getSetupCommands = (chainKey: string): { commands: string[], description: string } => {
+    const chainConfigs: Record<string, { wsUrl: string; description: string }> = {
+      polkadot: {
+        wsUrl: "wss://rpc.polkadot.io",
+        description: "Polkadot mainnet"
+      },
+      kusama: {
+        wsUrl: "wss://kusama-rpc.polkadot.io",
+        description: "Kusama network"
+      },
+      moonbeam: {
+        wsUrl: "wss://wss.api.moonbeam.network",
+        description: "Moonbeam parachain"
+      },
+      bifrost: {
+        wsUrl: "wss://hk.p.bifrost-rpc.liebi.com/ws",
+        description: "Bifrost parachain"
+      },
+      astar: {
+        wsUrl: "wss://rpc.astar.network",
+        description: "Astar parachain"
+      },
+      acala: {
+        wsUrl: "wss://acala-rpc.dwellir.com",
+        description: "Acala parachain"
+      },
+      hydration: {
+        wsUrl: "wss://rpc.hydration.cloud",
+        description: "Hydration parachain"
+      }
+    }
+    
+    const config = chainConfigs[chainKey] || chainConfigs.polkadot
+    
+    return {
+      commands: [
+        "npm install -g polkadot-api",
+        `papi add ${chainKey} --wsUrl ${config!.wsUrl}`,
+        "papi generate",
+        "npm install"
+      ],
+      description: config!.description
+    }
+  }
 
   const handleCopyCode = async () => {
     try {
@@ -63,13 +115,57 @@ export function RightPane({ code, consoleOutput, onClearConsole, activeTab }: Ri
 
   return (
     <div className="flex-1 border-l bg-muted/30 flex flex-col min-h-0 max-h-full overflow-hidden">
-      <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as "code" | "console")} className="flex-1 flex flex-col min-h-0 max-h-full">
+      <Tabs value={currentTab} onValueChange={(value) => setCurrentTab(value as "setup" | "code" | "console")} className="flex-1 flex flex-col min-h-0 max-h-full">
         <div className="p-4 border-b">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="setup">Setup</TabsTrigger>
             <TabsTrigger value="code">Code</TabsTrigger>
             <TabsTrigger value="console">Console</TabsTrigger>
           </TabsList>
         </div>
+        
+        <TabsContent value="setup" className="flex-1 p-4 m-0 h-0 max-h-full overflow-hidden">
+          <Card className="h-full flex flex-col max-h-full">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Settings className="w-4 h-4" />
+                <CardTitle className="text-sm">
+                  Setup Required{selectedChain && ` for ${selectedChain.charAt(0).toUpperCase() + selectedChain.slice(1)}`}
+                </CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 flex-1 overflow-auto">
+              {selectedChain ? (
+                <div className="space-y-4">
+                  <div className="text-sm text-muted-foreground">
+                    Run these commands in your project to use the generated code:
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {getSetupCommands(selectedChain).commands.map((command, index) => (
+                      <div key={index} className="font-mono text-sm bg-muted p-3 rounded-md flex items-center gap-2">
+                        <span className="text-muted-foreground select-none">$</span>
+                        <span className="text-foreground">{command}</span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="text-sm text-muted-foreground">
+                    <strong>Setting up:</strong> {getSetupCommands(selectedChain).description}
+                  </div>
+                  
+                  <div className="text-xs text-muted-foreground mt-4 p-3 bg-muted/50 rounded-md">
+                    <strong>Note:</strong> After running these commands, you can copy and use the generated code from the Code tab.
+                  </div>
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground">
+                  Select a chain from the left panel to see setup instructions.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
         
         <TabsContent value="code" className="flex-1 p-4 m-0 h-0 max-h-full overflow-hidden">
           <Card className="h-full flex flex-col max-h-full">

@@ -19,11 +19,22 @@ export default function Page() {
   const [selectedCall, setSelectedCall] = useState<{ pallet: string; call: PalletCall } | undefined>()
   const [selectedStorage, setSelectedStorage] = useState<{ pallet: string; storage: any } | undefined>()
   const [formData, setFormData] = useState<Record<string, any>>({})
+  
+  // Multi-method support
+  const [methodQueue, setMethodQueue] = useState<Array<{ 
+    pallet: string; 
+    call: PalletCall; 
+    formData: Record<string, any>;
+    id: string;
+  }>>([])
+  
   const [isRunning, setIsRunning] = useState(false)
   const [canRun, setCanRun] = useState(false)
-  const [activeTab, setActiveTab] = useState<"code" | "console">("code")
+  const [activeTab, setActiveTab] = useState<"setup" | "code" | "console">("setup")
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false)
   const [metadataError, setMetadataError] = useState<string | null>(null)
+  const [hasSelectedPallet, setHasSelectedPallet] = useState(false)
+  const [hasRunCode, setHasRunCode] = useState(false)
   
   const { status: chainStatus, api } = useClient(selectedChain)
 
@@ -100,9 +111,15 @@ export default function Page() {
     setSelectedStorage(undefined) // Clear storage selection
     setFormData({})
     setCode("")
-  }, [])
+    
+    // Auto-navigate to code tab on first pallet selection
+    if (!hasSelectedPallet) {
+      setActiveTab("code")
+      setHasSelectedPallet(true)
+    }
+  }, [hasSelectedPallet])
 
-  const handleStorageSelect = (pallet: string, storage: any) => {
+  const handleStorageSelect = useCallback((pallet: string, storage: any) => {
     setSelectedStorage({ pallet, storage })
     setSelectedCall(undefined) // Clear call selection
     setFormData({})
@@ -110,31 +127,101 @@ export default function Page() {
     // Generate storage query code immediately
     const queryCode = generateStorageQueryCode(selectedChain, pallet, storage)
     setCode(queryCode)
-  }
+    
+    // Auto-navigate to code tab on first pallet selection
+    if (!hasSelectedPallet) {
+      setActiveTab("code")
+      setHasSelectedPallet(true)
+    }
+  }, [selectedChain, hasSelectedPallet])
 
   const handleFormChange = useCallback((newFormData: Record<string, any>) => {
     setFormData(newFormData)
     
     // Generate code snippet
-    if (selectedCall) {
-      const snippet = generateCodeSnippet(selectedChain, selectedCall.pallet, selectedCall.call, newFormData)
-      setCode(snippet)
+    updateGeneratedCode()
+  }, [selectedChain, selectedCall, methodQueue])
+
+  // Update generated code based on current state
+  const updateGeneratedCode = useCallback(() => {
+    if (methodQueue.length > 0) {
+      // Multi-method code generation
+      const multiCode = generateMultiMethodCode(selectedChain, methodQueue)
+      setCode(multiCode)
+    } else if (selectedCall) {
+      // Single method code generation
+      const singleCode = generateCodeSnippet(selectedChain, selectedCall.pallet, selectedCall.call, formData)
+      setCode(singleCode)
     }
-  }, [selectedChain, selectedCall])
+  }, [selectedChain, selectedCall, formData, methodQueue])
+
+  // Update code when dependencies change
+  useEffect(() => {
+    updateGeneratedCode()
+  }, [updateGeneratedCode])
+
+  // Add current method to queue
+  const handleAddToQueue = useCallback(() => {
+    if (!selectedCall) return
+    
+    const queueItem = {
+      pallet: selectedCall.pallet,
+      call: selectedCall.call,
+      formData: { ...formData },
+      id: Math.random().toString(36).substr(2, 9)
+    }
+    
+    setMethodQueue(prev => [...prev, queueItem])
+    
+    // Clear current selection after adding
+    setSelectedCall(undefined)
+    setFormData({})
+    setCode("")
+  }, [selectedCall, formData])
+
+  // Remove method from queue
+  const handleRemoveFromQueue = useCallback((id: string) => {
+    setMethodQueue(prev => prev.filter(item => item.id !== id))
+  }, [])
+
+  // Clear entire queue
+  const handleClearQueue = useCallback(() => {
+    setMethodQueue([])
+  }, [])
 
   const handleValidChange = useCallback((isValid: boolean) => {
     setCanRun(isValid)
   }, [])
 
   const handleRunClick = async () => {
-    if (!selectedCall || !code || !api) return
+    if (!api) return
+
+    // Check if we have either a single call or a method queue
+    if (!selectedCall && methodQueue.length === 0) return
 
     setIsRunning(true)
     setActiveTab("console") // Switch to console tab when running
     setConsoleOutput([]) // Clear previous output
+    
+    // Mark that user has run code (for future navigation behavior)
+    if (!hasRunCode) {
+      setHasRunCode(true)
+    }
 
-    // Execute real transaction
-    await executeRealTransaction(selectedCall, formData, selectedChain, api, setConsoleOutput, setIsRunning)
+    try {
+      if (methodQueue.length > 0) {
+        // Execute multiple methods sequentially
+        await executeMultipleTransactions(methodQueue, selectedChain, api, setConsoleOutput)
+      } else if (selectedCall) {
+        // Execute single transaction
+        await executeRealTransaction(selectedCall, formData, selectedChain, api, setConsoleOutput, setIsRunning)
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      setConsoleOutput(prev => [...prev, `❌ Execution error: ${errorMessage}`])
+    } finally {
+      setIsRunning(false)
+    }
   }
 
   const handleAbortClick = () => {
@@ -166,7 +253,7 @@ export default function Page() {
         </div>
 
         {/* Desktop layout */}
-        <div className="hidden lg:grid lg:grid-cols-[260px_400px_1fr] flex-1">
+        <div className="hidden lg:grid lg:grid-cols-[320px_400px_1fr] flex-1 overflow-hidden">
           <LeftPane 
             isOpen={true} 
             onClose={() => {}} 
@@ -183,10 +270,14 @@ export default function Page() {
             selectedChain={selectedChain}
             selectedCall={selectedCall}
             selectedStorage={selectedStorage}
+            methodQueue={methodQueue}
             onFormChange={handleFormChange}
             onValidChange={handleValidChange}
             onRunClick={handleRunClick}
             onAbortClick={handleAbortClick}
+            onAddToQueue={handleAddToQueue}
+            onRemoveFromQueue={handleRemoveFromQueue}
+            onClearQueue={handleClearQueue}
             isRunning={isRunning}
             canRun={canRun}
           />
@@ -195,6 +286,7 @@ export default function Page() {
             consoleOutput={consoleOutput}
             onClearConsole={handleClearConsole}
             activeTab={activeTab}
+            selectedChain={selectedChain}
           />
         </div>
 
@@ -205,10 +297,14 @@ export default function Page() {
             selectedChain={selectedChain}
             selectedCall={selectedCall}
             selectedStorage={selectedStorage}
+            methodQueue={methodQueue}
             onFormChange={handleFormChange}
             onValidChange={handleValidChange}
             onRunClick={handleRunClick}
             onAbortClick={handleAbortClick}
+            onAddToQueue={handleAddToQueue}
+            onRemoveFromQueue={handleRemoveFromQueue}
+            onClearQueue={handleClearQueue}
             isRunning={isRunning}
             canRun={canRun}
           />
@@ -218,13 +314,14 @@ export default function Page() {
               consoleOutput={consoleOutput}
               onClearConsole={handleClearConsole}
               activeTab={activeTab}
+              selectedChain={selectedChain}
             />
           </div>
         </div>
 
         {/* Mobile sheet for left pane */}
         <Sheet open={leftPaneOpen} onOpenChange={setLeftPaneOpen}>
-          <SheetContent side="left" className="p-0 w-64">
+          <SheetContent side="left" className="p-0 w-80">
             <LeftPane 
               isOpen={leftPaneOpen} 
               onClose={() => setLeftPaneOpen(false)}
@@ -296,6 +393,60 @@ async function executeRealTransaction(
   } finally {
     setIsRunning(false)
   }
+}
+
+async function executeMultipleTransactions(
+  methodQueue: Array<{ pallet: string; call: PalletCall; formData: Record<string, any>; id: string }>,
+  chainKey: string,
+  client: any,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>
+) {
+  setConsoleOutput(prev => [...prev, `🚀 Starting execution of ${methodQueue.length} methods...`])
+  
+  for (let i = 0; i < methodQueue.length; i++) {
+    const method = methodQueue[i]
+    if (!method) continue // Safety check
+    
+    const methodNumber = i + 1
+    
+    setConsoleOutput(prev => [...prev, `\n📋 Method ${methodNumber}/${methodQueue.length}: ${method.pallet}.${method.call.name}`])
+    
+    try {
+      // Execute this method
+      const result = await executeTransactionWithSteps(
+        { pallet: method.pallet, call: method.call },
+        method.formData,
+        {
+          signer: "//Alice" as const,
+          chainKey,
+          client
+        },
+        (step: TransactionStep) => {
+          // Add each step to console output as it happens
+          setConsoleOutput(prev => [...prev, `  ${step.message}`])
+        }
+      )
+
+      // Add transaction details
+      const details = formatTransactionDetails({ pallet: method.pallet, call: method.call }, method.formData)
+      setConsoleOutput(prev => [...prev, `  ${details}`])
+
+      if (result.success) {
+        setConsoleOutput(prev => [...prev, `  ✅ Method ${methodNumber} completed successfully!`])
+      } else {
+        setConsoleOutput(prev => [...prev, `  ❌ Method ${methodNumber} failed: ${result.error}`])
+        setConsoleOutput(prev => [...prev, `⚠️  Stopping execution due to failure in method ${methodNumber}`])
+        return // Stop execution on first failure
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      setConsoleOutput(prev => [...prev, `  ❌ Method ${methodNumber} error: ${errorMessage}`])
+      setConsoleOutput(prev => [...prev, `⚠️  Stopping execution due to error in method ${methodNumber}`])
+      return // Stop execution on error
+    }
+  }
+  
+  setConsoleOutput(prev => [...prev, `\n🎉 All ${methodQueue.length} methods completed successfully!`])
 }
 
 // simulateTransactionExecution function removed as it's no longer used
@@ -450,15 +601,11 @@ function formatTransactionDetails(selectedCall: { pallet: string; call: PalletCa
 }
 
 function generateStorageQueryCode(chainKey: string, pallet: string, storage: any): string {
-  const setupCommands = getSetupCommands(chainKey)
   const descriptorImport = getDescriptorImport(chainKey)
   const descriptorName = getDescriptorName(chainKey)
   const { imports, connection, cleanup } = getChainConnection(chainKey)
   
-  return `// SETUP REQUIRED: Run these commands in your project:
-${setupCommands}
-
-import { createClient } from "polkadot-api"
+  return `import { createClient } from "polkadot-api"
 ${imports}
 ${descriptorImport}
 
@@ -516,15 +663,11 @@ function generateCodeSnippet(chainKey: string, pallet: string, call: PalletCall,
     return `  ${arg.name}: ${JSON.stringify(value)}`
   }).join(',\n')
 
-  const setupCommands = getSetupCommands(chainKey)
   const descriptorImport = getDescriptorImport(chainKey)
   const descriptorName = getDescriptorName(chainKey)
   const { imports, connection, cleanup } = getChainConnection(chainKey)
 
-  return `// SETUP REQUIRED: Run these commands in your project:
-${setupCommands}
-
-import { createClient } from "polkadot-api"
+  return `import { createClient } from "polkadot-api"
 ${imports}
 ${descriptorImport}
 
@@ -545,4 +688,82 @@ ${connection}
 }
 
 main().catch(console.error)`
+}
+
+function generateMultiMethodCode(
+  chainKey: string, 
+  methodQueue: Array<{ pallet: string; call: PalletCall; formData: Record<string, any>; id: string }>
+): string {
+  const setupCommands = getSetupCommands(chainKey)
+  const descriptorImport = getDescriptorImport(chainKey)
+  const descriptorName = getDescriptorName(chainKey)
+  const { imports, connection, cleanup } = getChainConnection(chainKey)
+
+  // Generate method calls
+  const methodCalls = methodQueue.map((method, index) => {
+    const args = method.call.args.map(arg => {
+      const value = method.formData[arg.name] || ''
+      
+      // Handle MultiAddress types properly for dest/target fields
+      if (arg.name === 'dest' || arg.name === 'target' || arg.type.includes('MultiAddress')) {
+        if (typeof value === 'string' && value.startsWith('//')) {
+          const accountMap: Record<string, string> = {
+            '//Alice': '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
+            '//Bob': '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
+            '//Charlie': '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
+          }
+          const address = accountMap[value] || accountMap['//Alice']
+          return `    ${arg.name}: MultiAddress.Id("${address}"), // ${value}`
+        } else if (typeof value === 'string' && value.length > 40) {
+          return `    ${arg.name}: MultiAddress.Id("${value}")`
+        } else {
+          return `    ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY") // //Alice`
+        }
+      }
+      
+      // Handle BigInt values properly
+      if (arg.type.includes('u128') || arg.type.includes('u64') || arg.name === 'value' || arg.name === 'amount') {
+        const numValue = typeof value === 'string' ? value : String(value || '0')
+        if (numValue && !numValue.includes('n') && (parseInt(numValue) > Number.MAX_SAFE_INTEGER || numValue.length > 10)) {
+          return `    ${arg.name}: ${numValue}n`
+        }
+        return `    ${arg.name}: ${numValue}n`
+      }
+      
+      return `    ${arg.name}: ${JSON.stringify(value)}`
+    }).join(',\n')
+
+    return `
+  // Method ${index + 1}: ${method.pallet}.${method.call.name}
+  console.log("Creating ${method.pallet}.${method.call.name}...")
+  const call${index + 1} = typedApi.tx.${method.pallet}.${method.call.name}({${args ? '\n' + args + '\n  ' : ''}})
+  const result${index + 1} = await call${index + 1}.signAndSubmit(signer)
+  console.log("Result ${index + 1}:", result${index + 1})
+  
+  // Check if method ${index + 1} succeeded before continuing
+  if (!result${index + 1}.success) {
+    console.error("Method ${index + 1} failed, stopping execution")
+    return
+  }`
+  }).join('\n')
+
+  return `// SETUP REQUIRED: Run these commands in your project:
+${setupCommands}
+
+import { createClient } from "polkadot-api"
+${imports}
+${descriptorImport}
+
+async function executeMultipleMethods() {
+${connection}
+  const typedApi = client.getTypedApi(${descriptorName})
+  
+  // You'll need a proper signer here
+  const signer = yourSigner // Replace with actual signer
+  ${methodCalls}
+
+  console.log("All methods completed successfully!")${cleanup || ''}
+}
+
+executeMultipleMethods().catch(console.error)`
 }
