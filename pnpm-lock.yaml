@@ -18,6 +18,9 @@ importers:
       '@workspace/typescript-config':
         specifier: workspace:*
         version: link:packages/typescript-config
+      polkadot-api:
+        specifier: ^1.14.1
+        version: 1.14.1(jiti@2.4.2)(postcss@8.5.3)(rxjs@7.8.2)
       prettier:
         specifier: ^3.5.1
         version: 3.5.1
@@ -100,9 +103,6 @@ importers:
 
   packages/core:
     dependencies:
-      '@polkadot-api/descriptors':
-        specifier: file:../../.papi/descriptors
-        version: file:.papi/descriptors(polkadot-api@1.14.1(jiti@2.4.2)(postcss@8.5.3)(rxjs@7.8.2))
       '@polkadot-api/metadata-builders':
         specifier: ^0.12.2
         version: 0.12.2

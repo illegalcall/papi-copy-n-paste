@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "prebuild": "papi generate",
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
@@ -11,6 +12,7 @@
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
+    "polkadot-api": "^1.14.1",
     "prettier": "^3.5.1",
     "turbo": "^2.4.2",
     "typescript": "5.7.3"
