@@ -483,14 +483,59 @@ function parseDecodedMetadata(decodedMetadata: any, chainKey: string): ChainMeta
     const metadataVersion = decodedMetadata.metadata
     let palletData: any[] = []
 
-    if (metadataVersion?.v15?.pallets) {
+    console.log('Metadata structure debug:', {
+      hasV15: !!metadataVersion?.v15,
+      hasV14: !!metadataVersion?.v14,
+      hasV13: !!metadataVersion?.v13,
+      hasV12: !!metadataVersion?.v12,
+      availableVersions: Object.keys(metadataVersion || {}),
+      hasTag: !!metadataVersion?.tag,
+      hasValue: !!metadataVersion?.value,
+      tagValue: metadataVersion?.tag
+    })
+
+    // Handle enum/variant-style metadata (modern PAPI format)
+    if (metadataVersion?.tag !== undefined && metadataVersion?.value) {
+      const versionTag = metadataVersion.tag
+      const versionData = metadataVersion.value
+      
+      console.log(`Processing metadata variant tag: ${versionTag}`)
+      
+      // Map tag numbers to version names (common mapping)
+      if (versionTag === 15 || versionTag === 'V15') {
+        console.log('Processing metadata v15 (via tag)')
+        palletData = versionData.pallets || []
+      } else if (versionTag === 14 || versionTag === 'V14') {
+        console.log('Processing metadata v14 (via tag)')
+        palletData = versionData.pallets || []
+      } else if (versionTag === 13 || versionTag === 'V13') {
+        console.log('Processing metadata v13 (via tag)')
+        palletData = versionData.pallets || []
+      } else if (versionTag === 12 || versionTag === 'V12') {
+        console.log('Processing metadata v12 (via tag)')
+        palletData = versionData.pallets || []
+      } else {
+        console.log(`Processing metadata tag ${versionTag} (attempting generic pallets extraction)`)
+        palletData = versionData.pallets || versionData || []
+      }
+    }
+    // Handle direct version properties (legacy format)
+    else if (metadataVersion?.v15?.pallets) {
       console.log('Processing metadata v15')
       palletData = metadataVersion.v15.pallets
     } else if (metadataVersion?.v14?.pallets) {
       console.log('Processing metadata v14')
       palletData = metadataVersion.v14.pallets
+    } else if (metadataVersion?.v13?.pallets) {
+      console.log('Processing metadata v13')
+      palletData = metadataVersion.v13.pallets
+    } else if (metadataVersion?.v12?.pallets) {
+      console.log('Processing metadata v12')
+      palletData = metadataVersion.v12.pallets
     } else {
       console.warn('Unknown metadata version, falling back to enhanced mock')
+      console.warn('Available metadata keys:', Object.keys(metadataVersion || {}))
+      console.warn('Metadata structure:', JSON.stringify(metadataVersion, null, 2).substring(0, 500))
       return createEnhancedMockMetadata(chainKey)
     }
 
