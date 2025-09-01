@@ -19,6 +19,8 @@ export default function Page() {
   const [selectedCall, setSelectedCall] = useState<{ pallet: string; call: PalletCall } | undefined>()
   const [selectedStorage, setSelectedStorage] = useState<{ pallet: string; storage: any } | undefined>()
   const [formData, setFormData] = useState<Record<string, any>>({})
+  const [storageQueryType, setStorageQueryType] = useState<string>('getValue')
+  const [storageParams, setStorageParams] = useState<Record<string, any>>({})
   
   // Multi-method support
   const [methodQueue, setMethodQueue] = useState<Array<{ 
@@ -123,9 +125,11 @@ export default function Page() {
     setSelectedStorage({ pallet, storage })
     setSelectedCall(undefined) // Clear call selection
     setFormData({})
+    setStorageParams({}) // Clear storage params
+    setStorageQueryType('getValue') // Reset to default query type
     
     // Generate storage query code immediately
-    const queryCode = generateStorageQueryCode(selectedChain, pallet, storage)
+    const queryCode = generateStorageQueryCode(selectedChain, pallet, storage, 'getValue', {})
     setCode(queryCode)
     
     // Auto-navigate to code tab on first pallet selection
@@ -134,6 +138,22 @@ export default function Page() {
       setHasSelectedPallet(true)
     }
   }, [selectedChain, hasSelectedPallet])
+  
+  const handleStorageQueryTypeChange = useCallback((newQueryType: string) => {
+    setStorageQueryType(newQueryType)
+    if (selectedStorage) {
+      const queryCode = generateStorageQueryCode(selectedChain, selectedStorage.pallet, selectedStorage.storage, newQueryType, storageParams)
+      setCode(queryCode)
+    }
+  }, [selectedChain, selectedStorage, storageParams])
+  
+  const handleStorageParamsChange = useCallback((newParams: Record<string, any>) => {
+    setStorageParams(newParams)
+    if (selectedStorage) {
+      const queryCode = generateStorageQueryCode(selectedChain, selectedStorage.pallet, selectedStorage.storage, storageQueryType, newParams)
+      setCode(queryCode)
+    }
+  }, [selectedChain, selectedStorage, storageQueryType])
 
   const handleFormChange = useCallback((newFormData: Record<string, any>) => {
     setFormData(newFormData)
@@ -282,6 +302,10 @@ export default function Page() {
             onClearQueue={handleClearQueue}
             isRunning={isRunning}
             canRun={canRun}
+            storageQueryType={storageQueryType}
+            storageParams={storageParams}
+            onStorageQueryTypeChange={handleStorageQueryTypeChange}
+            onStorageParamsChange={handleStorageParamsChange}
           />
           <RightPane
             code={code}
@@ -309,6 +333,10 @@ export default function Page() {
             onClearQueue={handleClearQueue}
             isRunning={isRunning}
             canRun={canRun}
+            storageQueryType={storageQueryType}
+            storageParams={storageParams}
+            onStorageQueryTypeChange={handleStorageQueryTypeChange}
+            onStorageParamsChange={handleStorageParamsChange}
           />
           <div className="border-t">
             <RightPane
@@ -602,12 +630,26 @@ function formatTransactionDetails(selectedCall: { pallet: string; call: PalletCa
   return paramStr ? `🔗 Parameters: ${paramStr}` : `🔗 ${selectedCall.pallet}.${selectedCall.call.name} transaction`
 }
 
-function generateStorageQueryCode(chainKey: string, pallet: string, storage: any): string {
+function generateStorageQueryCode(chainKey: string, pallet: string, storage: any, queryType: string = 'getValue', storageParams: Record<string, any> = {}): string {
   const descriptorImport = getDescriptorImport(chainKey)
   const descriptorName = getDescriptorName(chainKey)
   const { imports, connection, cleanup } = getChainConnection(chainKey)
+  const setupCommands = getSetupCommands(chainKey)
   
-  return `import { createClient } from "polkadot-api"
+  // Detect if storage requires parameters
+  const requiresKeys = detectStorageParameters(pallet, storage.name)
+  const hasParams = Boolean(requiresKeys && Object.keys(storageParams).length > 0)
+  
+  // Generate parameter string for storage queries that need keys
+  const paramString = hasParams && requiresKeys ? generateStorageParams(storageParams, requiresKeys) : ''
+  
+  // Generate different query types based on selection
+  const queryCode = generateStorageQueryByType(queryType, pallet, storage.name, paramString, hasParams)
+  
+  return `// SETUP REQUIRED: Run these commands in your project:
+${setupCommands}
+
+import { createClient } from "polkadot-api"
 ${imports}
 ${descriptorImport}
 
@@ -615,15 +657,205 @@ async function queryStorage() {
 ${connection}
   const typedApi = client.getTypedApi(${descriptorName})
   
-  const result = await typedApi.query.${pallet}.${storage.name}()
-  console.log("${pallet}.${storage.name}:", JSON.stringify(result, (_key, value) =>
-    typeof value === 'bigint' ? value.toString() : value
-  ))${cleanup || ''}
-  
-  return result
+${queryCode}${cleanup || ''}
 }
 
 queryStorage().catch(console.error)`
+}
+
+function detectStorageParameters(pallet: string, storageName: string): string[] | null {
+  // Common storage entries that require parameters (account keys, indices, etc.)
+  const storageWithParams = {
+    'System': {
+      'Account': ['AccountId'],
+      'BlockHash': ['BlockNumber']
+    },
+    'Balances': {
+      'Account': ['AccountId'], 
+      'Locks': ['AccountId']
+    },
+    'Staking': {
+      'Bonded': ['AccountId'],
+      'Ledger': ['AccountId'],
+      'Validators': ['AccountId'],
+      'Nominators': ['AccountId']
+    },
+    'Democracy': {
+      'ReferendumInfoOf': ['ReferendumIndex'],
+      'VotingOf': ['AccountId']
+    },
+    'Treasury': {
+      'Proposals': ['ProposalIndex']
+    },
+    'Vesting': {
+      'Vesting': ['AccountId']
+    },
+    'XcmPallet': {
+      'Queries': ['QueryId'],
+      'AssetTraps': ['Hash']
+    }
+  }
+  
+  const palletStorage = storageWithParams[pallet as keyof typeof storageWithParams]
+  if (palletStorage && storageName in palletStorage) {
+    return palletStorage[storageName as keyof typeof palletStorage] as string[]
+  }
+  
+  return null
+}
+
+function generateStorageParams(storageParams: Record<string, any>, requiredParams: string[]): string {
+  const params = requiredParams.map(paramType => {
+    const paramValue = storageParams[paramType.toLowerCase()] || storageParams[paramType] || 
+                       storageParams['key'] || storageParams['param'] || ''
+    
+    // Handle different parameter types
+    if (paramType === 'AccountId' && typeof paramValue === 'string') {
+      if (paramValue.startsWith('//')) {
+        // Convert test accounts to actual addresses
+        const accountMap: Record<string, string> = {
+          '//Alice': '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
+          '//Bob': '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
+          '//Charlie': '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y'
+        }
+        return `"${accountMap[paramValue] || accountMap['//Alice']}"`
+      }
+      return `"${paramValue}"`
+    } else if (paramType.includes('Number') || paramType.includes('Index')) {
+      return String(paramValue || '0')
+    } else if (paramType === 'Hash') {
+      return `"${paramValue || '0x0000000000000000000000000000000000000000000000000000000000000000'}"`
+    }
+    
+    return `"${paramValue}"`
+  }).join(', ')
+  
+  return params
+}
+
+function generateStorageQueryByType(queryType: string, pallet: string, storageName: string, paramString: string, hasParams: boolean): string {
+  const baseQuery = `typedApi.query.${pallet}.${storageName}`
+  const params = hasParams ? `(${paramString})` : '()'
+  
+  switch (queryType) {
+    case 'getValue':
+      return `  // Get single storage value
+  const result = await ${baseQuery}.getValue${params}
+  console.log("${pallet}.${storageName} result:", JSON.stringify(result, (_key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  ))`
+
+    case 'getValueAt':
+      return `  // Get storage value at specific block
+  const result = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "finalized" })
+  console.log("${pallet}.${storageName} at finalized:", JSON.stringify(result, (_key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  ))
+  
+  // You can also query at "best" block or specific block hash:
+  // const atBest = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "best" })
+  // const atBlock = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "0x..." })`
+
+    case 'getValues':
+      if (!hasParams) {
+        return `  // getValues() requires storage entries with keys
+  // This storage entry ("${storageName}") doesn't require parameters
+  // Use getValue() instead for simple storage entries
+  const result = await ${baseQuery}.getValue()
+  console.log("${pallet}.${storageName}:", JSON.stringify(result, (_key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  ))`
+      }
+      return `  // Get multiple storage values with different keys
+  const keys = [
+    ${paramString},
+    // Add more keys here...
+    // "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty", // Bob
+    // "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y"  // Charlie
+  ]
+  
+  const results = await ${baseQuery}.getValues(keys)
+  console.log("${pallet}.${storageName} multiple results:")
+  results.forEach((result, index) => {
+    console.log(\`Key \${index}:\`, JSON.stringify(result, (_key, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+    ))
+  })`
+
+    case 'getEntries':
+      return `  // Get all storage entries${hasParams ? ' (or entries matching partial keys)' : ''}
+  const entries = await ${baseQuery}.getEntries()
+  console.log("${pallet}.${storageName} all entries:")
+  entries.forEach(([key, value]) => {
+    console.log("Key:", key)
+    console.log("Value:", JSON.stringify(value, (_key, val) =>
+      typeof val === 'bigint' ? val.toString() : val
+    ))
+    console.log("---")
+  })
+  
+  ${hasParams ? `// You can also get entries with partial key matching:
+  // const partialEntries = await ${baseQuery}.getEntries(${paramString})` : ''}`
+
+    case 'watchValue':
+      return `  // Watch storage value changes (returns Observable)
+  console.log("Watching ${pallet}.${storageName} for changes...")
+  
+  const subscription = ${baseQuery}.watchValue${params}.subscribe({
+    next: (result) => {
+      console.log("${pallet}.${storageName} changed:", JSON.stringify(result, (_key, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      ))
+    },
+    error: (error) => {
+      console.error("Watch error:", error)
+    },
+    complete: () => {
+      console.log("Watch complete")
+    }
+  })
+  
+  // Stop watching after 30 seconds (optional)
+  setTimeout(() => {
+    subscription.unsubscribe()
+    console.log("Stopped watching ${pallet}.${storageName}")
+  }, 30000)`
+
+    case 'comprehensive':
+      return `  // Comprehensive storage query example
+  console.log("=== Comprehensive ${pallet}.${storageName} Query ===")
+  
+  // 1. Get current value
+  const current = await ${baseQuery}.getValue${params}
+  console.log("Current value:", JSON.stringify(current, (_key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  ))
+  
+  // 2. Get value at finalized block
+  const finalized = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ', ' : ''}{ at: "finalized" })
+  console.log("Finalized value:", JSON.stringify(finalized, (_key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  ))
+  
+  ${hasParams ? `// 3. Get multiple values (if storage has keys)
+  const multipleKeys = [${paramString}] // Add more keys as needed
+  const multipleResults = await ${baseQuery}.getValues(multipleKeys)
+  console.log("Multiple results:", multipleResults.length)
+  
+  ` : ''}// ${hasParams ? '4' : '3'}. Get storage key for this query
+  const storageKey = ${baseQuery}.getKey${params}
+  console.log("Storage key:", storageKey)
+  
+  // ${hasParams ? '5' : '4'}. Watch for changes (uncomment to enable)
+  // const watcher = ${baseQuery}.watchValue${params}.subscribe(console.log)`
+
+    default:
+      return `  // Default: Get single storage value
+  const result = await ${baseQuery}.getValue${params}
+  console.log("${pallet}.${storageName}:", JSON.stringify(result, (_key, value) =>
+    typeof value === 'bigint' ? value.toString() : value
+  ))`
+  }
 }
 
 function generateCodeSnippet(chainKey: string, pallet: string, call: PalletCall, formData: Record<string, any>): string {
