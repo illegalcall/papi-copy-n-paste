@@ -37,6 +37,52 @@ function renderDocumentation(docs: string[]) {
   // Split into paragraphs for better structure
   const paragraphs = docText.split(/\n\s*\n/)
   
+  // Helper function to detect if content is actually code vs text with technical terms
+  const isActuallyCode = (text: string): boolean => {
+    const lines = text.split('\n')
+    const codeLines = lines.filter(line => {
+      const trimmed = line.trim()
+      return trimmed.length > 0 && (
+        // Actual Rust syntax patterns
+        /^(impl|type|struct|enum|fn|use|mod|const|static|trait|pub|let|mut)\s+/.test(trimmed) ||
+        /^[A-Za-z_][A-Za-z0-9_]*\s*[,:;]/.test(trimmed) || // Field declarations
+        /[;,]\s*$/.test(trimmed) || // Lines ending with code punctuation
+        /<[A-Za-z_][A-Za-z0-9_]*>/.test(trimmed) || // Generic types
+        /where\s+[A-Za-z_][A-Za-z0-9_]*\s*:/.test(trimmed) || // Trait bounds
+        /^#\[[^\]]+\]/.test(trimmed) || // Attributes
+        /^(crate|super|self)::/.test(trimmed) || // Module paths
+        /[A-Za-z_][A-Za-z0-9_]*!\s*\(/.test(trimmed) || // Macro calls
+        /:\s*[A-Za-z_][A-Za-z0-9_]*(\s*[<>()[\]{},;]|\s*$)/.test(trimmed) || // Type annotations
+        /[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*\s*\(/.test(trimmed) || // Method calls
+        /^\s*(let|return|break|continue)\s+/.test(trimmed) || // Statements
+        /^\s*(if|else|match|for|while|loop)\s+/.test(trimmed) || // Control flow
+        /^\s*[})\]]\s*$/.test(trimmed) || // Structural elements
+        /^\s*[{(\[]\s*$/.test(trimmed) // Structural elements
+      )
+    })
+    
+    const textLines = lines.filter(line => {
+      const trimmed = line.trim()
+      return trimmed.length > 0 && (
+        // Text patterns (sentences, documentation)
+        /^[A-Z][a-z]+\s+[a-z]+\s+/.test(trimmed) || // Sentences starting with capital
+        /^The\s+/.test(trimmed) || // Documentation starting with "The"
+        /^You\s+can\s+/.test(trimmed) || // Documentation starting with "You can"
+        /^But\s+this\s+/.test(trimmed) || // Documentation starting with "But this"
+        /^This\s+comes\s+/.test(trimmed) || // Documentation patterns
+        /^[a-z]+\s+[a-z]+\s+/.test(trimmed) && !trimmed.includes('::') && !trimmed.includes('{') && !trimmed.includes('}') // Lowercase sentences
+      )
+    })
+    
+    const nonEmptyLines = lines.filter(line => line.trim().length > 0)
+    const codeRatio = codeLines.length / nonEmptyLines.length
+    const textRatio = textLines.length / nonEmptyLines.length
+    
+    // If more than 60% looks like actual code syntax, it's code
+    // If more than 60% looks like text, it's text
+    return codeRatio > 0.6 && textRatio < 0.4
+  }
+  
   // Merge continuous code blocks
   const mergedContent: Array<{ type: 'code' | 'text', content: string }> = []
   
@@ -46,15 +92,75 @@ function renderDocumentation(docs: string[]) {
     // Skip empty paragraphs
     if (!trimmedParagraph) return
     
-    const isCodeBlock = /^(impl|type|struct|enum|fn|use|#\[|\/\/|\/\*|```|nocompile)/.test(trimmedParagraph) ||
-                       paragraph.includes('nocompile') ||
-                       paragraph.includes('```') ||
-                       paragraph.split('\n').length > 2 && paragraph.includes('::') ||
-                       /^\s*(impl|type|struct|enum)\s+/.test(paragraph) ||
-                       /^\s*[})\]]\s*$/.test(trimmedParagraph) || // Closing braces/brackets
-                       /^\s*[{(\[]\s*$/.test(trimmedParagraph) || // Opening braces/brackets
-                       /^[A-Za-z_][A-Za-z0-9_]*\s*[,:]/.test(trimmedParagraph) || // Field names
-                       /Storage|Runtime|Account|Balance|Provider/.test(trimmedParagraph) // Common Rust types
+    // Enhanced code detection with precise patterns
+    const isCodeBlock = (() => {
+      // Explicit code markers
+      if (/^(impl|type|struct|enum|fn|use|mod|const|static|trait|pub|let|mut|#\[|\/\/|\/\*|```|nocompile)/.test(trimmedParagraph)) {
+        return true
+      }
+      
+      // Code block markers
+      if (paragraph.includes('nocompile') || paragraph.includes('```')) {
+        return true
+      }
+      
+      // Multi-line content with specific Rust syntax patterns
+      if (paragraph.split('\n').length > 2 && (
+        /::[A-Za-z_][A-Za-z0-9_]*/.test(paragraph) || // Qualified names like pallet_balances::Config
+        /where\s+[A-Za-z_][A-Za-z0-9_]*\s*:/.test(paragraph) || // Trait bounds
+        /for<[A-Za-z_][A-Za-z0-9_]*>/.test(paragraph) || // Generic for loops
+        /macro_rules!/.test(paragraph) || // Macro definitions
+        /<[A-Za-z_][A-Za-z0-9_]*>/.test(paragraph) || // Generic type parameters
+        /[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*\s*\(/.test(paragraph) || // Method calls
+        /[A-Za-z_][A-Za-z0-9_]*!\s*\(/.test(paragraph) || // Macro calls
+        isActuallyCode(paragraph) // Use helper function for better detection
+      )) {
+        return true
+      }
+      
+      // Structural elements (braces, brackets, parentheses)
+      if (/^\s*[})\]]\s*$/.test(trimmedParagraph) || // Closing braces/brackets
+          /^\s*[{(\[]\s*$/.test(trimmedParagraph)) { // Opening braces/brackets
+        return true
+      }
+      
+      // Lines ending with code punctuation
+      if (/[;,]\s*$/.test(trimmedParagraph)) {
+        return true
+      }
+      
+      // Type definitions and field declarations (must be at start of line)
+      if (/^\s*[A-Za-z_][A-Za-z0-9_]*\s*[,:;]/.test(trimmedParagraph)) {
+        return true
+      }
+      
+      // Attribute macros
+      if (/^#\[[^\]]+\]/.test(trimmedParagraph)) {
+        return true
+      }
+      
+      // Module paths and qualified names (must be at start)
+      if (/^(crate|super|self)::/.test(trimmedParagraph)) {
+        return true
+      }
+      
+      // Type annotations and patterns
+      if (/:\s*[A-Za-z_][A-Za-z0-9_]*(\s*[<>()[\]{},;]|\s*$)/.test(trimmedParagraph)) {
+        return true
+      }
+      
+      // Assignment and return statements
+      if (/^\s*(let|return|break|continue)\s+/.test(trimmedParagraph)) {
+        return true
+      }
+      
+      // Match expressions and control flow
+      if (/^\s*(if|else|match|for|while|loop)\s+/.test(trimmedParagraph)) {
+        return true
+      }
+      
+      return false
+    })()
     
     if (isCodeBlock) {
       // Clean up the code block
@@ -82,6 +188,22 @@ function renderDocumentation(docs: string[]) {
     } else {
       // Skip headers like "# Example" that are standalone
       if (trimmedParagraph.match(/^# Example\s*$/)) return
+      
+      // Skip standalone technical terms that aren't code
+      if (trimmedParagraph.match(/^(Storage|Runtime|Account|Balance|Provider|System|pallet|frame_system)\s*$/)) return
+      
+      // Skip lines that are just punctuation or structural elements
+      if (/^[{}()[\].,;:]\s*$/.test(trimmedParagraph)) return
+      
+      // Skip lines that look like they might be code but are actually text
+      if (/^[A-Z][a-z]+\s+[a-z]+\s+/.test(trimmedParagraph) && 
+          !trimmedParagraph.includes('::') && 
+          !trimmedParagraph.includes('{') && 
+          !trimmedParagraph.includes('}')) {
+        // This looks like a sentence starting with a capital letter, not code
+        mergedContent.push({ type: 'text', content: trimmedParagraph })
+        return
+      }
       
       // Add text content
       mergedContent.push({ type: 'text', content: trimmedParagraph })
