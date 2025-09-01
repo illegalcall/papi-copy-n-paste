@@ -74,9 +74,13 @@ export function RightPane({
     
     const config = chainConfigs[chainKey] || chainConfigs.polkadot
     
-    const addCommand = config?.wellKnown 
+    if (!config) {
+      throw new Error(`No configuration found for chain: ${chainKey}`)
+    }
+    
+    const addCommand = config.wellKnown 
       ? `papi add ${config.keyName} -n ${config.wellKnown}`
-      : `papi add ${config.keyName} --wsUrl ${config.wsUrl!}`
+      : `papi add ${config.keyName} --wsUrl ${config.wsUrl}`
     
     return {
       commands: [
