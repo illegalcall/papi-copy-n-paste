@@ -27,7 +27,7 @@
   {
     "key": "acala",
     "name": "Acala",
-    "ws": "wss://acala-rpc-0.aca-api.network",
+    "ws": "wss://acala-rpc.dwellir.com",
     "specVersion": 2260,
     "paraId": 2000,
     "genesisHash": "0xfc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c",

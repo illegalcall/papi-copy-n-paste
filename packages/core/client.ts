@@ -34,8 +34,9 @@ export const chains: ChainConfig[] = chainsData
 // Enhanced client cache with performance optimizations
 const clientCache = new Map<string, any>()
 const connectionPromises = new Map<string, Promise<any>>()
-const connectionHealth = new Map<string, { lastCheck: number; isHealthy: boolean }>()
+const connectionHealth = new Map<string, { lastCheck: number; isHealthy: boolean; failureCount: number }>()
 const CONNECTION_HEALTH_TTL = 30000 // 30 seconds
+const MAX_FAILURE_COUNT = 5 // Maximum consecutive failures before marking as unhealthy
 
 // Connection pool management
 const MAX_CONCURRENT_CONNECTIONS = 3
@@ -60,6 +61,27 @@ const PUBLIC_RPC_ENDPOINTS = {
     'wss://kusama-rpc.dwellir.com',
     'wss://kusama.api.onfinality.io/public-ws',
     'wss://kusama-rpc.polkadot.io'
+  ],
+  acala: [
+    'wss://acala-rpc.dwellir.com',
+    'wss://acala-rpc-0.aca-api.network',
+    'wss://acala.api.onfinality.io/public-ws',
+    'wss://acala-rpc.polkadot.io'
+  ],
+  moonbeam: [
+    'wss://wss.api.moonbeam.network',
+    'wss://moonbeam.api.onfinality.io/public-ws',
+    'wss://moonbeam-rpc.dwellir.com'
+  ],
+  astar: [
+    'wss://rpc.astar.network',
+    'wss://astar.api.onfinality.io/public-ws',
+    'wss://astar-rpc.dwellir.com'
+  ],
+  bifrost: [
+    'wss://hk.p.bifrost-rpc.liebi.com/ws',
+    'wss://bifrost.api.onfinality.io/public-ws',
+    'wss://bifrost-rpc.dwellir.com'
   ]
 }
 
@@ -77,10 +99,32 @@ function isConnectionHealthy(chainKey: string): boolean {
 
 // Update connection health status
 function updateConnectionHealth(chainKey: string, isHealthy: boolean) {
-  connectionHealth.set(chainKey, {
-    lastCheck: Date.now(),
-    isHealthy
-  })
+  const currentHealth = connectionHealth.get(chainKey) || { 
+    lastCheck: 0, 
+    isHealthy: false, 
+    failureCount: 0 
+  }
+  
+  if (isHealthy) {
+    connectionHealth.set(chainKey, {
+      lastCheck: Date.now(),
+      isHealthy: true,
+      failureCount: 0
+    })
+  } else {
+    const newFailureCount = currentHealth.failureCount + 1
+    const isHealthyAfterFailure = newFailureCount < MAX_FAILURE_COUNT
+    
+    connectionHealth.set(chainKey, {
+      lastCheck: Date.now(),
+      isHealthy: isHealthyAfterFailure,
+      failureCount: newFailureCount
+    })
+    
+    if (!isHealthyAfterFailure) {
+      console.warn(`⚠️ Chain ${chainKey} marked as unhealthy after ${newFailureCount} consecutive failures`)
+    }
+  }
 }
 
 // Update performance metrics
@@ -125,29 +169,42 @@ async function isDataCurrent(client: any, chainKey: string): Promise<boolean> {
 
 // Create WebSocket client with fallback endpoints and timeout
 async function createWebSocketClient(chainKey: string, endpoints: string[]): Promise<any> {
-  for (const endpoint of endpoints) {
-    try {
-      console.log(`🔌 Trying WebSocket endpoint: ${endpoint}`)
-      const client = createClient(
-        withPolkadotSdkCompat(getWsProvider(endpoint))
-      )
-      
-      // Test the connection with timeout
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Connection timeout')), 10000)
-      )
-      
-      const connectionPromise = client._request('system_chain', [])
-      await Promise.race([connectionPromise, timeoutPromise])
-      
-      console.log(`✅ WebSocket connection successful: ${endpoint}`)
-      return client
-    } catch (error) {
-      console.warn(`⚠️ WebSocket endpoint failed: ${endpoint}`, error)
-      continue
+  const CONNECTION_TIMEOUT = 8000 // 8 seconds timeout
+  const MAX_RETRIES = 3
+  
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    for (const endpoint of endpoints) {
+      try {
+        console.log(`🔌 Trying WebSocket endpoint: ${endpoint} (attempt ${attempt + 1}/${MAX_RETRIES})`)
+        const client = createClient(
+          withPolkadotSdkCompat(getWsProvider(endpoint))
+        )
+        
+        // Test the connection with timeout
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Connection timeout')), CONNECTION_TIMEOUT)
+        )
+        
+        const connectionPromise = client._request('system_chain', [])
+        await Promise.race([connectionPromise, timeoutPromise])
+        
+        console.log(`✅ WebSocket connection successful: ${endpoint}`)
+        return client
+      } catch (error) {
+        console.warn(`⚠️ WebSocket endpoint failed: ${endpoint}`, error)
+        continue
+      }
+    }
+    
+    // If all endpoints failed, wait before retrying
+    if (attempt < MAX_RETRIES - 1) {
+      const retryDelay = Math.min(1000 * Math.pow(2, attempt), 5000) // Exponential backoff, max 5s
+      console.log(`⏳ All endpoints failed, retrying in ${retryDelay}ms...`)
+      await new Promise(resolve => setTimeout(resolve, retryDelay))
     }
   }
-  throw new Error(`All WebSocket endpoints failed for ${chainKey}`)
+  
+  throw new Error(`All WebSocket endpoints failed for ${chainKey} after ${MAX_RETRIES} attempts`)
 }
 
 // Removed preloading to avoid connection issues
@@ -188,6 +245,7 @@ export async function createSmoldotClient(chainKey: string) {
       try {
         if (PUBLIC_RPC_ENDPOINTS[chainKey as keyof typeof PUBLIC_RPC_ENDPOINTS]) {
           const endpoints = PUBLIC_RPC_ENDPOINTS[chainKey as keyof typeof PUBLIC_RPC_ENDPOINTS]
+          console.log(`🔄 Connecting to ${chainKey} via public RPC endpoints:`, endpoints)
           const client = await createWebSocketClient(chainKey, endpoints)
           connectionType = 'public-rpc'
           result = { client, smoldot: null, chain: null, connectionType }
