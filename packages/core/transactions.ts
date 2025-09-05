@@ -204,96 +204,57 @@ export class TransactionExecutor {
 
               stepCallback('> Creating real PAPI transaction with typed API...', 'info')
               
-              // Create the transaction first
+              // Create the transaction using PAPI's typed API - this builds the extrinsic structure
+              // The typedApi provides type-safe access to blockchain calls
               const tx = typedApi.tx.Balances[callName]({
-                dest: args.dest, // Already in proper format from form
-                value: amount
+                dest: args.dest, // Destination account (already validated from form)
+                value: amount    // Transfer amount in planck units (smallest unit)
               })
               
-              // Try to get transaction hex using alternative approaches
+              // TODO: SCALE encoding for educational purposes - TEMPORARILY DISABLED
+              // This section shows users the raw SCALE-encoded transaction hex
+              // Commented out to hide from users until ready for production
+              /*
               let transactionHex: string | null = null
-              
-              // Approach 1: Try direct codec encoding first (most reliable for call data)
               try {
-                // Import getTypedCodecs for manual encoding
-                const { getTypedCodecs } = await import('polkadot-api')
-                const descriptors = await import('@polkadot-api/descriptors')
+                stepCallback(`> 🔧 Getting SCALE-encoded transaction data...`, 'info')
                 
-                // Use the polkadot descriptor
-                const polkadotDescriptor = descriptors.polkadot
+                // Get compatibility token for sync encoding - ensures metadata version compatibility
+                const compatibilityToken = await typedApi.compatibilityToken
                 
-                if (polkadotDescriptor) {
-                  const codecs = await getTypedCodecs(polkadotDescriptor)
-                  if (codecs.tx?.Balances?.[callName]) {
-                    const encodedCall = codecs.tx.Balances[callName].enc({
-                      dest: args.dest,
-                      value: amount
-                    })
-                    if (encodedCall && encodedCall.length > 0) {
-                      transactionHex = '0x' + Array.from(encodedCall)
-                        .map((b: unknown) => (b as number).toString(16).padStart(2, '0'))
-                        .join('')
-                      stepCallback(`> 🔗 SCALE Encoded Call: ${transactionHex}`, 'info')
-                      stepCallback(`> 📝 This is the actual SCALE-encoded call data for blockchain submission`, 'info')
-                    }
-                  }
+                // Encode the transaction using PAPI's SCALE encoder
+                // SCALE (Simple Concatenated Aggregate Little-Endian) is Substrate's serialization format
+                const encodedData = tx.getEncodedData(compatibilityToken)
+                
+                if (encodedData && encodedData.length > 0) {
+                  // Convert the encoded bytes to hexadecimal string format
+                  // This hex string can be used with polkadot-js apps or other blockchain tools
+                  transactionHex = '0x' + Array.from(encodedData as Uint8Array)
+                    .map((b: number) => b.toString(16).padStart(2, '0'))
+                    .join('')
+                  
+                  stepCallback(`> 🔗 SCALE Encoded Transaction: ${transactionHex}`, 'info')
+                  stepCallback(`> 📏 Encoded length: ${encodedData.length} bytes`, 'info')
+                  stepCallback(`> 📝 This is the actual SCALE-encoded transaction data for blockchain submission`, 'info')
+                } else {
+                  stepCallback(`> ⚠️ SCALE encoding returned empty data`, 'info')
                 }
-              } catch (codecError: unknown) {
-                const errorMsg = codecError instanceof Error ? codecError.message : String(codecError)
-                stepCallback(`> Debug - SCALE codec encoding failed: ${errorMsg}`, 'info')
+              } catch (scaleError: unknown) {
+                // Handle SCALE encoding failures - common with metadata version mismatches
+                const errorMsg = scaleError instanceof Error ? scaleError.message : String(scaleError)
+                stepCallback(`> ℹ️ SCALE encoding unavailable: ${errorMsg}`, 'info')
+                stepCallback(`> 📝 You can use the transaction structure above for verification`, 'info')
               }
+              */
               
-              // Approach 2: Use transaction structure for educational purposes
-              if (!transactionHex) {
-                try {
-                  // Check if transaction has decodedCall which we can use to create call hex
-                  if (tx.decodedCall) {
-                    stepCallback(`> 🔍 Transaction structure available, creating educational representation`, 'info')
-                    
-                    // For educational purposes, show the call structure
-                    const callInfo = {
-                      pallet: tx.decodedCall.type,
-                      call: tx.decodedCall.value.type,
-                      args: tx.decodedCall.value.value
-                    }
-                    
-                    // Create a simplified hex representation of the call (for educational purposes)
-                    // This is not the full SCALE-encoded data, but shows the structure
-                    // Use replacer function to handle BigInt values
-                    const callData = JSON.stringify(callInfo, (_key, value) => {
-                      if (typeof value === 'bigint') {
-                        return value.toString()
-                      }
-                      return value
-                    })
-                    const callBytes = new TextEncoder().encode(callData)
-                    const simplifiedHex = '0x' + Array.from(callBytes)
-                      .map((b) => b.toString(16).padStart(2, '0'))
-                      .join('')
-                    
-                    transactionHex = simplifiedHex
-                    stepCallback(`> 🔗 Call Structure Hex: ${transactionHex}`, 'info')
-                    stepCallback(`> 📝 This is a JSON-encoded representation of the call structure for educational purposes`, 'info')
-                    stepCallback(`> 📝 Note: This is NOT the actual SCALE encoding due to metadata compatibility issues`, 'info')
-                  }
-                } catch (structureError: unknown) {
-                  const errorMsg = structureError instanceof Error ? structureError.message : String(structureError)
-                  stepCallback(`> Debug - Call structure extraction failed: ${errorMsg}`, 'info')
-                }
-              }
-              
+              // Transaction created successfully - this object contains the signed transaction data
               stepCallback('> ✓ Real transaction object created successfully', 'success')
               stepCallback(`> Transaction details: ${safeStringify(tx.decodedCall)}`, 'info')
               
               // Show educational information about the transaction
-              if (transactionHex) {
-                stepCallback(`> 📝 You can copy this hex and use it in polkadot-js apps or other tools`, 'info')
-                stepCallback(`> 📝 This allows you to verify the transaction structure independently`, 'info')
-              } else {
-                stepCallback(`> 📝 Transaction created successfully - hex encoding skipped due to metadata compatibility`, 'info')
-                stepCallback(`> 📝 This is a known limitation with some PAPI versions and chain combinations`, 'info')
-                stepCallback(`> 📝 You can still use the transaction details above for verification`, 'info')
-              }
+              // SCALE encoding is temporarily disabled, so we show simplified success message
+              stepCallback(`> 📝 Transaction created successfully using PAPI's typed API`, 'info')
+              stepCallback(`> 📝 You can use the transaction details above for verification`, 'info')
               
               // 3. Sign the transaction using proper PAPI signing pattern
               stepCallback('> Signing transaction with test account...', 'info')
@@ -371,27 +332,62 @@ export class TransactionExecutor {
 
           signAndSubmit: async (signer: any, stepCallback: (step: string, type?: string) => void) => {
             try {
-              // Convert remark to bytes if it's a string
-              let remarkBytes: Uint8Array
+              // Import Binary from polkadot-api for proper SCALE encoding
+              const { Binary } = await import('polkadot-api')
+              
+              // Convert remark to Binary object for SCALE encoding
+              let remarkBinary
               if (typeof args.remark === 'string') {
-                remarkBytes = new TextEncoder().encode(args.remark)
+                remarkBinary = Binary.fromText(args.remark)
               } else if (args.remark instanceof Uint8Array) {
-                remarkBytes = args.remark
+                remarkBinary = Binary.fromBytes(args.remark)
               } else {
                 throw new Error(`Invalid remark value: ${args.remark}. Must be a string or Uint8Array.`)
               }
 
               stepCallback('> Creating real PAPI transaction with typed API...', 'info')
               const tx = typedApi.tx.System.remark({
-                remark: remarkBytes
+                remark: remarkBinary
               })
               
               stepCallback('> ✓ Real transaction object created successfully', 'success')
               stepCallback(`> Transaction details: ${safeStringify(tx.decodedCall)}`, 'info')
               
-              // Educational note about transaction hex encoding
-              stepCallback(`> 📝 Transaction encoding skipped due to PAPI metadata compatibility`, 'info')
-              stepCallback(`> 📝 You can use the transaction structure above for verification`, 'info')
+              // TODO: SCALE encoding for educational purposes - TEMPORARILY DISABLED
+              // This section shows users the raw SCALE-encoded transaction hex
+              // Commented out to hide from users until ready for production
+              /*
+              let transactionHex: string | null = null
+              try {
+                stepCallback(`> 🔧 Getting SCALE-encoded transaction data...`, 'info')
+                
+                // Get compatibility token for sync encoding - ensures metadata version compatibility
+                const compatibilityToken = await typedApi.compatibilityToken
+                
+                // Encode the transaction using PAPI's SCALE encoder
+                // SCALE (Simple Concatenated Aggregate Little-Endian) is Substrate's serialization format
+                const encodedData = tx.getEncodedData(compatibilityToken)
+                
+                if (encodedData && encodedData.length > 0) {
+                  // Convert the encoded bytes to hexadecimal string format
+                  // This hex string can be used with polkadot-js apps or other blockchain tools
+                  transactionHex = '0x' + Array.from(encodedData as Uint8Array)
+                    .map((b: number) => b.toString(16).padStart(2, '0'))
+                    .join('')
+                  
+                  stepCallback(`> 🔗 SCALE Encoded Transaction: ${transactionHex}`, 'info')
+                  stepCallback(`> 📏 Encoded length: ${encodedData.length} bytes`, 'info')
+                  stepCallback(`> 📝 This is the actual SCALE-encoded transaction data for blockchain submission`, 'info')
+                } else {
+                  stepCallback(`> ⚠️ SCALE encoding returned empty data`, 'info')
+                }
+              } catch (scaleError: unknown) {
+                // Handle SCALE encoding failures - common with metadata version mismatches
+                const errorMsg = scaleError instanceof Error ? scaleError.message : String(scaleError)
+                stepCallback(`> ℹ️ SCALE encoding unavailable: ${errorMsg}`, 'info')
+                stepCallback(`> 📝 You can use the transaction structure above for verification`, 'info')
+              }
+              */
               
               stepCallback('> Signing transaction with test account...', 'info')
               stepCallback('> ✓ Transaction signed successfully (simulated for safety)', 'success')

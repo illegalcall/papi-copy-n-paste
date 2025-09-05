@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/componen
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import { Button } from "@workspace/ui/components/button"
 import { Toast } from "@workspace/ui/components/toast"
-import { Copy, Terminal, Trash2, Settings } from "lucide-react"
+import { Badge } from "@workspace/ui/components/badge"
+import { Copy, Terminal, Trash2, Settings, Code, Eye } from "lucide-react"
 import { SyntaxHighlighter } from "@/components/code/syntax-highlighter"
 
 interface RightPaneProps {
@@ -25,6 +26,7 @@ export function RightPane({
 }: RightPaneProps) {
   const [currentTab, setCurrentTab] = useState<"setup" | "code" | "console">("setup")
   const [showToast, setShowToast] = useState(false)
+  const [developerMode, setDeveloperMode] = useState(false)
 
   // Update current tab when activeTab prop changes
   useEffect(() => {
@@ -115,10 +117,112 @@ export function RightPane({
   }
 
   const renderConsoleLine = (line: string) => {
-    // Check if line contains transaction hex
-    const txHexMatch = line.match(/> 🔗 Transaction hex: (0x[a-fA-F0-9]+)/)
-    if (txHexMatch && txHexMatch[1]) {
-      const fullHex = txHexMatch[1]
+    // In basic mode, filter out developer-specific lines
+    if (!developerMode) {
+      const developerLines = [
+        /> 🔗 SCALE Encoded Call:/,
+        /> 📝 This is the actual SCALE-encoded call data/,
+        /> 🔗 Call Structure Hex:/,
+        /> 📝 This is a JSON-encoded representation/,
+        /> 📝 Note: This is NOT the actual SCALE encoding/,
+        /> 📝 Transaction encoding skipped due to/,
+        /> 📝 You can copy this hex and use it in/,
+        /> 📝 This allows you to verify the transaction/,
+        /> 📝 You can use the transaction structure above/,
+        /> Debug -/
+      ]
+      
+      if (developerLines.some(regex => regex.test(line))) {
+        return null // Don't render developer-only lines in basic mode
+      }
+    }
+
+    // Enhanced SCALE-encoded call hex handling
+    const scaleHexMatch = line.match(/> 🔗 SCALE Encoded Call: (0x[a-fA-F0-9]+)/)
+    if (scaleHexMatch && scaleHexMatch[1]) {
+      const fullHex = scaleHexMatch[1]
+      const trimmedHex = fullHex.length > 20 ? `${fullHex.slice(0, 16)}...${fullHex.slice(-16)}` : fullHex
+      
+      return (
+        <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-lg p-3 my-2">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Code className="w-4 h-4 text-emerald-400" />
+              <span className="text-emerald-400 font-semibold">SCALE-Encoded Call Data</span>
+              <Badge variant="secondary" className="text-xs bg-emerald-500/20 text-emerald-300 border-emerald-500/30">
+                Real Blockchain Format
+              </Badge>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 text-emerald-400 hover:text-emerald-300"
+              onClick={() => {
+                navigator.clipboard.writeText(fullHex)
+                setShowToast(true)
+              }}
+              title="Copy full SCALE-encoded hex"
+            >
+              <Copy className="w-3 h-3" />
+            </Button>
+          </div>
+          <div className="space-y-2">
+            <code className="text-emerald-300 font-mono text-xs bg-black/30 px-3 py-2 rounded block break-all">
+              {trimmedHex}
+            </code>
+            <p className="text-xs text-emerald-200/80">
+              💡 This is actual SCALE-encoded data that can be used in polkadot-js apps, CLI tools, and other Polkadot ecosystem tools.
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    // Call structure hex (educational fallback)
+    const structureHexMatch = line.match(/> 🔗 Call Structure Hex: (0x[a-fA-F0-9]+)/)
+    if (structureHexMatch && structureHexMatch[1]) {
+      const fullHex = structureHexMatch[1]
+      const trimmedHex = fullHex.length > 20 ? `${fullHex.slice(0, 16)}...${fullHex.slice(-16)}` : fullHex
+      
+      return (
+        <div className="bg-amber-900/20 border border-amber-500/30 rounded-lg p-3 my-2">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Eye className="w-4 h-4 text-amber-400" />
+              <span className="text-amber-400 font-semibold">Call Structure (Educational)</span>
+              <Badge variant="secondary" className="text-xs bg-amber-500/20 text-amber-300 border-amber-500/30">
+                JSON Format
+              </Badge>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 text-amber-400 hover:text-amber-300"
+              onClick={() => {
+                navigator.clipboard.writeText(fullHex)
+                setShowToast(true)
+              }}
+              title="Copy call structure hex"
+            >
+              <Copy className="w-3 h-3" />
+            </Button>
+          </div>
+          <div className="space-y-2">
+            <code className="text-amber-300 font-mono text-xs bg-black/30 px-3 py-2 rounded block break-all">
+              {trimmedHex}
+            </code>
+            <p className="text-xs text-amber-200/80">
+              📝 This is a JSON-encoded representation of the transaction structure for educational purposes.
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    // Legacy transaction hex handling (for backward compatibility)
+    const legacyHexMatch = line.match(/> 🔗 Transaction hex: (0x[a-fA-F0-9]+)/)
+    if (legacyHexMatch && legacyHexMatch[1]) {
+      const fullHex = legacyHexMatch[1]
       const trimmedHex = fullHex.length > 20 ? `${fullHex.slice(0, 10)}...${fullHex.slice(-10)}` : fullHex
       
       return (
@@ -142,8 +246,19 @@ export function RightPane({
         </div>
       )
     }
+
+    // Educational messages enhancement
+    if (line.includes('📝 This is the actual SCALE-encoded call data')) {
+      return <div className="text-xs text-emerald-200/80 pl-4">{line}</div>
+    }
+    if (line.includes('📝 This is a JSON-encoded representation')) {
+      return <div className="text-xs text-amber-200/80 pl-4">{line}</div>
+    }
+    if (line.includes('📝 Note: This is NOT the actual SCALE encoding')) {
+      return <div className="text-xs text-orange-200/80 pl-4">{line}</div>
+    }
     
-    // Check if line contains a URL (starting with http)
+    // URL handling
     const urlRegex = /(https?:\/\/[^\s]+)/g
     const parts = line.split(urlRegex)
     
@@ -156,7 +271,7 @@ export function RightPane({
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-400 hover:text-blue-300 underline transition-colors break-all inline-block max-w-full"
-            title={part} // Show full URL on hover
+            title={part}
           >
             {part}
           </a>
@@ -190,33 +305,71 @@ export function RightPane({
             <CardContent className="p-4 flex-1 overflow-auto">
               {selectedChain ? (
                 <div className="space-y-4">
-                  <div className="text-sm text-muted-foreground">
-                    Run these commands in your project to use the generated code:
-                  </div>
-                  
-                  <div className="bg-muted/50 border rounded-lg p-4 space-y-2">
-                    {getSetupCommands(selectedChain).commands.map((command, index) => (
-                      <div key={index} className="group flex items-center gap-2 hover:bg-muted/70 p-2 rounded-md transition-colors">
-                        <span className="text-muted-foreground select-none font-mono text-xs">$</span>
-                        <span className="font-mono text-sm text-foreground flex-1">{command}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
-                          onClick={() => handleCopyCommand(command)}
-                        >
-                          <Copy className="w-3 h-3" />
-                        </Button>
+                  <div className="space-y-4">
+                    {/* Starter Repository Section */}
+                    <div className="bg-blue-50/50 dark:bg-blue-950/30 border border-blue-200/50 dark:border-blue-800/50 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Code className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <span className="font-semibold text-blue-800 dark:text-blue-200">Quick Start</span>
                       </div>
-                    ))}
+                      <div className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+                        Use our starter repository to get up and running quickly:
+                      </div>
+                      <div className="bg-white/70 dark:bg-black/30 border rounded-md p-3">
+                        <div className="group flex items-center gap-2 hover:bg-muted/70 p-2 rounded-md transition-colors">
+                          <span className="text-muted-foreground select-none font-mono text-xs">$</span>
+                          <span className="font-mono text-sm text-foreground flex-1">git clone https://github.com/yourusername/papi-starter-template.git</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
+                            onClick={() => handleCopyCommand("git clone https://github.com/yourusername/papi-starter-template.git")}
+                          >
+                            <Copy className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+                        💡 Then copy your generated code into the starter project
+                      </div>
+                    </div>
+
+                    {/* Manual Setup Section */}
+                    <div>
+                      <div className="text-sm text-muted-foreground mb-3">
+                        Or run these commands in your existing project:
+                      </div>
+                      
+                      <div className="bg-muted/50 border rounded-lg p-4 space-y-2">
+                        {getSetupCommands(selectedChain).commands.map((command, index) => (
+                          <div key={index} className="group flex items-center gap-2 hover:bg-muted/70 p-2 rounded-md transition-colors">
+                            <span className="text-muted-foreground select-none font-mono text-xs">$</span>
+                            <span className="font-mono text-sm text-foreground flex-1">{command}</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
+                              onClick={() => handleCopyCommand(command)}
+                            >
+                              <Copy className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="text-sm text-muted-foreground">
                     <strong>Setting up:</strong> {getSetupCommands(selectedChain).description}
                   </div>
                   
-                  <div className="text-xs text-muted-foreground mt-4 p-3 bg-muted/50 rounded-md">
-                    <strong>Note:</strong> After running these commands, you can copy and use the generated code from the Code tab.
+                  <div className="text-xs text-muted-foreground mt-4 p-3 bg-muted/50 rounded-md space-y-2">
+                    <div><strong>Recommended Workflow:</strong></div>
+                    <div>1. Clone the starter repository for instant setup</div>
+                    <div>2. Configure your transactions using the UI</div>
+                    <div>3. Copy the generated code from the Code tab</div>
+                    <div>4. Paste into <code className="text-xs bg-muted px-1 rounded">src/transactions.ts</code> in the starter project</div>
+                    <div>5. Run <code className="text-xs bg-muted px-1 rounded">npm run dev</code> to test!</div>
                   </div>
                 </div>
               ) : (
@@ -264,27 +417,50 @@ export function RightPane({
                   <Terminal className="w-4 h-4" />
                   Console Output
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onClearConsole}
-                  disabled={consoleOutput.length === 0}
-                >
-                  <Trash2 className="w-3 h-3 mr-1" />
-                  Clear
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={developerMode ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setDeveloperMode(!developerMode)}
+                    className={developerMode ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}
+                  >
+                    <Code className="w-3 h-3 mr-1" />
+                    {developerMode ? "Dev Mode" : "Basic"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onClearConsole}
+                    disabled={consoleOutput.length === 0}
+                  >
+                    <Trash2 className="w-3 h-3 mr-1" />
+                    Clear
+                  </Button>
+                </div>
               </div>
+              {developerMode && (
+                <div className="text-xs text-muted-foreground mt-2 p-2 bg-emerald-50/50 dark:bg-emerald-950/30 rounded border border-emerald-200/50 dark:border-emerald-800/50">
+                  🧪 <strong>Developer Mode:</strong> Showing SCALE encoding, transaction hex data, and technical details for advanced users and educational purposes.
+                </div>
+              )}
             </CardHeader>
             <CardContent className="p-0 flex-1 flex flex-col">
               <div className="overflow-auto p-4 pr-6 font-mono text-xs space-y-1 h-[calc(100vh-20rem)]">
                 {consoleOutput.length === 0 ? (
                   <div className="text-muted-foreground">No output yet...</div>
                 ) : (
-                  consoleOutput.map((line, index) => (
-                    <div key={index} className="break-words whitespace-pre-wrap leading-relaxed">
-                      {renderConsoleLine(line)}
-                    </div>
-                  ))
+                  consoleOutput.map((line, index) => {
+                    const renderedLine = renderConsoleLine(line)
+                    // Skip rendering if the line is filtered out (returns null)
+                    if (renderedLine === null) {
+                      return null
+                    }
+                    return (
+                      <div key={index} className="break-words whitespace-pre-wrap leading-relaxed">
+                        {renderedLine}
+                      </div>
+                    )
+                  }).filter(Boolean) // Remove null entries
                 )}
               </div>
             </CardContent>

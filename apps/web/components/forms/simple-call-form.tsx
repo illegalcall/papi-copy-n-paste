@@ -103,8 +103,7 @@ export function SimpleCallForm({ pallet, call, onFormChange, onValidChange }: Si
             />
             {arg.name === 'value' || arg.name === 'amount' ? (
               <p className="text-xs text-muted-foreground">
-                💡 Value in planck units. 1 DOT = 10,000,000,000 planck
-                {value > 0 && ` (≈ ${(Number(value) / 10000000000).toFixed(4)} DOT)`}
+                {value > 0 && `≈ ${(Number(value) / 10000000000).toFixed(4)} DOT`}
               </p>
             ) : null}
           </div>
@@ -124,9 +123,6 @@ export function SimpleCallForm({ pallet, call, onFormChange, onValidChange }: Si
                 <SelectItem value="//Eve">Eve (5HGjWAeF...)</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">
-              💡 Test accounts for development. Use real addresses in production.
-            </p>
           </div>
         )}
         
@@ -145,18 +141,6 @@ export function SimpleCallForm({ pallet, call, onFormChange, onValidChange }: Si
           </div>
         )}
         
-        {/* Common mistakes warning */}
-        {paramInfo.commonMistakes.length > 0 && value && (
-          <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded border-l-2 border-amber-200">
-            <div className="flex items-start gap-1">
-              <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="font-medium">Watch out for:</p>
-                <p>{paramInfo.commonMistakes[0]}</p>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     )
   }
@@ -213,13 +197,13 @@ function getParameterEducation(paramName: string, paramType: string) {
     dest: {
       description: 'Destination account address - where you want to send tokens',
       examples: ['//Alice', '//Bob', '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'],
-      commonMistakes: ['Using invalid address format', 'Sending to wrong address'],
+      commonMistakes: ['Sending to wrong address'],
       tipForBeginners: 'Always verify the destination address before sending!'
     },
     value: {
       description: 'Amount in planck units (10^10 planck = 1 DOT)',
       examples: ['10000000000', '5000000000', '100000000000'],
-      commonMistakes: ['Using wrong decimal places', 'Sending more than balance'],
+      commonMistakes: ['Sending more than balance'],
       tipForBeginners: 'DOT has 10 decimal places. 1 DOT = 10,000,000,000 planck'
     },
     amount: {
@@ -249,7 +233,7 @@ function getParameterEducation(paramName: string, paramType: string) {
   return paramEducation[paramName] || {
     description: `Parameter of type ${paramType}`,
     examples: [],
-    commonMistakes: ['Incorrect parameter format']
+    commonMistakes: []
   }
 }
 

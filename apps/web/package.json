@@ -15,7 +15,6 @@
     "test:debug": "playwright test --debug"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.10.0",
     "@playwright/test": "^1.55.0",
     "@polkadot-api/smoldot": "^0.3.10",
     "@types/prismjs": "^1.26.5",
@@ -28,9 +27,7 @@
     "prismjs": "^1.30.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "^7.60.0",
-    "smoldot": "^2.0.36",
-    "zod": "^3.23.8"
+    "smoldot": "^2.0.36"
   },
   "devDependencies": {
     "@types/node": "^20",
