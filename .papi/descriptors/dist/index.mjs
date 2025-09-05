@@ -78,7 +78,7 @@ var genesis5 = "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3da
 var _allDescriptors5 = { descriptors: descriptorValues5, metadataTypes: metadataTypes5, asset: asset5, getMetadata: getMetadata5, genesis: genesis5 };
 var kusama_default = _allDescriptors5;
 
-// .papi/descriptors/node_modules/@polkadot-api/substrate-bindings/dist/esm/types/enum.mjs
+// node_modules/.pnpm/@polkadot-api+substrate-bindings@0.14.0/node_modules/@polkadot-api/substrate-bindings/dist/esm/types/enum.mjs
 var discriminant = {
   is(value, type) {
     return value.type === type;

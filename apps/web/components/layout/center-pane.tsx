@@ -434,6 +434,19 @@ export function CenterPane({
             </>
           )}
           
+          {/* Storage query run */}
+          {selectedStorage && !selectedCall && methodQueue.length === 0 && (
+            <Button 
+              size={isRunning ? "default" : "lg"}
+              disabled={isRunning}
+              onClick={onRunClick}
+              className="min-w-0 flex-shrink"
+            >
+              <Play className="w-4 h-4 mr-2" />
+              {isRunning ? 'Querying...' : 'Run Query'}
+            </Button>
+          )}
+          
           {/* Multi-method run */}
           {methodQueue.length > 0 && (
             <>
