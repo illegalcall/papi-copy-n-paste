@@ -272,9 +272,12 @@ export function EnhancedQuerySelector({
               </Badge>
             </div>
             
-            <div className="ml-5 mt-0.5">
+            <div className="ml-5 mt-0.5 space-y-1">
               <div className="text-xs text-muted-foreground/80">
                 {option.useCase}
+              </div>
+              <div className="text-xs text-blue-600 font-mono">
+                Returns: {option.returnType}
               </div>
             </div>
           </div>
@@ -376,8 +379,11 @@ export function EnhancedQuerySelector({
 
       {/* Selected Option Details */}
       {selectedOption && (
-        <div className="text-xs text-muted-foreground">
-          {selectedOption.useCase}
+        <div className="text-xs text-muted-foreground space-y-1">
+          <div>{selectedOption.useCase}</div>
+          <div className="text-blue-600 font-mono">
+            Returns: {selectedOption.returnType} | {selectedOption.performance}
+          </div>
         </div>
       )}
     </div>

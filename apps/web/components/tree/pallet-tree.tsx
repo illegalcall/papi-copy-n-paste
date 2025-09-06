@@ -20,18 +20,41 @@ export function PalletTree({ pallets, searchQuery, onCallSelect, onStorageSelect
   const [expandedPallets, setExpandedPallets] = useState<Set<string>>(new Set(['System', 'Balances', 'Timestamp']))
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['System-calls', 'Balances-calls', 'Timestamp-calls']))
 
+  // Filter function for individual items within pallets
+  const filterItems = <T extends { name: string }>(items: T[], query: string): T[] => {
+    if (!query) return items
+    const lowerQuery = query.toLowerCase()
+    return items.filter(item => item.name.toLowerCase().includes(lowerQuery))
+  }
 
-  const filteredPallets = pallets.filter(pallet => {
-    if (!searchQuery) return true
+  // Enhanced filtering that also filters items within pallets
+  const filteredPallets = pallets.map(pallet => {
+    if (!searchQuery) return pallet
     
     const query = searchQuery.toLowerCase()
-    return (
-      pallet.name.toLowerCase().includes(query) ||
-      pallet.calls.some(call => call.name.toLowerCase().includes(query)) ||
-      pallet.storage.some(storage => storage.name.toLowerCase().includes(query)) ||
-      pallet.events.some(event => event.name.toLowerCase().includes(query))
-    )
-  })
+    const palletNameMatches = pallet.name.toLowerCase().includes(query)
+    
+    // Filter individual items within the pallet
+    const filteredCalls = filterItems(pallet.calls, searchQuery)
+    const filteredStorage = filterItems(pallet.storage, searchQuery)
+    const filteredEvents = filterItems(pallet.events, searchQuery)
+    
+    // Include pallet if name matches OR if any items within it match
+    const hasMatches = palletNameMatches || 
+                      filteredCalls.length > 0 || 
+                      filteredStorage.length > 0 || 
+                      filteredEvents.length > 0
+    
+    if (!hasMatches) return null
+    
+    // Return pallet with filtered items
+    return {
+      ...pallet,
+      calls: filteredCalls,
+      storage: filteredStorage,
+      events: filteredEvents
+    }
+  }).filter((pallet): pallet is PalletInfo => pallet !== null)
 
   const togglePallet = (palletName: string) => {
     const newExpanded = new Set(expandedPallets)
@@ -61,6 +84,33 @@ export function PalletTree({ pallets, searchQuery, onCallSelect, onStorageSelect
     onStorageSelect(pallet.name, storage)
   }
 
+  // Auto-expand pallets that have search matches
+  const shouldAutoExpand = (pallet: PalletInfo): boolean => {
+    if (!searchQuery) return false
+    const query = searchQuery.toLowerCase()
+    return (
+      pallet.calls.length > 0 || 
+      pallet.storage.length > 0 || 
+      pallet.events.length > 0
+    ) && !pallet.name.toLowerCase().includes(query) // Only auto-expand if pallet name doesn't match (items inside do)
+  }
+
+  // Highlight matching text in names
+  const highlightMatch = (text: string, query: string) => {
+    if (!query) return text
+    
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
+    const parts = text.split(regex)
+    
+    return parts.map((part, index) => 
+      regex.test(part) ? (
+        <span key={index} className="bg-yellow-200 dark:bg-yellow-800 px-0.5 rounded">
+          {part}
+        </span>
+      ) : part
+    )
+  }
+
   if (filteredPallets.length === 0) {
     return (
       <div className="text-center text-muted-foreground py-4">
@@ -71,26 +121,30 @@ export function PalletTree({ pallets, searchQuery, onCallSelect, onStorageSelect
 
   return (
     <div className="space-y-1" data-testid="pallet-tree">
-      {filteredPallets.map((pallet) => (
-        <div key={pallet.name} data-testid="pallet-item">
-          <Button
-            variant="ghost"
-            className="w-full justify-start h-8 px-2 font-normal"
-            onClick={() => togglePallet(pallet.name)}
-          >
-            {expandedPallets.has(pallet.name) ? (
-              <ChevronDown className="w-4 h-4 mr-1" />
-            ) : (
-              <ChevronRight className="w-4 h-4 mr-1" />
-            )}
-            <Package className="w-4 h-4 mr-2" />
-            <span className="truncate">{pallet.name}</span>
-            <span className="ml-auto text-xs text-muted-foreground">
-              {pallet.calls.length}
-            </span>
-          </Button>
+      {filteredPallets.map((pallet) => {
+        const isExpanded = expandedPallets.has(pallet.name) || shouldAutoExpand(pallet)
+        const totalItems = pallet.calls.length + pallet.storage.length + pallet.events.length
+        
+        return (
+          <div key={pallet.name} data-testid="pallet-item">
+            <Button
+              variant="ghost"
+              className="w-full justify-start h-8 px-2 font-normal"
+              onClick={() => togglePallet(pallet.name)}
+            >
+              {isExpanded ? (
+                <ChevronDown className="w-4 h-4 mr-1" />
+              ) : (
+                <ChevronRight className="w-4 h-4 mr-1" />
+              )}
+              <Package className="w-4 h-4 mr-2" />
+              <span className="truncate">{highlightMatch(pallet.name, searchQuery)}</span>
+              <span className="ml-auto text-xs text-muted-foreground">
+                {totalItems}
+              </span>
+            </Button>
 
-            {expandedPallets.has(pallet.name) && (
+            {isExpanded && (
             <div className="ml-4 space-y-1">
               {/* Calls Section */}
               {pallet.calls.length > 0 && (
@@ -120,7 +174,7 @@ export function PalletTree({ pallets, searchQuery, onCallSelect, onStorageSelect
                             className="w-full justify-start h-6 px-2 font-normal text-xs"
                             onClick={() => handleCallClick(pallet, call)}
                           >
-                            <span className="truncate">{call.name}</span>
+                            <span className="truncate">{highlightMatch(call.name, searchQuery)}</span>
                             {call.args.length > 0 && (
                               <span className="ml-auto text-xs text-muted-foreground">
                                 {call.args.length} args
@@ -162,7 +216,7 @@ export function PalletTree({ pallets, searchQuery, onCallSelect, onStorageSelect
                             className="w-full justify-start h-6 px-2 font-normal text-xs"
                             onClick={() => handleStorageClick(pallet, storage)}
                           >
-                            <span className="truncate">{storage.name}</span>
+                            <span className="truncate">{highlightMatch(storage.name, searchQuery)}</span>
                           </Button>
                         )
                       })}
@@ -197,7 +251,7 @@ export function PalletTree({ pallets, searchQuery, onCallSelect, onStorageSelect
                           className="w-full justify-start h-6 px-2 font-normal text-xs"
                           disabled
                         >
-                          <span className="truncate">{event.name}</span>
+                          <span className="truncate">{highlightMatch(event.name, searchQuery)}</span>
                         </Button>
                       ))}
                     </div>
@@ -207,7 +261,8 @@ export function PalletTree({ pallets, searchQuery, onCallSelect, onStorageSelect
             </div>
           )}
         </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
