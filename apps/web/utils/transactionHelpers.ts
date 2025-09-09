@@ -199,7 +199,6 @@ export async function executeStorageQuery(
           await executeGetValue(storageQuery, paramValues, setConsoleOutput, hasParams)
       }
     } else {
-      setConsoleOutput(prev => [...prev, `⚠️ Typed API not available, falling back to raw storage query`])
       await executeRawStorageQuery(selectedStorage, queryType, storageParams, client, setConsoleOutput)
     }
     

@@ -180,11 +180,11 @@ export async function createEnhancedClient(chainKey: string, providerId: string)
       )
     )
     
-    // Test connection with timeout
+    // Test connection with shorter timeout for better UX
     await Promise.race([
       client._request('system_chain', []),
       new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Connection test timeout after 10s')), 10000)
+        setTimeout(() => reject(new Error('Connection test timeout after 8s')), 8000)
       )
     ])
     
@@ -250,6 +250,32 @@ export function useEnhancedClient(chainKey: string, providerId: string): Connect
         
         const errorMessage = error instanceof Error ? error.message : 'Unknown connection error'
         console.error(`❌ Connection failed for ${chainKey}:${providerId}:`, errorMessage)
+        
+        // Try fallback provider for smoldot failures
+        const currentProvider = getProvider(chainKey, providerId)
+        if (currentProvider?.type === 'smoldot' && (errorMessage.includes('smoldot') || errorMessage.includes('timeout'))) {
+          console.log(`🔄 Trying fallback RPC provider for ${chainKey}`)
+          const networkConfig = getNetworkConfig(chainKey)
+          const rpcProvider = networkConfig?.providers.find(p => p.type === 'rpc' && p.reliability === 'high')
+          
+          if (rpcProvider) {
+            try {
+              const fallback = await createEnhancedClient(chainKey, rpcProvider.id)
+              if (mounted) {
+                setState({
+                  status: 'connected',
+                  client: fallback.client,
+                  provider: fallback.provider,
+                  chainKey,
+                  connectionTime: fallback.connectionTime
+                })
+                return
+              }
+            } catch (fallbackError) {
+              console.error(`❌ Fallback also failed for ${chainKey}:`, fallbackError)
+            }
+          }
+        }
         
         setState(prev => ({
           ...prev,

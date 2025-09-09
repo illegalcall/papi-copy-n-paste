@@ -7,6 +7,7 @@ import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import { Database, HelpCircle, Code2, ChevronDown, ChevronUp } from "lucide-react"
 import { EnhancedQuerySelector } from "./enhanced-query-selector"
+import { extractActualTypes, getTypeExample, formatTypeForDisplay } from "../../utils/typeExtraction"
 
 interface StorageFormProps {
   pallet: string
@@ -205,7 +206,63 @@ function detectStorageParameters(pallet: string, storageName: string): string[] 
   return getStorageParameters('polkadot', pallet, storageName)
 }
 
-// Generate expected response structure based on storage type and query type
+// Enhanced response structure generator using PAPI types
+function generateEnhancedResponseStructure(
+  actualType: string,
+  displayType: string,
+  queryType: string, 
+  pallet: string, 
+  storageName: string,
+  typeInfo: ReturnType<typeof extractActualTypes>
+): string {
+  // If we have type definition, use it for examples
+  const hasTypeDefinition = typeInfo.typeDefinition && typeInfo.typeDefinition !== 'unknown'
+  
+  if (hasTypeDefinition) {
+    const actualExample = getTypeExample(typeInfo.typeDefinition!, storageName)
+    return generateResponseWithActualType(actualExample, displayType, queryType)
+  }
+  
+  // Fallback to original generator
+  return generateResponseStructure(actualType, queryType, pallet, storageName)
+}
+
+// Generate response structure using actual type information
+function generateResponseWithActualType(
+  actualExample: string,
+  displayType: string,
+  queryType: string
+): string {
+  
+  switch (queryType) {
+    case 'getValue':
+    case 'getValueAt':
+      return `Promise<${displayType}>\n\n// Example response:\n${actualExample}`
+
+    case 'getValues':
+      return `Promise<${displayType}[]>\n\n// Example response:\n[\n  ${actualExample.split('\n').map(l => '  ' + l).join('\n')},\n  // ... more items\n]`
+
+    case 'getEntries':
+      return `Promise<Map<string, ${displayType}>>\n\n// Example response:\nMap {\n  "0x1234..." => ${actualExample.split('\n').map(l => '  ' + l).join('\n')},\n  "0x5678..." => ${actualExample.split('\n').map(l => '  ' + l).join('\n')}\n}`
+
+    case 'watchValue':
+    case 'watchValueFinalized':
+    case 'watchValueBest':
+      return `Observable<${displayType}>\n\n// Stream of values:\n${actualExample}\n// Updates automatically when storage changes`
+
+    case 'watchEntries':
+    case 'watchEntriesPartial':
+      return `Observable<Map<string, ${displayType}>>\n\n// Stream of entry maps:\nMap {\n  "0x1234..." => ${actualExample.split('\n').map(l => '  ' + l).join('\n')}\n}\n// Updates when entries are added/removed/changed`
+
+    case 'comprehensive':
+      return `Multiple Examples\n\n// getValue(): Promise<${displayType}>\n${actualExample}\n\n// watchValue(): Observable<${displayType}>\n// Stream of ${actualExample}\n\n// getEntries(): Promise<Map<string, ${displayType}>>\n// Map of all entries`
+
+    default:
+      return `Promise<${displayType}>\n\n// Example response:\n${actualExample}`
+  }
+}
+
+// Generate expected response structure based on storage type and query type (legacy)
 function generateResponseStructure(
   returnType: string, 
   queryType: string, 
@@ -390,14 +447,20 @@ export function StorageForm({
   const [localParams, setLocalParams] = useState<Record<string, any>>(storageParams)
   const [showResponseStructure, setShowResponseStructure] = useState(false)
   
-  // Get type information dynamically from storage entry and descriptors
-  const typeInfo = getStorageTypeInfo(chainKey, pallet, storage.name, storage)
+  // Get ACTUAL type information from PAPI descriptors (new approach)
+  const actualTypeInfo = extractActualTypes(chainKey, pallet, storage.name)
   
-  const requiredParams = typeInfo.paramTypes.length > 0 ? typeInfo.paramTypes : null
-  const actualType = typeInfo.returnType
+  // Fallback to pattern-based inference if descriptor reading fails
+  const fallbackTypeInfo = getStorageTypeInfo(chainKey, pallet, storage.name, storage)
   
-  // Generate response structure dynamically
-  const responseStructure = generateResponseStructure(actualType, queryType, pallet, storage.name)
+  // Use actual types if available, otherwise fallback
+  const requiredParams = actualTypeInfo.paramTypes.length > 0 ? actualTypeInfo.paramTypes : 
+                         (fallbackTypeInfo.paramTypes.length > 0 ? fallbackTypeInfo.paramTypes : null)
+  const actualType = actualTypeInfo.actualType !== 'unknown' ? actualTypeInfo.actualType : fallbackTypeInfo.returnType
+  const displayType = formatTypeForDisplay(actualTypeInfo)
+  
+  // Generate response structure with type information
+  const responseStructure = generateEnhancedResponseStructure(actualType, displayType, queryType, pallet, storage.name, actualTypeInfo)
 
   useEffect(() => {
     onParamsChange(localParams)
@@ -503,7 +566,6 @@ export function StorageForm({
                 {responseStructure}
               </pre>
               <div className="mt-2 text-xs text-muted-foreground">
-                <div className="text-blue-600">✨ Generated from storage type information and query selection</div>
                 <div>Structure updates automatically when you change query type or storage</div>
               </div>
             </div>
@@ -513,7 +575,6 @@ export function StorageForm({
         {/* Storage Info */}
         <div className="text-xs text-muted-foreground space-y-1">
           <div><strong>Type:</strong> {storage.type || actualType}</div>
-          <div className="text-blue-600 text-xs">✓ From PAPI descriptors</div>
           {requiredParams ? (
             <div><strong>Requires Keys:</strong> {requiredParams.join(', ')}</div>
           ) : (

@@ -96,7 +96,7 @@ export const networkConfigs: NetworkConfig[] = [
     color: '#000000',
     chainSpecPath: 'polkadot-api/chains/ksmcc3',
     genesisHash: '0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe',
-    defaultProvider: 'smoldot-kusama',
+    defaultProvider: 'allnodes-kusama',
     providers: [
       {
         id: 'smoldot-kusama',
@@ -113,6 +113,7 @@ export const networkConfigs: NetworkConfig[] = [
         type: 'rpc',
         description: 'Remote RPC node',
         url: 'wss://kusama-rpc.publicnode.com',
+        isRecommended: true,
         reliability: 'high',
         latency: 'low'
       },
