@@ -1,20 +1,36 @@
-"use client"
+"use client";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
-import { networkConfigs } from "@workspace/core/network-providers"
-import Image from "next/image"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select";
+import { networkConfigs } from "@workspace/core/network-providers";
+import Image from "next/image";
 
 interface NetworkSelectorProps {
-  selectedChain: string
-  onNetworkChange: (chainKey: string) => void
-  disabled?: boolean
+  selectedChain: string;
+  onNetworkChange: (chainKey: string) => void;
+  disabled?: boolean;
 }
 
-export function NetworkSelector({ selectedChain, onNetworkChange, disabled = false }: NetworkSelectorProps) {
-  const selectedNetwork = networkConfigs.find(config => config.chain === selectedChain)
+export function NetworkSelector({
+  selectedChain,
+  onNetworkChange,
+  disabled = false,
+}: NetworkSelectorProps) {
+  const selectedNetwork = networkConfigs.find(
+    (config) => config.chain === selectedChain,
+  );
 
   return (
-    <Select value={selectedChain} onValueChange={onNetworkChange} disabled={disabled}>
+    <Select
+      value={selectedChain}
+      onValueChange={onNetworkChange}
+      disabled={disabled}
+    >
       <SelectTrigger className="w-[120px] h-8">
         <SelectValue>
           {selectedNetwork && (
@@ -26,7 +42,9 @@ export function NetworkSelector({ selectedChain, onNetworkChange, disabled = fal
                 height={16}
                 className="rounded-full"
               />
-              <span className="text-sm font-medium">{selectedNetwork.chainName}</span>
+              <span className="text-sm font-medium">
+                {selectedNetwork.chainName}
+              </span>
             </div>
           )}
         </SelectValue>
@@ -48,5 +66,5 @@ export function NetworkSelector({ selectedChain, onNetworkChange, disabled = fal
         ))}
       </SelectContent>
     </Select>
-  )
+  );
 }

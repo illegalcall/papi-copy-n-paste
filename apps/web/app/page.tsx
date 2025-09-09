@@ -1,29 +1,30 @@
-"use client"
+"use client";
 
-import { useEffect, useCallback } from "react"
-import { Header } from "@/components/layout/header"
-import { LeftPane } from "@/components/layout/left-pane"
-import { CenterPane } from "@/components/layout/center-pane"
-import { RightPane } from "@/components/layout/right-pane"
-import { Sheet, SheetContent } from "@workspace/ui/components/sheet"
-import { Button } from "@workspace/ui/components/button"
-import { Menu } from "lucide-react"
+import { useEffect, useCallback } from "react";
+import { Header } from "@/components/layout/header";
+import { LeftPane } from "@/components/layout/left-pane";
+import { CenterPane } from "@/components/layout/center-pane";
+import { RightPane } from "@/components/layout/right-pane";
+import { Sheet, SheetContent } from "@workspace/ui/components/sheet";
+import { Button } from "@workspace/ui/components/button";
+import { Menu } from "lucide-react";
 
 // Import our refactored hooks
-import { useChainConnection } from "../hooks/useChainConnection"
-import { useCallSelection } from "../hooks/useCallSelection"
-import { useStorageQuery } from "../hooks/useStorageQuery"
-import { useTransactionQueue } from "../hooks/useTransactionQueue"
-import { useCodeGeneration } from "../hooks/useCodeGeneration"
-import { useExecution } from "../hooks/useExecution"
+import { useChainConnection } from "../hooks/useChainConnection";
+import { useCallSelection } from "../hooks/useCallSelection";
+import { useStorageQuery } from "../hooks/useStorageQuery";
+import { useTransactionQueue } from "../hooks/useTransactionQueue";
+import { useCodeGeneration } from "../hooks/useCodeGeneration";
+import { useExecution } from "../hooks/useExecution";
+import { useDebounce } from "../hooks/useDebounce";
 
 // Import execution helpers
-import { 
-  executeRealTransaction, 
-  executeMultipleTransactions, 
+import {
+  executeRealTransaction,
+  executeMultipleTransactions,
   executeMultipleStorageQueries,
-  executeStorageQuery 
-} from "../utils/transactionHelpers"
+  executeStorageQuery,
+} from "../utils/transactionHelpers";
 
 export default function Page() {
   // Chain connection and metadata
@@ -35,8 +36,8 @@ export default function Page() {
     metadataError,
     chainStatus,
     api,
-    handleNetworkChange
-  } = useChainConnection()
+    handleNetworkChange,
+  } = useChainConnection();
 
   // Call selection and form handling
   const {
@@ -47,8 +48,8 @@ export default function Page() {
     handleFormChange,
     handleValidChange,
     clearCallSelection,
-    resetCallState
-  } = useCallSelection()
+    resetCallState,
+  } = useCallSelection();
 
   // Storage query handling
   const {
@@ -60,8 +61,8 @@ export default function Page() {
     handleStorageQueryTypeChange,
     handleStorageParamsChange,
     clearStorageSelection,
-    resetStorageState
-  } = useStorageQuery()
+    resetStorageState,
+  } = useStorageQuery();
 
   // Queue management
   const {
@@ -73,15 +74,14 @@ export default function Page() {
     removeFromStorageQueue,
     clearMethodQueue,
     clearStorageQueue,
-    clearAllQueues
-  } = useTransactionQueue()
+    clearAllQueues,
+  } = useTransactionQueue();
 
   // Code generation
-  const {
-    code,
-    updateGeneratedCode,
-    clearCode
-  } = useCodeGeneration(selectedChain, selectedProvider)
+  const { code, updateGeneratedCode, clearCode } = useCodeGeneration(
+    selectedChain,
+    selectedProvider,
+  );
 
   // Execution state
   const {
@@ -96,105 +96,193 @@ export default function Page() {
     resetExecutionState,
     setConsoleOutput,
     setHasSelectedPallet,
-    setLeftPaneOpen
-  } = useExecution()
+    setLeftPaneOpen,
+    setActiveTab,
+  } = useExecution();
 
-  // Update generated code when dependencies change
+  // Debounce form data to prevent expensive code generation on every keystroke
+  const debouncedFormData = useDebounce(formData, 300);
+  const debouncedStorageParams = useDebounce(storageParams, 300);
+
+  // Enhanced form change handler that switches to code tab
+  const enhancedHandleFormChange = useCallback(
+    (formData: Record<string, any>) => {
+      handleFormChange(formData);
+      // Switch to code tab when user starts typing/changing form values
+      setActiveTab("code");
+    },
+    [handleFormChange, setActiveTab],
+  );
+
+  // Enhanced storage params change handler that switches to code tab
+  const enhancedHandleStorageParamsChange = useCallback(
+    (params: Record<string, any>) => {
+      handleStorageParamsChange(params);
+      // Switch to code tab when user changes storage parameters
+      setActiveTab("code");
+    },
+    [handleStorageParamsChange, setActiveTab],
+  );
+
+  // Update generated code when dependencies change (with debounced form data)
   useEffect(() => {
     updateGeneratedCode(
       selectedCall,
       selectedStorage,
-      formData,
+      debouncedFormData,
       storageQueryType,
-      storageParams,
+      debouncedStorageParams,
       methodQueue,
-      storageQueue
-    )
+      storageQueue,
+    );
   }, [
     selectedCall,
     selectedStorage,
-    formData,
+    debouncedFormData,
     storageQueryType,
-    storageParams,
+    debouncedStorageParams,
     methodQueue,
     storageQueue,
-    updateGeneratedCode
-  ])
+    updateGeneratedCode,
+  ]);
 
   // Update hasSelectedPallet when pallets are selected
   useEffect(() => {
-    const hasPalletSelection = !!selectedCall || !!selectedStorage || methodQueue.length > 0 || storageQueue.length > 0
-    setHasSelectedPallet(hasPalletSelection)
-  }, [selectedCall, selectedStorage, methodQueue.length, storageQueue.length, setHasSelectedPallet])
+    const hasPalletSelection =
+      !!selectedCall ||
+      !!selectedStorage ||
+      methodQueue.length > 0 ||
+      storageQueue.length > 0;
+    setHasSelectedPallet(hasPalletSelection);
+  }, [
+    selectedCall,
+    selectedStorage,
+    methodQueue.length,
+    storageQueue.length,
+    setHasSelectedPallet,
+  ]);
 
   // Handle network changes - reset all state
-  const onNetworkChange = useCallback((chainKey: string, providerId: string) => {
-    handleNetworkChange(chainKey, providerId)
-    // Reset all dependent state
-    resetCallState()
-    resetStorageState()
-    clearAllQueues()
-    clearCode()
-    resetExecutionState()
-  }, [
-    handleNetworkChange,
-    resetCallState,
-    resetStorageState,
-    clearAllQueues,
-    clearCode,
-    resetExecutionState
-  ])
+  const onNetworkChange = useCallback(
+    (chainKey: string, providerId: string) => {
+      handleNetworkChange(chainKey, providerId);
+      // Reset all dependent state
+      resetCallState();
+      resetStorageState();
+      clearAllQueues();
+      clearCode();
+      resetExecutionState();
+    },
+    [
+      handleNetworkChange,
+      resetCallState,
+      resetStorageState,
+      clearAllQueues,
+      clearCode,
+      resetExecutionState,
+    ],
+  );
 
   // Queue management handlers
   const handleAddToQueue = useCallback(() => {
-    addToMethodQueue(selectedCall, formData)
+    addToMethodQueue(selectedCall, formData);
     // Clear current selection after adding
-    clearCallSelection()
-    clearCode()
-  }, [selectedCall, formData, addToMethodQueue, clearCallSelection, clearCode])
+    clearCallSelection();
+    clearCode();
+  }, [selectedCall, formData, addToMethodQueue, clearCallSelection, clearCode]);
 
   const handleAddStorageToQueue = useCallback(() => {
-    addToStorageQueue(selectedStorage, storageQueryType, storageParams)
+    addToStorageQueue(selectedStorage, storageQueryType, storageParams);
     // Clear current selection after adding
-    clearStorageSelection()
-    clearCode()
-  }, [selectedStorage, storageQueryType, storageParams, addToStorageQueue, clearStorageSelection, clearCode])
+    clearStorageSelection();
+    clearCode();
+  }, [
+    selectedStorage,
+    storageQueryType,
+    storageParams,
+    addToStorageQueue,
+    clearStorageSelection,
+    clearCode,
+  ]);
 
-  // Create wrapped handlers that clear conflicting selections
-  const wrappedHandleCallSelect = useCallback((pallet: string, call: any) => {
-    handleCallSelect(pallet, call)
-    clearStorageSelection() // Clear storage when call is selected
-  }, [handleCallSelect, clearStorageSelection])
+  // Create wrapped handlers that clear conflicting selections and switch to code tab
+  const wrappedHandleCallSelect = useCallback(
+    (pallet: string, call: any) => {
+      handleCallSelect(pallet, call);
+      clearStorageSelection(); // Clear storage when call is selected
+      setActiveTab("code"); // Switch to code tab when pallet/call is selected
+    },
+    [handleCallSelect, clearStorageSelection, setActiveTab],
+  );
 
-  const wrappedHandleStorageSelect = useCallback((pallet: string, storage: any) => {
-    handleStorageSelect(pallet, storage)
-    clearCallSelection() // Clear call when storage is selected
-  }, [handleStorageSelect, clearCallSelection])
+  const wrappedHandleStorageSelect = useCallback(
+    (pallet: string, storage: any) => {
+      handleStorageSelect(pallet, storage);
+      clearCallSelection(); // Clear call when storage is selected
+      setActiveTab("code"); // Switch to code tab when pallet/storage is selected
+    },
+    [handleStorageSelect, clearCallSelection, setActiveTab],
+  );
 
   // Execution handlers
   const executeCurrentOperation = useCallback(async () => {
-    if (!api) return
+    if (!api) return;
 
     // Check if we have either a single call, storage query, method queue, or storage queue
-    if (!selectedCall && !selectedStorage && methodQueue.length === 0 && storageQueue.length === 0) return
+    if (
+      !selectedCall &&
+      !selectedStorage &&
+      methodQueue.length === 0 &&
+      storageQueue.length === 0
+    )
+      return;
 
     try {
       if (methodQueue.length > 0) {
         // Execute multiple methods sequentially
-        await executeMultipleTransactions(methodQueue, selectedChain, api, setConsoleOutput)
+        await executeMultipleTransactions(
+          methodQueue,
+          selectedChain,
+          api,
+          setConsoleOutput,
+        );
       } else if (storageQueue.length > 0) {
         // Execute multiple storage queries sequentially
-        await executeMultipleStorageQueries(storageQueue, selectedChain, api, setConsoleOutput)
+        await executeMultipleStorageQueries(
+          storageQueue,
+          selectedChain,
+          api,
+          setConsoleOutput,
+        );
       } else if (selectedCall) {
         // Execute single transaction
-        await executeRealTransaction(selectedCall, formData, selectedChain, api, setConsoleOutput, () => {})
+        await executeRealTransaction(
+          selectedCall,
+          formData,
+          selectedChain,
+          api,
+          setConsoleOutput,
+          () => {},
+        );
       } else if (selectedStorage) {
         // Execute single storage query
-        await executeStorageQuery(selectedStorage, storageQueryType, storageParams, selectedChain, api, setConsoleOutput, () => {})
+        await executeStorageQuery(
+          selectedStorage,
+          storageQueryType,
+          storageParams,
+          selectedChain,
+          api,
+          setConsoleOutput,
+          () => {},
+        );
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-      setConsoleOutput(prev => [...prev, `❌ Execution error: ${errorMessage}`])
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      setConsoleOutput((prev) => [
+        ...prev,
+        `❌ Execution error: ${errorMessage}`,
+      ]);
     }
   }, [
     api,
@@ -206,29 +294,33 @@ export default function Page() {
     storageQueryType,
     storageParams,
     selectedChain,
-    setConsoleOutput
-  ])
+    setConsoleOutput,
+  ]);
 
   const onRunClick = useCallback(() => {
-    handleRunClick(executeCurrentOperation)
-  }, [handleRunClick, executeCurrentOperation])
+    handleRunClick(executeCurrentOperation);
+  }, [handleRunClick, executeCurrentOperation]);
 
   // Determine if we can run anything
-  const canRunAny = canRunCall || canRunStorage || methodQueue.length > 0 || storageQueue.length > 0
+  const canRunAny =
+    canRunCall ||
+    canRunStorage ||
+    methodQueue.length > 0 ||
+    storageQueue.length > 0;
 
   return (
     <div className="h-screen flex flex-col">
-      <Header 
+      <Header
         selectedChain={selectedChain}
         selectedProvider={selectedProvider}
         onNetworkChange={onNetworkChange}
       />
-      
+
       <div className="flex-1 flex overflow-hidden">
         {/* Mobile menu button */}
         <div className="lg:hidden">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="icon"
             onClick={() => setLeftPaneOpen(true)}
             className="fixed top-4 left-4 z-10 bg-background/80 backdrop-blur-sm"
@@ -239,12 +331,23 @@ export default function Page() {
 
         {/* Left pane - always visible on desktop, sheet on mobile */}
         <div className="hidden lg:block lg:w-[25%] lg:flex-shrink-0">
-          <LeftPane 
+          <LeftPane
             isOpen={true}
             onClose={() => {}}
             pallets={pallets}
-            selectedCall={selectedCall ? { pallet: selectedCall.pallet, call: selectedCall.call.name } : undefined}
-            selectedStorage={selectedStorage ? { pallet: selectedStorage.pallet, storage: selectedStorage.storage.name } : undefined}
+            selectedCall={
+              selectedCall
+                ? { pallet: selectedCall.pallet, call: selectedCall.call.name }
+                : undefined
+            }
+            selectedStorage={
+              selectedStorage
+                ? {
+                    pallet: selectedStorage.pallet,
+                    storage: selectedStorage.storage.name,
+                  }
+                : undefined
+            }
             onCallSelect={wrappedHandleCallSelect}
             onStorageSelect={wrappedHandleStorageSelect}
             isLoading={isLoadingMetadata}
@@ -255,37 +358,51 @@ export default function Page() {
         {/* Mobile sheet for left pane */}
         <Sheet open={leftPaneOpen} onOpenChange={setLeftPaneOpen}>
           <SheetContent side="left" className="p-0 w-80">
-            <LeftPane 
+            <LeftPane
               isOpen={leftPaneOpen}
               onClose={() => setLeftPaneOpen(false)}
               pallets={pallets}
-              selectedCall={selectedCall ? { pallet: selectedCall.pallet, call: selectedCall.call.name } : undefined}
-              selectedStorage={selectedStorage ? { pallet: selectedStorage.pallet, storage: selectedStorage.storage.name } : undefined}
+              selectedCall={
+                selectedCall
+                  ? {
+                      pallet: selectedCall.pallet,
+                      call: selectedCall.call.name,
+                    }
+                  : undefined
+              }
+              selectedStorage={
+                selectedStorage
+                  ? {
+                      pallet: selectedStorage.pallet,
+                      storage: selectedStorage.storage.name,
+                    }
+                  : undefined
+              }
               onCallSelect={(pallet, call) => {
-                wrappedHandleCallSelect(pallet, call)
-                setLeftPaneOpen(false)
+                wrappedHandleCallSelect(pallet, call);
+                setLeftPaneOpen(false);
               }}
               onStorageSelect={(pallet, storage) => {
-                wrappedHandleStorageSelect(pallet, storage)
-                setLeftPaneOpen(false)
+                wrappedHandleStorageSelect(pallet, storage);
+                setLeftPaneOpen(false);
               }}
               isLoading={isLoadingMetadata}
               error={metadataError}
             />
           </SheetContent>
         </Sheet>
-        
+
         {/* Center pane */}
         <div className="w-full lg:w-[25%] lg:flex-shrink-0">
-          <CenterPane 
+          <CenterPane
             chainStatus={chainStatus}
             selectedChain={selectedChain}
             selectedCall={selectedCall}
             selectedStorage={selectedStorage}
-            onFormChange={handleFormChange}
+            onFormChange={enhancedHandleFormChange}
             onValidChange={handleValidChange}
             onStorageQueryTypeChange={handleStorageQueryTypeChange}
-            onStorageParamsChange={handleStorageParamsChange}
+            onStorageParamsChange={enhancedHandleStorageParamsChange}
             onAddToQueue={handleAddToQueue}
             onAddStorageToQueue={handleAddStorageToQueue}
             onRemoveFromQueue={removeFromMethodQueue}
@@ -303,10 +420,10 @@ export default function Page() {
             storageParams={storageParams}
           />
         </div>
-        
+
         {/* Right pane */}
         <div className="w-full lg:w-[50%] lg:flex-shrink-0">
-          <RightPane 
+          <RightPane
             code={code}
             consoleOutput={consoleOutput}
             activeTab={activeTab}
@@ -316,5 +433,5 @@ export default function Page() {
         </div>
       </div>
     </div>
-  )
+  );
 }

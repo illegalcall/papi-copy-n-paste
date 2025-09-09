@@ -1,14 +1,14 @@
-import type { ChainSpec } from "polkadot-api/chains"
+import type { ChainSpec } from "polkadot-api/chains";
 
 export interface ChainConfig {
-  name: string
-  displayName: string
-  wsUrls: string[]
-  chainSpec: () => Promise<{ chainSpec: ChainSpec }>
-  descriptorName: string
-  isTestnet?: boolean
-  symbol: string
-  decimals: number
+  name: string;
+  displayName: string;
+  wsUrls: string[];
+  chainSpec: () => Promise<{ chainSpec: ChainSpec }>;
+  descriptorName: string;
+  isTestnet?: boolean;
+  symbol: string;
+  decimals: number;
 }
 
 // Basic chain configurations for PAPI learning
@@ -20,11 +20,11 @@ export const supportedChains = {
     decimals: 10,
     wsUrls: [
       "wss://rpc.polkadot.io",
-      "wss://polkadot.api.onfinality.io/public-ws"
+      "wss://polkadot.api.onfinality.io/public-ws",
     ],
     chainSpec: () => import("polkadot-api/chains/polkadot"),
     descriptorName: "polkadot",
-    isTestnet: false
+    isTestnet: false,
   },
   kusama: {
     name: "kusama",
@@ -33,11 +33,11 @@ export const supportedChains = {
     decimals: 12,
     wsUrls: [
       "wss://kusama-rpc.polkadot.io",
-      "wss://kusama.api.onfinality.io/public-ws"
+      "wss://kusama.api.onfinality.io/public-ws",
     ],
     chainSpec: () => import("polkadot-api/chains/ksmcc3"),
     descriptorName: "kusama",
-    isTestnet: false
+    isTestnet: false,
   },
   westend: {
     name: "westend",
@@ -46,31 +46,28 @@ export const supportedChains = {
     decimals: 12,
     wsUrls: [
       "wss://westend-rpc.polkadot.io",
-      "wss://westend.api.onfinality.io/public-ws"
+      "wss://westend.api.onfinality.io/public-ws",
     ],
     chainSpec: () => import("polkadot-api/chains/westend2"),
     descriptorName: "westend",
-    isTestnet: true
+    isTestnet: true,
   },
   paseo: {
     name: "paseo",
     displayName: "Paseo",
     symbol: "PAS",
     decimals: 10,
-    wsUrls: [
-      "wss://paseo-rpc.dwellir.com",
-      "wss://paseo.dotters.network"
-    ],
+    wsUrls: ["wss://paseo-rpc.dwellir.com", "wss://paseo.dotters.network"],
     chainSpec: () => import("polkadot-api/chains/paseo"),
     descriptorName: "paseo",
-    isTestnet: true
-  }
-} as const
+    isTestnet: true,
+  },
+} as const;
 
-export type SupportedChain = keyof typeof supportedChains
+export type SupportedChain = keyof typeof supportedChains;
 
 export function getChainConfig(chainName: SupportedChain): ChainConfig {
-  return supportedChains[chainName]
+  return supportedChains[chainName];
 }
 
 // Simple utility to randomize RPC endpoints for load balancing
@@ -78,15 +75,15 @@ export function shuffleArray<T>(array: T[]): T[] {
   return array
     .map((v) => ({ v, p: Math.random() }))
     .sort((a, b) => a.p - b.p)
-    .map(({ v }) => v)
+    .map(({ v }) => v);
 }
 
 // Format balance with proper decimals and symbol
 export function formatBalance(
   amount: bigint | string,
-  chainName: SupportedChain
+  chainName: SupportedChain,
 ): string {
-  const { decimals, symbol } = supportedChains[chainName]
-  const balance = Number(amount) / Math.pow(10, decimals)
-  return `${balance.toFixed(4)} ${symbol}`
+  const { decimals, symbol } = supportedChains[chainName];
+  const balance = Number(amount) / Math.pow(10, decimals);
+  return `${balance.toFixed(4)} ${symbol}`;
 }

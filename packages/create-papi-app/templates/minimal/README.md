@@ -27,7 +27,7 @@ Build for production:
 
 - `index.ts` - Main application entry point
 - `.papi/` - PAPI configuration and generated descriptors
-{{#includeExamples}}- `examples/` - Example PAPI usage{{/includeExamples}}
+  {{#includeExamples}}- `examples/` - Example PAPI usage{{/includeExamples}}
 
 ## PAPI Configuration
 
