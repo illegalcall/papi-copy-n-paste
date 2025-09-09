@@ -3,53 +3,9 @@
  */
 
 export function getSetupCommands(chainKey: string): string {
-  const chainConfigs = {
-    polkadot: {
-      cliName: "polkadot",
-      aliasName: "dot"
-    },
-    kusama: {
-      cliName: "kusama", 
-      aliasName: "ksm"
-    },
-    moonbeam: {
-      cliName: "moonbeam",
-      aliasName: "moonbeam"
-    },
-    bifrost: {
-      cliName: "bifrost",
-      aliasName: "bifrost"
-    },
-    astar: {
-      cliName: "astar",
-      aliasName: "astar"
-    },
-    acala: {
-      cliName: "acala",
-      aliasName: "acala"
-    },
-    hydration: {
-      cliName: "hydration",
-      aliasName: "hydration"
-    },
-    westend: {
-      cliName: "westend2",
-      aliasName: "westend"
-    },
-    rococo: {
-      cliName: "rococo_v2_2",
-      aliasName: "rococo"
-    }
-  }
-
-  const config = chainConfigs[chainKey as keyof typeof chainConfigs] || chainConfigs.polkadot
-
-  return `// Install polkadot-api
-// npm i polkadot-api
-// 
-// Add chain and generate types:
-// npx papi add ${config.aliasName} -n ${config.cliName}
-// npx papi`
+  // This function is kept for backward compatibility but should not be used for code generation
+  // Setup instructions are now handled by the Setup tab in RightPane
+  return ""
 }
 
 export function getChainSpecImport(chainKey: string): string {

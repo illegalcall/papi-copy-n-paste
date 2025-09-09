@@ -411,7 +411,6 @@ function generateInlineStorageCode(
 ): string {
   const descriptorImport = getDescriptorImport(chainKey)
   const descriptorName = getDescriptorName(chainKey)
-  const setupCommands = getSetupCommands(chainKey)
   
   const requiresKeys = detectStorageParameters(pallet, storage.name)
   const hasParams = Boolean(requiresKeys && Object.keys(storageParams).length > 0)
@@ -422,9 +421,7 @@ function generateInlineStorageCode(
   // Generate the actual query code based on type
   const queryCode = generateStorageQueryByType(queryType, pallet, storage.name, paramString, hasParams)
   
-  return `${setupCommands}
-
-import { createClient } from "polkadot-api"
+  return `import { createClient } from "polkadot-api"
 ${descriptorImport}
 
 async function query${pallet}${storage.name}() {
@@ -446,11 +443,8 @@ function generateFunctionStorageCode(
 ): string {
   const descriptorImport = getDescriptorImport(chainKey)
   const descriptorName = getDescriptorName(chainKey)
-  const setupCommands = getSetupCommands(chainKey)
   
-  return `${setupCommands}
-
-import { createClient } from "polkadot-api"
+  return `import { createClient } from "polkadot-api"
 ${descriptorImport}
 
 export async function query${pallet}${storage.name}(${Object.keys(storageParams).length > 0 ? 'params: any' : ''}) {
@@ -520,11 +514,8 @@ function generateInlineCode(
 
   const descriptorImport = getDescriptorImport(chainKey)
   const descriptorName = getDescriptorName(chainKey)
-  const setupCommands = getSetupCommands(chainKey)
 
-  return `${setupCommands}
-
-import { createClient } from "polkadot-api"
+  return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
 ${descriptorImport}
 
@@ -582,11 +573,8 @@ function generateFunctionCode(
 
   const descriptorImport = getDescriptorImport(chainKey)
   const descriptorName = getDescriptorName(chainKey)
-  const setupCommands = getSetupCommands(chainKey)
 
-  return `${setupCommands}
-
-import { createClient } from "polkadot-api"
+  return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
 ${descriptorImport}
 
@@ -615,7 +603,6 @@ export function generateMultiMethodCode(
 ): string {
   const descriptorImport = getDescriptorImport(chainKey)
   const descriptorName = getDescriptorName(chainKey)
-  const setupCommands = getSetupCommands(chainKey)
 
   // Generate method calls
   const methodCalls = methodQueue.map((method, index) => {
@@ -665,9 +652,7 @@ export function generateMultiMethodCode(
   }`
   }).join('\n')
 
-  return `${setupCommands}
-
-import { createClient } from "polkadot-api"
+  return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
 ${descriptorImport}
 
