@@ -83,5 +83,31 @@
     "color": "#00D4AA",
     "explorerUrl": "https://hydration.subscan.io",
     "explorerName": "Subscan"
+  },
+  {
+    "key": "westend",
+    "name": "Westend",
+    "ws": "wss://westend-rpc.polkadot.io",
+    "specVersion": 1015000,
+    "paraId": null,
+    "genesisHash": "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+    "chainSpecPath": "polkadot-api/chains/westend2",
+    "icon": "/icons/westend.svg",
+    "color": "#DA68A7",
+    "explorerUrl": "https://westend.subscan.io",
+    "explorerName": "Subscan"
+  },
+  {
+    "key": "rococo",
+    "name": "Rococo",
+    "ws": "wss://rococo-rpc.polkadot.io",
+    "specVersion": 1015000,
+    "paraId": null,
+    "genesisHash": "0x6408de7737c59c238890533af25896a2c20608d8b380bb01029acb392781063e",
+    "chainSpecPath": "polkadot-api/chains/rococo_v2_2",
+    "icon": "/icons/rococo.svg",
+    "color": "#6f42c1",
+    "explorerUrl": "https://rococo.subscan.io",
+    "explorerName": "Subscan"
   }
 ]

@@ -31,6 +31,18 @@
       "metadata": ".papi/metadata/kusama.scale",
       "genesis": "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
       "codeHash": "0x4c843d1c1b5ce542fcc0e9cc1439ad3384e5753da24d2747c4aa24162a202449"
+    },
+    "westend": {
+      "wsUrl": "wss://westend-rpc.polkadot.io",
+      "metadata": ".papi/metadata/westend.scale",
+      "genesis": "0xe143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e",
+      "codeHash": "0x042cc8527e4b901f1f11b7e32ad9462ce5a1443947119c85c235d1887492519b"
+    },
+    "rococo": {
+      "wsUrl": "wss://rococo-rpc.polkadot.io",
+      "metadata": ".papi/metadata/rococo.scale",
+      "genesis": "0x6408de7737c59c238890533af25896a2c20608d8b380bb01029acb392781063e",
+      "codeHash": "0xf645d939be087a8a76ade94d3e28f51f0c4b70abfc0db8b302e2372590b9e31a"
     }
   }
 }

@@ -6,7 +6,8 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "create-app": "pnpm build && node packages/create-papi-app/bin/create-papi-app.js"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

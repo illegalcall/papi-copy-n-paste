@@ -1,0 +1,461 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]: Copy‑n‑Paste PAPI
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - generic [ref=e7]:
+            - generic [ref=e8]: "Network:"
+            - combobox [ref=e9]:
+              - generic:
+                - generic:
+                  - img "Polkadot"
+                  - generic: Polkadot
+              - img
+          - generic [ref=e10]:
+            - generic [ref=e11]: "Provider:"
+            - combobox [ref=e12]:
+              - generic:
+                - generic:
+                  - generic:
+                    - img
+                  - generic: Allnodes
+              - img
+        - generic [ref=e14]:
+          - button "Toggle theme" [ref=e15]:
+            - img
+            - img
+            - generic [ref=e16]: Toggle theme
+          - link "GitHub" [ref=e17] [cursor=pointer]:
+            - /url: https://github.com/polkadot-api/polkadot-api
+            - img
+            - generic [ref=e18] [cursor=pointer]: GitHub
+          - link "Documentation" [ref=e19] [cursor=pointer]:
+            - /url: https://papi.how
+            - img
+            - generic [ref=e20] [cursor=pointer]: Documentation
+    - generic [ref=e21]:
+      - generic [ref=e23]:
+        - generic [ref=e25]:
+          - img [ref=e26]
+          - textbox "Search pallets..." [ref=e29]
+        - generic [ref=e32]:
+          - button "AssetRate 5" [ref=e34]:
+            - img
+            - img
+            - generic [ref=e35]: AssetRate
+            - generic [ref=e36]: "5"
+          - button "Auctions 6" [ref=e38]:
+            - img
+            - img
+            - generic [ref=e39]: Auctions
+            - generic [ref=e40]: "6"
+          - button "AuthorityDiscovery 4" [ref=e42]:
+            - img
+            - img
+            - generic [ref=e43]: AuthorityDiscovery
+            - generic [ref=e44]: "4"
+          - button "Authorship 2" [ref=e46]:
+            - img
+            - img
+            - generic [ref=e47]: Authorship
+            - generic [ref=e48]: "2"
+          - button "Babe 18" [ref=e50]:
+            - img
+            - img
+            - generic [ref=e51]: Babe
+            - generic [ref=e52]: "18"
+          - generic [ref=e53]:
+            - button "Balances 12" [ref=e54]:
+              - img
+              - img
+              - generic [ref=e55]: Balances
+              - generic [ref=e56]: "12"
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - button "Calls (5)" [ref=e59]:
+                  - img
+                  - img
+                  - generic [ref=e60]: Calls (5)
+                - generic [ref=e61]:
+                  - button "transfer_allow_death 2 args" [ref=e62]:
+                    - generic [ref=e63]: transfer_allow_death
+                    - generic [ref=e64]: 2 args
+                  - button "transfer 2 args" [ref=e65]:
+                    - generic [ref=e66]: transfer
+                    - generic [ref=e67]: 2 args
+                  - button "transfer_keep_alive 2 args" [ref=e68]:
+                    - generic [ref=e69]: transfer_keep_alive
+                    - generic [ref=e70]: 2 args
+                  - button "transfer_all 2 args" [ref=e71]:
+                    - generic [ref=e72]: transfer_all
+                    - generic [ref=e73]: 2 args
+                  - button "force_transfer 3 args" [ref=e74]:
+                    - generic [ref=e75]: force_transfer
+                    - generic [ref=e76]: 3 args
+              - button "Storage (7)" [ref=e78]:
+                - img
+                - img
+                - generic [ref=e79]: Storage (7)
+          - button "Beefy 6" [ref=e81]:
+            - img
+            - img
+            - generic [ref=e82]: Beefy
+            - generic [ref=e83]: "6"
+          - button "BeefyMmrLeaf 4" [ref=e85]:
+            - img
+            - img
+            - generic [ref=e86]: BeefyMmrLeaf
+            - generic [ref=e87]: "4"
+          - button "Bounties 6" [ref=e89]:
+            - img
+            - img
+            - generic [ref=e90]: Bounties
+            - generic [ref=e91]: "6"
+          - button "ChildBounties 13" [ref=e93]:
+            - img
+            - img
+            - generic [ref=e94]: ChildBounties
+            - generic [ref=e95]: "13"
+          - button "Claims 7" [ref=e97]:
+            - img
+            - img
+            - generic [ref=e98]: Claims
+            - generic [ref=e99]: "7"
+          - button "Configuration 5" [ref=e101]:
+            - img
+            - img
+            - generic [ref=e102]: Configuration
+            - generic [ref=e103]: "5"
+          - button "ConvictionVoting 4" [ref=e105]:
+            - img
+            - img
+            - generic [ref=e106]: ConvictionVoting
+            - generic [ref=e107]: "4"
+          - button "Coretime 2" [ref=e109]:
+            - img
+            - img
+            - generic [ref=e110]: Coretime
+            - generic [ref=e111]: "2"
+          - button "CoretimeAssignmentProvider 4" [ref=e113]:
+            - img
+            - img
+            - generic [ref=e114]: CoretimeAssignmentProvider
+            - generic [ref=e115]: "4"
+          - button "Crowdloan 6" [ref=e117]:
+            - img
+            - img
+            - generic [ref=e118]: Crowdloan
+            - generic [ref=e119]: "6"
+          - button "DelegatedStaking 10" [ref=e121]:
+            - img
+            - img
+            - generic [ref=e122]: DelegatedStaking
+            - generic [ref=e123]: "10"
+          - button "Democracy 8" [ref=e125]:
+            - img
+            - img
+            - generic [ref=e126]: Democracy
+            - generic [ref=e127]: "8"
+          - button "Dmp 5" [ref=e129]:
+            - img
+            - img
+            - generic [ref=e130]: Dmp
+            - generic [ref=e131]: "5"
+          - button "ElectionProviderMultiPhase 14" [ref=e133]:
+            - img
+            - img
+            - generic [ref=e134]: ElectionProviderMultiPhase
+            - generic [ref=e135]: "14"
+          - button "FastUnstake 7" [ref=e137]:
+            - img
+            - img
+            - generic [ref=e138]: FastUnstake
+            - generic [ref=e139]: "7"
+          - button "Grandpa 8" [ref=e141]:
+            - img
+            - img
+            - generic [ref=e142]: Grandpa
+            - generic [ref=e143]: "8"
+          - button "Historical 3" [ref=e145]:
+            - img
+            - img
+            - generic [ref=e146]: Historical
+            - generic [ref=e147]: "3"
+          - button "Hrmp 14" [ref=e149]:
+            - img
+            - img
+            - generic [ref=e150]: Hrmp
+            - generic [ref=e151]: "14"
+          - button "Indices 5" [ref=e153]:
+            - img
+            - img
+            - generic [ref=e154]: Indices
+            - generic [ref=e155]: "5"
+          - button "Initializer 3" [ref=e157]:
+            - img
+            - img
+            - generic [ref=e158]: Initializer
+            - generic [ref=e159]: "3"
+          - button "MessageQueue 5" [ref=e161]:
+            - img
+            - img
+            - generic [ref=e162]: MessageQueue
+            - generic [ref=e163]: "5"
+          - button "Mmr 4" [ref=e165]:
+            - img
+            - img
+            - generic [ref=e166]: Mmr
+            - generic [ref=e167]: "4"
+          - button "Multisig 3" [ref=e169]:
+            - img
+            - img
+            - generic [ref=e170]: Multisig
+            - generic [ref=e171]: "3"
+          - button "NominationPools 28" [ref=e173]:
+            - img
+            - img
+            - generic [ref=e174]: NominationPools
+            - generic [ref=e175]: "28"
+          - button "Offences 3" [ref=e177]:
+            - img
+            - img
+            - generic [ref=e178]: Offences
+            - generic [ref=e179]: "3"
+          - button "OnDemand 8" [ref=e181]:
+            - img
+            - img
+            - generic [ref=e182]: OnDemand
+            - generic [ref=e183]: "8"
+          - button "Origins 2" [ref=e185]:
+            - img
+            - img
+            - generic [ref=e186]: Origins
+            - generic [ref=e187]: "2"
+          - button "ParachainsOrigin 2" [ref=e189]:
+            - img
+            - img
+            - generic [ref=e190]: ParachainsOrigin
+            - generic [ref=e191]: "2"
+          - button "ParaInclusion 3" [ref=e193]:
+            - img
+            - img
+            - generic [ref=e194]: ParaInclusion
+            - generic [ref=e195]: "3"
+          - button "ParaInherent 4" [ref=e197]:
+            - img
+            - img
+            - generic [ref=e198]: ParaInherent
+            - generic [ref=e199]: "4"
+          - button "Paras 22" [ref=e201]:
+            - img
+            - img
+            - generic [ref=e202]: Paras
+            - generic [ref=e203]: "22"
+          - button "ParaScheduler 5" [ref=e205]:
+            - img
+            - img
+            - generic [ref=e206]: ParaScheduler
+            - generic [ref=e207]: "5"
+          - button "ParasDisputes 7" [ref=e209]:
+            - img
+            - img
+            - generic [ref=e210]: ParasDisputes
+            - generic [ref=e211]: "7"
+          - button "ParaSessionInfo 7" [ref=e213]:
+            - img
+            - img
+            - generic [ref=e214]: ParaSessionInfo
+            - generic [ref=e215]: "7"
+          - button "ParasShared 6" [ref=e217]:
+            - img
+            - img
+            - generic [ref=e218]: ParasShared
+            - generic [ref=e219]: "6"
+          - button "ParasSlashing 4" [ref=e221]:
+            - img
+            - img
+            - generic [ref=e222]: ParasSlashing
+            - generic [ref=e223]: "4"
+          - button "Preimage 7" [ref=e225]:
+            - img
+            - img
+            - generic [ref=e226]: Preimage
+            - generic [ref=e227]: "7"
+          - button "Proxy 4" [ref=e229]:
+            - img
+            - img
+            - generic [ref=e230]: Proxy
+            - generic [ref=e231]: "4"
+          - button "Referenda 7" [ref=e233]:
+            - img
+            - img
+            - generic [ref=e234]: Referenda
+            - generic [ref=e235]: "7"
+          - button "Registrar 5" [ref=e237]:
+            - img
+            - img
+            - generic [ref=e238]: Registrar
+            - generic [ref=e239]: "5"
+          - button "Scheduler 6" [ref=e241]:
+            - img
+            - img
+            - generic [ref=e242]: Scheduler
+            - generic [ref=e243]: "6"
+          - button "Session 8" [ref=e245]:
+            - img
+            - img
+            - generic [ref=e246]: Session
+            - generic [ref=e247]: "8"
+          - button "Slots 3" [ref=e249]:
+            - img
+            - img
+            - generic [ref=e250]: Slots
+            - generic [ref=e251]: "3"
+          - button "Staking 48" [ref=e253]:
+            - img
+            - img
+            - generic [ref=e254]: Staking
+            - generic [ref=e255]: "48"
+          - button "StateTrieMigration 5" [ref=e257]:
+            - img
+            - img
+            - generic [ref=e258]: StateTrieMigration
+            - generic [ref=e259]: "5"
+          - generic [ref=e260]:
+            - button "System 22" [ref=e261]:
+              - img
+              - img
+              - generic [ref=e262]: System
+              - generic [ref=e263]: "22"
+            - generic [ref=e264]:
+              - generic [ref=e265]:
+                - button "Calls (3)" [ref=e266]:
+                  - img
+                  - img
+                  - generic [ref=e267]: Calls (3)
+                - generic [ref=e268]:
+                  - button "remark 1 args" [ref=e269]:
+                    - generic [ref=e270]: remark
+                    - generic [ref=e271]: 1 args
+                  - button "remark_with_event 1 args" [ref=e272]:
+                    - generic [ref=e273]: remark_with_event
+                    - generic [ref=e274]: 1 args
+                  - button "set_heap_pages 1 args" [ref=e275]:
+                    - generic [ref=e276]: set_heap_pages
+                    - generic [ref=e277]: 1 args
+              - button "Storage (19)" [ref=e279]:
+                - img
+                - img
+                - generic [ref=e280]: Storage (19)
+          - generic [ref=e281]:
+            - button "Timestamp 3" [ref=e282]:
+              - img
+              - img
+              - generic [ref=e283]: Timestamp
+              - generic [ref=e284]: "3"
+            - generic [ref=e285]:
+              - generic [ref=e286]:
+                - button "Calls (1)" [ref=e287]:
+                  - img
+                  - img
+                  - generic [ref=e288]: Calls (1)
+                - button "set 1 args" [ref=e290]:
+                  - generic [ref=e291]: set
+                  - generic [ref=e292]: 1 args
+              - button "Storage (2)" [ref=e294]:
+                - img
+                - img
+                - generic [ref=e295]: Storage (2)
+          - button "TransactionPayment 3" [ref=e297]:
+            - img
+            - img
+            - generic [ref=e298]: TransactionPayment
+            - generic [ref=e299]: "3"
+          - button "Treasury 10" [ref=e301]:
+            - img
+            - img
+            - generic [ref=e302]: Treasury
+            - generic [ref=e303]: "10"
+          - button "Utility 4" [ref=e305]:
+            - img
+            - img
+            - generic [ref=e306]: Utility
+            - generic [ref=e307]: "4"
+          - button "Vesting 5" [ref=e309]:
+            - img
+            - img
+            - generic [ref=e310]: Vesting
+            - generic [ref=e311]: "5"
+          - button "VoterList 5" [ref=e313]:
+            - img
+            - img
+            - generic [ref=e314]: VoterList
+            - generic [ref=e315]: "5"
+          - button "Whitelist 3" [ref=e317]:
+            - img
+            - img
+            - generic [ref=e318]: Whitelist
+            - generic [ref=e319]: "3"
+          - button "XcmPallet 18" [ref=e321]:
+            - img
+            - img
+            - generic [ref=e322]: XcmPallet
+            - generic [ref=e323]: "18"
+      - generic [ref=e324]:
+        - generic [ref=e328]: Connected to polkadot
+        - generic [ref=e329]:
+          - generic [ref=e330]:
+            - generic [ref=e331]: Select a Pallet Call or Storage
+            - generic [ref=e332]: Choose a call (to execute transactions) or storage item (to query data) from the left panel
+          - generic [ref=e334]: Select a chain and explore the available pallets
+      - generic [ref=e336]:
+        - tablist [ref=e338]:
+          - tab "Setup" [selected] [ref=e339]
+          - tab "Code" [ref=e340]
+          - tab "Console" [ref=e341]
+        - tabpanel "Setup" [ref=e342]:
+          - generic [ref=e343]:
+            - generic [ref=e345]:
+              - img [ref=e346]
+              - generic [ref=e349]: Setup Required for Polkadot
+            - generic [ref=e351]:
+              - generic [ref=e353]:
+                - generic [ref=e354]: "Run these commands in your project:"
+                - generic [ref=e355]:
+                  - generic [ref=e356]:
+                    - generic [ref=e357]: $
+                    - generic [ref=e358]: npm install -g polkadot-api
+                    - button [ref=e359]:
+                      - img
+                  - generic [ref=e360]:
+                    - generic [ref=e361]: $
+                    - generic [ref=e362]: papi add dot -n polkadot
+                    - button [ref=e363]:
+                      - img
+                  - generic [ref=e364]:
+                    - generic [ref=e365]: $
+                    - generic [ref=e366]: papi generate
+                    - button [ref=e367]:
+                      - img
+                  - generic [ref=e368]:
+                    - generic [ref=e369]: $
+                    - generic [ref=e370]: npm install
+                    - button [ref=e371]:
+                      - img
+              - generic [ref=e372]:
+                - strong [ref=e373]: "Setting up:"
+                - text: Polkadot mainnet
+              - generic [ref=e374]:
+                - strong [ref=e376]: "Recommended Workflow:"
+                - generic [ref=e377]: 1. Run the setup commands above in your project
+                - generic [ref=e378]: 2. Configure your transactions using the UI
+                - generic [ref=e379]: 3. Copy the generated code from the Code tab
+                - generic [ref=e380]: 4. Paste into your project and run it
+  - button "Open Next.js Dev Tools" [ref=e386] [cursor=pointer]:
+    - img [ref=e387] [cursor=pointer]
+  - alert [ref=e390]
+```

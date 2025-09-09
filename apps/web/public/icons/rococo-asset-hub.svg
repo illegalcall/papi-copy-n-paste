@@ -1,0 +1,5 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="12" cy="12" r="10" fill="#6f42c1" stroke="#FFFFFF" stroke-width="2"/>
+  <rect x="8" y="8" width="8" height="8" fill="white" opacity="0.8" rx="2"/>
+  <text x="12" y="14" text-anchor="middle" fill="#6f42c1" font-family="Arial, sans-serif" font-weight="bold" font-size="6">RA</text>
+</svg>

@@ -1,0 +1,20 @@
+{{#includeChopsticks}}{
+  "name": "{{projectName}}-chopsticks",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Chopsticks local development setup for {{projectName}}",
+  "scripts": {
+    "start": "bun run ./main.ts"
+  },
+  "keywords": ["chopsticks", "polkadot", "{{chainName}}"],
+  "dependencies": {
+    "@acala-network/chopsticks": "^1.0.2",
+    "@polkadot-api/substrate-bindings": "^0.16.0",
+    "@polkadot-labs/hdkd": "^0.0.6",
+    "@polkadot-labs/hdkd-helpers": "^0.0.6",
+    "polkadot-api": "^1.16.3"
+  },
+  "devDependencies": {
+    "bun": "^1.0.0"
+  }
+}{{/includeChopsticks}}

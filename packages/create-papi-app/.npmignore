@@ -1,0 +1,44 @@
+# Source files
+src/
+tsconfig.json
+tsconfig.*.json
+
+# Development
+node_modules/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+test/
+tests/
+*.test.ts
+*.test.js
+coverage/
+
+# Development tools
+.eslintrc*
+.prettierrc*
+.editorconfig
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Only include built files and templates
+!dist/
+!bin/
+!templates/
+!README.md
+!LICENSE
