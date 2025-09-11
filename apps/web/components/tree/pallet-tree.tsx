@@ -48,6 +48,29 @@ export function PalletTree({
     return items.filter((item) => item.name.toLowerCase().includes(lowerQuery));
   };
 
+  // Enhanced filtering that searches in method arguments and descriptions
+  const enhancedFilterItems = <T extends { name: string; args?: any[] }>(
+    items: T[],
+    query: string,
+  ): T[] => {
+    if (!query) return items;
+    const lowerQuery = query.toLowerCase();
+    return items.filter((item) => {
+      // Search in item name
+      if (item.name.toLowerCase().includes(lowerQuery)) return true;
+      
+      // Search in arguments if available
+      if (item.args) {
+        return item.args.some((arg) => 
+          arg.name?.toLowerCase().includes(lowerQuery) ||
+          arg.type?.toLowerCase().includes(lowerQuery)
+        );
+      }
+      
+      return false;
+    });
+  };
+
   // Enhanced filtering that also filters items within pallets
   const filteredPallets = pallets
     .map((pallet) => {
@@ -56,10 +79,11 @@ export function PalletTree({
       const query = searchQuery.toLowerCase();
       const palletNameMatches = pallet.name.toLowerCase().includes(query);
 
-      // Filter individual items within the pallet
-      const filteredCalls = filterItems(pallet.calls, searchQuery);
-      const filteredStorage = filterItems(pallet.storage, searchQuery);
-      const filteredEvents = filterItems(pallet.events, searchQuery);
+      // If pallet name matches, show ALL items within it (no filtering)
+      // Otherwise, filter individual items within the pallet using enhanced search
+      const filteredCalls = palletNameMatches ? pallet.calls : enhancedFilterItems(pallet.calls, searchQuery);
+      const filteredStorage = palletNameMatches ? pallet.storage : enhancedFilterItems(pallet.storage, searchQuery);
+      const filteredEvents = palletNameMatches ? pallet.events : filterItems(pallet.events, searchQuery);
 
       // Include pallet if name matches OR if any items within it match
       const hasMatches =
@@ -112,12 +136,21 @@ export function PalletTree({
   const shouldAutoExpand = (pallet: PalletInfo): boolean => {
     if (!searchQuery) return false;
     const query = searchQuery.toLowerCase();
+    const palletNameMatches = pallet.name.toLowerCase().includes(query);
+    
+    // Auto-expand if pallet name matches OR if items inside match
     return (
+      palletNameMatches ||
       (pallet.calls.length > 0 ||
         pallet.storage.length > 0 ||
-        pallet.events.length > 0) &&
-      !pallet.name.toLowerCase().includes(query)
-    ); // Only auto-expand if pallet name doesn't match (items inside do)
+        pallet.events.length > 0)
+    );
+  };
+
+  // Auto-expand sections when pallet name matches search
+  const shouldAutoExpandSection = (palletName: string): boolean => {
+    if (!searchQuery) return false;
+    return palletName.toLowerCase().includes(searchQuery.toLowerCase());
   };
 
   // Highlight matching text in names
@@ -191,7 +224,7 @@ export function PalletTree({
                       className="w-full justify-start h-7 px-2 font-normal text-xs"
                       onClick={() => toggleSection(`${pallet.name}-calls`)}
                     >
-                      {expandedSections.has(`${pallet.name}-calls`) ? (
+                      {(expandedSections.has(`${pallet.name}-calls`) || shouldAutoExpandSection(pallet.name)) ? (
                         <ChevronDown className="w-3 h-3 mr-1" />
                       ) : (
                         <ChevronRight className="w-3 h-3 mr-1" />
@@ -200,27 +233,50 @@ export function PalletTree({
                       <span>Calls ({pallet.calls.length})</span>
                     </Button>
 
-                    {expandedSections.has(`${pallet.name}-calls`) && (
+                    {(expandedSections.has(`${pallet.name}-calls`) || shouldAutoExpandSection(pallet.name)) && (
                       <div className="ml-4 space-y-0.5">
                         {pallet.calls.map((call) => {
                           const isSelected =
                             selectedCall?.pallet === pallet.name &&
                             selectedCall?.call === call.name;
+                          
+                          // Check if this call was matched by argument search
+                          const argumentMatched = searchQuery && call.args.some((arg) => 
+                            arg.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            arg.type?.toLowerCase().includes(searchQuery.toLowerCase())
+                          ) && !call.name.toLowerCase().includes(searchQuery.toLowerCase());
+
                           return (
                             <Button
                               key={call.name}
                               variant={isSelected ? "secondary" : "ghost"}
-                              className="w-full justify-start h-6 px-2 font-normal text-xs"
+                              className="w-full justify-start h-auto min-h-6 px-2 py-1 font-normal text-xs"
                               onClick={() => handleCallClick(pallet, call)}
                             >
-                              <span className="truncate">
-                                {highlightMatch(call.name, searchQuery)}
-                              </span>
-                              {call.args.length > 0 && (
-                                <span className="ml-auto text-xs text-muted-foreground">
-                                  {call.args.length} args
-                                </span>
-                              )}
+                              <div className="flex flex-col items-start w-full">
+                                <div className="flex items-center justify-between w-full">
+                                  <span className="truncate">
+                                    {highlightMatch(call.name, searchQuery)}
+                                  </span>
+                                  {call.args.length > 0 && (
+                                    <span className="ml-auto text-xs text-muted-foreground">
+                                      {call.args.length} args
+                                    </span>
+                                  )}
+                                </div>
+                                {argumentMatched && (
+                                  <div className="text-xs text-muted-foreground mt-0.5 text-left">
+                                    Found in: {call.args
+                                      .filter(arg => 
+                                        arg.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                        arg.type?.toLowerCase().includes(searchQuery.toLowerCase())
+                                      )
+                                      .map(arg => arg.name || arg.type)
+                                      .slice(0, 2)
+                                      .join(', ')}
+                                  </div>
+                                )}
+                              </div>
                             </Button>
                           );
                         })}
@@ -237,7 +293,7 @@ export function PalletTree({
                       className="w-full justify-start h-7 px-2 font-normal text-xs"
                       onClick={() => toggleSection(`${pallet.name}-storage`)}
                     >
-                      {expandedSections.has(`${pallet.name}-storage`) ? (
+                      {(expandedSections.has(`${pallet.name}-storage`) || shouldAutoExpandSection(pallet.name)) ? (
                         <ChevronDown className="w-3 h-3 mr-1" />
                       ) : (
                         <ChevronRight className="w-3 h-3 mr-1" />
@@ -246,7 +302,7 @@ export function PalletTree({
                       <span>Storage ({pallet.storage.length})</span>
                     </Button>
 
-                    {expandedSections.has(`${pallet.name}-storage`) && (
+                    {(expandedSections.has(`${pallet.name}-storage`) || shouldAutoExpandSection(pallet.name)) && (
                       <div className="ml-4 space-y-0.5">
                         {pallet.storage.map((storage) => {
                           const isSelected =
@@ -280,7 +336,7 @@ export function PalletTree({
                       className="w-full justify-start h-7 px-2 font-normal text-xs"
                       onClick={() => toggleSection(`${pallet.name}-events`)}
                     >
-                      {expandedSections.has(`${pallet.name}-events`) ? (
+                      {(expandedSections.has(`${pallet.name}-events`) || shouldAutoExpandSection(pallet.name)) ? (
                         <ChevronDown className="w-3 h-3 mr-1" />
                       ) : (
                         <ChevronRight className="w-3 h-3 mr-1" />
@@ -289,7 +345,7 @@ export function PalletTree({
                       <span>Events ({pallet.events.length})</span>
                     </Button>
 
-                    {expandedSections.has(`${pallet.name}-events`) && (
+                    {(expandedSections.has(`${pallet.name}-events`) || shouldAutoExpandSection(pallet.name)) && (
                       <div className="ml-4 space-y-0.5">
                         {pallet.events.map((event) => (
                           <Button

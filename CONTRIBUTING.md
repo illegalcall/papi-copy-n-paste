@@ -44,7 +44,7 @@ papi-copy-paste/
 │   ├── core/                # Core PAPI functionality
 │   ├── ui/                  # Shared UI components (shadcn/ui)
 │   ├── learning-engine/     # Educational features
-│   └── create-papi-app/     # CLI scaffolding tool
+│   └── create-papi-app/     # CLI scaffolding tool (published separately)
 └── turbo.json               # Turbo monorepo configuration
 ```
 

@@ -66,7 +66,7 @@ This project uses a monorepo structure with the following packages:
 ### Applications
 
 - **`apps/web`**: Next.js web application with the main UI
-- **`packages/create-papi-app`**: CLI tool for scaffolding PAPI projects
+- **`create-papi-app`**: CLI tool for scaffolding PAPI projects (published as separate npm package)
 
 ### Core Packages
 
@@ -128,7 +128,7 @@ papi-copy-paste/
 │   ├── core/                # Core PAPI functionality
 │   ├── ui/                  # Shared UI components
 │   ├── learning-engine/     # Educational features
-│   └── create-papi-app/     # CLI scaffolding tool
+│   └── create-papi-app/     # CLI scaffolding tool (published separately)
 └── turbo.json               # Turbo monorepo configuration
 ```
 
@@ -142,7 +142,7 @@ pnpm lint                    # Run linting
 pnpm format                  # Format code with Prettier
 
 # Package management
-pnpm create-app              # Run the CLI scaffolding tool
+pnpm create-app              # Run the CLI scaffolding tool (via npm)
 ```
 
 ### Adding New Chains

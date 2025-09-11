@@ -2,7 +2,7 @@
 
 import { Input } from "@workspace/ui/components/input";
 import { Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useImperativeHandle, forwardRef } from "react";
 import { PalletTree } from "@/components/tree/pallet-tree";
 import { PalletInfo, PalletCall } from "@workspace/core";
 
@@ -18,7 +18,12 @@ interface LeftPaneProps {
   error?: string | null;
 }
 
-export function LeftPane({
+export interface LeftPaneRef {
+  focusSearch: () => void;
+  clearSearch: () => void;
+}
+
+export const LeftPane = forwardRef<LeftPaneRef, LeftPaneProps>(({
   isOpen,
   onClose,
   pallets,
@@ -28,8 +33,19 @@ export function LeftPane({
   selectedStorage,
   isLoading = false,
   error = null,
-}: LeftPaneProps) {
+}, ref) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focusSearch: () => {
+      searchInputRef.current?.focus();
+      searchInputRef.current?.select();
+    },
+    clearSearch: () => {
+      setSearchQuery("");
+    }
+  }), []);
 
   return (
     <div className="w-full h-full bg-muted/40 border-r flex flex-col">
@@ -37,7 +53,8 @@ export function LeftPane({
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search pallets..."
+            ref={searchInputRef}
+            placeholder="Search pallets, methods, args... (⌘K)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-8"
@@ -86,4 +103,6 @@ export function LeftPane({
       </div>
     </div>
   );
-}
+});
+
+LeftPane.displayName = 'LeftPane';

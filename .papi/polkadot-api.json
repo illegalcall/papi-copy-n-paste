@@ -45,10 +45,10 @@
       "codeHash": "0xf645d939be087a8a76ade94d3e28f51f0c4b70abfc0db8b302e2372590b9e31a"
     },
     "paseo": {
-      "wsUrl": "wss://pas-rpc.stakeworld.io/assethub",
+      "wsUrl": "wss://rpc.ibp.network/paseo",
       "metadata": ".papi/metadata/paseo.scale",
-      "genesis": "0xd6eec26135305a8ad257a20d003357284c8aa03d0bdb2b357ab0a22371e11ef2",
-      "codeHash": "0x6b99330eb07c2dfd4510609ae8c49d9a2732f9bef8b9c0da544828f4e1a34942"
+      "genesis": "0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f",
+      "codeHash": "0x96f6cb4f577e7ecb8c9e648f77724c0c850fe366854f99a29c79275895b4c636"
     }
   }
 }
