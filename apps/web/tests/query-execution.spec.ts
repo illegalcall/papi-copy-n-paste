@@ -83,7 +83,7 @@ test.describe("Query Execution and Code Generation", () => {
     // Should contain setup instructions
     expect(generatedCode).toContain("npm install");
     expect(generatedCode).toContain("papi add");
-    expect(generatedCode).toContain("papi generate");
+    expect(generatedCode).toContain("npx papi");
   });
 
   test("should generate different code for different providers", async ({

@@ -32,15 +32,18 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://papi-copy-paste.vercel.app"),
+  metadataBase: new URL("https://papi-copy-n-paste-web.vercel.app"),
   alternates: {
     canonical: "/",
   },
+  category: "technology",
+  classification: "Web3 Developer Tools",
+  referrer: "origin-when-cross-origin",
   openGraph: {
     title: "Copy‑n‑Paste PAPI | Multi-Chain Polkadot API Explorer",
     description:
       "Interactive multi-chain explorer for Polkadot API. Connect to Polkadot, Kusama, and parachains. Generate ready-to-use code snippets for the entire Polkadot ecosystem.",
-    url: "https://papi-copy-paste.vercel.app",
+    url: "https://papi-copy-n-paste-web.vercel.app",
     siteName: "Copy‑n‑Paste PAPI",
     locale: "en_US",
     type: "website",
@@ -91,8 +94,55 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Copy‑n‑Paste PAPI",
+    "description": "Interactive multi-chain explorer for Polkadot API (PAPI). Connect to Polkadot, Kusama, and parachains. Generate ready-to-use code snippets for transactions, queries, and storage operations across the entire Polkadot ecosystem.",
+    "url": "https://papi-copy-n-paste-web.vercel.app",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Polkadot Ecosystem",
+      "url": "https://polkadot.network"
+    },
+    "creator": {
+      "@type": "Person",
+      "name": "illegalcall",
+      "url": "https://github.com/illegalcall"
+    },
+    "keywords": "Polkadot, Kusama, PAPI, Polkadot API, blockchain, Web3, substrate, parachains, transactions, multi-chain, code generator, developer tools",
+    "featureList": [
+      "Multi-chain support for Polkadot ecosystem",
+      "Interactive pallet explorer",
+      "Ready-to-use code generation",
+      "Transaction and storage query builders",
+      "Real-time blockchain interaction",
+      "Developer-friendly interface"
+    ]
+  };
+
   return (
     <html lang="en" suppressHydrationWarning className="overflow-hidden">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.svg" sizes="any" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://vercel.com" />
+        <link rel="dns-prefetch" href="https://analytics.vercel.com" />
+      </head>
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased overflow-hidden`}
       >

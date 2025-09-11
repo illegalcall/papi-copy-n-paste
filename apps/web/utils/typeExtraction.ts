@@ -6,6 +6,17 @@
 // Cache for parsed type information
 const typeCache = new Map<string, any>();
 
+export interface TypeScriptTypeInfo {
+  signature: string;
+  parameters: Array<{
+    name: string;
+    type: string;
+    description?: string;
+  }>;
+  returnType?: string;
+  complexity: 'simple' | 'medium' | 'complex';
+}
+
 // Known type mappings from PAPI descriptors (updated when descriptors are available)
 const knownTypeMappings: Record<string, Record<string, Record<string, any>>> = {
   polkadot: {
@@ -233,4 +244,256 @@ export function formatTypeForDisplay(
   }
 
   return typeInfo.actualType;
+}
+
+/**
+ * Converts PAPI type strings to TypeScript equivalents for transaction calls
+ */
+export function papiTypeToTypeScript(papiType: string): string {
+  // Handle common PAPI to TypeScript conversions
+  const typeMap: Record<string, string> = {
+    // Numeric types
+    'u8': 'number',
+    'u16': 'number', 
+    'u32': 'number',
+    'u64': 'bigint',
+    'u128': 'bigint',
+    'i8': 'number',
+    'i16': 'number',
+    'i32': 'number',
+    'i64': 'bigint',
+    'i128': 'bigint',
+    
+    // Blockchain specific types
+    'AccountId32': 'MultiAddress',
+    'AccountId': 'MultiAddress',
+    'H256': 'HexString',
+    'Balance': 'bigint',
+    
+    // Basic types
+    'Bool': 'boolean',
+    'Bytes': 'HexString',
+    'Text': 'string',
+    'Str': 'string',
+  };
+
+  // Handle direct mappings
+  if (typeMap[papiType]) {
+    return typeMap[papiType];
+  }
+
+  // Handle Compact<T>
+  const compactMatch = papiType.match(/^Compact<(.+)>$/);
+  if (compactMatch && compactMatch[1]) {
+    return papiTypeToTypeScript(compactMatch[1]);
+  }
+
+  // Handle Option<T>
+  const optionMatch = papiType.match(/^Option<(.+)>$/);
+  if (optionMatch && optionMatch[1]) {
+    return `${papiTypeToTypeScript(optionMatch[1])} | undefined`;
+  }
+
+  // Handle Vec<T>
+  const vecMatch = papiType.match(/^Vec<(.+)>$/);
+  if (vecMatch && vecMatch[1]) {
+    return `${papiTypeToTypeScript(vecMatch[1])}[]`;
+  }
+
+  // Handle Result<T, E>
+  const resultMatch = papiType.match(/^Result<(.+),\s*(.+)>$/);
+  if (resultMatch && resultMatch[1] && resultMatch[2]) {
+    return `Result<${papiTypeToTypeScript(resultMatch[1])}, ${papiTypeToTypeScript(resultMatch[2])}>`;
+  }
+
+  // Handle tuples (T, U, V)
+  const tupleMatch = papiType.match(/^\(([^)]+)\)$/);
+  if (tupleMatch && tupleMatch[1]) {
+    const types = tupleMatch[1].split(',').map(t => papiTypeToTypeScript(t.trim()));
+    return `[${types.join(', ')}]`;
+  }
+
+  // Handle complex types - keep as-is but clean up
+  return papiType
+    .replace(/^sp_runtime::|^pallet_|^frame_/, '') // Remove common prefixes
+    .replace(/::/, '.'); // Replace Rust :: with TS .
+}
+
+/**
+ * Generates TypeScript-style call signature for a transaction
+ */
+export function generateCallSignature(
+  pallet: string, 
+  callName: string, 
+  args: Array<{ name: string; type: string; }>
+): TypeScriptTypeInfo {
+  
+  const parameters = args.map(arg => ({
+    name: arg.name,
+    type: papiTypeToTypeScript(arg.type),
+    description: getParameterDescription(arg.name, arg.type)
+  }));
+
+  // Create TypeScript interface for parameters
+  const paramInterface = parameters.length > 0 
+    ? `{ ${parameters.map(p => `${p.name}: ${p.type}`).join('; ')} }`
+    : '{}';
+
+  // Generate the TxDescriptor signature
+  const signature = `TxDescriptor<${paramInterface}>`;
+
+  // Determine complexity based on parameter types and count
+  const complexity = determineComplexity(parameters);
+
+  return {
+    signature,
+    parameters,
+    returnType: 'SubmittableExtrinsic',
+    complexity
+  };
+}
+
+/**
+ * Generates TypeScript-style storage query signature
+ */
+export function generateStorageSignature(
+  pallet: string,
+  storageName: string,
+  keyTypes: string[] = [],
+  valueType: string = 'unknown'
+): TypeScriptTypeInfo {
+  
+  const parameters = keyTypes.map((type, index) => ({
+    name: `key${index + 1}`,
+    type: papiTypeToTypeScript(type),
+    description: `Storage key parameter ${index + 1}`
+  }));
+
+  const returnType = papiTypeToTypeScript(valueType);
+  
+  // Create signature based on whether it has keys
+  const signature = parameters.length > 0
+    ? `StorageDescriptor<[${parameters.map(p => p.type).join(', ')}], ${returnType}>`
+    : `StorageDescriptor<[], ${returnType}>`;
+
+  return {
+    signature,
+    parameters,
+    returnType,
+    complexity: determineComplexity(parameters)
+  };
+}
+
+/**
+ * Determines the complexity of a type signature
+ */
+function determineComplexity(parameters: Array<{ type: string; }>): 'simple' | 'medium' | 'complex' {
+  if (parameters.length === 0) return 'simple';
+  if (parameters.length <= 2) {
+    const hasComplexTypes = parameters.some(p => 
+      p.type.includes('|') || 
+      p.type.includes('[]') || 
+      p.type.includes('Result') ||
+      p.type.includes('MultiAddress')
+    );
+    return hasComplexTypes ? 'medium' : 'simple';
+  }
+  return 'complex';
+}
+
+/**
+ * Generates TypeScript-style constant signature
+ */
+export function generateConstantSignature(
+  pallet: string,
+  constantName: string,
+  constantType: string,
+  value: any
+): TypeScriptTypeInfo {
+  const tsType = papiTypeToTypeScript(constantType);
+  
+  // Create signature for the constant
+  const signature = `${tsType}`;
+  
+  return {
+    signature,
+    parameters: [], // Constants have no parameters
+    returnType: tsType,
+    complexity: 'simple'
+  };
+}
+
+/**
+ * Gets human-readable explanation for common constant types
+ */
+export function getConstantExplanation(constantName: string, constantType: string, value: any): string {
+  const normalizedName = constantName.toLowerCase();
+  
+  if (normalizedName.includes('deposit')) {
+    return `💰 Deposit amount in plancks (1 DOT = 10¹⁰ plancks)`;
+  }
+  
+  if (normalizedName.includes('period') && constantType === 'u32') {
+    return `⏰ Time period in blocks (~6 seconds per block)`;
+  }
+  
+  if (constantType === 'Permill') {
+    return `📊 Percentage in parts per million (1,000,000 = 100%)`;
+  }
+  
+  if (constantType === 'Perbill') {
+    return `📊 Percentage in parts per billion (1,000,000,000 = 100%)`;
+  }
+  
+  if (normalizedName.includes('max') && constantType === 'u32') {
+    return `🔢 Maximum limit or count`;
+  }
+  
+  if (constantType === 'Weight') {
+    return `⚖️ Computational weight limits`;
+  }
+  
+  if (constantType.includes('u128') && normalizedName.includes('balance')) {
+    return `💰 Balance amount in smallest unit`;
+  }
+  
+  return '';
+}
+
+/**
+ * Gets parameter descriptions based on common parameter names
+ */
+function getParameterDescription(paramName: string, paramType: string): string {
+  const descriptions: Record<string, string> = {
+    'dest': 'Destination account for the transaction',
+    'value': 'Amount to transfer (in smallest unit)',
+    'amount': 'Amount for the operation (in smallest unit)', 
+    'who': 'Account to perform operation on',
+    'target': 'Target account for the operation',
+    'source': 'Source account for the operation',
+    'beneficiary': 'Account that will benefit from the operation',
+    'controller': 'Controller account',
+    'stash': 'Stash account for staking',
+    'validator': 'Validator account',
+    'nominees': 'List of validator nominees',
+    'remark': 'On-chain remark or comment',
+    'data': 'Data payload for the transaction',
+    'call': 'Call to execute',
+    'calls': 'Batch of calls to execute',
+    'index': 'Index or identifier',
+    'new_free': 'New free balance amount',
+    'new_reserved': 'New reserved balance amount'
+  };
+
+  return descriptions[paramName] || `Parameter of type ${paramType}`;
+}
+
+/**
+ * Formats TypeScript type for display with syntax highlighting classes
+ * Returns the original string - highlighting will be handled by CSS classes in components
+ */
+export function formatTypeWithHighlighting(typeString: string): string {
+  // For now, just return the clean type string
+  // The components will handle styling with proper CSS classes
+  return typeString;
 }

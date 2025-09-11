@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "cd ../.. && papi generate && cd apps/web && next build",
+    "build": "cd ../.. && npx papi && cd apps/web && next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",

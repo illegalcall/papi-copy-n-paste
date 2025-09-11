@@ -374,7 +374,8 @@ export function CenterPane({
   };
 
   return (
-    <div className="flex-1 px-6 py-4 overflow-auto">
+    <div className="flex-1 overflow-hidden flex flex-col">
+      <div className="flex-1 overflow-y-auto px-6 py-4">
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-2">
           <div
@@ -667,6 +668,7 @@ export function CenterPane({
             </Button>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

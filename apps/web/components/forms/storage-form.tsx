@@ -1,13 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
@@ -23,7 +16,9 @@ import {
   extractActualTypes,
   getTypeExample,
   formatTypeForDisplay,
+  generateStorageSignature,
 } from "../../utils/typeExtraction";
+import { TypeAliasDisplay, CallSignature } from "@/components/type-display";
 
 interface StorageFormProps {
   pallet: string;
@@ -428,6 +423,7 @@ export function StorageForm({
   const [localParams, setLocalParams] =
     useState<Record<string, any>>(storageParams);
   const [showResponseStructure, setShowResponseStructure] = useState(false);
+  const [showTypeInfo, setShowTypeInfo] = useState(true);
 
   // Get ACTUAL type information from PAPI descriptors (new approach)
   const actualTypeInfo = extractActualTypes(chainKey, pallet, storage.name);
@@ -462,6 +458,14 @@ export function StorageForm({
     storage.name,
     actualTypeInfo,
   );
+  
+  // Generate TypeScript type information for storage
+  const storageTypeInfo = generateStorageSignature(
+    pallet,
+    storage.name,
+    actualTypeInfo.paramTypes,
+    actualType
+  );
 
   useEffect(() => {
     onParamsChange(localParams);
@@ -493,27 +497,65 @@ export function StorageForm({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <Database className="w-4 h-4" />
-          <span>
+    <div className="space-y-4">
+      {/* Storage Header - No Card */}
+      <div className="space-y-1">
+        <div className="flex items-center space-x-2">
+          <Database className="w-4 h-4 text-muted-foreground" />
+          <h3 className="text-lg font-semibold text-foreground">
             {pallet}.{storage.name}
-          </span>
-          <Badge variant="outline">Storage Query</Badge>
-        </CardTitle>
-        <CardDescription>
+          </h3>
+          <Badge variant="outline" className="text-xs">Storage Query</Badge>
+        </div>
+        <p className="text-sm text-muted-foreground">
           {storage.docs?.[0] || "Storage entry in the blockchain state"}
-        </CardDescription>
-      </CardHeader>
+        </p>
+      </div>
 
-      <CardContent className="space-y-4">
+      {/* TypeScript Type Information - Inline Compact */}
+      <div className="space-y-2">
+        <button
+          type="button"
+          className="flex items-center justify-between w-full p-2 bg-muted/20 rounded-md hover:bg-muted/30 transition-colors border"
+          onClick={() => setShowTypeInfo(!showTypeInfo)}
+        >
+          <div className="flex items-center space-x-2 flex-1 min-w-0">
+            <Code2 className="w-3 h-3 text-muted-foreground" />
+            <div className="font-mono text-xs text-foreground truncate">
+              <span className="text-pink-600">{storage.name}</span>
+              <span className="text-muted-foreground">: </span>
+              <span className="text-purple-600">StorageDescriptor</span>
+              <span className="text-gray-400">&lt;</span>
+              <span className="text-foreground">{storageTypeInfo.returnType}</span>
+              <span className="text-gray-400">&gt;</span>
+            </div>
+          </div>
+          {showTypeInfo ? (
+            <ChevronUp className="w-3 h-3 text-muted-foreground" />
+          ) : (
+            <ChevronDown className="w-3 h-3 text-muted-foreground" />
+          )}
+        </button>
+
+        {showTypeInfo && (
+          <div className="max-h-48 overflow-y-auto p-3 bg-muted/10 rounded-md border border-muted/50">
+            <CallSignature 
+              typeInfo={storageTypeInfo}
+              description={storage.docs?.[0] || "Storage entry in the blockchain state"}
+            />
+          </div>
+        )}
+      </div>
+
         {/* Enhanced Query Type Selection */}
-        <EnhancedQuerySelector
-          value={queryType}
-          onValueChange={onQueryTypeChange}
-          storageName={storage.name}
-        />
+        <div className="space-y-4">
+          <h4 className="text-sm font-semibold text-foreground">Query Configuration</h4>
+          <EnhancedQuerySelector
+            value={queryType}
+            onValueChange={onQueryTypeChange}
+            storageName={storage.name}
+          />
+        </div>
 
         {/* Storage Parameters (if needed) */}
         {requiredParams && requiredParams.length > 0 && (
@@ -619,7 +661,6 @@ export function StorageForm({
             </div>
           )}
         </div>
-      </CardContent>
-    </Card>
+    </div>
   );
 }
