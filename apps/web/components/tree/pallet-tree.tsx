@@ -8,18 +8,22 @@ import {
   Zap,
   Database,
   Calendar,
+  Settings,
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import { PalletInfo, PalletCall } from "@workspace/core";
+
 
 interface PalletTreeProps {
   pallets: PalletInfo[];
   searchQuery: string;
   onCallSelect: (pallet: string, call: PalletCall) => void;
   onStorageSelect: (pallet: string, storage: any) => void;
+  onConstantSelect?: (pallet: string, constant: any) => void;
   selectedCall?: { pallet: string; call: string };
   selectedStorage?: { pallet: string; storage: string };
+  selectedConstant?: { pallet: string; constant: string };
 }
 
 export function PalletTree({
@@ -27,8 +31,10 @@ export function PalletTree({
   searchQuery,
   onCallSelect,
   onStorageSelect,
+  onConstantSelect,
   selectedCall,
   selectedStorage,
+  selectedConstant,
 }: PalletTreeProps) {
   // Start with essential pallets expanded for better UX and scrollable content
   const [expandedPallets, setExpandedPallets] = useState<Set<string>>(
@@ -84,13 +90,15 @@ export function PalletTree({
       const filteredCalls = palletNameMatches ? pallet.calls : enhancedFilterItems(pallet.calls, searchQuery);
       const filteredStorage = palletNameMatches ? pallet.storage : enhancedFilterItems(pallet.storage, searchQuery);
       const filteredEvents = palletNameMatches ? pallet.events : filterItems(pallet.events, searchQuery);
+      const filteredConstants = palletNameMatches ? pallet.constants : filterItems(pallet.constants, searchQuery);
 
       // Include pallet if name matches OR if any items within it match
       const hasMatches =
         palletNameMatches ||
         filteredCalls.length > 0 ||
         filteredStorage.length > 0 ||
-        filteredEvents.length > 0;
+        filteredEvents.length > 0 ||
+        filteredConstants.length > 0;
 
       if (!hasMatches) return null;
 
@@ -100,6 +108,7 @@ export function PalletTree({
         calls: filteredCalls,
         storage: filteredStorage,
         events: filteredEvents,
+        constants: filteredConstants,
       };
     })
     .filter((pallet): pallet is PalletInfo => pallet !== null);
@@ -132,6 +141,12 @@ export function PalletTree({
     onStorageSelect(pallet.name, storage);
   };
 
+  const handleConstantClick = (pallet: PalletInfo, constant: any) => {
+    if (onConstantSelect) {
+      onConstantSelect(pallet.name, constant);
+    }
+  };
+
   // Auto-expand pallets that have search matches
   const shouldAutoExpand = (pallet: PalletInfo): boolean => {
     if (!searchQuery) return false;
@@ -143,7 +158,8 @@ export function PalletTree({
       palletNameMatches ||
       (pallet.calls.length > 0 ||
         pallet.storage.length > 0 ||
-        pallet.events.length > 0)
+        pallet.events.length > 0 ||
+        pallet.constants.length > 0)
     );
   };
 
@@ -191,7 +207,7 @@ export function PalletTree({
         const isExpanded =
           expandedPallets.has(pallet.name) || shouldAutoExpand(pallet);
         const totalItems =
-          pallet.calls.length + pallet.storage.length + pallet.events.length;
+          pallet.calls.length + pallet.storage.length + pallet.events.length + pallet.constants.length;
 
         return (
           <div key={pallet.name} data-testid="pallet-item">
@@ -359,6 +375,56 @@ export function PalletTree({
                             </span>
                           </Button>
                         ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Constants Section */}
+                {pallet.constants.length > 0 && (
+                  <div>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start h-7 px-2 font-normal text-xs"
+                      onClick={() => toggleSection(`${pallet.name}-constants`)}
+                    >
+                      {(expandedSections.has(`${pallet.name}-constants`) || shouldAutoExpandSection(pallet.name)) ? (
+                        <ChevronDown className="w-3 h-3 mr-1" />
+                      ) : (
+                        <ChevronRight className="w-3 h-3 mr-1" />
+                      )}
+                      <Settings className="w-3 h-3 mr-2" />
+                      <span>Constants ({pallet.constants.length})</span>
+                    </Button>
+
+                    {(expandedSections.has(`${pallet.name}-constants`) || shouldAutoExpandSection(pallet.name)) && (
+                      <div className="ml-4 space-y-0.5">
+                        {pallet.constants.map((constant) => {
+                          const isSelected =
+                            selectedConstant?.pallet === pallet.name &&
+                            selectedConstant?.constant === constant.name;
+                          return (
+                            <Button
+                              key={constant.name}
+                              variant={isSelected ? "secondary" : "ghost"}
+                              className="w-full justify-start h-auto min-h-6 px-2 py-1 font-normal text-xs"
+                              onClick={() => handleConstantClick(pallet, constant)}
+                            >
+                              <div className="flex flex-col items-start w-full">
+                                <div className="flex items-center justify-between w-full">
+                                  <span className="truncate">
+                                    {highlightMatch(constant.name, searchQuery)}
+                                  </span>
+                                </div>
+                                {constant.docs && constant.docs.length > 0 && (
+                                  <div className="text-xs text-muted-foreground mt-0.5 text-left truncate w-full" title={constant.docs[0]}>
+                                    {constant.docs[0]}
+                                  </div>
+                                )}
+                              </div>
+                            </Button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>

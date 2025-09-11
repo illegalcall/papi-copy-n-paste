@@ -621,3 +621,64 @@ async function executeWatchValue(
     ]);
   }
 }
+
+// Execute a constant query
+export async function executeConstantQuery(
+  selectedConstant: { pallet: string; constant: any },
+  chainKey: string,
+  client: any,
+  setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
+  setIsRunning: React.Dispatch<React.SetStateAction<boolean>>,
+) {
+  try {
+    setConsoleOutput((prev) => [
+      ...prev,
+      `⚙️ Querying constant ${selectedConstant.pallet}.${selectedConstant.constant.name}...`,
+    ]);
+    
+    // Constants are available in the metadata, but for execution in the web interface
+    // we'll show the constant information and suggest using the generated code
+    const constantInfo = selectedConstant.constant;
+    
+    setConsoleOutput((prev) => [
+      ...prev,
+      `📋 Constant Name: ${constantInfo.name}`,
+    ]);
+    
+    setConsoleOutput((prev) => [
+      ...prev,
+      `🏷️ Type: ${constantInfo.type}`,
+    ]);
+    
+    if (constantInfo.docs && constantInfo.docs.length > 0) {
+      setConsoleOutput((prev) => [
+        ...prev,
+        `📖 Description: ${constantInfo.docs[0]}`,
+      ]);
+    }
+    
+    if (constantInfo.value !== undefined && constantInfo.value !== null) {
+      setConsoleOutput((prev) => [
+        ...prev,
+        `📊 Current Value: ${JSON.stringify(constantInfo.value)}`,
+      ]);
+    }
+    
+    setConsoleOutput((prev) => [
+      ...prev,
+      `💡 To query this constant in your code, use: typedApi.constants.${selectedConstant.pallet}.${constantInfo.name}()`,
+    ]);
+    
+    setConsoleOutput((prev) => [
+      ...prev,
+      `✅ Constant information retrieved successfully!`,
+    ]);
+    
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    setConsoleOutput((prev) => [
+      ...prev,
+      `❌ Constant query error: ${errorMessage}`,
+    ]);
+  }
+}

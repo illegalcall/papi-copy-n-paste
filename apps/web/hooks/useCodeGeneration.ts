@@ -7,6 +7,7 @@ import { PalletCall } from "@workspace/core";
 import {
   generateCodeSnippet,
   generateStorageQueryCode,
+  generateConstantQueryCode,
   generateMultiMethodCode,
   generateMultiStorageCode,
 } from "../utils/codeGenerators";
@@ -76,6 +77,35 @@ export function useCodeGeneration(
         setCode(
           `// Error generating code: ${error instanceof Error ? error.message : "Unknown error"}`,
         );
+      }
+    },
+    [selectedChain, selectedProvider],
+  );
+
+  // Generate code for constant query
+  const generateConstantCode = useCallback(
+    (
+      selectedConstant: { pallet: string; constant: any } | undefined,
+    ) => {
+      if (!selectedConstant) {
+        setCode("");
+        return;
+      }
+
+      try {
+        const generatedCode = generateConstantQueryCode(
+          selectedChain,
+          selectedProvider,
+          selectedConstant.pallet,
+          selectedConstant.constant,
+        );
+        setCode(generatedCode);
+        setCanRun(true);
+      } catch (error) {
+        setCode(
+          `// Error generating code: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+        setCanRun(false);
       }
     },
     [selectedChain, selectedProvider],
@@ -155,6 +185,7 @@ export function useCodeGeneration(
     (
       selectedCall: { pallet: string; call: PalletCall } | undefined,
       selectedStorage: { pallet: string; storage: any } | undefined,
+      selectedConstant: { pallet: string; constant: any } | undefined,
       formData: Record<string, any>,
       storageQueryType: string,
       storageParams: Record<string, any>,
@@ -172,7 +203,7 @@ export function useCodeGeneration(
         id: string;
       }>,
     ) => {
-      // Priority: method queue > storage queue > single call > single storage
+      // Priority: method queue > storage queue > single call > single storage > single constant
       if (methodQueue.length > 0) {
         generateMultiMethodCodeSnippet(methodQueue);
       } else if (storageQueue.length > 0) {
@@ -182,6 +213,8 @@ export function useCodeGeneration(
         generateTransactionCode(selectedCall, formData);
       } else if (selectedStorage) {
         generateStorageCode(selectedStorage, storageQueryType, storageParams);
+      } else if (selectedConstant) {
+        generateConstantCode(selectedConstant);
       } else {
         setCode("");
         setCanRun(false);
@@ -190,6 +223,7 @@ export function useCodeGeneration(
     [
       generateTransactionCode,
       generateStorageCode,
+      generateConstantCode,
       generateMultiMethodCodeSnippet,
       generateMultiStorageCodeSnippet,
     ],
@@ -209,6 +243,7 @@ export function useCodeGeneration(
     // Actions
     generateTransactionCode,
     generateStorageCode,
+    generateConstantCode,
     generateMultiMethodCodeSnippet,
     generateMultiStorageCodeSnippet,
     updateGeneratedCode,

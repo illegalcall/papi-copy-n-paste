@@ -545,7 +545,7 @@ export function RightPane({
                     variant="outline"
                     size="sm"
                     onClick={onClearConsole}
-                    disabled={consoleOutput.length === 0}
+                    disabled={consoleOutput?.length === 0}
                   >
                     <Trash2 className="w-3 h-3 mr-1" />
                     Clear
@@ -562,7 +562,7 @@ export function RightPane({
             </CardHeader>
             <CardContent className="p-0 flex-1 flex flex-col">
               <div className="overflow-auto p-4 pr-6 font-mono text-xs space-y-1 h-[calc(100vh-20rem)]">
-                {consoleOutput.length === 0 ? (
+                {(!consoleOutput||consoleOutput?.length === 0) ? (
                   <div className="text-muted-foreground">No output yet...</div>
                 ) : (
                   consoleOutput

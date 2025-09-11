@@ -823,3 +823,97 @@ async function executeMultipleStorageQueries() {
 
 executeMultipleStorageQueries().catch(console.error)`;
 }
+
+// Constants code generation functions
+export function generateConstantQueryCode(
+  chainKey: string,
+  providerId: string,
+  pallet: string,
+  constant: any,
+): string {
+  const template = getCodeTemplate();
+  if (template === "function") {
+    return generateFunctionConstantCode(
+      chainKey,
+      providerId,
+      pallet,
+      constant,
+    );
+  } else {
+    return generateInlineConstantCode(
+      chainKey,
+      providerId,
+      pallet,
+      constant,
+    );
+  }
+}
+
+export function generateInlineConstantCode(
+  chainKey: string,
+  providerId: string,
+  pallet: string,
+  constant: any,
+): string {
+  const setupCommands = getSetupCommands(chainKey);
+  const descriptorImport = getDescriptorImport(chainKey);
+  const descriptorName = getDescriptorName(chainKey);
+
+  return `${setupCommands}
+
+import { createClient } from "polkadot-api"
+${descriptorImport}
+
+// Create the client and get the typed API
+const client = createClient(provider) // Replace with your provider
+const typedApi = client.getTypedApi(${descriptorName})
+
+// Query the constant value
+const ${pallet.toLowerCase()}${constant.name} = await typedApi.constants.${pallet}.${constant.name}()
+
+console.log("${pallet}.${constant.name}:", ${pallet.toLowerCase()}${constant.name})
+
+// Constant information:
+// Name: ${constant.name}
+// Type: ${constant.type}
+// Description: ${constant.docs && constant.docs.length > 0 ? constant.docs[0] : 'No description available'}
+// Current value: (see console output above)`;
+}
+
+export function generateFunctionConstantCode(
+  chainKey: string,
+  providerId: string,
+  pallet: string,
+  constant: any,
+): string {
+  const descriptorImport = getDescriptorImport(chainKey);
+  const descriptorName = getDescriptorName(chainKey);
+
+  return `import { createClient } from "polkadot-api"
+${descriptorImport}
+
+export async function get${pallet}${constant.name}() {
+  try {
+    const typedApi = client.getTypedApi(${descriptorName})
+    
+    const constantValue = await typedApi.constants.${pallet}.${constant.name}()
+    
+    return { 
+      success: true, 
+      value: constantValue,
+      type: "${constant.type}",
+      description: "${constant.docs && constant.docs.length > 0 ? constant.docs[0] : 'No description available'}"
+    }
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error.message 
+    }
+  }
+}
+
+// Constant information:
+// Name: ${constant.name}
+// Type: ${constant.type}
+// Description: ${constant.docs && constant.docs.length > 0 ? constant.docs[0] : 'No description available'}`;
+}

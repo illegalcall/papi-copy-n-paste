@@ -12,8 +12,10 @@ interface LeftPaneProps {
   pallets: PalletInfo[];
   onCallSelect: (pallet: string, call: PalletCall) => void;
   onStorageSelect: (pallet: string, storage: any) => void;
+  onConstantSelect?: (pallet: string, constant: any) => void;
   selectedCall?: { pallet: string; call: string };
   selectedStorage?: { pallet: string; storage: string };
+  selectedConstant?: { pallet: string; constant: string };
   isLoading?: boolean;
   error?: string | null;
 }
@@ -29,8 +31,10 @@ export const LeftPane = forwardRef<LeftPaneRef, LeftPaneProps>(({
   pallets,
   onCallSelect,
   onStorageSelect,
+  onConstantSelect,
   selectedCall,
   selectedStorage,
+  selectedConstant,
   isLoading = false,
   error = null,
 }, ref) => {
@@ -95,8 +99,10 @@ export const LeftPane = forwardRef<LeftPaneRef, LeftPaneProps>(({
               searchQuery={searchQuery}
               onCallSelect={onCallSelect}
               onStorageSelect={onStorageSelect}
+              onConstantSelect={onConstantSelect}
               selectedCall={selectedCall}
               selectedStorage={selectedStorage}
+              selectedConstant={selectedConstant}
             />
           )}
         </div>

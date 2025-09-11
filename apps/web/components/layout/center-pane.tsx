@@ -12,6 +12,7 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Play, Square, Plus, X, List } from "lucide-react";
 import { SimpleCallForm } from "@/components/forms/simple-call-form";
 import { StorageForm } from "@/components/forms/storage-form";
+import { ConstantForm } from "@/components/forms/constant-form";
 import { PalletCall } from "@workspace/core";
 import { SyntaxHighlighter } from "@/components/code/syntax-highlighter";
 
@@ -20,6 +21,7 @@ interface CenterPaneProps {
   selectedChain: string;
   selectedCall?: { pallet: string; call: PalletCall };
   selectedStorage?: { pallet: string; storage: any };
+  selectedConstant?: { pallet: string; constant: any };
   methodQueue: Array<{
     pallet: string;
     call: PalletCall;
@@ -46,6 +48,7 @@ interface CenterPaneProps {
   isRunning: boolean;
   canRun: boolean;
   canRunStorage: boolean;
+  canRunConstant?: boolean;
   // Storage query props
   storageQueryType?: string;
   storageParams?: Record<string, any>;
@@ -340,6 +343,7 @@ export function CenterPane({
   selectedChain,
   selectedCall,
   selectedStorage,
+  selectedConstant,
   methodQueue,
   storageQueue,
   onFormChange,
@@ -525,13 +529,19 @@ export function CenterPane({
           onQueryTypeChange={onStorageQueryTypeChange || (() => {})}
           onParamsChange={onStorageParamsChange || (() => {})}
         />
+      ) : selectedConstant ? (
+        <ConstantForm
+          key={`${selectedConstant.pallet}-${selectedConstant.constant.name}`}
+          pallet={selectedConstant.pallet}
+          constant={selectedConstant.constant}
+        />
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle>Select a Pallet Call or Storage</CardTitle>
+            <CardTitle>Select a Pallet Call, Storage, or Constant</CardTitle>
             <CardDescription>
-              Choose a call (to execute transactions) or storage item (to query
-              data) from the left panel
+              Choose a call (to execute transactions), storage item (to query
+              data), or constant (to view configuration) from the left panel
             </CardDescription>
           </CardHeader>
           <CardContent>

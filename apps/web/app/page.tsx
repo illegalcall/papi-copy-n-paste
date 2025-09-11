@@ -13,6 +13,7 @@ import { Menu } from "lucide-react";
 import { useChainConnection } from "../hooks/useChainConnection";
 import { useCallSelection } from "../hooks/useCallSelection";
 import { useStorageQuery } from "../hooks/useStorageQuery";
+import { useConstantQuery } from "../hooks/useConstantQuery";
 import { useTransactionQueue } from "../hooks/useTransactionQueue";
 import { useCodeGeneration } from "../hooks/useCodeGeneration";
 import { useExecution } from "../hooks/useExecution";
@@ -25,6 +26,7 @@ import {
   executeMultipleTransactions,
   executeMultipleStorageQueries,
   executeStorageQuery,
+  executeConstantQuery,
 } from "../utils/transactionHelpers";
 
 export default function Page() {
@@ -64,6 +66,15 @@ export default function Page() {
     clearStorageSelection,
     resetStorageState,
   } = useStorageQuery();
+
+  // Constant query handling
+  const {
+    selectedConstant,
+    canRunConstant,
+    handleConstantSelect,
+    clearConstantSelection,
+    resetConstantState,
+  } = useConstantQuery();
 
   // Queue management
   const {
@@ -157,6 +168,7 @@ export default function Page() {
     updateGeneratedCode(
       selectedCall,
       selectedStorage,
+      selectedConstant,
       debouncedFormData,
       storageQueryType,
       debouncedStorageParams,
@@ -166,6 +178,7 @@ export default function Page() {
   }, [
     selectedCall,
     selectedStorage,
+    selectedConstant,
     debouncedFormData,
     storageQueryType,
     debouncedStorageParams,
@@ -179,12 +192,14 @@ export default function Page() {
     const hasPalletSelection =
       !!selectedCall ||
       !!selectedStorage ||
+      !!selectedConstant ||
       methodQueue.length > 0 ||
       storageQueue.length > 0;
     setHasSelectedPallet(hasPalletSelection);
   }, [
     selectedCall,
     selectedStorage,
+    selectedConstant,
     methodQueue.length,
     storageQueue.length,
     setHasSelectedPallet,
@@ -197,6 +212,7 @@ export default function Page() {
       // Reset all dependent state
       resetCallState();
       resetStorageState();
+      resetConstantState();
       clearAllQueues();
       clearCode();
       resetExecutionState();
@@ -205,6 +221,7 @@ export default function Page() {
       handleNetworkChange,
       resetCallState,
       resetStorageState,
+      resetConstantState,
       clearAllQueues,
       clearCode,
       resetExecutionState,
@@ -238,28 +255,41 @@ export default function Page() {
     (pallet: string, call: any) => {
       handleCallSelect(pallet, call);
       clearStorageSelection(); // Clear storage when call is selected
+      clearConstantSelection(); // Clear constant when call is selected
       setActiveTab("code"); // Switch to code tab when pallet/call is selected
     },
-    [handleCallSelect, clearStorageSelection, setActiveTab],
+    [handleCallSelect, clearStorageSelection, clearConstantSelection, setActiveTab],
   );
 
   const wrappedHandleStorageSelect = useCallback(
     (pallet: string, storage: any) => {
       handleStorageSelect(pallet, storage);
       clearCallSelection(); // Clear call when storage is selected
+      clearConstantSelection(); // Clear constant when storage is selected
       setActiveTab("code"); // Switch to code tab when pallet/storage is selected
     },
-    [handleStorageSelect, clearCallSelection, setActiveTab],
+    [handleStorageSelect, clearCallSelection, clearConstantSelection, setActiveTab],
+  );
+
+  const wrappedHandleConstantSelect = useCallback(
+    (pallet: string, constant: any) => {
+      handleConstantSelect(pallet, constant);
+      clearCallSelection(); // Clear call when constant is selected
+      clearStorageSelection(); // Clear storage when constant is selected
+      setActiveTab("code"); // Switch to code tab when pallet/constant is selected
+    },
+    [handleConstantSelect, clearCallSelection, clearStorageSelection, setActiveTab],
   );
 
   // Execution handlers
   const executeCurrentOperation = useCallback(async () => {
     if (!api) return;
 
-    // Check if we have either a single call, storage query, method queue, or storage queue
+    // Check if we have either a single call, storage query, constant query, method queue, or storage queue
     if (
       !selectedCall &&
       !selectedStorage &&
+      !selectedConstant &&
       methodQueue.length === 0 &&
       storageQueue.length === 0
     )
@@ -303,6 +333,15 @@ export default function Page() {
           setConsoleOutput,
           () => {},
         );
+      } else if (selectedConstant) {
+        // Execute single constant query
+        await executeConstantQuery(
+          selectedConstant,
+          selectedChain,
+          api,
+          setConsoleOutput,
+          () => {},
+        );
       }
     } catch (error) {
       const errorMessage =
@@ -316,6 +355,7 @@ export default function Page() {
     api,
     selectedCall,
     selectedStorage,
+    selectedConstant,
     methodQueue,
     storageQueue,
     formData,
@@ -333,6 +373,7 @@ export default function Page() {
   const canRunAny =
     canRunCall ||
     canRunStorage ||
+    canRunConstant ||
     methodQueue.length > 0 ||
     storageQueue.length > 0;
 
@@ -377,8 +418,17 @@ export default function Page() {
                   }
                 : undefined
             }
+            selectedConstant={
+              selectedConstant
+                ? {
+                    pallet: selectedConstant.pallet,
+                    constant: selectedConstant.constant.name,
+                  }
+                : undefined
+            }
             onCallSelect={wrappedHandleCallSelect}
             onStorageSelect={wrappedHandleStorageSelect}
+            onConstantSelect={wrappedHandleConstantSelect}
             isLoading={isLoadingMetadata}
             error={metadataError}
           />
@@ -408,12 +458,24 @@ export default function Page() {
                     }
                   : undefined
               }
+              selectedConstant={
+                selectedConstant
+                  ? {
+                      pallet: selectedConstant.pallet,
+                      constant: selectedConstant.constant.name,
+                    }
+                  : undefined
+              }
               onCallSelect={(pallet, call) => {
                 wrappedHandleCallSelect(pallet, call);
                 setLeftPaneOpen(false);
               }}
               onStorageSelect={(pallet, storage) => {
                 wrappedHandleStorageSelect(pallet, storage);
+                setLeftPaneOpen(false);
+              }}
+              onConstantSelect={(pallet, constant) => {
+                wrappedHandleConstantSelect(pallet, constant);
                 setLeftPaneOpen(false);
               }}
               isLoading={isLoadingMetadata}
@@ -429,6 +491,7 @@ export default function Page() {
             selectedChain={selectedChain}
             selectedCall={selectedCall}
             selectedStorage={selectedStorage}
+            selectedConstant={selectedConstant}
             onFormChange={enhancedHandleFormChange}
             onValidChange={handleValidChange}
             onStorageQueryTypeChange={handleStorageQueryTypeChange}
@@ -441,6 +504,7 @@ export default function Page() {
             onClearStorageQueue={clearStorageQueue}
             canRun={canRunAny}
             canRunStorage={canRunStorage}
+            canRunConstant={canRunConstant}
             isRunning={isRunning}
             onRunClick={onRunClick}
             onAbortClick={handleAbortClick}
