@@ -58,7 +58,7 @@ export function generateStorageParams(
       "";
 
     // Handle different parameter types
-    if (paramType === "AccountId") {
+    if (paramType === "AccountId" || paramType === "SS58String") {
       if (typeof value === "string" && value.startsWith("//")) {
         const accountMap: Record<string, string> = {
           "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
@@ -93,7 +93,7 @@ export function generateStorageParamValues(
       "";
 
     // Handle different parameter types
-    if (paramType === "AccountId" && typeof paramValue === "string") {
+    if ((paramType === "AccountId" || paramType === "SS58String") && typeof paramValue === "string") {
       if (paramValue.startsWith("//")) {
         // Convert test accounts to actual addresses
         const accountMap: Record<string, string> = {

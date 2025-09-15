@@ -236,7 +236,7 @@ export async function executeStorageQuery(
     // Detect if this storage requires parameters using dynamic detection
     const requiredParams = detectStorageParameters(palletName, storageName, chainKey);
     const hasParams = Boolean(
-      requiredParams && Object.keys(storageParams).length > 0,
+      requiredParams && requiredParams.length > 0 && Object.keys(storageParams).length > 0,
     );
 
     // Generate parameter values if needed
@@ -307,6 +307,7 @@ export async function executeStorageQuery(
         selectedStorage,
         queryType,
         storageParams,
+        chainKey,
         client,
         setConsoleOutput,
       );
@@ -356,6 +357,7 @@ async function executeRawStorageQuery(
   selectedStorage: { pallet: string; storage: any },
   queryType: string,
   storageParams: Record<string, any>,
+  chainKey: string,
   client: any,
   setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
 ) {
@@ -382,6 +384,7 @@ async function executeRawStorageQuery(
             client,
             palletName,
             storageName,
+            chainKey,
             setConsoleOutput,
           );
           break;
@@ -408,6 +411,7 @@ async function executeRawStorageQuery(
             client,
             palletName,
             storageName,
+            chainKey,
             setConsoleOutput,
           );
       }
@@ -432,6 +436,7 @@ async function executeRawGetValue(
   client: any,
   palletName: string,
   storageName: string,
+  chainKey: string,
   setConsoleOutput: React.Dispatch<React.SetStateAction<string[]>>,
 ) {
   try {
@@ -461,9 +466,17 @@ async function executeRawGetValue(
       `   • Storage Item: ${palletName}.${storageName}`,
     ]);
 
+    // Detect storage parameters for this specific query
+    const requiredParams = detectStorageParameters(palletName, storageName, chainKey);
+
+    // Show actual parameter detection results
+    const paramDisplayText = requiredParams.length > 0
+      ? `${requiredParams.join(', ')} (${requiredParams.length} parameter${requiredParams.length > 1 ? 's' : ''})`
+      : 'None (detected by pattern matching)';
+
     setConsoleOutput((prev) => [
       ...prev,
-      `   • Parameters Required: None (detected by pattern matching)`,
+      `   • Parameters Required: ${paramDisplayText}`,
     ]);
 
     setConsoleOutput((prev) => [
@@ -479,17 +492,35 @@ async function executeRawGetValue(
         `📦 Loading chain descriptor for runtime integration...`,
       ]);
 
-      // Get the correct descriptor based on chain - this should be available globally
+      // Get the correct descriptor based on chain
       const descriptors = (window as any).papiDescriptors || {};
+      const descriptorName = getDescriptorName(chainKey);
 
-      if (!descriptors.polkadot) {
+      // Check if descriptor is available for this chain
+      if (!descriptorName) {
+        setConsoleOutput((prev) => [
+          ...prev,
+          `❌ No descriptor available for chain: ${chainKey}`,
+          `💡 This chain is not currently supported for typed API queries`,
+          `🔧 Supported chains: polkadot, kusama, moonbeam, bifrost, astar, paseo, westend, rococo, hydration`,
+        ]);
+        return;
+      }
+
+      if (!descriptors[descriptorName]) {
         // Try to import the descriptor dynamically
         setConsoleOutput((prev) => [
           ...prev,
-          `🔄 Importing polkadot descriptor dynamically...`,
+          `🔄 Importing ${descriptorName} descriptor dynamically for ${chainKey}...`,
         ]);
 
-        const { polkadot } = await import('../../../.papi/descriptors/dist');
+        // Dynamically import the correct descriptor
+        const descriptorModule = await import('../../../.papi/descriptors/dist');
+        const descriptor = descriptorModule[descriptorName as keyof typeof descriptorModule];
+
+        if (!descriptor) {
+          throw new Error(`Descriptor ${descriptorName} not found in descriptors module`);
+        }
 
         setConsoleOutput((prev) => [
           ...prev,
@@ -502,7 +533,7 @@ async function executeRawGetValue(
           `🔗 Creating typed API connection...`,
         ]);
 
-        const typedApi = client.getTypedApi(polkadot);
+        const typedApi = client.getTypedApi(descriptor);
 
         setConsoleOutput((prev) => [
           ...prev,
@@ -532,12 +563,41 @@ async function executeRawGetValue(
 
           // Execute the actual storage query - handle both direct function and object cases
           let result;
+
+          // Generate parameter values if needed
+          const paramValues = requiredParams.length > 0
+            ? requiredParams.map(paramType => {
+                if (paramType === 'SS58String' || paramType === 'AccountId') {
+                  return '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'; // Alice
+                } else if (paramType === 'u32') {
+                  return 1; // Use 1 for farm IDs
+                } else if (paramType === 'u64') {
+                  return 1n; // Use 1n (bigint) for deposit IDs
+                } else if (paramType === 'Hash') {
+                  return '0x0000000000000000000000000000000000000000000000000000000000000000';
+                } else {
+                  return '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'; // Default to Alice
+                }
+              })
+            : [];
+
+          setConsoleOutput((prev) => [
+            ...prev,
+            `🔧 Using parameters: ${paramValues.length > 0 ? JSON.stringify(paramValues) : 'none'}`,
+          ]);
+
           if (typeof storageFunction === 'function') {
-            result = await storageFunction();
+            result = paramValues.length > 0
+              ? await storageFunction(...paramValues)
+              : await storageFunction();
           } else if (storageFunction && typeof storageFunction.getValue === 'function') {
-            result = await storageFunction.getValue();
+            result = paramValues.length > 0
+              ? await storageFunction.getValue(...paramValues)
+              : await storageFunction.getValue();
           } else if (storageFunction && typeof storageFunction.query === 'function') {
-            result = await storageFunction.query();
+            result = paramValues.length > 0
+              ? await storageFunction.query(...paramValues)
+              : await storageFunction.query();
           } else {
             throw new Error(`Storage item ${palletName}.${storageName} is not callable: ${typeof storageFunction}`);
           }

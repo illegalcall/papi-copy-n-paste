@@ -98,7 +98,7 @@ export const networkConfigs: NetworkConfig[] = [
     chainSpecPath: "polkadot-api/chains/ksmcc3",
     genesisHash:
       "0xb0a8d493285c2df73290dfb7e61f870f17b41801197a149ca93654499ea3dafe",
-    defaultProvider: "allnodes-kusama",
+    defaultProvider: "smoldot-kusama",
     providers: [
       {
         id: "smoldot-kusama",
@@ -147,7 +147,7 @@ export const networkConfigs: NetworkConfig[] = [
     chainSpecPath: "polkadot-api/chains/moonbeam",
     genesisHash:
       "0xfe58ea77779b7abda7da4ec526d14db9b1e9cd40a217c34892af80a9b332b76d",
-    defaultProvider: "smoldot-moonbeam",
+    defaultProvider: "moonbeam-rpc",
     providers: [
       {
         id: "smoldot-moonbeam",
@@ -186,7 +186,7 @@ export const networkConfigs: NetworkConfig[] = [
     chainSpecPath: "polkadot-api/chains/astar",
     genesisHash:
       "0x9eb76c5184c4ab8679d2d5d819fdf90b9c001403e9e17da2e14b6d8aec4029c6",
-    defaultProvider: "smoldot-astar",
+    defaultProvider: "astar-rpc",
     providers: [
       {
         id: "smoldot-astar",
@@ -225,7 +225,7 @@ export const networkConfigs: NetworkConfig[] = [
     chainSpecPath: "polkadot-api/chains/acala",
     genesisHash:
       "0xfc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c",
-    defaultProvider: "smoldot-acala",
+    defaultProvider: "dwellir-acala",
     providers: [
       {
         id: "smoldot-acala",
@@ -264,7 +264,7 @@ export const networkConfigs: NetworkConfig[] = [
     chainSpecPath: "polkadot-api/chains/bifrost",
     genesisHash:
       "0x9f28c6a68e0fc9646eff64935684f6eeeece527e37bbe1f213d22caa1d9d6bed",
-    defaultProvider: "smoldot-bifrost",
+    defaultProvider: "bifrost-rpc",
     providers: [
       {
         id: "smoldot-bifrost",
@@ -300,10 +300,10 @@ export const networkConfigs: NetworkConfig[] = [
     chainName: "Hydration",
     icon: "/icons/hydration.svg",
     color: "#00D4AA",
-    chainSpecPath: "polkadot-api/chains/hydration",
+    chainSpecPath: undefined, // Hydration is not a built-in chain, uses RPC
     genesisHash:
       "0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d",
-    defaultProvider: "smoldot-hydration",
+    defaultProvider: "hydration-rpc",
     providers: [
       {
         id: "smoldot-hydration",
@@ -420,7 +420,7 @@ export const networkConfigs: NetworkConfig[] = [
     chainSpecPath: "polkadot-api/chains/rococo_v2_2",
     genesisHash:
       "0x6408de7737c59c238890533af25896a2c20608d8b380bb01029acb392781063e",
-    defaultProvider: "smoldot-rococo",
+    defaultProvider: "rococo-rpc",
     providers: [
       {
         id: "smoldot-rococo",

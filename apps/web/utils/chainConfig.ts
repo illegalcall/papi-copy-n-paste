@@ -33,18 +33,21 @@ export function getDescriptorImport(chainKey: string): string {
     bifrost: "bifrost",
     astar: "astar",
     paseo: "paseo",
-    acala: "polkadot", // fallback
-    hydration: "polkadot", // fallback
-    westend: "polkadot", // fallback
-    rococo: "polkadot", // fallback
+    westend: "westend",
+    rococo: "rococo",
+    hydration: "hydration",
+    // Chains without descriptors - will show error in UI
+    acala: null,
   };
 
-  const descriptorName =
-    descriptorMap[chainKey as keyof typeof descriptorMap] || "polkadot";
+  const descriptorName = descriptorMap[chainKey as keyof typeof descriptorMap];
+  if (!descriptorName) {
+    throw new Error(`No descriptor available for chain: ${chainKey}`);
+  }
   return `import { ${descriptorName} } from "@polkadot-api/descriptors"`;
 }
 
-export function getDescriptorName(chainKey: string): string {
+export function getDescriptorName(chainKey: string): string | null {
   const descriptorMap = {
     polkadot: "polkadot",
     kusama: "kusama",
@@ -52,13 +55,14 @@ export function getDescriptorName(chainKey: string): string {
     bifrost: "bifrost",
     astar: "astar",
     paseo: "paseo",
-    acala: "polkadot", // fallback
-    hydration: "polkadot", // fallback
-    westend: "polkadot", // fallback
-    rococo: "polkadot", // fallback
+    westend: "westend",
+    rococo: "rococo",
+    hydration: "hydration",
+    // Chains without descriptors - will return null
+    acala: null,
   };
 
-  return descriptorMap[chainKey as keyof typeof descriptorMap] || "polkadot";
+  return descriptorMap[chainKey as keyof typeof descriptorMap] || null;
 }
 
 export function getChainConnection(chainKey: string): {
@@ -67,7 +71,7 @@ export function getChainConnection(chainKey: string): {
   cleanup?: string;
 } {
   // Chains that use smoldot as default
-  const smoldotChains = ["polkadot", "kusama", "paseo"];
+  const smoldotChains = ["polkadot", "kusama", "paseo", "westend"];
 
   if (smoldotChains.includes(chainKey)) {
     // Use smoldot connection for relay chains
@@ -75,6 +79,7 @@ export function getChainConnection(chainKey: string): {
       polkadot: { chainSpec: "polkadot" },
       kusama: { chainSpec: "ksmcc3" },
       paseo: { chainSpec: "paseo" },
+      westend: { chainSpec: "westend" },
     };
 
     const config =
