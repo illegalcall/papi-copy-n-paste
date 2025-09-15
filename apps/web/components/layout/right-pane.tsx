@@ -18,10 +18,12 @@ import { Toast } from "@workspace/ui/components/toast";
 import { Badge } from "@workspace/ui/components/badge";
 import { Copy, Terminal, Trash2, Settings, Code, Eye } from "lucide-react";
 import { SyntaxHighlighter } from "@/components/code/syntax-highlighter";
+import { ConsoleItem } from "@/hooks/useExecution";
+import { ArrayResult } from "@/utils/cleanLogger";
 
 interface RightPaneProps {
   code: string;
-  consoleOutput: string[];
+  consoleOutput: ConsoleItem[];
   onClearConsole?: () => void;
   activeTab?: "setup" | "code" | "console";
   selectedChain?: string;
@@ -39,6 +41,8 @@ export function RightPane({
   );
   const [showToast, setShowToast] = useState(false);
   const [developerMode, setDeveloperMode] = useState(false);
+  const [copiedResult, setCopiedResult] = useState<string | null>(null);
+  const [copiedArrayResult, setCopiedArrayResult] = useState<string | null>(null);
 
   // Update current tab when activeTab prop changes
   useEffect(() => {
@@ -566,7 +570,68 @@ export function RightPane({
                   <div className="text-muted-foreground">No output yet...</div>
                 ) : (
                   consoleOutput
-                    .map((line, index) => {
+                    .map((item, index) => {
+                      // Handle ArrayResult objects (summarized arrays with copy button)
+                      if (typeof item === 'object' && item && 'type' in item && item.type === 'array-result') {
+                        const arrayResult = item as ArrayResult;
+                        const fullJsonString = JSON.stringify(arrayResult.rawData, (_, val) =>
+                          typeof val === 'bigint' ? val.toString() : val, 2
+                        );
+                        const copyId = `array-${index}`;
+
+                        return (
+                          <div key={index} className="flex items-center gap-2 group break-words whitespace-pre-wrap leading-relaxed">
+                            <span>{arrayResult.displayText}</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
+                              onClick={() => {
+                                navigator.clipboard.writeText(fullJsonString);
+                                setCopiedArrayResult(copyId);
+                                setTimeout(() => setCopiedArrayResult(null), 2000);
+                              }}
+                              title="Copy full array data"
+                            >
+                              <Copy className="w-3 h-3" />
+                            </Button>
+                            {copiedArrayResult === copyId && (
+                              <span className="text-xs text-green-500">Copied!</span>
+                            )}
+                          </div>
+                        );
+                      }
+
+                      // Handle string messages
+                      const line = item as string;
+
+                      // Check if this line contains a result that should have a copy button
+                      const resultMatch = line.match(/^Result: (.+)$/);
+                      if (resultMatch && resultMatch[1]) {
+                        const resultValue = resultMatch[1];
+                        return (
+                          <div key={index} className="flex items-center gap-2 group break-words whitespace-pre-wrap leading-relaxed">
+                            <span>{line}</span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
+                              onClick={() => {
+                                navigator.clipboard.writeText(resultValue);
+                                setCopiedResult(resultValue);
+                                setTimeout(() => setCopiedResult(null), 2000);
+                              }}
+                              title="Copy result"
+                            >
+                              <Copy className="w-3 h-3" />
+                            </Button>
+                            {copiedResult === resultValue && (
+                              <span className="text-xs text-green-500">Copied!</span>
+                            )}
+                          </div>
+                        );
+                      }
+
                       const renderedLine = renderConsoleLine(line);
                       // Skip rendering if the line is filtered out (returns null)
                       if (renderedLine === null) {

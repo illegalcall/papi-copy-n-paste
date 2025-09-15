@@ -89,7 +89,7 @@ interface TypeAliasDisplayProps {
   pallet: string;
 }
 
-export function TypeAliasDisplay({ typeInfo, callName, pallet }: TypeAliasDisplayProps) {
+export function TypeAliasDisplay({ typeInfo, callName }: TypeAliasDisplayProps) {
   return (
     <div className="space-y-2">
       {/* Main Type Signature */}

@@ -14,7 +14,7 @@ interface ConstantsFormProps {
 export function ConstantsForm({ pallet, constants }: ConstantsFormProps) {
   const [showConstants, setShowConstants] = useState(true);
 
-  const formatConstantValue = (value: any, type: string): string => {
+  const formatConstantValue = (value: any): string => {
     if (value === null || value === undefined) return "null";
     
     // Handle different value types
@@ -44,7 +44,7 @@ export function ConstantsForm({ pallet, constants }: ConstantsFormProps) {
   };
 
   const renderConstant = (constant: PalletConstant) => {
-    const displayValue = formatConstantValue(constant.value, constant.type);
+    const displayValue = formatConstantValue(constant.value);
     const isComplexValue = displayValue.includes('\n');
     
     return (

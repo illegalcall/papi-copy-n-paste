@@ -15,8 +15,6 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
 
   // Handle storage selection
   const handleStorageSelect = useCallback((pallet: string, storage: any) => {
-    console.log(`📊 Storage selected: ${pallet}.${storage.name}`);
-
     setSelectedStorage({ pallet, storage });
     setStorageParams({}); // Reset params when selecting new storage
 
@@ -28,7 +26,6 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
   // Handle storage query type change
   const handleStorageQueryTypeChange = useCallback(
     (newQueryType: string) => {
-      console.log(`🔄 Storage query type changed to: ${newQueryType}`);
       setStorageQueryType(newQueryType);
 
       // Re-validate with current params using dynamic detection
@@ -41,15 +38,11 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
   // Handle storage parameter changes
   const handleStorageParamsChange = useCallback(
     (newParams: Record<string, any>) => {
-      console.log("📝 Storage params changed:", newParams);
       setStorageParams(newParams);
 
       // Update validation state with dynamic detection
       const isValid = isStorageQueryValid(selectedStorage, newParams, chainKey);
       setCanRunStorage(isValid);
-      console.log(
-        `🔍 Storage query validation: ${isValid ? "valid" : "invalid"}`,
-      );
     },
     [selectedStorage, chainKey],
   );
