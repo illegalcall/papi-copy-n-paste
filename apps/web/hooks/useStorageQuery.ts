@@ -5,7 +5,7 @@
 import { useState, useCallback } from "react";
 import { isStorageQueryValid } from "../utils/storageHelpers";
 
-export function useStorageQuery() {
+export function useStorageQuery(chainKey: string = 'polkadot') {
   const [selectedStorage, setSelectedStorage] = useState<
     { pallet: string; storage: any } | undefined
   >();
@@ -20,10 +20,10 @@ export function useStorageQuery() {
     setSelectedStorage({ pallet, storage });
     setStorageParams({}); // Reset params when selecting new storage
 
-    // Update validation state
-    const isValid = isStorageQueryValid({ pallet, storage }, {});
+    // Update validation state with dynamic detection
+    const isValid = isStorageQueryValid({ pallet, storage }, {}, chainKey);
     setCanRunStorage(isValid);
-  }, []);
+  }, [chainKey]);
 
   // Handle storage query type change
   const handleStorageQueryTypeChange = useCallback(
@@ -31,11 +31,11 @@ export function useStorageQuery() {
       console.log(`🔄 Storage query type changed to: ${newQueryType}`);
       setStorageQueryType(newQueryType);
 
-      // Re-validate with current params
-      const isValid = isStorageQueryValid(selectedStorage, storageParams);
+      // Re-validate with current params using dynamic detection
+      const isValid = isStorageQueryValid(selectedStorage, storageParams, chainKey);
       setCanRunStorage(isValid);
     },
-    [selectedStorage, storageParams],
+    [selectedStorage, storageParams, chainKey],
   );
 
   // Handle storage parameter changes
@@ -44,14 +44,14 @@ export function useStorageQuery() {
       console.log("📝 Storage params changed:", newParams);
       setStorageParams(newParams);
 
-      // Update validation state
-      const isValid = isStorageQueryValid(selectedStorage, newParams);
+      // Update validation state with dynamic detection
+      const isValid = isStorageQueryValid(selectedStorage, newParams, chainKey);
       setCanRunStorage(isValid);
       console.log(
         `🔍 Storage query validation: ${isValid ? "valid" : "invalid"}`,
       );
     },
-    [selectedStorage],
+    [selectedStorage, chainKey],
   );
 
   // Clear storage selection

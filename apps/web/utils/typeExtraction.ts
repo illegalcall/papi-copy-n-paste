@@ -117,7 +117,7 @@ export function extractActualTypes(
     }
 
     // Fallback to pattern-based inference
-    const fallback = fallbackToInference(pallet, storageName);
+    const fallback = fallbackToInference(pallet, storageName, chainKey);
     typeCache.set(cacheKey, fallback);
     return fallback;
   } catch (error) {
@@ -125,7 +125,7 @@ export function extractActualTypes(
       `Failed to extract types for ${chainKey}.${pallet}.${storageName}:`,
       error,
     );
-    const fallback = fallbackToInference(pallet, storageName);
+    const fallback = fallbackToInference(pallet, storageName, chainKey);
     typeCache.set(cacheKey, fallback);
     return fallback;
   }
@@ -198,37 +198,41 @@ export function getTypeExample(
 
 /**
  * Fallback to pattern-based inference when descriptor reading fails
+ * Now uses dynamic storage detection for parameter types
  */
 function fallbackToInference(
   pallet: string,
   storageName: string,
+  chainKey: string = 'polkadot'
 ): {
   returnType: string;
   actualType: string;
   paramTypes: string[];
   typeDefinition?: string;
 } {
-  const commonPatterns: Record<
-    string,
-    { returnType: string; paramTypes: string[] }
-  > = {
-    Account: { returnType: "AccountInfo", paramTypes: ["SS58String"] },
-    Locks: { returnType: "Array<BalanceLock>", paramTypes: ["SS58String"] },
-    Number: { returnType: "number", paramTypes: [] },
-    BlockHash: { returnType: "Hash", paramTypes: ["number"] },
-    TotalIssuance: { returnType: "bigint", paramTypes: [] },
-    InactiveIssuance: { returnType: "bigint", paramTypes: [] },
-  };
+  // Import dynamic detection at the top of the file, but for now use inline
+  const { detectStorageParameters, getStorageParameterInfo } = require('./dynamicStorageDetection');
 
-  const pattern = commonPatterns[storageName] || {
-    returnType: "unknown",
-    paramTypes: [],
-  };
+  // Get both parameter types and return type from dynamic detection
+  const paramTypes = detectStorageParameters(pallet, storageName, chainKey);
+  const storageInfo = getStorageParameterInfo(chainKey, pallet, storageName);
+
+  // Use dynamic return type if available, otherwise fall back to pattern-based inference
+  let returnType = storageInfo.returnType || "unknown";
+
+  // If still unknown, try some basic inference based on storage name patterns
+  if (returnType === "unknown") {
+    if (storageName === "Account") returnType = "AccountInfo";
+    else if (storageName === "TotalIssuance" || storageName === "InactiveIssuance") returnType = "bigint";
+    else if (storageName.includes("Count")) returnType = "number";
+    else if (storageName.includes("Hash")) returnType = "Hash";
+    else if (storageName.includes("Upgrade")) returnType = "boolean";
+  }
 
   return {
-    returnType: pattern.returnType,
-    actualType: pattern.returnType,
-    paramTypes: pattern.paramTypes,
+    returnType,
+    actualType: returnType,
+    paramTypes,
     typeDefinition: undefined,
   };
 }

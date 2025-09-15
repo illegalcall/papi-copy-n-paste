@@ -21,6 +21,7 @@ import {
   moonbeam,
   bifrost,
   astar,
+  paseo,
 } from "@polkadot-api/descriptors";
 
 // Type-safe mapping of chain keys to descriptors
@@ -30,6 +31,7 @@ const CHAIN_DESCRIPTORS: Record<string, any> = {
   moonbeam,
   bifrost,
   astar,
+  paseo,
   // Fallback chains (add descriptors when endpoints are available)
   acala: polkadot, // Use polkadot as fallback
   hydration: polkadot, // Use polkadot as fallback
@@ -67,7 +69,7 @@ export function getTypedApiForChain(client: any, chainKey: string): any {
 }
 
 // Export the descriptors for direct use if needed
-export { polkadot, kusama, moonbeam, bifrost, astar };
+export { polkadot, kusama, moonbeam, bifrost, astar, paseo };
 export type { SupportedChainKey };
 
 // List of chains with real descriptors vs fallbacks
@@ -77,5 +79,6 @@ export const CHAINS_WITH_REAL_DESCRIPTORS = [
   "moonbeam",
   "bifrost",
   "astar",
+  "paseo",
 ] as const;
 export const CHAINS_WITH_FALLBACK_DESCRIPTORS = ["acala", "hydration"] as const;

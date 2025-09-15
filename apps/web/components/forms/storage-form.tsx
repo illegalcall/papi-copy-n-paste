@@ -18,6 +18,7 @@ import {
   formatTypeForDisplay,
   generateStorageSignature,
 } from "../../utils/typeExtraction";
+import { detectStorageParameters, getStorageParameterInfo } from "../../utils/dynamicStorageDetection";
 import { TypeAliasDisplay, CallSignature } from "@/components/type-display";
 
 interface StorageFormProps {
@@ -65,6 +66,7 @@ function getStorageTypeInfo(
       pallet,
       storageName,
       storageType,
+      chainKey
     );
 
     result = {
@@ -73,7 +75,7 @@ function getStorageTypeInfo(
     };
   } else {
     // Fallback to pattern-based inference
-    result = inferFromStorageName(pallet, storageName);
+    result = inferFromStorageName(pallet, storageName, chainKey);
   }
 
   // Cache the result
@@ -82,85 +84,30 @@ function getStorageTypeInfo(
   return result;
 }
 
-// Determine if storage requires parameters based on common patterns
+// Determine if storage requires parameters using dynamic detection
 function determineStorageParameters(
   pallet: string,
   storageName: string,
   storageType: string,
+  chainKey: string = 'polkadot'
 ): string[] {
-  // Common patterns for storage that requires keys
-  const storagePatterns: Record<string, string[]> = {
-    // Account-based storage
-    Account: ["AccountId"],
-    Locks: ["AccountId"],
-    Freezes: ["AccountId"],
-    Reserves: ["AccountId"],
-
-    // Block-based storage
-    BlockHash: ["BlockNumber"],
-    BlockWeight: ["BlockNumber"],
-
-    // Staking storage (often requires era and/or validator)
-    ErasStakers: ["EraIndex", "AccountId"],
-    ErasStakersClipped: ["EraIndex", "AccountId"],
-    ErasValidatorReward: ["EraIndex"],
-    ErasRewardPoints: ["EraIndex"],
-
-    // Democracy/Governance
-    ReferendumInfoOf: ["ReferendumIndex"],
-    VotingOf: ["AccountId"],
-    ProposalOf: ["ProposalIndex"],
-
-    // Identity
-    IdentityOf: ["AccountId"],
-    SuperOf: ["AccountId"],
-
-    // Assets
-    Asset: ["AssetId"],
-    AssetAccount: ["AssetId", "AccountId"],
-  };
-
-  // Direct match on storage name
-  if (storagePatterns[storageName]) {
-    return storagePatterns[storageName];
-  }
-
-  // Pattern matching for common suffixes
-  if (storageName.endsWith("Of") && storageName !== "TotalIssuance") {
-    // Most "...Of" storage entries require a key
-    return ["AccountId"];
-  }
-
-  // Check if the type suggests it needs parameters
-  if (
-    storageType.includes("Map") ||
-    (storageType.includes("Vec") && storageName.includes("Account"))
-  ) {
-    return ["AccountId"];
-  }
-
-  // No parameters needed
-  return [];
+  // Use dynamic detection to get parameter types
+  return detectStorageParameters(pallet, storageName, chainKey);
 }
 
-// Simple fallback inference for when no descriptor info is available
+// Dynamic inference using metadata-driven detection
 function inferFromStorageName(
   pallet: string,
   storageName: string,
+  chainKey: string = 'polkadot'
 ): { returnType: string; paramTypes: string[] } {
-  // Basic inference based on common naming patterns
-  const commonPatterns: Record<
-    string,
-    { returnType: string; paramTypes: string[] }
-  > = {
-    Account: { returnType: "AccountInfo", paramTypes: ["SS58String"] },
-    Number: { returnType: "number", paramTypes: [] },
-    BlockHash: { returnType: "Hash", paramTypes: ["number"] },
-    TotalIssuance: { returnType: "bigint", paramTypes: [] },
-    InactiveIssuance: { returnType: "bigint", paramTypes: [] },
-  };
+  // Use dynamic detection to get both parameter and return type information
+  const storageInfo = getStorageParameterInfo(chainKey, pallet, storageName);
 
-  return commonPatterns[storageName] || { returnType: "Codec", paramTypes: [] };
+  return {
+    returnType: storageInfo.returnType || "Codec",
+    paramTypes: storageInfo.required
+  };
 }
 
 // Enhanced response structure generator using PAPI types

@@ -1,91 +1,31 @@
 /**
  * Storage query helper functions for parameter detection and formatting
+ *
+ * Now using Dynamic Storage Parameter Detection Engine
  */
+
+import { detectStorageParameters as dynamicDetectStorageParameters, getStorageParameterInfo } from './dynamicStorageDetection';
 
 export function detectStorageParameters(
   palletName: string,
   storageName: string,
+  chainKey: string = 'polkadot'
 ): string[] {
-  const palletStorage: Record<string, Record<string, string[]>> = {
-    System: {
-      Account: ["AccountId"],
-      BlockHash: ["u32"],
-      BlockWeight: ["u32"],
-    },
-    Balances: {
-      Account: ["AccountId"],
-      Locks: ["AccountId"],
-      Reserves: ["AccountId"],
-      Holds: ["AccountId"],
-      Freezes: ["AccountId"],
-    },
-    Staking: {
-      Bonded: ["AccountId"],
-      Ledger: ["AccountId"],
-      Validators: ["AccountId"],
-      Nominators: ["AccountId"],
-      Payee: ["AccountId"],
-    },
-  };
-
-  // First, check if we have specific parameter info
-  const palletConfig = palletStorage[palletName];
-  if (palletConfig && palletConfig[storageName]) {
-    return palletConfig[storageName];
-  }
-
-  // Fall back to pattern matching
-  const storagePatterns: Record<string, string[]> = {
-    // Account-based storage
-    Account: ["AccountId"],
-    Locks: ["AccountId"],
-    Freezes: ["AccountId"],
-    Reserves: ["AccountId"],
-
-    // Block-based storage
-    BlockHash: ["BlockNumber"],
-    BlockWeight: ["BlockNumber"],
-
-    // Validator/Nominator patterns
-    Bonded: ["AccountId"],
-    Ledger: ["AccountId"],
-    Validators: ["AccountId"],
-    Nominators: ["AccountId"],
-    Payee: ["AccountId"],
-
-    // Identity patterns
-    IdentityOf: ["AccountId"],
-    SubsOf: ["AccountId"],
-
-    // Council/Democracy patterns
-    Members: [],
-    Voting: ["AccountId"],
-    VotingOf: ["AccountId"],
-
-    // Multisig patterns
-    Multisigs: ["AccountId", "CallHash"],
-
-    // Treasury patterns
-    Proposals: ["ProposalIndex"],
-    Approvals: [],
-
-    // Preimage patterns
-    PreimageFor: ["Hash"],
-    StatusFor: ["Hash"],
-  };
-
-  return storagePatterns[storageName] || [];
+  // Use the dynamic detector instead of hard-coded mappings
+  return dynamicDetectStorageParameters(palletName, storageName, chainKey);
 }
 
 export function isStorageQueryValid(
   selectedStorage: { pallet: string; storage: any } | undefined,
   storageParams: Record<string, any>,
+  chainKey: string = 'polkadot'
 ): boolean {
   if (!selectedStorage) return false;
 
   const requiredParams = detectStorageParameters(
     selectedStorage.pallet,
     selectedStorage.storage.name,
+    chainKey
   );
   if (requiredParams.length === 0) return true;
 
