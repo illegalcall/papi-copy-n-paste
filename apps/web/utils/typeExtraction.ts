@@ -116,18 +116,10 @@ export function extractActualTypes(
       return result;
     }
 
-    // Fallback to pattern-based inference
-    const fallback = fallbackToInference(pallet, storageName, chainKey);
-    typeCache.set(cacheKey, fallback);
-    return fallback;
+    // No fallback - throw error if metadata is missing
+    throw new Error(`No type information available for ${chainKey}.${pallet}.${storageName} in known mappings`);
   } catch (error) {
-    console.warn(
-      `Failed to extract types for ${chainKey}.${pallet}.${storageName}:`,
-      error,
-    );
-    const fallback = fallbackToInference(pallet, storageName, chainKey);
-    typeCache.set(cacheKey, fallback);
-    return fallback;
+    throw new Error(`Failed to extract types for ${chainKey}.${pallet}.${storageName}: ${error instanceof Error ? error.message : error}`);
   }
 }
 
@@ -196,46 +188,6 @@ export function getTypeExample(
 // Actual structure depends on runtime definition`;
 }
 
-/**
- * Fallback to pattern-based inference when descriptor reading fails
- * Now uses dynamic storage detection for parameter types
- */
-function fallbackToInference(
-  pallet: string,
-  storageName: string,
-  chainKey: string = 'polkadot'
-): {
-  returnType: string;
-  actualType: string;
-  paramTypes: string[];
-  typeDefinition?: string;
-} {
-  // Import dynamic detection at the top of the file, but for now use inline
-  const { detectStorageParameters, getStorageParameterInfo } = require('./dynamicStorageDetection');
-
-  // Get both parameter types and return type from dynamic detection
-  const paramTypes = detectStorageParameters(pallet, storageName, chainKey);
-  const storageInfo = getStorageParameterInfo(chainKey, pallet, storageName);
-
-  // Use dynamic return type if available, otherwise fall back to pattern-based inference
-  let returnType = storageInfo.returnType || "unknown";
-
-  // If still unknown, try some basic inference based on storage name patterns
-  if (returnType === "unknown") {
-    if (storageName === "Account") returnType = "AccountInfo";
-    else if (storageName === "TotalIssuance" || storageName === "InactiveIssuance") returnType = "bigint";
-    else if (storageName.includes("Count")) returnType = "number";
-    else if (storageName.includes("Hash")) returnType = "Hash";
-    else if (storageName.includes("Upgrade")) returnType = "boolean";
-  }
-
-  return {
-    returnType,
-    actualType: returnType,
-    paramTypes,
-    typeDefinition: undefined,
-  };
-}
 
 /**
  * Format type for display in the UI

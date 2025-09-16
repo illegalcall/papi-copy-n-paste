@@ -44,11 +44,11 @@
       "genesis": "0x6408de7737c59c238890533af25896a2c20608d8b380bb01029acb392781063e",
       "codeHash": "0xf645d939be087a8a76ade94d3e28f51f0c4b70abfc0db8b302e2372590b9e31a"
     },
-    "paseo": {
-      "wsUrl": "wss://rpc.ibp.network/paseo",
-      "metadata": ".papi/metadata/paseo.scale",
-      "genesis": "0x77afd6190f1554ad45fd0d31aee62aacc33c6db0ea801129acb813f913e0764f",
-      "codeHash": "0x96f6cb4f577e7ecb8c9e648f77724c0c850fe366854f99a29c79275895b4c636"
+    "paseo_asset_hub": {
+      "wsUrl": "wss://testnet-passet-hub.polkadot.io",
+      "metadata": ".papi/metadata/paseo_asset_hub.scale",
+      "genesis": "0xfd974cf9eaf028f5e44b9fdd1949ab039c6cf9cc54449b0b60d71b042e79aeb6",
+      "codeHash": "0x3e088e61b3cb51e74c67cb3634a699109bf3ded14fbd35ed731968d0aa82a441"
     },
     "hydration": {
       "wsUrl": "wss://hydration-rpc.n.dwellir.com",

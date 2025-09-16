@@ -1,6 +1,6 @@
 /**
  * Auto-generated storage metadata from PAPI descriptors
- * Generated on: 2025-09-16T03:35:27.549Z
+ * Generated on: 2025-09-16T10:51:58.766Z
  */
 
 export interface StorageParameterInfo {
@@ -225,7 +225,14 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "boolean"
         }
       },
-      "Multisig": {},
+      "Multisig": {
+        "Multisigs": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Multisigs",
+          "returnType": "unknown"
+        }
+      },
       "Proxy": {
         "Proxies": {
           "required": [
@@ -569,6 +576,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item Ledger",
           "returnType": "unknown"
         },
+        "StakerInfo": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item StakerInfo",
+          "returnType": "unknown"
+        },
         "ContractStake": {
           "required": [
             "u32"
@@ -641,6 +654,25 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item Asset",
           "returnType": "unknown"
         },
+        "Account": {
+          "required": [
+            "AssetId",
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item Account",
+          "returnType": "unknown"
+        },
+        "Approvals": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item Approvals",
+          "returnType": "unknown"
+        },
         "Metadata": {
           "required": [
             "u64"
@@ -677,6 +709,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "Oracle": {
+        "RawValues": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RawValues",
+          "returnType": "unknown"
+        },
         "Values": {
           "required": [
             "Anonymize_I4rgf5d3abfav5_"
@@ -851,6 +889,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item OutboundXcmpStatus",
           "returnType": "unknown"
         },
+        "OutboundXcmpMessages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item OutboundXcmpMessages",
+          "returnType": "Uint8Array"
+        },
         "SignalMessages": {
           "required": [
             "u32"
@@ -909,6 +953,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item SafeXcmVersion",
           "returnType": "number"
         },
+        "SupportedVersion": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item SupportedVersion",
+          "returnType": "number"
+        },
+        "VersionNotifiers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifiers",
+          "returnType": "bigint"
+        },
+        "VersionNotifyTargets": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifyTargets",
+          "returnType": "unknown"
+        },
         "VersionDiscoveryQueue": {
           "required": [],
           "optional": [],
@@ -920,6 +982,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item CurrentMigration",
           "returnType": "XcmPalletVersionMigrationStage"
+        },
+        "RemoteLockedFungibles": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RemoteLockedFungibles",
+          "returnType": "unknown"
         },
         "LockedFungibles": {
           "required": [
@@ -988,6 +1056,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item ServiceHead",
           "returnType": "unknown"
+        },
+        "Pages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Pages",
+          "returnType": "unknown"
         }
       },
       "EVM": {
@@ -1006,6 +1080,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item AccountCodesMetadata",
           "returnType": "unknown"
+        },
+        "AccountStorages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AccountStorages",
+          "returnType": "Hash"
         }
       },
       "Ethereum": {
@@ -1484,6 +1564,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item EnteredUntil",
           "returnType": "number"
+        },
+        "Deposits": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Deposits",
+          "returnType": "bigint"
         }
       },
       "TxPause": {
@@ -2079,6 +2165,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item CandidatePool",
           "returnType": "unknown"
         },
+        "AtStake": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AtStake",
+          "returnType": "unknown"
+        },
         "DelayedPayouts": {
           "required": [
             "u32"
@@ -2108,9 +2200,21 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item Points",
           "returnType": "number"
+        },
+        "AwardedPts": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AwardedPts",
+          "returnType": "number"
         }
       },
       "ConvictionVoting": {
+        "VotingFor": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VotingFor",
+          "returnType": "ConvictionVotingVoteVoting"
+        },
         "ClassLocksFor": {
           "required": [
             "AccountId"
@@ -2183,6 +2287,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item OutboundXcmpStatus",
           "returnType": "unknown"
         },
+        "OutboundXcmpMessages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item OutboundXcmpMessages",
+          "returnType": "Uint8Array"
+        },
         "SignalMessages": {
           "required": [
             "u32"
@@ -2241,6 +2351,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item SafeXcmVersion",
           "returnType": "number"
         },
+        "SupportedVersion": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item SupportedVersion",
+          "returnType": "number"
+        },
+        "VersionNotifiers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifiers",
+          "returnType": "bigint"
+        },
+        "VersionNotifyTargets": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifyTargets",
+          "returnType": "unknown"
+        },
         "VersionDiscoveryQueue": {
           "required": [],
           "optional": [],
@@ -2252,6 +2380,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item CurrentMigration",
           "returnType": "XcmPalletVersionMigrationStage"
+        },
+        "RemoteLockedFungibles": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RemoteLockedFungibles",
+          "returnType": "unknown"
         },
         "LockedFungibles": {
           "required": [
@@ -2301,6 +2435,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "required": [],
           "optional": [],
           "description": "Storage item ServiceHead",
+          "returnType": "unknown"
+        },
+        "Pages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Pages",
           "returnType": "unknown"
         }
       },
@@ -2354,7 +2494,14 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "unknown"
         }
       },
-      "Multisig": {},
+      "Multisig": {
+        "Multisigs": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Multisigs",
+          "returnType": "unknown"
+        }
+      },
       "Identity": {
         "IdentityOf": {
           "required": [
@@ -2589,6 +2736,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item AccountCodesMetadata",
           "returnType": "unknown"
+        },
+        "AccountStorages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AccountStorages",
+          "returnType": "Hash"
         }
       },
       "EVMChainId": {
@@ -2639,9 +2792,40 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item TotalIssuance",
           "returnType": "bigint"
+        },
+        "Locks": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Locks",
+          "returnType": "unknown"
+        },
+        "Accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Accounts",
+          "returnType": "unknown"
+        },
+        "Reserves": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Reserves",
+          "returnType": "unknown"
         }
       },
-      "UnknownTokens": {},
+      "UnknownTokens": {
+        "ConcreteFungibleBalances": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ConcreteFungibleBalances",
+          "returnType": "bigint"
+        },
+        "AbstractFungibleBalances": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AbstractFungibleBalances",
+          "returnType": "bigint"
+        }
+      },
       "ZenlinkProtocol": {
         "ForeignLedger": {
           "required": [
@@ -2986,6 +3170,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item RedeemPool",
           "returnType": "bigint"
+        },
+        "FailedFundsToRefund": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item FailedFundsToRefund",
+          "returnType": "unknown"
+        },
+        "ReserveInfos": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ReserveInfos",
+          "returnType": "unknown"
         }
       },
       "AssetRegistry": {
@@ -3097,6 +3293,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item TokenUnlockNextId",
           "returnType": "number"
         },
+        "TokenUnlockLedger": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item TokenUnlockLedger",
+          "returnType": "unknown"
+        },
+        "UserUnlockLedger": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item UserUnlockLedger",
+          "returnType": "unknown"
+        },
+        "TimeUnitUnlockLedger": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item TimeUnitUnlockLedger",
+          "returnType": "unknown"
+        },
         "TokenToRebond": {
           "required": [
             "Anonymize_Iebirugq1dbhv6_"
@@ -3162,6 +3376,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item VtokenIncentiveCoef",
           "returnType": "bigint"
+        },
+        "VtokenLockLedger": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VtokenLockLedger",
+          "returnType": "unknown"
         }
       },
       "Slp": {
@@ -3189,6 +3409,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item HostingFees",
           "returnType": "unknown"
         },
+        "DelegatorsIndex2Multilocation": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item DelegatorsIndex2Multilocation",
+          "returnType": "unknown"
+        },
+        "DelegatorsMultilocation2Index": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item DelegatorsMultilocation2Index",
+          "returnType": "number"
+        },
         "DelegatorNextIndex": {
           "required": [
             "Anonymize_Iebirugq1dbhv6_"
@@ -3213,12 +3445,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item ValidatorBoostList",
           "returnType": "unknown"
         },
+        "ValidatorsByDelegator": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ValidatorsByDelegator",
+          "returnType": "unknown"
+        },
         "ValidatorsByDelegatorXcmUpdateQueue": {
           "required": [
             "u64"
           ],
           "optional": [],
           "description": "Storage item ValidatorsByDelegatorXcmUpdateQueue",
+          "returnType": "unknown"
+        },
+        "DelegatorLedgers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item DelegatorLedgers",
           "returnType": "unknown"
         },
         "DelegatorLedgerXcmUpdateQueue": {
@@ -3243,6 +3487,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item CurrencyDelays",
+          "returnType": "unknown"
+        },
+        "DelegatorLatestTuneRecord": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item DelegatorLatestTuneRecord",
           "returnType": "unknown"
         },
         "CurrencyLatestTuneRecord": {
@@ -3294,7 +3544,14 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "unknown"
         }
       },
-      "XcmInterface": {},
+      "XcmInterface": {
+        "XcmWeightAndFee": {
+          "required": [],
+          "optional": [],
+          "description": "sufficient, otherwise the execution of XCM msg on relaychain will fail.",
+          "returnType": "unknown"
+        }
+      },
       "TokenConversion": {
         "RelaychainLease": {
           "required": [],
@@ -3352,6 +3609,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item GaugePoolInfos",
           "returnType": "unknown"
         },
+        "GaugeInfos": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item GaugeInfos",
+          "returnType": "unknown"
+        },
+        "SharesAndWithdrawnRewards": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item SharesAndWithdrawnRewards",
+          "returnType": "unknown"
+        },
         "BoostPoolInfos": {
           "required": [],
           "optional": [],
@@ -3388,6 +3657,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item BoostVotingPools",
+          "returnType": "bigint"
+        },
+        "BoostBasicRewards": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item BoostBasicRewards",
           "returnType": "bigint"
         },
         "UserFarmingPool": {
@@ -3429,6 +3704,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item DistributionInfos",
           "returnType": "unknown"
+        },
+        "TokensProportions": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item TokensProportions",
+          "returnType": "number"
         },
         "DollarStandardInfos": {
           "required": [
@@ -3475,6 +3756,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item RegisterWhiteList",
           "returnType": "unknown"
+        },
+        "AccountToOuterMultilocation": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AccountToOuterMultilocation",
+          "returnType": "unknown"
+        },
+        "OuterMultilocationToAccount": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item OuterMultilocationToAccount",
+          "returnType": "string"
         },
         "CrossingMinimumAmount": {
           "required": [
@@ -3528,6 +3821,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item PointHistory",
           "returnType": "unknown"
         },
+        "UserPointHistory": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item UserPointHistory",
+          "returnType": "unknown"
+        },
         "UserPointEpoch": {
           "required": [
             "u64"
@@ -3574,6 +3873,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item UserMarkupInfos",
+          "returnType": "unknown"
+        },
+        "LockedTokens": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item LockedTokens",
           "returnType": "unknown"
         },
         "TotalLock": {
@@ -3736,6 +4041,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item Members",
           "returnType": "number"
         },
+        "IdToIndex": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item IdToIndex",
+          "returnType": "number"
+        },
+        "IndexToId": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item IndexToId",
+          "returnType": "string"
+        },
+        "Voting": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Voting",
+          "returnType": "unknown"
+        },
         "VotingCleanup": {
           "required": [
             "u32"
@@ -3800,6 +4123,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item Pools",
           "returnType": "unknown"
         },
+        "TokenRateCaches": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item TokenRateCaches",
+          "returnType": "unknown"
+        },
         "TokenRateHardcap": {
           "required": [
             "Anonymize_Iebirugq1dbhv6_"
@@ -3810,6 +4139,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "VtokenVoting": {
+        "ReferendumInfoFor": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ReferendumInfoFor",
+          "returnType": "unknown"
+        },
+        "VotingForV2": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VotingForV2",
+          "returnType": "unknown"
+        },
         "ClassLocksFor": {
           "required": [
             "AccountId"
@@ -3873,6 +4214,36 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item VoteCapRatio",
           "returnType": "number"
+        },
+        "DelegatorVotes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item DelegatorVotes",
+          "returnType": "unknown"
+        },
+        "PendingDelegatorVotes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item PendingDelegatorVotes",
+          "returnType": "unknown"
+        },
+        "ReferendumTimeoutV3": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ReferendumTimeoutV3",
+          "returnType": "unknown"
+        },
+        "VoteDelegatorFor": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VoteDelegatorFor",
+          "returnType": "number"
+        },
+        "ReferendumVoteStatusStore": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ReferendumVoteStatusStore",
+          "returnType": "unknown"
         }
       },
       "LendMarket": {
@@ -3913,6 +4284,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item TotalReserves",
           "returnType": "bigint"
+        },
+        "AccountBorrows": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AccountBorrows",
+          "returnType": "unknown"
+        },
+        "AccountDeposits": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AccountDeposits",
+          "returnType": "unknown"
+        },
+        "AccountEarned": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AccountEarned",
+          "returnType": "unknown"
         },
         "BorrowIndex": {
           "required": [
@@ -4002,6 +4391,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item RewardBorrowState",
           "returnType": "unknown"
         },
+        "RewardSupplierIndex": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RewardSupplierIndex",
+          "returnType": "bigint"
+        },
+        "RewardBorrowerIndex": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RewardBorrowerIndex",
+          "returnType": "bigint"
+        },
         "RewardAccured": {
           "required": [
             "AccountId"
@@ -4038,6 +4439,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "Oracle": {
+        "RawValues": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RawValues",
+          "returnType": "unknown"
+        },
         "Values": {
           "required": [
             "Anonymize_Iebirugq1dbhv6_"
@@ -4090,6 +4497,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item CommissionTokens",
           "returnType": "unknown"
         },
+        "ChannelCommissionTokenRates": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ChannelCommissionTokenRates",
+          "returnType": "number"
+        },
+        "ChannelVtokenShares": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ChannelVtokenShares",
+          "returnType": "number"
+        },
         "VtokenIssuanceSnapshots": {
           "required": [
             "Anonymize_Iebirugq1dbhv6_"
@@ -4114,6 +4533,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item PeriodVtokenTotalRedeem",
           "returnType": "unknown"
         },
+        "PeriodChannelVtokenMint": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item PeriodChannelVtokenMint",
+          "returnType": "unknown"
+        },
         "PeriodTotalCommissions": {
           "required": [
             "Anonymize_Iebirugq1dbhv6_"
@@ -4128,6 +4553,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item PeriodClearedCommissions",
+          "returnType": "bigint"
+        },
+        "ChannelClaimableCommissions": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ChannelClaimableCommissions",
           "returnType": "bigint"
         }
       },
@@ -4166,6 +4597,30 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item ConfigurationByStakingProtocol",
           "returnType": "unknown"
         },
+        "DelegatorByStakingProtocolAndDelegatorIndex": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item DelegatorByStakingProtocolAndDelegatorIndex",
+          "returnType": "unknown"
+        },
+        "DelegatorIndexByStakingProtocolAndDelegator": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item DelegatorIndexByStakingProtocolAndDelegator",
+          "returnType": "number"
+        },
+        "LedgerByStakingProtocolAndDelegator": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item LedgerByStakingProtocolAndDelegator",
+          "returnType": "unknown"
+        },
+        "ValidatorsByStakingProtocolAndDelegator": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ValidatorsByStakingProtocolAndDelegator",
+          "returnType": "unknown"
+        },
         "NextDelegatorIndexByStakingProtocol": {
           "required": [
             "Anonymize_Icj6nnp3j96bc6_"
@@ -4188,6 +4643,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item LastUpdateOngoingTimeUnitBlockNumber",
+          "returnType": "number"
+        },
+        "LastUpdateTokenExchangeRateBlockNumber": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item LastUpdateTokenExchangeRateBlockNumber",
           "returnType": "number"
         }
       }
@@ -4699,7 +5160,14 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "unknown"
         }
       },
-      "Multisig": {},
+      "Multisig": {
+        "Multisigs": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Multisigs",
+          "returnType": "unknown"
+        }
+      },
       "Uniques": {
         "Class": {
           "required": [
@@ -4717,12 +5185,48 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item OwnershipAcceptance",
           "returnType": "bigint"
         },
+        "Account": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Account",
+          "returnType": "null"
+        },
+        "ClassAccount": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ClassAccount",
+          "returnType": "null"
+        },
+        "Asset": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Asset",
+          "returnType": "unknown"
+        },
         "ClassMetadataOf": {
           "required": [
             "u64"
           ],
           "optional": [],
           "description": "Storage item ClassMetadataOf",
+          "returnType": "unknown"
+        },
+        "InstanceMetadataOf": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item InstanceMetadataOf",
+          "returnType": "unknown"
+        },
+        "Attribute": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Attribute",
+          "returnType": "unknown"
+        },
+        "ItemPriceOf": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ItemPriceOf",
           "returnType": "unknown"
         },
         "CollectionMaxSupply": {
@@ -4755,6 +5259,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "ConvictionVoting": {
+        "VotingFor": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VotingFor",
+          "returnType": "ConvictionVotingVoteVoting"
+        },
         "ClassLocksFor": {
           "required": [
             "AccountId"
@@ -4993,6 +5503,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item GlobalFarm",
           "returnType": "unknown"
         },
+        "YieldFarm": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item YieldFarm",
+          "returnType": "unknown"
+        },
         "Deposit": {
           "required": [
             "u64"
@@ -5000,6 +5516,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item Deposit",
           "returnType": "unknown"
+        },
+        "ActiveYieldFarm": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ActiveYieldFarm",
+          "returnType": "number"
         }
       },
       "OmnipoolLiquidityMining": {
@@ -5143,12 +5665,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item Votes",
           "returnType": "unknown"
         },
+        "VotesRewarded": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VotesRewarded",
+          "returnType": "unknown"
+        },
         "PositionVotes": {
           "required": [
             "u64"
           ],
           "optional": [],
           "description": "Storage item PositionVotes",
+          "returnType": "unknown"
+        },
+        "ProcessedVotes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ProcessedVotes",
           "returnType": "unknown"
         },
         "SixSecBlocksSince": {
@@ -5174,6 +5708,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item PoolPegs",
           "returnType": "unknown"
+        },
+        "AssetTradability": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AssetTradability",
+          "returnType": "number"
         },
         "PoolSnapshots": {
           "required": [
@@ -5210,6 +5750,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item PoolData",
           "returnType": "unknown"
+        },
+        "FeeCollectorWithAsset": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item FeeCollectorWithAsset",
+          "returnType": "boolean"
         }
       },
       "XYK": {
@@ -5293,6 +5839,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item Referrer",
           "returnType": "unknown"
         },
+        "AssetRewards": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AssetRewards",
+          "returnType": "unknown"
+        },
         "PendingConversions": {
           "required": [
             "u32"
@@ -5356,6 +5908,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item TotalIssuance",
           "returnType": "bigint"
+        },
+        "Locks": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Locks",
+          "returnType": "unknown"
+        },
+        "Accounts": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Accounts",
+          "returnType": "unknown"
+        },
+        "Reserves": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Reserves",
+          "returnType": "unknown"
         }
       },
       "Vesting": {
@@ -5384,6 +5954,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item AccountCodesMetadata",
           "returnType": "unknown"
+        },
+        "AccountStorages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AccountStorages",
+          "returnType": "Hash"
         },
         "Suicided": {
           "required": [
@@ -5499,6 +6075,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item GlobalFarm",
           "returnType": "unknown"
         },
+        "YieldFarm": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item YieldFarm",
+          "returnType": "unknown"
+        },
         "Deposit": {
           "required": [
             "u64"
@@ -5506,6 +6088,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item Deposit",
           "returnType": "unknown"
+        },
+        "ActiveYieldFarm": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ActiveYieldFarm",
+          "returnType": "number"
         }
       },
       "DCA": {
@@ -5522,6 +6110,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item Schedules",
           "returnType": "unknown"
+        },
+        "ScheduleOwnership": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ScheduleOwnership",
+          "returnType": "null"
         },
         "RemainingAmounts": {
           "required": [
@@ -5771,6 +6365,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item SafeXcmVersion",
           "returnType": "number"
         },
+        "SupportedVersion": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item SupportedVersion",
+          "returnType": "number"
+        },
+        "VersionNotifiers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifiers",
+          "returnType": "bigint"
+        },
+        "VersionNotifyTargets": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifyTargets",
+          "returnType": "unknown"
+        },
         "VersionDiscoveryQueue": {
           "required": [],
           "optional": [],
@@ -5782,6 +6394,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item CurrentMigration",
           "returnType": "XcmPalletVersionMigrationStage"
+        },
+        "RemoteLockedFungibles": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RemoteLockedFungibles",
+          "returnType": "unknown"
         },
         "LockedFungibles": {
           "required": [
@@ -5822,6 +6440,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item OutboundXcmpStatus",
           "returnType": "unknown"
+        },
+        "OutboundXcmpMessages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item OutboundXcmpMessages",
+          "returnType": "Uint8Array"
         },
         "SignalMessages": {
           "required": [
@@ -5866,9 +6490,28 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item ServiceHead",
           "returnType": "unknown"
+        },
+        "Pages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Pages",
+          "returnType": "unknown"
         }
       },
-      "UnknownTokens": {},
+      "UnknownTokens": {
+        "ConcreteFungibleBalances": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ConcreteFungibleBalances",
+          "returnType": "bigint"
+        },
+        "AbstractFungibleBalances": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AbstractFungibleBalances",
+          "returnType": "bigint"
+        }
+      },
       "Authorship": {
         "Author": {
           "required": [],
@@ -5992,6 +6635,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "required": [],
           "optional": [],
           "description": "Storage item Accumulator",
+          "returnType": "unknown"
+        },
+        "Oracles": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Oracles",
           "returnType": "unknown"
         },
         "WhitelistedAssets": {
@@ -6496,6 +7145,42 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item ErasStartSessionIndex",
           "returnType": "number"
         },
+        "ErasStakers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasStakers",
+          "returnType": "unknown"
+        },
+        "ErasStakersOverview": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasStakersOverview",
+          "returnType": "unknown"
+        },
+        "ErasStakersClipped": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasStakersClipped",
+          "returnType": "unknown"
+        },
+        "ErasStakersPaged": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasStakersPaged",
+          "returnType": "unknown"
+        },
+        "ClaimedRewards": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ClaimedRewards",
+          "returnType": "unknown"
+        },
+        "ErasValidatorPrefs": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasValidatorPrefs",
+          "returnType": "unknown"
+        },
         "ErasValidatorReward": {
           "required": [
             "u32"
@@ -6558,6 +7243,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item BondedEras",
           "returnType": "unknown"
         },
+        "ValidatorSlashInEra": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ValidatorSlashInEra",
+          "returnType": "unknown"
+        },
+        "NominatorSlashInEra": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item NominatorSlashInEra",
+          "returnType": "bigint"
+        },
         "SlashingSpans": {
           "required": [
             "AccountId"
@@ -6594,6 +7291,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item Reports",
+          "returnType": "unknown"
+        },
+        "ConcurrentReportsIndex": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ConcurrentReportsIndex",
           "returnType": "unknown"
         }
       },
@@ -6770,6 +7473,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "ConvictionVoting": {
+        "VotingFor": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VotingFor",
+          "returnType": "ConvictionVotingVoteVoting"
+        },
         "ClassLocksFor": {
           "required": [
             "AccountId"
@@ -6835,6 +7544,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item Members",
           "returnType": "number"
+        },
+        "IdToIndex": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item IdToIndex",
+          "returnType": "number"
+        },
+        "IndexToId": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item IndexToId",
+          "returnType": "string"
+        },
+        "Voting": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Voting",
+          "returnType": "unknown"
         },
         "VotingCleanup": {
           "required": [
@@ -7040,6 +7767,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item Skeptic",
           "returnType": "string"
         },
+        "Votes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Votes",
+          "returnType": "unknown"
+        },
         "VoteClearCursor": {
           "required": [
             "AccountId"
@@ -7065,6 +7798,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item Defending",
           "returnType": "unknown"
+        },
+        "DefenderVotes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item DefenderVotes",
+          "returnType": "unknown"
         }
       },
       "Recovery": {
@@ -7074,6 +7813,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item Recoverable",
+          "returnType": "unknown"
+        },
+        "ActiveRecoveries": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ActiveRecoveries",
           "returnType": "unknown"
         },
         "Proxy": {
@@ -7151,7 +7896,14 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "unknown"
         }
       },
-      "Multisig": {},
+      "Multisig": {
+        "Multisigs": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Multisigs",
+          "returnType": "unknown"
+        }
+      },
       "Preimage": {
         "StatusFor": {
           "required": [
@@ -7230,6 +7982,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item ParentTotalChildBounties",
           "returnType": "number"
+        },
+        "ChildBounties": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ChildBounties",
+          "returnType": "unknown"
+        },
+        "ChildBountyDescriptionsV1": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ChildBountyDescriptionsV1",
+          "returnType": "Uint8Array"
         },
         "V0ToV1ChildBountyIds": {
           "required": [
@@ -8047,6 +8811,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item LastPrunedSession",
           "returnType": "number"
         },
+        "Disputes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Disputes",
+          "returnType": "unknown"
+        },
+        "BackersOnDisputes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item BackersOnDisputes",
+          "returnType": "unknown"
+        },
+        "Included": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Included",
+          "returnType": "number"
+        },
         "Frozen": {
           "required": [],
           "optional": [],
@@ -8055,6 +8837,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "ParasSlashing": {
+        "UnappliedSlashes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item UnappliedSlashes",
+          "returnType": "unknown"
+        },
         "ValidatorSetCounts": {
           "required": [
             "u32"
@@ -8247,6 +9035,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item SafeXcmVersion",
           "returnType": "number"
         },
+        "SupportedVersion": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item SupportedVersion",
+          "returnType": "number"
+        },
+        "VersionNotifiers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifiers",
+          "returnType": "bigint"
+        },
+        "VersionNotifyTargets": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifyTargets",
+          "returnType": "unknown"
+        },
         "VersionDiscoveryQueue": {
           "required": [],
           "optional": [],
@@ -8258,6 +9064,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item CurrentMigration",
           "returnType": "XcmPalletVersionMigrationStage"
+        },
+        "RemoteLockedFungibles": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RemoteLockedFungibles",
+          "returnType": "unknown"
         },
         "LockedFungibles": {
           "required": [
@@ -8308,6 +9120,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item ServiceHead",
           "returnType": "ParachainsInclusionAggregateMessageOrigin"
+        },
+        "Pages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Pages",
+          "returnType": "unknown"
         }
       },
       "AssetRate": {
@@ -8839,6 +9657,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item CandidatePool",
           "returnType": "unknown"
         },
+        "AtStake": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AtStake",
+          "returnType": "unknown"
+        },
+        "WasInactive": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item WasInactive",
+          "returnType": "null"
+        },
         "DelayedPayouts": {
           "required": [
             "u32"
@@ -8859,6 +9689,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item Points",
+          "returnType": "number"
+        },
+        "AwardedPts": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AwardedPts",
           "returnType": "number"
         },
         "EnableMarkingOffline": {
@@ -8954,6 +9790,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item MinOrbiterDeposit",
           "returnType": "bigint"
+        },
+        "OrbiterPerRound": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item OrbiterPerRound",
+          "returnType": "HexString"
         },
         "RegisteredOrbiter": {
           "required": [
@@ -9092,7 +9934,14 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "boolean"
         }
       },
-      "Multisig": {},
+      "Multisig": {
+        "Multisigs": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Multisigs",
+          "returnType": "unknown"
+        }
+      },
       "Parameters": {
         "Parameters": {
           "required": [
@@ -9127,6 +9976,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item AccountCodesMetadata",
           "returnType": "unknown"
+        },
+        "AccountStorages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AccountStorages",
+          "returnType": "Hash"
         }
       },
       "Ethereum": {
@@ -9230,6 +10085,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "ConvictionVoting": {
+        "VotingFor": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VotingFor",
+          "returnType": "unknown"
+        },
         "ClassLocksFor": {
           "required": [
             "HexString"
@@ -9506,6 +10367,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item OutboundXcmpStatus",
           "returnType": "unknown"
         },
+        "OutboundXcmpMessages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item OutboundXcmpMessages",
+          "returnType": "Uint8Array"
+        },
         "SignalMessages": {
           "required": [
             "u32"
@@ -9564,6 +10431,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item SafeXcmVersion",
           "returnType": "number"
         },
+        "SupportedVersion": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item SupportedVersion",
+          "returnType": "number"
+        },
+        "VersionNotifiers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifiers",
+          "returnType": "bigint"
+        },
+        "VersionNotifyTargets": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifyTargets",
+          "returnType": "unknown"
+        },
         "VersionDiscoveryQueue": {
           "required": [],
           "optional": [],
@@ -9575,6 +10460,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item CurrentMigration",
           "returnType": "XcmPalletVersionMigrationStage"
+        },
+        "RemoteLockedFungibles": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RemoteLockedFungibles",
+          "returnType": "unknown"
         },
         "LockedFungibles": {
           "required": [
@@ -9610,6 +10501,25 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item Asset",
+          "returnType": "unknown"
+        },
+        "Account": {
+          "required": [
+            "AssetId",
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item Account",
+          "returnType": "unknown"
+        },
+        "Approvals": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item Approvals",
           "returnType": "unknown"
         },
         "Metadata": {
@@ -9704,6 +10614,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "required": [],
           "optional": [],
           "description": "Storage item ServiceHead",
+          "returnType": "unknown"
+        },
+        "Pages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Pages",
           "returnType": "unknown"
         }
       },
@@ -9923,6 +10839,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item ParasInfo",
           "returnType": "unknown"
+        },
+        "ImportedParaHeads": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ImportedParaHeads",
+          "returnType": "Uint8Array"
+        },
+        "ImportedParaHashes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ImportedParaHashes",
+          "returnType": "Hash"
         }
       },
       "BridgeKusamaMessages": {
@@ -9983,7 +10911,7 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
       }
     }
   },
-  "paseo": {
+  "paseo_asset_hub": {
     "pallets": {
       "System": {
         "Account": {
@@ -10109,168 +11037,162 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "unknown"
         }
       },
-      "Scheduler": {
-        "IncompleteSince": {
+      "ParachainSystem": {
+        "UnincludedSegment": {
           "required": [],
           "optional": [],
-          "description": "Storage item IncompleteSince",
-          "returnType": "number"
-        },
-        "Agenda": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item Agenda",
+          "description": "Storage item UnincludedSegment",
           "returnType": "unknown"
         },
-        "Retries": {
-          "required": [
-            "Anonymize_I9jd27rnpm8ttv_"
-          ],
+        "AggregatedUnincludedSegment": {
+          "required": [],
           "optional": [],
-          "description": "Storage item Retries",
+          "description": "Storage item AggregatedUnincludedSegment",
           "returnType": "unknown"
         },
-        "Lookup": {
-          "required": [
-            "Hash"
-          ],
+        "PendingValidationCode": {
+          "required": [],
           "optional": [],
-          "description": "Storage item Lookup",
-          "returnType": "unknown"
-        }
-      },
-      "Preimage": {
-        "StatusFor": {
-          "required": [
-            "Hash"
-          ],
-          "optional": [],
-          "description": "Storage item StatusFor",
-          "returnType": "PreimageOldRequestStatus"
-        },
-        "RequestStatusFor": {
-          "required": [
-            "Hash"
-          ],
-          "optional": [],
-          "description": "Storage item RequestStatusFor",
-          "returnType": "PreimageRequestStatus"
-        },
-        "PreimageFor": {
-          "required": [
-            "Anonymize_I4pact7n2e9a0i_"
-          ],
-          "optional": [],
-          "description": "Storage item PreimageFor",
+          "description": "Storage item PendingValidationCode",
           "returnType": "Uint8Array"
-        }
-      },
-      "Babe": {
-        "EpochIndex": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item EpochIndex",
-          "returnType": "bigint"
         },
-        "Authorities": {
+        "NewValidationCode": {
           "required": [],
           "optional": [],
-          "description": "Storage item Authorities",
+          "description": "Storage item NewValidationCode",
+          "returnType": "Uint8Array"
+        },
+        "ValidationData": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ValidationData",
           "returnType": "unknown"
         },
-        "GenesisSlot": {
+        "DidSetValidationCode": {
           "required": [],
           "optional": [],
-          "description": "Storage item GenesisSlot",
-          "returnType": "bigint"
+          "description": "Storage item DidSetValidationCode",
+          "returnType": "boolean"
         },
-        "CurrentSlot": {
+        "LastRelayChainBlockNumber": {
           "required": [],
           "optional": [],
-          "description": "Storage item CurrentSlot",
-          "returnType": "bigint"
-        },
-        "Randomness": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Randomness",
-          "returnType": "Hash"
-        },
-        "PendingEpochConfigChange": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item PendingEpochConfigChange",
-          "returnType": "BabeDigestsNextConfigDescriptor"
-        },
-        "NextRandomness": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item NextRandomness",
-          "returnType": "Hash"
-        },
-        "NextAuthorities": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item NextAuthorities",
-          "returnType": "unknown"
-        },
-        "SegmentIndex": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item SegmentIndex",
+          "description": "Storage item LastRelayChainBlockNumber",
           "returnType": "number"
         },
-        "UnderConstruction": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item UnderConstruction",
-          "returnType": "unknown"
-        },
-        "Initialized": {
+        "UpgradeRestrictionSignal": {
           "required": [],
           "optional": [],
-          "description": "Storage item Initialized",
+          "description": "Storage item UpgradeRestrictionSignal",
           "returnType": "unknown"
         },
-        "AuthorVrfRandomness": {
+        "UpgradeGoAhead": {
           "required": [],
           "optional": [],
-          "description": "Storage item AuthorVrfRandomness",
+          "description": "Storage item UpgradeGoAhead",
           "returnType": "unknown"
         },
-        "EpochStart": {
+        "RelayStateProof": {
           "required": [],
           "optional": [],
-          "description": "Storage item EpochStart",
+          "description": "Storage item RelayStateProof",
           "returnType": "unknown"
         },
-        "Lateness": {
+        "RelevantMessagingState": {
           "required": [],
           "optional": [],
-          "description": "Storage item Lateness",
+          "description": "Storage item RelevantMessagingState",
+          "returnType": "unknown"
+        },
+        "HostConfiguration": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item HostConfiguration",
+          "returnType": "unknown"
+        },
+        "LastDmqMqcHead": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item LastDmqMqcHead",
+          "returnType": "Hash"
+        },
+        "LastHrmpMqcHeads": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item LastHrmpMqcHeads",
+          "returnType": "unknown"
+        },
+        "ProcessedDownwardMessages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ProcessedDownwardMessages",
           "returnType": "number"
         },
-        "EpochConfig": {
+        "LastProcessedDownwardMessage": {
           "required": [],
           "optional": [],
-          "description": "Storage item EpochConfig",
+          "description": "Storage item LastProcessedDownwardMessage",
           "returnType": "unknown"
         },
-        "NextEpochConfig": {
+        "HrmpWatermark": {
           "required": [],
           "optional": [],
-          "description": "Storage item NextEpochConfig",
+          "description": "Storage item HrmpWatermark",
+          "returnType": "number"
+        },
+        "LastProcessedHrmpMessage": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item LastProcessedHrmpMessage",
           "returnType": "unknown"
         },
-        "SkippedEpochs": {
+        "HrmpOutboundMessages": {
           "required": [],
           "optional": [],
-          "description": "Storage item SkippedEpochs",
+          "description": "Storage item HrmpOutboundMessages",
           "returnType": "unknown"
+        },
+        "UpwardMessages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item UpwardMessages",
+          "returnType": "unknown"
+        },
+        "PendingUpwardMessages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item PendingUpwardMessages",
+          "returnType": "unknown"
+        },
+        "UpwardDeliveryFeeFactor": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item UpwardDeliveryFeeFactor",
+          "returnType": "bigint"
+        },
+        "AnnouncedHrmpMessagesPerCandidate": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AnnouncedHrmpMessagesPerCandidate",
+          "returnType": "number"
+        },
+        "ReservedXcmpWeightOverride": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ReservedXcmpWeightOverride",
+          "returnType": "unknown"
+        },
+        "ReservedDmpWeightOverride": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ReservedDmpWeightOverride",
+          "returnType": "unknown"
+        },
+        "CustomValidationHeadData": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item CustomValidationHeadData",
+          "returnType": "Uint8Array"
         }
       },
       "Timestamp": {
@@ -10287,14 +11209,28 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "boolean"
         }
       },
-      "Indices": {
-        "Accounts": {
+      "ParachainInfo": {
+        "ParachainId": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ParachainId",
+          "returnType": "number"
+        }
+      },
+      "MultiBlockMigrations": {
+        "Cursor": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Cursor",
+          "returnType": "unknown"
+        },
+        "Historic": {
           "required": [
-            "u32"
+            "bytes"
           ],
           "optional": [],
-          "description": "Storage item Accounts",
-          "returnType": "unknown"
+          "description": "Storage item Historic",
+          "returnType": "null"
         }
       },
       "Balances": {
@@ -10373,262 +11309,38 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "string"
         }
       },
-      "Staking": {
-        "ValidatorCount": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ValidatorCount",
-          "returnType": "number"
-        },
-        "MinimumValidatorCount": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MinimumValidatorCount",
-          "returnType": "number"
-        },
+      "CollatorSelection": {
         "Invulnerables": {
           "required": [],
           "optional": [],
           "description": "Storage item Invulnerables",
           "returnType": "unknown"
         },
-        "Bonded": {
+        "CandidateList": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item CandidateList",
+          "returnType": "unknown"
+        },
+        "LastAuthoredBlock": {
           "required": [
             "AccountId"
           ],
           "optional": [],
-          "description": "Storage item Bonded",
-          "returnType": "string"
+          "description": "Storage item LastAuthoredBlock",
+          "returnType": "number"
         },
-        "MinNominatorBond": {
+        "DesiredCandidates": {
           "required": [],
           "optional": [],
-          "description": "Storage item MinNominatorBond",
+          "description": "Storage item DesiredCandidates",
+          "returnType": "number"
+        },
+        "CandidacyBond": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item CandidacyBond",
           "returnType": "bigint"
-        },
-        "MinValidatorBond": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MinValidatorBond",
-          "returnType": "bigint"
-        },
-        "MinimumActiveStake": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MinimumActiveStake",
-          "returnType": "bigint"
-        },
-        "MinCommission": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MinCommission",
-          "returnType": "number"
-        },
-        "Ledger": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item Ledger",
-          "returnType": "unknown"
-        },
-        "Payee": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item Payee",
-          "returnType": "StakingRewardDestination"
-        },
-        "Validators": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item Validators",
-          "returnType": "unknown"
-        },
-        "CounterForValidators": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForValidators",
-          "returnType": "number"
-        },
-        "MaxValidatorsCount": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MaxValidatorsCount",
-          "returnType": "number"
-        },
-        "Nominators": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item Nominators",
-          "returnType": "unknown"
-        },
-        "CounterForNominators": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForNominators",
-          "returnType": "number"
-        },
-        "VirtualStakers": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item VirtualStakers",
-          "returnType": "null"
-        },
-        "CounterForVirtualStakers": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForVirtualStakers",
-          "returnType": "number"
-        },
-        "MaxNominatorsCount": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MaxNominatorsCount",
-          "returnType": "number"
-        },
-        "CurrentEra": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CurrentEra",
-          "returnType": "number"
-        },
-        "ActiveEra": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ActiveEra",
-          "returnType": "unknown"
-        },
-        "ErasStartSessionIndex": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item ErasStartSessionIndex",
-          "returnType": "number"
-        },
-        "ErasValidatorReward": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item ErasValidatorReward",
-          "returnType": "bigint"
-        },
-        "ErasRewardPoints": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item ErasRewardPoints",
-          "returnType": "unknown"
-        },
-        "ErasTotalStake": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item ErasTotalStake",
-          "returnType": "bigint"
-        },
-        "ForceEra": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ForceEra",
-          "returnType": "StakingForcing"
-        },
-        "MaxStakedRewards": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MaxStakedRewards",
-          "returnType": "number"
-        },
-        "SlashRewardFraction": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item SlashRewardFraction",
-          "returnType": "number"
-        },
-        "CanceledSlashPayout": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CanceledSlashPayout",
-          "returnType": "bigint"
-        },
-        "UnappliedSlashes": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item UnappliedSlashes",
-          "returnType": "unknown"
-        },
-        "BondedEras": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item BondedEras",
-          "returnType": "unknown"
-        },
-        "SlashingSpans": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item SlashingSpans",
-          "returnType": "unknown"
-        },
-        "SpanSlash": {
-          "required": [
-            "Anonymize_I6ouflveob4eli_"
-          ],
-          "optional": [],
-          "description": "Storage item SpanSlash",
-          "returnType": "unknown"
-        },
-        "CurrentPlannedSession": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CurrentPlannedSession",
-          "returnType": "number"
-        },
-        "ChillThreshold": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ChillThreshold",
-          "returnType": "number"
-        }
-      },
-      "Offences": {
-        "Reports": {
-          "required": [
-            "Hash"
-          ],
-          "optional": [],
-          "description": "Storage item Reports",
-          "returnType": "unknown"
-        }
-      },
-      "Historical": {
-        "HistoricalSessions": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item HistoricalSessions",
-          "returnType": "unknown"
-        },
-        "StoredRange": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item StoredRange",
-          "returnType": "unknown"
         }
       },
       "Session": {
@@ -10668,7 +11380,7 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item NextKeys",
-          "returnType": "unknown"
+          "returnType": "Hash"
         },
         "KeyOwner": {
           "required": [
@@ -10679,943 +11391,72 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "string"
         }
       },
-      "Grandpa": {
-        "State": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item State",
-          "returnType": "GrandpaStoredState"
-        },
-        "PendingChange": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item PendingChange",
-          "returnType": "unknown"
-        },
-        "NextForced": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item NextForced",
-          "returnType": "number"
-        },
-        "Stalled": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Stalled",
-          "returnType": "unknown"
-        },
-        "CurrentSetId": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CurrentSetId",
-          "returnType": "bigint"
-        },
-        "SetIdSession": {
-          "required": [
-            "u64"
-          ],
-          "optional": [],
-          "description": "Storage item SetIdSession",
-          "returnType": "number"
-        },
+      "Aura": {
         "Authorities": {
           "required": [],
           "optional": [],
           "description": "Storage item Authorities",
           "returnType": "unknown"
-        }
-      },
-      "AuthorityDiscovery": {
-        "Keys": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Keys",
-          "returnType": "unknown"
         },
-        "NextKeys": {
+        "CurrentSlot": {
           "required": [],
           "optional": [],
-          "description": "Storage item NextKeys",
-          "returnType": "unknown"
-        }
-      },
-      "Treasury": {
-        "ProposalCount": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ProposalCount",
-          "returnType": "number"
-        },
-        "Proposals": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item Proposals",
-          "returnType": "unknown"
-        },
-        "Deactivated": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Deactivated",
+          "description": "Storage item CurrentSlot",
           "returnType": "bigint"
-        },
-        "Approvals": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Approvals",
-          "returnType": "unknown"
-        },
-        "SpendCount": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item SpendCount",
-          "returnType": "number"
-        },
-        "Spends": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item Spends",
-          "returnType": "unknown"
-        },
-        "LastSpendPeriod": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item LastSpendPeriod",
-          "returnType": "number"
         }
       },
-      "ConvictionVoting": {
-        "ClassLocksFor": {
-          "required": [
-            "AccountId"
-          ],
+      "AuraExt": {
+        "Authorities": {
+          "required": [],
           "optional": [],
-          "description": "Storage item ClassLocksFor",
+          "description": "Storage item Authorities",
+          "returnType": "unknown"
+        },
+        "RelaySlotInfo": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RelaySlotInfo",
           "returnType": "unknown"
         }
       },
-      "Referenda": {
-        "ReferendumCount": {
+      "XcmpQueue": {
+        "InboundXcmpSuspended": {
           "required": [],
           "optional": [],
-          "description": "Storage item ReferendumCount",
-          "returnType": "number"
-        },
-        "ReferendumInfoFor": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item ReferendumInfoFor",
+          "description": "Storage item InboundXcmpSuspended",
           "returnType": "unknown"
         },
-        "TrackQueue": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item TrackQueue",
-          "returnType": "unknown"
-        },
-        "DecidingCount": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item DecidingCount",
-          "returnType": "number"
-        },
-        "MetadataOf": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item MetadataOf",
-          "returnType": "Hash"
-        }
-      },
-      "Whitelist": {
-        "WhitelistedCall": {
-          "required": [
-            "Hash"
-          ],
-          "optional": [],
-          "description": "Storage item WhitelistedCall",
-          "returnType": "null"
-        }
-      },
-      "Claims": {
-        "Claims": {
-          "required": [
-            "bytes"
-          ],
-          "optional": [],
-          "description": "Storage item Claims",
-          "returnType": "bigint"
-        },
-        "Total": {
+        "OutboundXcmpStatus": {
           "required": [],
           "optional": [],
-          "description": "Storage item Total",
-          "returnType": "bigint"
-        },
-        "Vesting": {
-          "required": [
-            "bytes"
-          ],
-          "optional": [],
-          "description": "Storage item Vesting",
+          "description": "Storage item OutboundXcmpStatus",
           "returnType": "unknown"
         },
-        "Signing": {
-          "required": [
-            "bytes"
-          ],
-          "optional": [],
-          "description": "Storage item Signing",
-          "returnType": "ClaimsStatementKind"
-        },
-        "Preclaims": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item Preclaims",
-          "returnType": "Hash"
-        }
-      },
-      "Vesting": {
-        "Vesting": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item Vesting",
-          "returnType": "unknown"
-        },
-        "StorageVersion": {
+        "OutboundXcmpMessages": {
           "required": [],
           "optional": [],
-          "description": "Storage item StorageVersion",
-          "returnType": "Version"
-        }
-      },
-      "Proxy": {
-        "Proxies": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item Proxies",
-          "returnType": "unknown"
-        },
-        "Announcements": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item Announcements",
-          "returnType": "unknown"
-        }
-      },
-      "Multisig": {},
-      "Bounties": {
-        "BountyCount": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item BountyCount",
-          "returnType": "number"
-        },
-        "Bounties": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item Bounties",
-          "returnType": "unknown"
-        },
-        "BountyDescriptions": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item BountyDescriptions",
+          "description": "Storage item OutboundXcmpMessages",
           "returnType": "Uint8Array"
         },
-        "BountyApprovals": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item BountyApprovals",
-          "returnType": "unknown"
-        }
-      },
-      "ChildBounties": {
-        "ChildBountyCount": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ChildBountyCount",
-          "returnType": "number"
-        },
-        "ParentChildBounties": {
+        "SignalMessages": {
           "required": [
             "u32"
           ],
           "optional": [],
-          "description": "Storage item ParentChildBounties",
-          "returnType": "number"
-        },
-        "ParentTotalChildBounties": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item ParentTotalChildBounties",
-          "returnType": "number"
-        },
-        "V0ToV1ChildBountyIds": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item V0ToV1ChildBountyIds",
-          "returnType": "unknown"
-        },
-        "ChildrenCuratorFees": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item ChildrenCuratorFees",
-          "returnType": "bigint"
-        }
-      },
-      "ElectionProviderMultiPhase": {
-        "Round": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Round",
-          "returnType": "number"
-        },
-        "CurrentPhase": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CurrentPhase",
-          "returnType": "ElectionProviderMultiPhasePhase"
-        },
-        "QueuedSolution": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item QueuedSolution",
-          "returnType": "unknown"
-        },
-        "Snapshot": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Snapshot",
-          "returnType": "unknown"
-        },
-        "DesiredTargets": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item DesiredTargets",
-          "returnType": "number"
-        },
-        "SnapshotMetadata": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item SnapshotMetadata",
-          "returnType": "unknown"
-        },
-        "SignedSubmissionNextIndex": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item SignedSubmissionNextIndex",
-          "returnType": "number"
-        },
-        "SignedSubmissionIndices": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item SignedSubmissionIndices",
-          "returnType": "unknown"
-        },
-        "SignedSubmissionsMap": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item SignedSubmissionsMap",
-          "returnType": "unknown"
-        },
-        "MinimumUntrustedScore": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MinimumUntrustedScore",
-          "returnType": "unknown"
-        }
-      },
-      "VoterList": {
-        "ListNodes": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item ListNodes",
-          "returnType": "unknown"
-        },
-        "CounterForListNodes": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForListNodes",
-          "returnType": "number"
-        },
-        "ListBags": {
-          "required": [
-            "u64"
-          ],
-          "optional": [],
-          "description": "Storage item ListBags",
-          "returnType": "unknown"
-        },
-        "NextNodeAutoRebagged": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item NextNodeAutoRebagged",
-          "returnType": "string"
-        },
-        "Lock": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Lock",
-          "returnType": "null"
-        }
-      },
-      "NominationPools": {
-        "TotalValueLocked": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item TotalValueLocked",
-          "returnType": "bigint"
-        },
-        "MinJoinBond": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MinJoinBond",
-          "returnType": "bigint"
-        },
-        "MinCreateBond": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MinCreateBond",
-          "returnType": "bigint"
-        },
-        "MaxPools": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MaxPools",
-          "returnType": "number"
-        },
-        "MaxPoolMembers": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MaxPoolMembers",
-          "returnType": "number"
-        },
-        "MaxPoolMembersPerPool": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MaxPoolMembersPerPool",
-          "returnType": "number"
-        },
-        "GlobalMaxCommission": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item GlobalMaxCommission",
-          "returnType": "number"
-        },
-        "PoolMembers": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item PoolMembers",
-          "returnType": "unknown"
-        },
-        "CounterForPoolMembers": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForPoolMembers",
-          "returnType": "number"
-        },
-        "BondedPools": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item BondedPools",
-          "returnType": "unknown"
-        },
-        "CounterForBondedPools": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForBondedPools",
-          "returnType": "number"
-        },
-        "RewardPools": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item RewardPools",
-          "returnType": "unknown"
-        },
-        "CounterForRewardPools": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForRewardPools",
-          "returnType": "number"
-        },
-        "SubPoolsStorage": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item SubPoolsStorage",
-          "returnType": "unknown"
-        },
-        "CounterForSubPoolsStorage": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForSubPoolsStorage",
-          "returnType": "number"
-        },
-        "Metadata": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item Metadata",
+          "description": "Storage item SignalMessages",
           "returnType": "Uint8Array"
         },
-        "CounterForMetadata": {
+        "QueueConfig": {
           "required": [],
           "optional": [],
-          "description": "Storage item CounterForMetadata",
-          "returnType": "number"
-        },
-        "LastPoolId": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item LastPoolId",
-          "returnType": "number"
-        },
-        "ReversePoolIdLookup": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item ReversePoolIdLookup",
-          "returnType": "number"
-        },
-        "CounterForReversePoolIdLookup": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForReversePoolIdLookup",
-          "returnType": "number"
-        },
-        "ClaimPermissions": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item ClaimPermissions",
-          "returnType": "NominationPoolsClaimPermission"
-        }
-      },
-      "FastUnstake": {
-        "Head": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Head",
+          "description": "Storage item QueueConfig",
           "returnType": "unknown"
         },
-        "Queue": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item Queue",
-          "returnType": "bigint"
-        },
-        "CounterForQueue": {
+        "QueueSuspended": {
           "required": [],
           "optional": [],
-          "description": "Storage item CounterForQueue",
-          "returnType": "number"
-        },
-        "ErasToCheckPerBlock": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ErasToCheckPerBlock",
-          "returnType": "number"
-        }
-      },
-      "DelegatedStaking": {
-        "Delegators": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item Delegators",
-          "returnType": "unknown"
-        },
-        "CounterForDelegators": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForDelegators",
-          "returnType": "number"
-        },
-        "Agents": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item Agents",
-          "returnType": "unknown"
-        },
-        "CounterForAgents": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForAgents",
-          "returnType": "number"
-        }
-      },
-      "StakingAhClient": {
-        "ValidatorSet": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ValidatorSet",
-          "returnType": "unknown"
-        },
-        "IncompleteValidatorSetReport": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item IncompleteValidatorSetReport",
-          "returnType": "unknown"
-        },
-        "ValidatorPoints": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item ValidatorPoints",
-          "returnType": "number"
-        },
-        "Mode": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Mode",
-          "returnType": "unknown"
-        },
-        "NextSessionChangesValidators": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item NextSessionChangesValidators",
-          "returnType": "number"
-        },
-        "ValidatorSetAppliedAt": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ValidatorSetAppliedAt",
-          "returnType": "number"
-        },
-        "BufferedOffences": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item BufferedOffences",
-          "returnType": "unknown"
-        }
-      },
-      "Configuration": {
-        "ActiveConfig": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ActiveConfig",
-          "returnType": "unknown"
-        },
-        "PendingConfigs": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item PendingConfigs",
-          "returnType": "unknown"
-        },
-        "BypassConsistencyCheck": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item BypassConsistencyCheck",
+          "description": "Storage item QueueSuspended",
           "returnType": "boolean"
-        }
-      },
-      "ParasShared": {
-        "CurrentSessionIndex": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CurrentSessionIndex",
-          "returnType": "number"
-        },
-        "ActiveValidatorIndices": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ActiveValidatorIndices",
-          "returnType": "unknown"
-        },
-        "ActiveValidatorKeys": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ActiveValidatorKeys",
-          "returnType": "unknown"
-        },
-        "AllowedRelayParents": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item AllowedRelayParents",
-          "returnType": "unknown"
-        }
-      },
-      "ParaInclusion": {
-        "V1": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item V1",
-          "returnType": "unknown"
-        }
-      },
-      "ParaInherent": {
-        "Included": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Included",
-          "returnType": "null"
-        },
-        "OnChainVotes": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item OnChainVotes",
-          "returnType": "unknown"
-        }
-      },
-      "ParaScheduler": {
-        "ValidatorGroups": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ValidatorGroups",
-          "returnType": "unknown"
-        },
-        "SessionStartBlock": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item SessionStartBlock",
-          "returnType": "number"
-        },
-        "ClaimQueue": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item ClaimQueue",
-          "returnType": "unknown"
-        }
-      },
-      "Paras": {
-        "PvfActiveVoteMap": {
-          "required": [
-            "Hash"
-          ],
-          "optional": [],
-          "description": "Storage item PvfActiveVoteMap",
-          "returnType": "unknown"
-        },
-        "PvfActiveVoteList": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item PvfActiveVoteList",
-          "returnType": "unknown"
-        },
-        "Parachains": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Parachains",
-          "returnType": "unknown"
-        },
-        "ParaLifecycles": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item ParaLifecycles",
-          "returnType": "ParachainsParasParaLifecycle"
-        },
-        "Heads": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item Heads",
-          "returnType": "Uint8Array"
-        },
-        "MostRecentContext": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item MostRecentContext",
-          "returnType": "number"
-        },
-        "CurrentCodeHash": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item CurrentCodeHash",
-          "returnType": "Hash"
-        },
-        "PastCodeHash": {
-          "required": [
-            "Anonymize_I9jd27rnpm8ttv_"
-          ],
-          "optional": [],
-          "description": "Storage item PastCodeHash",
-          "returnType": "Hash"
-        },
-        "PastCodeMeta": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item PastCodeMeta",
-          "returnType": "unknown"
-        },
-        "PastCodePruning": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item PastCodePruning",
-          "returnType": "unknown"
-        },
-        "FutureCodeUpgrades": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item FutureCodeUpgrades",
-          "returnType": "number"
-        },
-        "FutureCodeUpgradesAt": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item FutureCodeUpgradesAt",
-          "returnType": "unknown"
-        },
-        "FutureCodeHash": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item FutureCodeHash",
-          "returnType": "Hash"
-        },
-        "UpgradeGoAheadSignal": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item UpgradeGoAheadSignal",
-          "returnType": "UpgradeGoAhead"
-        },
-        "UpgradeRestrictionSignal": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item UpgradeRestrictionSignal",
-          "returnType": "UpgradeRestriction"
-        },
-        "UpgradeCooldowns": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item UpgradeCooldowns",
-          "returnType": "unknown"
-        },
-        "UpcomingUpgrades": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item UpcomingUpgrades",
-          "returnType": "unknown"
-        },
-        "ActionsQueue": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item ActionsQueue",
-          "returnType": "unknown"
-        },
-        "UpcomingParasGenesis": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item UpcomingParasGenesis",
-          "returnType": "unknown"
-        },
-        "CodeByHashRefs": {
-          "required": [
-            "Hash"
-          ],
-          "optional": [],
-          "description": "Storage item CodeByHashRefs",
-          "returnType": "number"
-        },
-        "CodeByHash": {
-          "required": [
-            "Hash"
-          ],
-          "optional": [],
-          "description": "Storage item CodeByHash",
-          "returnType": "Uint8Array"
-        }
-      },
-      "Initializer": {
-        "HasInitialized": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item HasInitialized",
-          "returnType": "null"
-        },
-        "BufferedSessionChanges": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item BufferedSessionChanges",
-          "returnType": "unknown"
-        }
-      },
-      "Dmp": {
-        "DownwardMessageQueues": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item DownwardMessageQueues",
-          "returnType": "unknown"
-        },
-        "DownwardMessageQueueHeads": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item DownwardMessageQueueHeads",
-          "returnType": "Hash"
         },
         "DeliveryFeeFactor": {
           "required": [
@@ -11626,337 +11467,7 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "bigint"
         }
       },
-      "Hrmp": {
-        "HrmpOpenChannelRequests": {
-          "required": [
-            "Anonymize_I50mrcbubp554e_"
-          ],
-          "optional": [],
-          "description": "Storage item HrmpOpenChannelRequests",
-          "returnType": "unknown"
-        },
-        "HrmpOpenChannelRequestsList": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item HrmpOpenChannelRequestsList",
-          "returnType": "unknown"
-        },
-        "HrmpOpenChannelRequestCount": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item HrmpOpenChannelRequestCount",
-          "returnType": "number"
-        },
-        "HrmpAcceptedChannelRequestCount": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item HrmpAcceptedChannelRequestCount",
-          "returnType": "number"
-        },
-        "HrmpCloseChannelRequests": {
-          "required": [
-            "Anonymize_I50mrcbubp554e_"
-          ],
-          "optional": [],
-          "description": "Storage item HrmpCloseChannelRequests",
-          "returnType": "null"
-        },
-        "HrmpCloseChannelRequestsList": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item HrmpCloseChannelRequestsList",
-          "returnType": "unknown"
-        },
-        "HrmpWatermarks": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item HrmpWatermarks",
-          "returnType": "number"
-        },
-        "HrmpChannels": {
-          "required": [
-            "Anonymize_I50mrcbubp554e_"
-          ],
-          "optional": [],
-          "description": "Storage item HrmpChannels",
-          "returnType": "unknown"
-        },
-        "HrmpIngressChannelsIndex": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item HrmpIngressChannelsIndex",
-          "returnType": "unknown"
-        },
-        "HrmpEgressChannelsIndex": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item HrmpEgressChannelsIndex",
-          "returnType": "unknown"
-        },
-        "HrmpChannelContents": {
-          "required": [
-            "Anonymize_I50mrcbubp554e_"
-          ],
-          "optional": [],
-          "description": "Storage item HrmpChannelContents",
-          "returnType": "unknown"
-        },
-        "HrmpChannelDigests": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item HrmpChannelDigests",
-          "returnType": "unknown"
-        }
-      },
-      "ParaSessionInfo": {
-        "AssignmentKeysUnsafe": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item AssignmentKeysUnsafe",
-          "returnType": "unknown"
-        },
-        "EarliestStoredSession": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item EarliestStoredSession",
-          "returnType": "number"
-        },
-        "Sessions": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item Sessions",
-          "returnType": "unknown"
-        },
-        "AccountKeys": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item AccountKeys",
-          "returnType": "unknown"
-        },
-        "SessionExecutorParams": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item SessionExecutorParams",
-          "returnType": "unknown"
-        }
-      },
-      "ParasDisputes": {
-        "LastPrunedSession": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item LastPrunedSession",
-          "returnType": "number"
-        },
-        "Frozen": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Frozen",
-          "returnType": "unknown"
-        }
-      },
-      "ParasSlashing": {
-        "ValidatorSetCounts": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item ValidatorSetCounts",
-          "returnType": "number"
-        }
-      },
-      "OnDemand": {
-        "ParaIdAffinity": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item ParaIdAffinity",
-          "returnType": "unknown"
-        },
-        "QueueStatus": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item QueueStatus",
-          "returnType": "unknown"
-        },
-        "FreeEntries": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item FreeEntries",
-          "returnType": "unknown"
-        },
-        "AffinityEntries": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item AffinityEntries",
-          "returnType": "unknown"
-        },
-        "Revenue": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Revenue",
-          "returnType": "unknown"
-        },
-        "Credits": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item Credits",
-          "returnType": "bigint"
-        }
-      },
-      "CoretimeAssignmentProvider": {
-        "CoreSchedules": {
-          "required": [
-            "Anonymize_I9jd27rnpm8ttv_"
-          ],
-          "optional": [],
-          "description": "Storage item CoreSchedules",
-          "returnType": "unknown"
-        },
-        "CoreDescriptors": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item CoreDescriptors",
-          "returnType": "unknown"
-        }
-      },
-      "Registrar": {
-        "PendingSwap": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item PendingSwap",
-          "returnType": "number"
-        },
-        "Paras": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item Paras",
-          "returnType": "unknown"
-        },
-        "NextFreeParaId": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item NextFreeParaId",
-          "returnType": "number"
-        }
-      },
-      "Slots": {
-        "Leases": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item Leases",
-          "returnType": "unknown"
-        }
-      },
-      "Auctions": {
-        "AuctionCounter": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item AuctionCounter",
-          "returnType": "number"
-        },
-        "AuctionInfo": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item AuctionInfo",
-          "returnType": "unknown"
-        },
-        "ReservedAmounts": {
-          "required": [
-            "Anonymize_I6ouflveob4eli_"
-          ],
-          "optional": [],
-          "description": "Storage item ReservedAmounts",
-          "returnType": "bigint"
-        },
-        "Winning": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item Winning",
-          "returnType": "unknown"
-        }
-      },
-      "Crowdloan": {
-        "Funds": {
-          "required": [
-            "u32"
-          ],
-          "optional": [],
-          "description": "Storage item Funds",
-          "returnType": "unknown"
-        },
-        "NewRaise": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item NewRaise",
-          "returnType": "unknown"
-        },
-        "EndingsCount": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item EndingsCount",
-          "returnType": "number"
-        },
-        "NextFundIndex": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item NextFundIndex",
-          "returnType": "number"
-        }
-      },
-      "StateTrieMigration": {
-        "MigrationProcess": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MigrationProcess",
-          "returnType": "unknown"
-        },
-        "AutoLimits": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item AutoLimits",
-          "returnType": "unknown"
-        },
-        "SignedMigrationMaxLimits": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item SignedMigrationMaxLimits",
-          "returnType": "unknown"
-        }
-      },
-      "XcmPallet": {
+      "PolkadotXcm": {
         "QueryCounter": {
           "required": [],
           "optional": [],
@@ -11985,6 +11496,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item SafeXcmVersion",
           "returnType": "number"
         },
+        "SupportedVersion": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item SupportedVersion",
+          "returnType": "number"
+        },
+        "VersionNotifiers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifiers",
+          "returnType": "bigint"
+        },
+        "VersionNotifyTargets": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifyTargets",
+          "returnType": "unknown"
+        },
         "VersionDiscoveryQueue": {
           "required": [],
           "optional": [],
@@ -11996,6 +11525,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item CurrentMigration",
           "returnType": "XcmPalletVersionMigrationStage"
+        },
+        "RemoteLockedFungibles": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RemoteLockedFungibles",
+          "returnType": "unknown"
         },
         "LockedFungibles": {
           "required": [
@@ -12032,10 +11567,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "unknown"
         }
       },
+      "ToRococoXcmRouter": {
+        "Bridge": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Bridge",
+          "returnType": "unknown"
+        }
+      },
       "MessageQueue": {
         "BookStateFor": {
           "required": [
-            "ParachainsInclusionAggregateMessageOrigin"
+            "Anonymize_Iejeo53sea6n4q_"
           ],
           "optional": [],
           "description": "Storage item BookStateFor",
@@ -12045,86 +11588,519 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "required": [],
           "optional": [],
           "description": "Storage item ServiceHead",
-          "returnType": "ParachainsInclusionAggregateMessageOrigin"
-        }
-      },
-      "AssetRate": {
-        "ConversionRateToNative": {
-          "required": [
-            "Anonymize_I2q3ri6itcjj5u_"
-          ],
-          "optional": [],
-          "description": "Maps an asset to its fixed point representation in the native balance.",
-          "returnType": "bigint"
-        }
-      },
-      "Beefy": {
-        "Authorities": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Authorities",
           "returnType": "unknown"
         },
-        "ValidatorSetId": {
+        "Pages": {
           "required": [],
           "optional": [],
-          "description": "Storage item ValidatorSetId",
-          "returnType": "bigint"
-        },
-        "NextAuthorities": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item NextAuthorities",
+          "description": "Storage item Pages",
           "returnType": "unknown"
-        },
-        "SetIdSession": {
+        }
+      },
+      "SnowbridgeSystemFrontend": {
+        "ExportOperatingMode": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ExportOperatingMode",
+          "returnType": "unknown"
+        }
+      },
+      "Multisig": {
+        "Multisigs": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Multisigs",
+          "returnType": "unknown"
+        }
+      },
+      "Proxy": {
+        "Proxies": {
           "required": [
-            "u64"
+            "AccountId"
           ],
           "optional": [],
-          "description": "Storage item SetIdSession",
+          "description": "Storage item Proxies",
+          "returnType": "unknown"
+        },
+        "Announcements": {
+          "required": [
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item Announcements",
+          "returnType": "unknown"
+        }
+      },
+      "Assets": {
+        "Asset": {
+          "required": [
+            "u32"
+          ],
+          "optional": [],
+          "description": "Storage item Asset",
+          "returnType": "unknown"
+        },
+        "Account": {
+          "required": [
+            "AssetId",
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item Account",
+          "returnType": "unknown"
+        },
+        "Approvals": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item Approvals",
+          "returnType": "unknown"
+        },
+        "Metadata": {
+          "required": [
+            "u32"
+          ],
+          "optional": [],
+          "description": "Storage item Metadata",
+          "returnType": "unknown"
+        },
+        "NextAssetId": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item NextAssetId",
+          "returnType": "number"
+        }
+      },
+      "Uniques": {
+        "Class": {
+          "required": [
+            "u32"
+          ],
+          "optional": [],
+          "description": "Storage item Class",
+          "returnType": "unknown"
+        },
+        "OwnershipAcceptance": {
+          "required": [
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item OwnershipAcceptance",
           "returnType": "number"
         },
-        "GenesisBlock": {
+        "Account": {
           "required": [],
           "optional": [],
-          "description": "Storage item GenesisBlock",
+          "description": "Storage item Account",
+          "returnType": "null"
+        },
+        "ClassAccount": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ClassAccount",
+          "returnType": "null"
+        },
+        "Asset": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Asset",
           "returnType": "unknown"
-        }
-      },
-      "Mmr": {
-        "RootHash": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item RootHash",
-          "returnType": "Hash"
         },
-        "NumberOfLeaves": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item NumberOfLeaves",
-          "returnType": "bigint"
-        },
-        "Nodes": {
+        "ClassMetadataOf": {
           "required": [
-            "u64"
+            "u32"
           ],
           "optional": [],
-          "description": "Storage item Nodes",
-          "returnType": "Hash"
-        }
-      },
-      "BeefyMmrLeaf": {
-        "BeefyAuthorities": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item BeefyAuthorities",
+          "description": "Storage item ClassMetadataOf",
           "returnType": "unknown"
         },
-        "BeefyNextAuthorities": {
+        "InstanceMetadataOf": {
           "required": [],
           "optional": [],
-          "description": "Storage item BeefyNextAuthorities",
+          "description": "Storage item InstanceMetadataOf",
+          "returnType": "unknown"
+        },
+        "Attribute": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Attribute",
+          "returnType": "unknown"
+        },
+        "ItemPriceOf": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ItemPriceOf",
+          "returnType": "unknown"
+        },
+        "CollectionMaxSupply": {
+          "required": [
+            "u32"
+          ],
+          "optional": [],
+          "description": "Storage item CollectionMaxSupply",
+          "returnType": "number"
+        }
+      },
+      "Nfts": {
+        "Collection": {
+          "required": [
+            "u32"
+          ],
+          "optional": [],
+          "description": "Storage item Collection",
+          "returnType": "unknown"
+        },
+        "OwnershipAcceptance": {
+          "required": [
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item OwnershipAcceptance",
+          "returnType": "number"
+        },
+        "Account": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Account",
+          "returnType": "null"
+        },
+        "CollectionAccount": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item CollectionAccount",
+          "returnType": "null"
+        },
+        "CollectionRoleOf": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item CollectionRoleOf",
+          "returnType": "number"
+        },
+        "Item": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Item",
+          "returnType": "unknown"
+        },
+        "CollectionMetadataOf": {
+          "required": [
+            "u32"
+          ],
+          "optional": [],
+          "description": "Storage item CollectionMetadataOf",
+          "returnType": "unknown"
+        },
+        "ItemMetadataOf": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ItemMetadataOf",
+          "returnType": "unknown"
+        },
+        "Attribute": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Attribute",
+          "returnType": "unknown"
+        },
+        "ItemPriceOf": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ItemPriceOf",
+          "returnType": "unknown"
+        },
+        "ItemAttributesApprovalsOf": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ItemAttributesApprovalsOf",
+          "returnType": "unknown"
+        },
+        "NextCollectionId": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item NextCollectionId",
+          "returnType": "number"
+        },
+        "PendingSwapOf": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item PendingSwapOf",
+          "returnType": "unknown"
+        },
+        "CollectionConfigOf": {
+          "required": [
+            "u32"
+          ],
+          "optional": [],
+          "description": "Storage item CollectionConfigOf",
+          "returnType": "unknown"
+        },
+        "ItemConfigOf": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ItemConfigOf",
+          "returnType": "bigint"
+        }
+      },
+      "ForeignAssets": {
+        "Asset": {
+          "required": [
+            "Anonymize_If9iqq7i64mur8_"
+          ],
+          "optional": [],
+          "description": "Storage item Asset",
+          "returnType": "unknown"
+        },
+        "Account": {
+          "required": [
+            "AssetId",
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item Account",
+          "returnType": "unknown"
+        },
+        "Approvals": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item Approvals",
+          "returnType": "unknown"
+        },
+        "Metadata": {
+          "required": [
+            "Anonymize_If9iqq7i64mur8_"
+          ],
+          "optional": [],
+          "description": "Storage item Metadata",
+          "returnType": "unknown"
+        },
+        "NextAssetId": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item NextAssetId",
+          "returnType": "unknown"
+        }
+      },
+      "NftFractionalization": {
+        "NftToAsset": {
+          "required": [
+            "Anonymize_I9jd27rnpm8ttv_"
+          ],
+          "optional": [],
+          "description": "Storage item NftToAsset",
+          "returnType": "unknown"
+        }
+      },
+      "PoolAssets": {
+        "Asset": {
+          "required": [
+            "u32"
+          ],
+          "optional": [],
+          "description": "Storage item Asset",
+          "returnType": "unknown"
+        },
+        "Account": {
+          "required": [
+            "AssetId",
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item Account",
+          "returnType": "unknown"
+        },
+        "Approvals": {
+          "required": [
+            "AssetId",
+            "AccountId",
+            "AccountId"
+          ],
+          "optional": [],
+          "description": "Storage item Approvals",
+          "returnType": "unknown"
+        },
+        "Metadata": {
+          "required": [
+            "u32"
+          ],
+          "optional": [],
+          "description": "Storage item Metadata",
+          "returnType": "unknown"
+        },
+        "NextAssetId": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item NextAssetId",
+          "returnType": "number"
+        }
+      },
+      "AssetConversion": {
+        "Pools": {
+          "required": [
+            "Anonymize_If21n82i0516em_"
+          ],
+          "optional": [],
+          "description": "Storage item Pools",
+          "returnType": "number"
+        },
+        "NextPoolAssetId": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item NextPoolAssetId",
+          "returnType": "number"
+        }
+      },
+      "AssetsFreezer": {
+        "Freezes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Freezes",
+          "returnType": "unknown"
+        },
+        "FrozenBalances": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item FrozenBalances",
+          "returnType": "bigint"
+        }
+      },
+      "ForeignAssetsFreezer": {
+        "Freezes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Freezes",
+          "returnType": "unknown"
+        },
+        "FrozenBalances": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item FrozenBalances",
+          "returnType": "bigint"
+        }
+      },
+      "PoolAssetsFreezer": {
+        "Freezes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Freezes",
+          "returnType": "unknown"
+        },
+        "FrozenBalances": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item FrozenBalances",
+          "returnType": "bigint"
+        }
+      },
+      "Revive": {
+        "PristineCode": {
+          "required": [
+            "Hash"
+          ],
+          "optional": [],
+          "description": "Storage item PristineCode",
+          "returnType": "Uint8Array"
+        },
+        "CodeInfoOf": {
+          "required": [
+            "Hash"
+          ],
+          "optional": [],
+          "description": "Storage item CodeInfoOf",
+          "returnType": "unknown"
+        },
+        "AccountInfoOf": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Storage item AccountInfoOf",
+          "returnType": "unknown"
+        },
+        "ImmutableDataOf": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Storage item ImmutableDataOf",
+          "returnType": "Uint8Array"
+        },
+        "DeletionQueue": {
+          "required": [
+            "u32"
+          ],
+          "optional": [],
+          "description": "Storage item DeletionQueue",
+          "returnType": "Uint8Array"
+        },
+        "DeletionQueueCounter": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item DeletionQueueCounter",
+          "returnType": "unknown"
+        },
+        "OriginalAccount": {
+          "required": [
+            "bytes"
+          ],
+          "optional": [],
+          "description": "Storage item OriginalAccount",
+          "returnType": "string"
+        }
+      },
+      "AssetRewards": {
+        "PoolStakers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item PoolStakers",
+          "returnType": "unknown"
+        },
+        "Pools": {
+          "required": [
+            "u32"
+          ],
+          "optional": [],
+          "description": "Storage item Pools",
+          "returnType": "unknown"
+        },
+        "PoolCost": {
+          "required": [
+            "u32"
+          ],
+          "optional": [],
+          "description": "Storage item PoolCost",
+          "returnType": "unknown"
+        },
+        "NextPoolId": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item NextPoolId",
+          "returnType": "number"
+        }
+      },
+      "StateTrieMigration": {
+        "MigrationProcess": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item MigrationProcess",
+          "returnType": "unknown"
+        },
+        "AutoLimits": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item AutoLimits",
+          "returnType": "unknown"
+        },
+        "SignedMigrationMaxLimits": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item SignedMigrationMaxLimits",
           "returnType": "unknown"
         }
       },
@@ -12134,98 +12110,6 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item Key",
           "returnType": "string"
-        }
-      },
-      "RcMigrator": {
-        "RcMigrationStage": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item RcMigrationStage",
-          "returnType": "unknown"
-        },
-        "RcAccounts": {
-          "required": [
-            "AccountId"
-          ],
-          "optional": [],
-          "description": "Storage item RcAccounts",
-          "returnType": "unknown"
-        },
-        "CounterForRcAccounts": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForRcAccounts",
-          "returnType": "number"
-        },
-        "RcMigratedBalance": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item RcMigratedBalance",
-          "returnType": "unknown"
-        },
-        "PendingXcmMessages": {
-          "required": [
-            "Hash"
-          ],
-          "optional": [],
-          "description": "Storage item PendingXcmMessages",
-          "returnType": "unknown"
-        },
-        "CounterForPendingXcmMessages": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CounterForPendingXcmMessages",
-          "returnType": "number"
-        },
-        "PendingXcmQueries": {
-          "required": [
-            "u64"
-          ],
-          "optional": [],
-          "description": "Storage item PendingXcmQueries",
-          "returnType": "Hash"
-        },
-        "UnprocessedMsgBuffer": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item UnprocessedMsgBuffer",
-          "returnType": "number"
-        },
-        "AhUmpQueuePriorityConfig": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item AhUmpQueuePriorityConfig",
-          "returnType": "unknown"
-        },
-        "Manager": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item Manager",
-          "returnType": "string"
-        },
-        "MigrationStartBlock": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MigrationStartBlock",
-          "returnType": "number"
-        },
-        "MigrationEndBlock": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item MigrationEndBlock",
-          "returnType": "number"
-        },
-        "WarmUpPeriod": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item WarmUpPeriod",
-          "returnType": "TraitsScheduleDispatchTime"
-        },
-        "CoolOffPeriod": {
-          "required": [],
-          "optional": [],
-          "description": "Storage item CoolOffPeriod",
-          "returnType": "TraitsScheduleDispatchTime"
         }
       }
     }
@@ -12761,6 +12645,42 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item ErasStartSessionIndex",
           "returnType": "number"
         },
+        "ErasStakers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasStakers",
+          "returnType": "unknown"
+        },
+        "ErasStakersOverview": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasStakersOverview",
+          "returnType": "unknown"
+        },
+        "ErasStakersClipped": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasStakersClipped",
+          "returnType": "unknown"
+        },
+        "ErasStakersPaged": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasStakersPaged",
+          "returnType": "unknown"
+        },
+        "ClaimedRewards": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ClaimedRewards",
+          "returnType": "unknown"
+        },
+        "ErasValidatorPrefs": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasValidatorPrefs",
+          "returnType": "unknown"
+        },
         "ErasValidatorReward": {
           "required": [
             "u32"
@@ -12823,6 +12743,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item BondedEras",
           "returnType": "unknown"
         },
+        "ValidatorSlashInEra": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ValidatorSlashInEra",
+          "returnType": "unknown"
+        },
+        "NominatorSlashInEra": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item NominatorSlashInEra",
+          "returnType": "bigint"
+        },
         "SlashingSpans": {
           "required": [
             "AccountId"
@@ -12859,6 +12791,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item Reports",
+          "returnType": "unknown"
+        },
+        "ConcurrentReportsIndex": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ConcurrentReportsIndex",
           "returnType": "unknown"
         }
       },
@@ -13035,6 +12973,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "ConvictionVoting": {
+        "VotingFor": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VotingFor",
+          "returnType": "ConvictionVotingVoteVoting"
+        },
         "ClassLocksFor": {
           "required": [
             "AccountId"
@@ -13168,7 +13112,14 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "unknown"
         }
       },
-      "Multisig": {},
+      "Multisig": {
+        "Multisigs": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Multisigs",
+          "returnType": "unknown"
+        }
+      },
       "Bounties": {
         "BountyCount": {
           "required": [],
@@ -13221,6 +13172,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item ParentTotalChildBounties",
           "returnType": "number"
+        },
+        "ChildBounties": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ChildBounties",
+          "returnType": "unknown"
+        },
+        "ChildBountyDescriptionsV1": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ChildBountyDescriptionsV1",
+          "returnType": "Uint8Array"
         },
         "V0ToV1ChildBountyIds": {
           "required": [
@@ -13954,6 +13917,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item LastPrunedSession",
           "returnType": "number"
         },
+        "Disputes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Disputes",
+          "returnType": "unknown"
+        },
+        "BackersOnDisputes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item BackersOnDisputes",
+          "returnType": "unknown"
+        },
+        "Included": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Included",
+          "returnType": "number"
+        },
         "Frozen": {
           "required": [],
           "optional": [],
@@ -13962,6 +13943,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "ParasSlashing": {
+        "UnappliedSlashes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item UnappliedSlashes",
+          "returnType": "unknown"
+        },
         "ValidatorSetCounts": {
           "required": [
             "u32"
@@ -14174,6 +14161,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item SafeXcmVersion",
           "returnType": "number"
         },
+        "SupportedVersion": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item SupportedVersion",
+          "returnType": "number"
+        },
+        "VersionNotifiers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifiers",
+          "returnType": "bigint"
+        },
+        "VersionNotifyTargets": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifyTargets",
+          "returnType": "unknown"
+        },
         "VersionDiscoveryQueue": {
           "required": [],
           "optional": [],
@@ -14185,6 +14190,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item CurrentMigration",
           "returnType": "XcmPalletVersionMigrationStage"
+        },
+        "RemoteLockedFungibles": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RemoteLockedFungibles",
+          "returnType": "unknown"
         },
         "LockedFungibles": {
           "required": [
@@ -14235,6 +14246,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item ServiceHead",
           "returnType": "ParachainsInclusionAggregateMessageOrigin"
+        },
+        "Pages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Pages",
+          "returnType": "unknown"
         }
       },
       "AssetRate": {
@@ -14663,6 +14680,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item Reports",
           "returnType": "unknown"
+        },
+        "ConcurrentReportsIndex": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ConcurrentReportsIndex",
+          "returnType": "unknown"
         }
       },
       "Historical": {
@@ -14832,6 +14855,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "ConvictionVoting": {
+        "VotingFor": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VotingFor",
+          "returnType": "ConvictionVotingVoteVoting"
+        },
         "ClassLocksFor": {
           "required": [
             "AccountId"
@@ -14897,6 +14926,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item Members",
           "returnType": "number"
+        },
+        "IdToIndex": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item IdToIndex",
+          "returnType": "number"
+        },
+        "IndexToId": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item IndexToId",
+          "returnType": "string"
+        },
+        "Voting": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Voting",
+          "returnType": "unknown"
         },
         "VotingCleanup": {
           "required": [
@@ -15148,6 +15195,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item Skeptic",
           "returnType": "string"
         },
+        "Votes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Votes",
+          "returnType": "unknown"
+        },
         "VoteClearCursor": {
           "required": [
             "AccountId"
@@ -15173,6 +15226,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item Defending",
           "returnType": "unknown"
+        },
+        "DefenderVotes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item DefenderVotes",
+          "returnType": "unknown"
         }
       },
       "Recovery": {
@@ -15182,6 +15241,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item Recoverable",
+          "returnType": "unknown"
+        },
+        "ActiveRecoveries": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ActiveRecoveries",
           "returnType": "unknown"
         },
         "Proxy": {
@@ -15259,7 +15324,14 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "unknown"
         }
       },
-      "Multisig": {},
+      "Multisig": {
+        "Multisigs": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Multisigs",
+          "returnType": "unknown"
+        }
+      },
       "Preimage": {
         "StatusFor": {
           "required": [
@@ -15340,6 +15412,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item ParentChildBounties",
           "returnType": "number"
+        },
+        "ChildBounties": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ChildBounties",
+          "returnType": "unknown"
         },
         "ChildBountyDescriptions": {
           "required": [
@@ -15875,6 +15953,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item LastPrunedSession",
           "returnType": "number"
         },
+        "Disputes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Disputes",
+          "returnType": "unknown"
+        },
+        "BackersOnDisputes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item BackersOnDisputes",
+          "returnType": "unknown"
+        },
+        "Included": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Included",
+          "returnType": "number"
+        },
         "Frozen": {
           "required": [],
           "optional": [],
@@ -15883,6 +15979,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "ParasSlashing": {
+        "UnappliedSlashes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item UnappliedSlashes",
+          "returnType": "unknown"
+        },
         "ValidatorSetCounts": {
           "required": [
             "u32"
@@ -15906,6 +16008,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item ServiceHead",
           "returnType": "ParachainsInclusionAggregateMessageOrigin"
+        },
+        "Pages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Pages",
+          "returnType": "unknown"
         }
       },
       "OnDemandAssignmentProvider": {
@@ -16083,6 +16191,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item SafeXcmVersion",
           "returnType": "number"
         },
+        "SupportedVersion": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item SupportedVersion",
+          "returnType": "number"
+        },
+        "VersionNotifiers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifiers",
+          "returnType": "bigint"
+        },
+        "VersionNotifyTargets": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifyTargets",
+          "returnType": "unknown"
+        },
         "VersionDiscoveryQueue": {
           "required": [],
           "optional": [],
@@ -16094,6 +16220,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item CurrentMigration",
           "returnType": "XcmPalletVersionMigrationStage"
+        },
+        "RemoteLockedFungibles": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RemoteLockedFungibles",
+          "returnType": "unknown"
         },
         "LockedFungibles": {
           "required": [
@@ -16757,6 +16889,42 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item ErasStartSessionIndex",
           "returnType": "number"
         },
+        "ErasStakers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasStakers",
+          "returnType": "unknown"
+        },
+        "ErasStakersOverview": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasStakersOverview",
+          "returnType": "unknown"
+        },
+        "ErasStakersClipped": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasStakersClipped",
+          "returnType": "unknown"
+        },
+        "ErasStakersPaged": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasStakersPaged",
+          "returnType": "unknown"
+        },
+        "ClaimedRewards": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ClaimedRewards",
+          "returnType": "unknown"
+        },
+        "ErasValidatorPrefs": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ErasValidatorPrefs",
+          "returnType": "unknown"
+        },
         "ErasValidatorReward": {
           "required": [
             "u32"
@@ -16819,6 +16987,18 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item BondedEras",
           "returnType": "unknown"
         },
+        "ValidatorSlashInEra": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ValidatorSlashInEra",
+          "returnType": "unknown"
+        },
+        "NominatorSlashInEra": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item NominatorSlashInEra",
+          "returnType": "bigint"
+        },
         "SlashingSpans": {
           "required": [
             "AccountId"
@@ -16855,6 +17035,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           ],
           "optional": [],
           "description": "Storage item Reports",
+          "returnType": "unknown"
+        },
+        "ConcurrentReportsIndex": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ConcurrentReportsIndex",
           "returnType": "unknown"
         }
       },
@@ -17073,6 +17259,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item Recoverable",
           "returnType": "unknown"
         },
+        "ActiveRecoveries": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item ActiveRecoveries",
+          "returnType": "unknown"
+        },
         "Proxy": {
           "required": [
             "AccountId"
@@ -17182,7 +17374,14 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "returnType": "unknown"
         }
       },
-      "Multisig": {},
+      "Multisig": {
+        "Multisigs": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Multisigs",
+          "returnType": "unknown"
+        }
+      },
       "ElectionProviderMultiPhase": {
         "Round": {
           "required": [],
@@ -17454,6 +17653,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "ConvictionVoting": {
+        "VotingFor": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VotingFor",
+          "returnType": "ConvictionVotingVoteVoting"
+        },
         "ClassLocksFor": {
           "required": [
             "AccountId"
@@ -18026,6 +18231,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item LastPrunedSession",
           "returnType": "number"
         },
+        "Disputes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Disputes",
+          "returnType": "unknown"
+        },
+        "BackersOnDisputes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item BackersOnDisputes",
+          "returnType": "unknown"
+        },
+        "Included": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Included",
+          "returnType": "number"
+        },
         "Frozen": {
           "required": [],
           "optional": [],
@@ -18034,6 +18257,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
         }
       },
       "ParasSlashing": {
+        "UnappliedSlashes": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item UnappliedSlashes",
+          "returnType": "unknown"
+        },
         "ValidatorSetCounts": {
           "required": [
             "u32"
@@ -18336,6 +18565,24 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "description": "Storage item SafeXcmVersion",
           "returnType": "number"
         },
+        "SupportedVersion": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item SupportedVersion",
+          "returnType": "number"
+        },
+        "VersionNotifiers": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifiers",
+          "returnType": "bigint"
+        },
+        "VersionNotifyTargets": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item VersionNotifyTargets",
+          "returnType": "unknown"
+        },
         "VersionDiscoveryQueue": {
           "required": [],
           "optional": [],
@@ -18347,6 +18594,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item CurrentMigration",
           "returnType": "XcmPalletVersionMigrationStage"
+        },
+        "RemoteLockedFungibles": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item RemoteLockedFungibles",
+          "returnType": "unknown"
         },
         "LockedFungibles": {
           "required": [
@@ -18397,6 +18650,12 @@ export const storageMetadata: { [chainKey: string]: ChainStorageMetadata } = {
           "optional": [],
           "description": "Storage item ServiceHead",
           "returnType": "ParachainsInclusionAggregateMessageOrigin"
+        },
+        "Pages": {
+          "required": [],
+          "optional": [],
+          "description": "Storage item Pages",
+          "returnType": "unknown"
         }
       },
       "AssetRate": {

@@ -125,17 +125,20 @@ class SimpleStorageExtractor {
       console.log(`  📦 Processing pallet: ${palletName}`);
       metadata.pallets[palletName] = {};
 
-      // Parse storage items in the pallet using improved regex
-      const storageRegex = /(\w+): StorageDescriptor<\[(.*?)\],\s*([^,]+),\s*[^,]+,\s*[^>]+>/g;
+      // Parse storage items in the pallet using improved regex to handle both formats:
+      // Format 1: StorageDescriptor<[Key: Type], ReturnType, ...>
+      // Format 2: StorageDescriptor<Anonymize<...>, ReturnType, ...>
+      const storageRegex = /(\w+): StorageDescriptor<(?:\[(.*?)\]|([^,]+)),\s*([^,]+),\s*[^,]+,\s*[^>]+>/g;
       let storageMatch;
 
       while ((storageMatch = storageRegex.exec(palletContent)) !== null) {
         const storageName = storageMatch[1];
-        const storageArgs = storageMatch[2].trim();
-        const returnTypeRaw = storageMatch[3].trim();
+        // Handle both formats: bracketed args [2] or direct type [3]
+        const storageArgs = (storageMatch[2] || storageMatch[3] || '').trim();
+        const returnTypeRaw = storageMatch[4].trim();
 
         // Extract parameter types from the arguments
-        const parameters = this.parseStorageArguments(storageArgs);
+        const parameters = this.parseStorageArguments(storageArgs, palletName, storageName);
 
         // Extract and clean return type
         const returnType = this.extractReturnType(returnTypeRaw);
@@ -273,14 +276,20 @@ class SimpleStorageExtractor {
   /**
    * Parse storage arguments to extract parameter types
    */
-  private parseStorageArguments(args: string): string[] {
+  private parseStorageArguments(args: string, palletName: string, storageName: string): string[] {
     if (!args || args.trim() === '') {
       return [];
     }
 
     const parameters: string[] = [];
 
-    // Split by comma and parse each parameter
+    // Handle Anonymize<...> types - these indicate complex multi-parameter types
+    if (args.startsWith('Anonymize<')) {
+      // Use pattern matching to determine parameters based on pallet and storage name
+      return this.getParametersFromPattern(palletName, storageName);
+    }
+
+    // Split by comma and parse each parameter (for bracket format like [Key: Type])
     const parts = args.split(',').map(part => part.trim());
 
     for (const part of parts) {
@@ -293,6 +302,49 @@ class SimpleStorageExtractor {
     }
 
     return parameters;
+  }
+
+  /**
+   * Get parameters from pattern matching (same logic as dynamic storage detection)
+   */
+  private getParametersFromPattern(pallet: string, storage: string): string[] {
+    // Assets pallet patterns (critical for AssetHub chains)
+    if (pallet === 'Assets') {
+      if (/^Account$/.test(storage)) return ['AssetId', 'AccountId'];
+      if (/^Asset$/.test(storage)) return ['AssetId'];
+      if (/^Metadata$/.test(storage)) return ['AssetId'];
+      if (/^Approvals$/.test(storage)) return ['AssetId', 'AccountId', 'AccountId'];
+    }
+
+    if (pallet === 'ForeignAssets') {
+      if (/^Account$/.test(storage)) return ['AssetId', 'AccountId'];
+      if (/^Asset$/.test(storage)) return ['AssetId'];
+      if (/^Metadata$/.test(storage)) return ['AssetId'];
+      if (/^Approvals$/.test(storage)) return ['AssetId', 'AccountId', 'AccountId'];
+    }
+
+    if (pallet === 'PoolAssets') {
+      if (/^Account$/.test(storage)) return ['AssetId', 'AccountId'];
+      if (/^Asset$/.test(storage)) return ['AssetId'];
+      if (/^Metadata$/.test(storage)) return ['AssetId'];
+      if (/^Approvals$/.test(storage)) return ['AssetId', 'AccountId', 'AccountId'];
+    }
+
+    // System pallet patterns
+    if (pallet === 'System') {
+      if (/^Account$/.test(storage)) return ['AccountId'];
+      if (/^EventTopics$/.test(storage)) return ['Hash'];
+      if (/^(BlockHash|ExtrinsicData)$/.test(storage)) return ['u32'];
+    }
+
+    // Balances pallet patterns
+    if (pallet === 'Balances') {
+      if (/^Account$/.test(storage)) return ['AccountId'];
+      if (/^(Reserves|Locks|Freezes|Holds)$/.test(storage)) return ['AccountId'];
+    }
+
+    // Default: assume no parameters for unknown complex types
+    return [];
   }
 
   /**

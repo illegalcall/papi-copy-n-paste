@@ -370,45 +370,40 @@ export function StorageForm({
   const [showResponseStructure, setShowResponseStructure] = useState(false);
   const [showTypeInfo, setShowTypeInfo] = useState(true);
 
-  // Get ACTUAL type information from PAPI descriptors (new approach)
-  const actualTypeInfo = extractActualTypes(chainKey, pallet, storage.name);
+  // Get ACTUAL type information from PAPI descriptors - no fallbacks
+  let actualTypeInfo;
+  let requiredParams = null;
+  let actualType = "unknown";
+  let displayType = "unknown";
 
-  // Fallback to pattern-based inference if descriptor reading fails
-  const fallbackTypeInfo = getStorageTypeInfo(
-    chainKey,
-    pallet,
-    storage.name,
-    storage,
-  );
-
-  // Use actual types if available, otherwise fallback
-  const requiredParams =
-    actualTypeInfo.paramTypes.length > 0
-      ? actualTypeInfo.paramTypes
-      : fallbackTypeInfo.paramTypes.length > 0
-        ? fallbackTypeInfo.paramTypes
-        : null;
-  const actualType =
-    actualTypeInfo.actualType !== "unknown"
-      ? actualTypeInfo.actualType
-      : fallbackTypeInfo.returnType;
-  const displayType = formatTypeForDisplay(actualTypeInfo);
+  try {
+    actualTypeInfo = extractActualTypes(chainKey, pallet, storage.name);
+    requiredParams = actualTypeInfo.paramTypes.length > 0 ? actualTypeInfo.paramTypes : null;
+    actualType = actualTypeInfo.actualType;
+    displayType = formatTypeForDisplay(actualTypeInfo);
+  } catch (error) {
+    console.error(`Type extraction failed for ${chainKey}.${pallet}.${storage.name}:`, error);
+    // No fallback - let it be unknown
+  }
 
   // Generate response structure with type information
-  const responseStructure = generateEnhancedResponseStructure(
+  const responseStructure = actualTypeInfo ? generateEnhancedResponseStructure(
     actualType,
     displayType,
     queryType,
     pallet,
     storage.name,
     actualTypeInfo,
-  );
+  ) : `// Type information not available for ${chainKey}.${pallet}.${storage.name}
+// This storage query requires proper metadata to determine return type structure
+const result = await typedApi.query.${pallet}.${storage.name}(/* parameters */);
+console.log('Result:', result);`;
   
   // Generate TypeScript type information for storage
   const storageTypeInfo = generateStorageSignature(
     pallet,
     storage.name,
-    actualTypeInfo.paramTypes,
+    actualTypeInfo?.paramTypes || [],
     actualType
   );
 
@@ -425,6 +420,8 @@ export function StorageForm({
       case "AccountId":
       case "SS58String":
         return "//Alice or 5GrwvaEF5z... (full address)";
+      case "AssetId":
+        return "1, 1000, etc. (asset identifier)";
       case "BlockNumber":
       case "number":
         return "1000000 (block number)";
@@ -525,6 +522,8 @@ export function StorageForm({
                 <div className="text-xs text-muted-foreground">
                   {(paramType === "AccountId" || paramType === "SS58String") &&
                     "Use test accounts (//Alice, //Bob) or full addresses"}
+                  {paramType === "AssetId" &&
+                    "Asset identifier (varies by chain)"}
                   {(paramType === "BlockNumber" || paramType === "number") &&
                     "Block number to query (empty uses latest)"}
                   {paramType.includes("Index") &&

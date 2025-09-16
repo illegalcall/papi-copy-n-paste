@@ -21,7 +21,7 @@ import {
   moonbeam,
   bifrost,
   astar,
-  paseo,
+  paseo_asset_hub,
   hydration,
 } from "@polkadot-api/descriptors";
 
@@ -32,7 +32,7 @@ const CHAIN_DESCRIPTORS: Record<string, any> = {
   moonbeam,
   bifrost,
   astar,
-  paseo,
+  paseo_asset_hub,
   hydration,
   // Note: acala not included - will throw error if used
 } as const;
@@ -68,7 +68,7 @@ export function getTypedApiForChain(client: any, chainKey: string): any {
 }
 
 // Export the descriptors for direct use if needed
-export { polkadot, kusama, moonbeam, bifrost, astar, paseo, hydration };
+export { polkadot, kusama, moonbeam, bifrost, astar, paseo_asset_hub, hydration };
 export type { SupportedChainKey };
 
 // List of chains with real descriptors vs unsupported
@@ -78,7 +78,7 @@ export const CHAINS_WITH_REAL_DESCRIPTORS = [
   "moonbeam",
   "bifrost",
   "astar",
-  "paseo",
+  "paseo_asset_hub",
   "hydration",
 ] as const;
 export const UNSUPPORTED_CHAINS = ["acala"] as const;

@@ -251,85 +251,41 @@ export async function executeStorageQuery(
     logger.info(`  Provided params: ${JSON.stringify(storageParams)}`);
     logger.info(`  Has params: ${hasParams}`);
 
+
     // Generate parameter values if needed
     const paramValues =
       hasParams && requiredParams
         ? generateStorageParamValues(storageParams, requiredParams)
         : [];
 
-    // Try to use typed API first, then fall back to raw queries
-    const storageQuery = (client as any).query?.[palletName]?.[storageName];
+    // Note: For modern PAPI, we use typed API approach instead of legacy client.query
+    // This supports all chain pallets including Assets on AssetHub chains
 
-    if (storageQuery) {
-      // Always log parameters for debugging
-      if (requiredParams && requiredParams.length > 0) {
-        logger.info(`Parameters required: ${requiredParams.join(', ')}`);
-        if (hasParams && paramValues.length > 0) {
-          const serializedParams = JSON.stringify(paramValues, (key, value) =>
-            typeof value === 'bigint' ? value.toString() : value
-          );
-          logger.info(`Parameters provided: ${serializedParams}`);
-        } else {
-          logger.info(`⚠️ Parameters required but none provided: ${JSON.stringify(storageParams)}`);
-        }
+    // Always log parameters for debugging
+    if (requiredParams && requiredParams.length > 0) {
+      logger.info(`Parameters required: ${requiredParams.join(', ')}`);
+      if (hasParams && paramValues.length > 0) {
+        const serializedParams = JSON.stringify(paramValues, (key, value) =>
+          typeof value === 'bigint' ? value.toString() : value
+        );
+        logger.info(`Parameters provided: ${serializedParams}`);
+      } else {
+        logger.info(`⚠️ Parameters required but none provided: ${JSON.stringify(storageParams)}`);
       }
+    }
 
-      // Execute the appropriate query type
-      switch (queryType) {
-        case "getValue":
-          await executeGetValue(
-            storageQuery,
-            paramValues,
-            logger,
-            hasParams,
-            palletName,
-            storageName,
-            queryType,
-          );
-          break;
-        case "getValueAt":
-          await executeGetValueAt(
-            client,
-            undefined,
-            selectedStorage.pallet,
-            selectedStorage.storage.name,
-            logger,
-          );
-          break;
-        case "watchValue":
-          const watchResult = await executeWatchValue(
-            client,
-            undefined,
-            selectedStorage.pallet,
-            selectedStorage.storage.name,
-            logger,
-            chainKey,
-          );
-          return watchResult; // Return watch state for UI
-        default:
-          await executeGetValue(
-            storageQuery,
-            paramValues,
-            logger,
-            hasParams,
-            palletName,
-            storageName,
-            queryType,
-          );
-      }
-    } else {
-      const rawResult = await executeRawStorageQuery(
-        selectedStorage,
-        queryType,
-        storageParams,
-        chainKey,
-        client,
-        logger,
-      );
-      // Return watch result if it's a watchValue operation
-      if (queryType === 'watchValue' && rawResult) {
-        return rawResult;
-      }
+    // Use modern PAPI typed API approach for all queries
+    const rawResult = await executeRawStorageQuery(
+      selectedStorage,
+      queryType,
+      storageParams,
+      chainKey,
+      client,
+      logger,
+    );
+    // Return watch result if it's a watchValue operation
+    if (queryType === 'watchValue' && rawResult) {
+      return rawResult;
     }
 
     // For non-watchValue operations, return undefined
@@ -363,6 +319,23 @@ async function executeGetValue(
     const result = hasParams
       ? await storageQuery(...paramValues)
       : await storageQuery();
+
+    // Enhanced logging for account balances
+    if (pallet === "System" && storageName === "Account" && result?.data) {
+      const free = result.data.free;
+      const reserved = result.data.reserved;
+      if (typeof free === 'bigint' && typeof reserved === 'bigint') {
+        const freeTokens = (Number(free) / 10**10).toFixed(4);
+        const reservedTokens = (Number(reserved) / 10**10).toFixed(4);
+        const totalTokens = (Number(free + reserved) / 10**10).toFixed(4);
+        logger.info(`💰 Native token balance (System.Account):`);
+        logger.info(`  Free: ${free} planck (${freeTokens} tokens)`);
+        logger.info(`  Reserved: ${reserved} planck (${reservedTokens} tokens)`);
+        logger.info(`  Total: ${free + reserved} planck (${totalTokens} tokens)`);
+        logger.info(`💡 For asset tokens, query Assets.Account with asset ID`);
+      }
+    }
+
     logger.querySuccess(pallet, storageName, queryType, result);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
@@ -370,7 +343,7 @@ async function executeGetValue(
   }
 }
 
-// Execute raw storage query (fallback)
+// Execute raw storage query using modern PAPI typed API
 async function executeRawStorageQuery(
   selectedStorage: { pallet: string; storage: any },
   queryType: string,
@@ -395,6 +368,7 @@ async function executeRawStorageQuery(
             storageName,
             chainKey,
             logger,
+            storageParams,
           );
           break;
         case "getValueAt":
@@ -423,6 +397,7 @@ async function executeRawStorageQuery(
             storageName,
             chainKey,
             logger,
+            storageParams,
           );
       }
     } else {
@@ -451,6 +426,7 @@ async function executeRawGetValue(
   storageName: string,
   chainKey: string,
   logger: any,
+  storageParams: Record<string, any> = {},
 ) {
   try {
     // Detect storage parameters for this specific query
@@ -486,21 +462,9 @@ async function executeRawGetValue(
           // Execute the actual storage query - handle both direct function and object cases
           let result;
 
-          // Generate parameter values if needed
+          // Generate parameter values from actual form data
           const paramValues = requiredParams.length > 0
-            ? requiredParams.map(paramType => {
-                if (paramType === 'SS58String' || paramType === 'AccountId') {
-                  return '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'; // Alice
-                } else if (paramType === 'u32') {
-                  return 1; // Use 1 for farm IDs
-                } else if (paramType === 'u64') {
-                  return 1n; // Use 1n (bigint) for deposit IDs
-                } else if (paramType === 'Hash') {
-                  return '0x0000000000000000000000000000000000000000000000000000000000000000';
-                } else {
-                  return '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY'; // Default to Alice
-                }
-              })
+            ? generateStorageParamValues(storageParams, requiredParams)
             : [];
 
 
