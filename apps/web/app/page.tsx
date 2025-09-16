@@ -28,6 +28,7 @@ import {
   stopWatchValue,
 } from "../utils/transactionHelpers";
 
+
 export default function Page() {
   // Chain connection and metadata
   const {
@@ -64,7 +65,7 @@ export default function Page() {
     handleStorageParamsChange,
     clearStorageSelection,
     resetStorageState,
-  } = useStorageQuery();
+  } = useStorageQuery(selectedChain);
 
   // Queue management
   const {
@@ -198,6 +199,7 @@ export default function Page() {
       resetExecutionState,
     ],
   );
+
 
   // Queue management handlers
   const handleAddToQueue = useCallback(() => {

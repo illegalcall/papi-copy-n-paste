@@ -446,6 +446,42 @@ function generateInlineStorageCode(
   storageParams: Record<string, any>,
 ): string {
   try {
+    // Handle custom RPC connections
+    if (chainKey === "custom") {
+      const connectionInfo = getChainConnection(chainKey, providerId);
+
+      return `import { createClient } from "polkadot-api"
+${connectionInfo.imports}
+
+async function queryStorage() {
+${connectionInfo.connection}
+
+  try {
+    // Note: Custom RPC - using raw API calls
+    // For storage queries on custom chains, you may need to:
+    // 1. Generate proper descriptors with 'papi add <chain>'
+    // 2. Or use raw RPC calls like client.getApi()._request()
+
+    console.log('Connected to custom RPC')
+    console.log('Available pallets and storage items depend on the chain')
+
+    // Example raw storage query (uncomment and modify as needed):
+    // const storageKey = "0x..." // Calculate proper storage key
+    // const result = await client.getApi()._request("state_getStorage", [storageKey])
+
+    return { success: true, message: 'Connected to custom RPC successfully' }
+  } catch (error) {${connectionInfo.cleanup || ''}
+    console.error('Storage query failed:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+// Execute the query
+queryStorage().then(result => {
+  console.log('Query result:', result)
+})`;
+    }
+
     const descriptorImport = getDescriptorImport(chainKey);
     const descriptorName = getDescriptorName(chainKey);
 
@@ -455,7 +491,7 @@ function generateInlineStorageCode(
 // 💡 Please switch to a supported chain to generate code`;
     }
 
-    const connectionInfo = getChainConnection(chainKey);
+    const connectionInfo = getChainConnection(chainKey, providerId);
 
   const requiresKeys = detectStorageParameters(pallet, storage.name, chainKey);
   const hasParams = Boolean(
@@ -513,7 +549,7 @@ function generateFunctionStorageCode(
 // 💡 Please switch to a supported chain to generate code`;
     }
 
-    const connectionInfo = getChainConnection(chainKey);
+    const connectionInfo = getChainConnection(chainKey, providerId);
 
   return `import { createClient } from "polkadot-api"
 ${descriptorImport}
@@ -559,6 +595,41 @@ function generateInlineCode(
   call: PalletCall,
   formData: Record<string, any>,
 ): string {
+  // Handle custom RPC connections
+  if (chainKey === "custom") {
+    const connectionInfo = getChainConnection(chainKey, providerId);
+
+    return `import { createClient } from "polkadot-api"
+${connectionInfo.imports}
+
+async function executeTransaction() {
+${connectionInfo.connection}
+
+  try {
+    // Note: Custom RPC - using raw API calls
+    // For transactions on custom chains, you may need to:
+    // 1. Generate proper descriptors with 'papi add <chain>'
+    // 2. Or use raw RPC calls like client.getApi()._request()
+
+    console.log('Connected to custom RPC')
+    console.log('Available pallets and calls depend on the chain')
+
+    // Example raw transaction (uncomment and modify as needed):
+    // const tx = await client.getApi()._request("author_submitExtrinsic", ["0x..."])
+
+    return { success: true, message: 'Connected to custom RPC successfully' }
+  } catch (error) {${connectionInfo.cleanup || ''}
+    console.error('Transaction failed:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+// Execute the transaction
+executeTransaction().then(result => {
+  console.log('Transaction result:', result)
+})`;
+  }
+
   const args = call.args
     .map((arg) => {
       const value = formData[arg.name] || "";
@@ -609,7 +680,7 @@ function generateInlineCode(
 // 💡 Please switch to a supported chain to generate code`;
     }
 
-    const connectionInfo = getChainConnection(chainKey);
+    const connectionInfo = getChainConnection(chainKey, providerId);
 
   return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
@@ -693,7 +764,7 @@ function generateFunctionCode(
 // 💡 Please switch to a supported chain to generate code`;
     }
 
-    const connectionInfo = getChainConnection(chainKey);
+    const connectionInfo = getChainConnection(chainKey, providerId);
 
   return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
@@ -743,7 +814,7 @@ export function generateMultiMethodCode(
 // 💡 Please switch to a supported chain to generate code`;
     }
 
-    const connectionInfo = getChainConnection(chainKey);
+    const connectionInfo = getChainConnection(chainKey, providerId);
 
   // Generate method calls
   const methodCalls = methodQueue
@@ -856,7 +927,7 @@ export function generateMultiStorageCode(
 // 💡 Please switch to a supported chain to generate code`;
     }
 
-    const connectionInfo = getChainConnection(chainKey);
+    const connectionInfo = getChainConnection(chainKey, providerId);
 
   // Generate storage queries
   const storageQueries = storageQueue

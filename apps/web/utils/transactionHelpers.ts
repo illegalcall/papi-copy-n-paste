@@ -15,6 +15,7 @@ import {
   decodeStorageResult,
 } from "./storageHelpers";
 import { createCleanLogger, QueryResult } from "./cleanLogger";
+import { getDescriptorForChain } from "@workspace/core/descriptors";
 
 // Observable subscriptions storage for watch functionality
 let activeWatchSubscriptions = new Map<string, any>();
@@ -244,6 +245,12 @@ export async function executeStorageQuery(
       requiredParams && requiredParams.length > 0 && Object.keys(storageParams).length > 0,
     );
 
+    // Debug logging for parameter detection
+    logger.info(`🔍 Storage ${palletName}.${storageName} analysis:`);
+    logger.info(`  Required params: ${requiredParams ? requiredParams.join(', ') : 'none'}`);
+    logger.info(`  Provided params: ${JSON.stringify(storageParams)}`);
+    logger.info(`  Has params: ${hasParams}`);
+
     // Generate parameter values if needed
     const paramValues =
       hasParams && requiredParams
@@ -254,11 +261,17 @@ export async function executeStorageQuery(
     const storageQuery = (client as any).query?.[palletName]?.[storageName];
 
     if (storageQuery) {
-      if (hasParams && paramValues.length > 0) {
-        const serializedParams = JSON.stringify(paramValues, (key, value) =>
-          typeof value === 'bigint' ? value.toString() : value
-        );
-        logger.info(`Parameters: ${serializedParams}`);
+      // Always log parameters for debugging
+      if (requiredParams && requiredParams.length > 0) {
+        logger.info(`Parameters required: ${requiredParams.join(', ')}`);
+        if (hasParams && paramValues.length > 0) {
+          const serializedParams = JSON.stringify(paramValues, (key, value) =>
+            typeof value === 'bigint' ? value.toString() : value
+          );
+          logger.info(`Parameters provided: ${serializedParams}`);
+        } else {
+          logger.info(`⚠️ Parameters required but none provided: ${JSON.stringify(storageParams)}`);
+        }
       }
 
       // Execute the appropriate query type
@@ -293,7 +306,6 @@ export async function executeStorageQuery(
             chainKey,
           );
           return watchResult; // Return watch state for UI
-          break;
         default:
           await executeGetValue(
             storageQuery,
@@ -462,13 +474,8 @@ async function executeRawGetValue(
 
       if (!descriptors[descriptorName]) {
 
-        // Dynamically import the correct descriptor
-        const descriptorModule = await import('../../../.papi/descriptors/dist');
-        const descriptor = descriptorModule[descriptorName as keyof typeof descriptorModule];
-
-        if (!descriptor) {
-          throw new Error(`Descriptor ${descriptorName} not found in descriptors module`);
-        }
+        // Get the descriptor using the helper function
+        const descriptor = getDescriptorForChain(chainKey);
 
         const typedApi = client.getTypedApi(descriptor);
         const palletQueries = typedApi.query[palletName];
@@ -598,23 +605,11 @@ async function executeWatchValue(
     }
 
     // Get the appropriate descriptor for the current chain
-    const descriptorName = getDescriptorName(chainKey);
-
-    // Dynamically import the descriptor - clean imports at top
     let descriptor: any;
     try {
-      if (!descriptorName) {
-        throw new Error(`Invalid descriptor name for chain: ${chainKey}`);
-      }
-
-      const descriptorsModule = await import('@polkadot-api/descriptors');
-      descriptor = descriptorsModule[descriptorName as keyof typeof descriptorsModule];
-
-      if (!descriptor) {
-        throw new Error(`Descriptor ${descriptorName} not found`);
-      }
+      descriptor = getDescriptorForChain(chainKey);
     } catch (importError) {
-      logger.error(`Failed to import descriptor ${descriptorName}: ${importError}`);
+      logger.error(`Failed to get descriptor for ${chainKey}: ${importError}`);
       return { watchKey, isWatching: false };
     }
 

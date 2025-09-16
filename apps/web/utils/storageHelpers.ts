@@ -27,17 +27,25 @@ export function isStorageQueryValid(
     selectedStorage.storage.name,
     chainKey
   );
-  if (requiredParams.length === 0) return true;
+
+  console.log(`Validation: ${selectedStorage.pallet}.${selectedStorage.storage.name}, required: [${requiredParams.join(', ')}], provided:`, storageParams);
+
+  if (requiredParams.length === 0) {
+    return true;
+  }
 
   // Check if all required parameters are provided and not empty
   for (const paramType of requiredParams) {
     const paramValue =
       storageParams[paramType.toLowerCase()] ||
       storageParams[paramType] ||
+      storageParams["ss58string"] || // Handle SS58String fields
+      storageParams["accountid"] ||  // Handle AccountId fields
       storageParams["key"] ||
       storageParams["param"];
 
     if (!paramValue || paramValue.toString().trim() === "") {
+      console.log(`Missing param: ${paramType}, checked keys: ${paramType.toLowerCase()}, ${paramType}, ss58string, accountid, key, param`);
       return false;
     }
   }
@@ -53,6 +61,8 @@ export function generateStorageParams(
     const value =
       storageParams[paramType.toLowerCase()] ||
       storageParams[paramType] ||
+      storageParams["ss58string"] ||
+      storageParams["accountid"] ||
       storageParams["key"] ||
       storageParams["param"] ||
       "";
@@ -88,6 +98,8 @@ export function generateStorageParamValues(
     const paramValue =
       storageParams[paramType.toLowerCase()] ||
       storageParams[paramType] ||
+      storageParams["ss58string"] ||
+      storageParams["accountid"] ||
       storageParams["key"] ||
       storageParams["param"] ||
       "";

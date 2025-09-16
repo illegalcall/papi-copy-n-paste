@@ -22,6 +22,7 @@ import {
   bifrost,
   astar,
   paseo,
+  hydration,
 } from "@polkadot-api/descriptors";
 
 // Type-safe mapping of chain keys to descriptors
@@ -32,9 +33,8 @@ const CHAIN_DESCRIPTORS: Record<string, any> = {
   bifrost,
   astar,
   paseo,
-  // Fallback chains (add descriptors when endpoints are available)
-  acala: polkadot, // Use polkadot as fallback
-  hydration: polkadot, // Use polkadot as fallback
+  hydration,
+  // Note: acala not included - will throw error if used
 } as const;
 
 type SupportedChainKey = keyof typeof CHAIN_DESCRIPTORS;
@@ -50,11 +50,10 @@ export function getDescriptorForChain(chainKey: string): any {
     return CHAIN_DESCRIPTORS[key];
   }
 
-  // Default to polkadot descriptor if chain not found
-  console.warn(
-    `No descriptor found for chain '${chainKey}', using polkadot as fallback`,
+  // Throw error for unsupported chains - no fallback
+  throw new Error(
+    `No descriptor available for chain '${chainKey}'. Supported chains: ${Object.keys(CHAIN_DESCRIPTORS).join(', ')}`
   );
-  return CHAIN_DESCRIPTORS.polkadot;
 }
 
 /**
@@ -69,10 +68,10 @@ export function getTypedApiForChain(client: any, chainKey: string): any {
 }
 
 // Export the descriptors for direct use if needed
-export { polkadot, kusama, moonbeam, bifrost, astar, paseo };
+export { polkadot, kusama, moonbeam, bifrost, astar, paseo, hydration };
 export type { SupportedChainKey };
 
-// List of chains with real descriptors vs fallbacks
+// List of chains with real descriptors vs unsupported
 export const CHAINS_WITH_REAL_DESCRIPTORS = [
   "polkadot",
   "kusama",
@@ -80,5 +79,6 @@ export const CHAINS_WITH_REAL_DESCRIPTORS = [
   "bifrost",
   "astar",
   "paseo",
+  "hydration",
 ] as const;
-export const CHAINS_WITH_FALLBACK_DESCRIPTORS = ["acala", "hydration"] as const;
+export const UNSUPPORTED_CHAINS = ["acala"] as const;
