@@ -2,14 +2,15 @@
  * Hook for managing call selection and form data
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback } from "../utils/reactImports";
 import { PalletCall } from "@workspace/core";
+import type { FormData } from "../types/forms";
 
 export function useCallSelection() {
   const [selectedCall, setSelectedCall] = useState<
     { pallet: string; call: PalletCall } | undefined
   >();
-  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [formData, setFormData] = useState<FormData>({});
   const [canRun, setCanRun] = useState(false);
 
   // Handle call selection
@@ -20,7 +21,7 @@ export function useCallSelection() {
   }, []);
 
   // Handle form data changes
-  const handleFormChange = useCallback((newFormData: Record<string, any>) => {
+  const handleFormChange = useCallback((newFormData: FormData) => {
     setFormData(newFormData);
   }, []);
 

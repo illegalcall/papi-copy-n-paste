@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import type { StorageParams, StorageParamsChangeHandler } from "../../types/forms";
 import { Badge } from "@workspace/ui/components/badge";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
@@ -26,9 +27,9 @@ interface StorageFormProps {
   storage: any;
   chainKey: string;
   onQueryTypeChange: (queryType: string) => void;
-  onParamsChange: (params: Record<string, any>) => void;
+  onParamsChange: StorageParamsChangeHandler;
   queryType: string;
-  storageParams: Record<string, any>;
+  storageParams: StorageParams;
 }
 
 // Query types are now defined in enhanced-query-selector.tsx
@@ -366,7 +367,7 @@ export function StorageForm({
   storageParams,
 }: StorageFormProps) {
   const [localParams, setLocalParams] =
-    useState<Record<string, any>>(storageParams);
+    useState<StorageParams>(storageParams);
   const [showResponseStructure, setShowResponseStructure] = useState(false);
   const [showTypeInfo, setShowTypeInfo] = useState(true);
 

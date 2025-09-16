@@ -357,64 +357,7 @@ function determineComplexity(parameters: Array<{ type: string; }>): 'simple' | '
   return 'complex';
 }
 
-/**
- * Generates TypeScript-style constant signature
- */
-export function generateConstantSignature(
-  pallet: string,
-  constantName: string,
-  constantType: string,
-  value: any
-): TypeScriptTypeInfo {
-  const tsType = papiTypeToTypeScript(constantType);
-  
-  // Create signature for the constant
-  const signature = `${tsType}`;
-  
-  return {
-    signature,
-    parameters: [], // Constants have no parameters
-    returnType: tsType,
-    complexity: 'simple'
-  };
-}
-
-/**
- * Gets human-readable explanation for common constant types
- */
-export function getConstantExplanation(constantName: string, constantType: string, value: any): string {
-  const normalizedName = constantName.toLowerCase();
-  
-  if (normalizedName.includes('deposit')) {
-    return `💰 Deposit amount in plancks (1 DOT = 10¹⁰ plancks)`;
-  }
-  
-  if (normalizedName.includes('period') && constantType === 'u32') {
-    return `⏰ Time period in blocks (~6 seconds per block)`;
-  }
-  
-  if (constantType === 'Permill') {
-    return `📊 Percentage in parts per million (1,000,000 = 100%)`;
-  }
-  
-  if (constantType === 'Perbill') {
-    return `📊 Percentage in parts per billion (1,000,000,000 = 100%)`;
-  }
-  
-  if (normalizedName.includes('max') && constantType === 'u32') {
-    return `🔢 Maximum limit or count`;
-  }
-  
-  if (constantType === 'Weight') {
-    return `⚖️ Computational weight limits`;
-  }
-  
-  if (constantType.includes('u128') && normalizedName.includes('balance')) {
-    return `💰 Balance amount in smallest unit`;
-  }
-  
-  return '';
-}
+// Unused constant signature functions removed - not referenced anywhere in codebase
 
 /**
  * Gets parameter descriptions based on common parameter names
@@ -444,12 +387,4 @@ function getParameterDescription(paramName: string, paramType: string): string {
   return descriptions[paramName] || `Parameter of type ${paramType}`;
 }
 
-/**
- * Formats TypeScript type for display with syntax highlighting classes
- * Returns the original string - highlighting will be handled by CSS classes in components
- */
-export function formatTypeWithHighlighting(typeString: string): string {
-  // For now, just return the clean type string
-  // The components will handle styling with proper CSS classes
-  return typeString;
-}
+// Unused type highlighting function removed - not referenced anywhere in codebase

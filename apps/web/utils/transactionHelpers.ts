@@ -8,6 +8,7 @@ import {
   type TransactionStep,
 } from "@workspace/core";
 import { getDescriptorName } from "./chainConfig";
+import type { StorageParams } from "../types/forms";
 import {
   detectStorageParameters,
   generateStorageParamValues,
@@ -426,7 +427,7 @@ async function executeRawGetValue(
   storageName: string,
   chainKey: string,
   logger: any,
-  storageParams: Record<string, any> = {},
+  storageParams: StorageParams = {},
 ) {
   try {
     // Detect storage parameters for this specific query

@@ -2,23 +2,12 @@
  * Hook for managing transaction and storage query queues
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback } from "../utils/reactImports";
 import { PalletCall } from "@workspace/core";
+import { generateId } from "../utils/generateId";
+import type { MethodQueueItem, StorageQueueItem } from "../types/forms";
 
-interface MethodQueueItem {
-  pallet: string;
-  call: PalletCall;
-  formData: Record<string, any>;
-  id: string;
-}
-
-interface StorageQueueItem {
-  pallet: string;
-  storage: any;
-  queryType: string;
-  storageParams: Record<string, any>;
-  id: string;
-}
+// Using centralized types from types/forms.ts
 
 export function useTransactionQueue() {
   // Method queue state
@@ -39,7 +28,7 @@ export function useTransactionQueue() {
         pallet: selectedCall.pallet,
         call: selectedCall.call,
         formData: { ...formData },
-        id: Math.random().toString(36).substr(2, 9),
+        id: generateId(),
       };
 
       setMethodQueue((prev) => [...prev, queueItem]);
@@ -61,7 +50,7 @@ export function useTransactionQueue() {
         storage: selectedStorage.storage,
         queryType: storageQueryType,
         storageParams: { ...storageParams },
-        id: Math.random().toString(36).substr(2, 9),
+        id: generateId(),
       };
 
       setStorageQueue((prev) => [...prev, queueItem]);

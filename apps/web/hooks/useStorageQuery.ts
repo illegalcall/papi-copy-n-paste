@@ -2,15 +2,17 @@
  * Hook for managing storage query state and validation
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback } from "../utils/reactImports";
 import { isStorageQueryValid } from "../utils/storageHelpers";
+import type { StorageParams } from "../types/forms";
+import { createStateClearer } from "../utils/stateHelpers";
 
 export function useStorageQuery(chainKey: string = 'polkadot') {
   const [selectedStorage, setSelectedStorage] = useState<
     { pallet: string; storage: any } | undefined
   >();
   const [storageQueryType, setStorageQueryType] = useState<string>("getValue");
-  const [storageParams, setStorageParams] = useState<Record<string, any>>({});
+  const [storageParams, setStorageParams] = useState<StorageParams>({});
   const [canRunStorage, setCanRunStorage] = useState(false);
 
   // Handle storage selection
@@ -37,7 +39,7 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
 
   // Handle storage parameter changes
   const handleStorageParamsChange = useCallback(
-    (newParams: Record<string, any>) => {
+    (newParams: StorageParams) => {
       setStorageParams(newParams);
 
       // Update validation state with dynamic detection
