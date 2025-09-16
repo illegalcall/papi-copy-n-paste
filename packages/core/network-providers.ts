@@ -462,7 +462,42 @@ export function getProvider(
   providerId: string,
 ): NetworkProvider | undefined {
   const config = getNetworkConfig(chainKey);
-  return config?.providers.find((provider) => provider.id === providerId);
+
+  // First check static providers
+  const staticProvider = config?.providers.find((provider) => provider.id === providerId);
+  if (staticProvider) {
+    return staticProvider;
+  }
+
+  // Check custom providers from localStorage (only in browser environment)
+  if (typeof localStorage !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('papi-custom-providers');
+      if (stored) {
+        const customProviders = JSON.parse(stored);
+        const customProvider = customProviders.find(
+          (provider: any) => provider.chainKey === chainKey && provider.id === providerId
+        );
+
+        if (customProvider) {
+          // Convert custom provider format to NetworkProvider format
+          return {
+            id: customProvider.id,
+            name: customProvider.name,
+            type: "custom" as NetworkProviderType,
+            description: customProvider.description || `Custom RPC for ${chainKey}`,
+            url: customProvider.wsUrl,
+            reliability: "medium",
+            latency: "medium"
+          };
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load custom providers:', error);
+    }
+  }
+
+  return undefined;
 }
 
 export function getDefaultProvider(
