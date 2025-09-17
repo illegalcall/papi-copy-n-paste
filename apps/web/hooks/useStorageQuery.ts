@@ -14,6 +14,7 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
   const [storageQueryType, setStorageQueryType] = useState<string>("getValue");
   const [storageParams, setStorageParams] = useState<StorageParams>({});
   const [canRunStorage, setCanRunStorage] = useState(false);
+  const [storageValidationErrors, setStorageValidationErrors] = useState<Record<string, string>>({});
 
   // Handle storage selection
   const handleStorageSelect = useCallback((pallet: string, storage: any) => {
@@ -49,6 +50,15 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
     [selectedStorage, chainKey],
   );
 
+  // Handle storage validation change (from Zod validation in StorageForm)
+  const handleStorageValidationChange = useCallback(
+    (isValid: boolean, errors: Record<string, string>) => {
+      setCanRunStorage(isValid);
+      setStorageValidationErrors(errors);
+    },
+    []
+  );
+
   // Clear storage selection
   const clearStorageSelection = useCallback(() => {
     setSelectedStorage(undefined);
@@ -71,11 +81,13 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
     storageQueryType,
     storageParams,
     canRunStorage,
+    storageValidationErrors,
 
     // Actions
     handleStorageSelect,
     handleStorageQueryTypeChange,
     handleStorageParamsChange,
+    handleStorageValidationChange,
     clearStorageSelection,
     resetStorageState,
 

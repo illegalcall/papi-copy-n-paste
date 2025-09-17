@@ -3,7 +3,6 @@ import { start } from "polkadot-api/smoldot";
 import { getSmProvider } from "polkadot-api/sm-provider";
 import { getWsProvider } from "polkadot-api/ws-provider/web";
 import { withPolkadotSdkCompat } from "polkadot-api/polkadot-sdk-compat";
-import { withLogsRecorder } from "polkadot-api/logs-provider";
 import { chainSpec as polkadotChainSpec } from "polkadot-api/chains/polkadot";
 import { chainSpec as kusamaChainSpec } from "polkadot-api/chains/ksmcc3";
 import { useEffect, useState } from "react";
@@ -31,7 +30,11 @@ function getSmoldotInstance() {
   if (!smoldotInstance) {
     smoldotInstance = start({
       logCallback: (level, target, message) => {
-        console.debug("smoldot[%s(%s)] %s", target, level, message);
+        // Only log errors and warnings, not debug/info messages
+        // level: 1=Error, 2=Warn, 3=Info, 4=Debug, 5=Trace
+        if (level <= 2) {
+          console.warn("smoldot[%s(%s)] %s", target, level, message);
+        }
       },
       forbidWs: false,
     });
@@ -195,16 +198,7 @@ export async function createEnhancedClient(
         throw new Error(`Unsupported provider type: ${provider.type}`);
     }
 
-    const client = createClient(
-      withLogsRecorder(
-        (...args) =>
-          console.debug(
-            `[${networkConfig.chainName}:${provider.name}]`,
-            ...args,
-          ),
-        rawProvider,
-      ),
-    );
+    const client = createClient(rawProvider);
 
     // Test connection with shorter timeout for better UX
     await Promise.race([

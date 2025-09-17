@@ -8,17 +8,26 @@ import {
   Zap,
   Database,
   Calendar,
+  Settings,
+  AlertTriangle,
+  Code,
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
-import { PalletInfo, PalletCall } from "@workspace/core";
+import { PalletInfo, PalletCall, PalletConstant, PalletError, PalletEvent } from "@workspace/core";
 
 interface PalletTreeProps {
   pallets: PalletInfo[];
   searchQuery: string;
   onCallSelect: (pallet: string, call: PalletCall) => void;
   onStorageSelect: (pallet: string, storage: any) => void;
+  onConstantSelect?: (pallet: string, constant: PalletConstant) => void;
+  onErrorSelect?: (pallet: string, error: PalletError) => void;
+  onEventSelect?: (pallet: string, event: PalletEvent) => void;
   selectedCall?: { pallet: string; call: string };
   selectedStorage?: { pallet: string; storage: string };
+  selectedConstant?: { pallet: string; constant: string };
+  selectedError?: { pallet: string; error: string };
+  selectedEvent?: { pallet: string; event: string };
 }
 
 export function PalletTree({
@@ -26,8 +35,14 @@ export function PalletTree({
   searchQuery,
   onCallSelect,
   onStorageSelect,
+  onConstantSelect,
+  onErrorSelect,
+  onEventSelect,
   selectedCall,
   selectedStorage,
+  selectedConstant,
+  selectedError,
+  selectedEvent,
 }: PalletTreeProps) {
   // Start with essential pallets expanded for better UX and scrollable content
   const [expandedPallets, setExpandedPallets] = useState<Set<string>>(
@@ -83,13 +98,17 @@ export function PalletTree({
       const filteredCalls = palletNameMatches ? pallet.calls : enhancedFilterItems(pallet.calls, searchQuery);
       const filteredStorage = palletNameMatches ? pallet.storage : enhancedFilterItems(pallet.storage, searchQuery);
       const filteredEvents = palletNameMatches ? pallet.events : filterItems(pallet.events, searchQuery);
+      const filteredConstants = palletNameMatches ? (pallet.constants || []) : filterItems(pallet.constants || [], searchQuery);
+      const filteredErrors = palletNameMatches ? (pallet.errors || []) : filterItems(pallet.errors || [], searchQuery);
 
       // Include pallet if name matches OR if any items within it match
       const hasMatches =
         palletNameMatches ||
         filteredCalls.length > 0 ||
         filteredStorage.length > 0 ||
-        filteredEvents.length > 0;
+        filteredEvents.length > 0 ||
+        filteredConstants.length > 0 ||
+        filteredErrors.length > 0;
 
       if (!hasMatches) return null;
 
@@ -99,6 +118,8 @@ export function PalletTree({
         calls: filteredCalls,
         storage: filteredStorage,
         events: filteredEvents,
+        constants: filteredConstants,
+        errors: filteredErrors,
       };
     })
     .filter((pallet): pallet is PalletInfo => pallet !== null);
@@ -131,6 +152,14 @@ export function PalletTree({
     onStorageSelect(pallet.name, storage);
   };
 
+  const handleConstantClick = (pallet: PalletInfo, constant: PalletConstant) => {
+    onConstantSelect?.(pallet.name, constant);
+  };
+
+  const handleErrorClick = (pallet: PalletInfo, error: PalletError) => {
+    onErrorSelect?.(pallet.name, error);
+  };
+
   // Auto-expand pallets that have search matches
   const shouldAutoExpand = (pallet: PalletInfo): boolean => {
     if (!searchQuery) return false;
@@ -142,7 +171,9 @@ export function PalletTree({
       palletNameMatches ||
       (pallet.calls.length > 0 ||
         pallet.storage.length > 0 ||
-        pallet.events.length > 0)
+        pallet.events.length > 0 ||
+        (pallet.constants || []).length > 0 ||
+        (pallet.errors || []).length > 0)
     );
   };
 
@@ -190,7 +221,8 @@ export function PalletTree({
         const isExpanded =
           expandedPallets.has(pallet.name) || shouldAutoExpand(pallet);
         const totalItems =
-          pallet.calls.length + pallet.storage.length + pallet.events.length;
+          pallet.calls.length + pallet.storage.length + pallet.events.length +
+          (pallet.constants || []).length + (pallet.errors || []).length;
 
         return (
           <div key={pallet.name} data-testid="pallet-item">
@@ -350,14 +382,100 @@ export function PalletTree({
                           <Button
                             key={event.name}
                             variant="ghost"
-                            className="w-full justify-start h-6 px-2 font-normal text-xs"
-                            disabled
+                            className={`w-full justify-start h-6 px-2 font-normal text-xs ${
+                              selectedEvent?.pallet === pallet.name && selectedEvent?.event === event.name
+                                ? "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100"
+                                : ""
+                            }`}
+                            onClick={() => onEventSelect?.(pallet.name, event)}
                           >
                             <span className="truncate">
                               {highlightMatch(event.name, searchQuery)}
                             </span>
                           </Button>
                         ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Constants Section */}
+                {(pallet.constants || []).length > 0 && (
+                  <div>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start h-7 px-2 font-normal text-xs"
+                      onClick={() => toggleSection(`${pallet.name}-constants`)}
+                    >
+                      {(expandedSections.has(`${pallet.name}-constants`) || shouldAutoExpandSection(pallet.name)) ? (
+                        <ChevronDown className="w-3 h-3 mr-1" />
+                      ) : (
+                        <ChevronRight className="w-3 h-3 mr-1" />
+                      )}
+                      <Settings className="w-3 h-3 mr-2" />
+                      <span>Constants ({(pallet.constants || []).length})</span>
+                    </Button>
+
+                    {(expandedSections.has(`${pallet.name}-constants`) || shouldAutoExpandSection(pallet.name)) && (
+                      <div className="ml-4 space-y-0.5">
+                        {(pallet.constants || []).map((constant) => {
+                          const isSelected =
+                            selectedConstant?.pallet === pallet.name &&
+                            selectedConstant?.constant === constant.name;
+                          return (
+                            <Button
+                              key={constant.name}
+                              variant={isSelected ? "secondary" : "ghost"}
+                              className="w-full justify-start h-6 px-2 font-normal text-xs"
+                              onClick={() => handleConstantClick(pallet, constant)}
+                            >
+                              <span className="truncate">
+                                {highlightMatch(constant.name, searchQuery)}
+                              </span>
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Errors Section */}
+                {(pallet.errors || []).length > 0 && (
+                  <div>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start h-7 px-2 font-normal text-xs"
+                      onClick={() => toggleSection(`${pallet.name}-errors`)}
+                    >
+                      {(expandedSections.has(`${pallet.name}-errors`) || shouldAutoExpandSection(pallet.name)) ? (
+                        <ChevronDown className="w-3 h-3 mr-1" />
+                      ) : (
+                        <ChevronRight className="w-3 h-3 mr-1" />
+                      )}
+                      <AlertTriangle className="w-3 h-3 mr-2" />
+                      <span>Errors ({(pallet.errors || []).length})</span>
+                    </Button>
+
+                    {(expandedSections.has(`${pallet.name}-errors`) || shouldAutoExpandSection(pallet.name)) && (
+                      <div className="ml-4 space-y-0.5">
+                        {(pallet.errors || []).map((error) => {
+                          const isSelected =
+                            selectedError?.pallet === pallet.name &&
+                            selectedError?.error === error.name;
+                          return (
+                            <Button
+                              key={error.name}
+                              variant={isSelected ? "secondary" : "ghost"}
+                              className="w-full justify-start h-6 px-2 font-normal text-xs"
+                              onClick={() => handleErrorClick(pallet, error)}
+                            >
+                              <span className="truncate">
+                                {highlightMatch(error.name, searchQuery)}
+                              </span>
+                            </Button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>

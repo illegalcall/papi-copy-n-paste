@@ -12,13 +12,19 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Play, Square, Plus, X, List, Eye, EyeOff } from "lucide-react";
 import { SimpleCallForm } from "@/components/forms/simple-call-form";
 import { StorageForm } from "@/components/forms/storage-form";
-import { PalletCall } from "@workspace/core";
+import { ConstantForm } from "@/components/forms/constant-form";
+import { ErrorForm } from "@/components/forms/error-form";
+import { EventForm } from "@/components/forms/event-form";
+import { PalletCall, PalletConstant, PalletError, PalletEvent } from "@workspace/core";
 
 interface CenterPaneProps {
   chainStatus: "connecting" | "ready" | "error";
   selectedChain: string;
   selectedCall?: { pallet: string; call: PalletCall };
   selectedStorage?: { pallet: string; storage: any };
+  selectedConstant?: { pallet: string; constant: PalletConstant };
+  selectedError?: { pallet: string; error: PalletError };
+  selectedEvent?: { pallet: string; event: PalletEvent };
   methodQueue: Array<{
     pallet: string;
     call: PalletCall;
@@ -52,6 +58,7 @@ interface CenterPaneProps {
   storageParams?: Record<string, any>;
   onStorageQueryTypeChange?: (queryType: string) => void;
   onStorageParamsChange?: (params: Record<string, any>) => void;
+  onStorageValidationChange?: (isValid: boolean, errors: Record<string, string>) => void;
 }
 
 
@@ -60,6 +67,9 @@ export function CenterPane({
   selectedChain,
   selectedCall,
   selectedStorage,
+  selectedConstant,
+  selectedError,
+  selectedEvent,
   methodQueue,
   storageQueue,
   onFormChange,
@@ -81,6 +91,7 @@ export function CenterPane({
   storageParams = {},
   onStorageQueryTypeChange,
   onStorageParamsChange,
+  onStorageValidationChange,
 }: CenterPaneProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -246,14 +257,36 @@ export function CenterPane({
           storageParams={storageParams || {}}
           onQueryTypeChange={onStorageQueryTypeChange || (() => {})}
           onParamsChange={onStorageParamsChange || (() => {})}
+          onValidationChange={onStorageValidationChange}
+        />
+      ) : selectedConstant ? (
+        <ConstantForm
+          key={`${selectedConstant.pallet}-${selectedConstant.constant.name}`}
+          pallet={selectedConstant.pallet}
+          constant={selectedConstant.constant}
+          chainKey={selectedChain}
+        />
+      ) : selectedError ? (
+        <ErrorForm
+          key={`${selectedError.pallet}-${selectedError.error.name}`}
+          pallet={selectedError.pallet}
+          error={selectedError.error}
+          chainKey={selectedChain}
+        />
+      ) : selectedEvent ? (
+        <EventForm
+          key={`${selectedEvent.pallet}-${selectedEvent.event.name}`}
+          pallet={selectedEvent.pallet}
+          event={selectedEvent.event}
+          chainKey={selectedChain}
         />
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle>Select a Pallet Call or Storage</CardTitle>
+            <CardTitle>Select a Pallet Item</CardTitle>
             <CardDescription>
-              Choose a call (to execute transactions) or storage item (to query
-              data) from the left panel
+              Choose a call (to execute transactions), storage item (to query
+              data), constant (to get fixed values), or error (to see error details) from the left panel
             </CardDescription>
           </CardHeader>
           <CardContent>

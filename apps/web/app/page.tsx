@@ -13,6 +13,9 @@ import { Menu } from "lucide-react";
 import { useChainConnection } from "../hooks/useChainConnection";
 import { useCallSelection } from "../hooks/useCallSelection";
 import { useStorageQuery } from "../hooks/useStorageQuery";
+import { useConstantSelection } from "../hooks/useConstantSelection";
+import { useErrorSelection } from "../hooks/useErrorSelection";
+import { useEventSelection } from "../hooks/useEventSelection";
 import { useTransactionQueue } from "../hooks/useTransactionQueue";
 import { useCodeGeneration } from "../hooks/useCodeGeneration";
 import { useExecution } from "../hooks/useExecution";
@@ -42,6 +45,7 @@ export default function Page() {
     handleNetworkChange,
   } = useChainConnection();
 
+
   // Call selection and form handling
   const {
     selectedCall,
@@ -63,9 +67,34 @@ export default function Page() {
     handleStorageSelect,
     handleStorageQueryTypeChange,
     handleStorageParamsChange,
+    handleStorageValidationChange,
     clearStorageSelection,
     resetStorageState,
   } = useStorageQuery(selectedChain);
+
+  // Constant selection handling
+  const {
+    selectedConstant,
+    handleConstantSelect,
+    clearConstantSelection,
+    resetConstantState,
+  } = useConstantSelection();
+
+  // Error selection handling
+  const {
+    selectedError,
+    handleErrorSelect,
+    clearErrorSelection,
+    resetErrorState,
+  } = useErrorSelection();
+
+  // Event selection handling
+  const {
+    selectedEvent,
+    handleEventSelect,
+    clearEventSelection,
+    resetEventState,
+  } = useEventSelection();
 
   // Queue management
   const {
@@ -161,6 +190,9 @@ export default function Page() {
     updateGeneratedCode(
       selectedCall,
       selectedStorage,
+      selectedConstant,
+      selectedError,
+      selectedEvent,
       debouncedFormData,
       storageQueryType,
       debouncedStorageParams,
@@ -170,6 +202,9 @@ export default function Page() {
   }, [
     selectedCall,
     selectedStorage,
+    selectedConstant,
+    selectedError,
+    selectedEvent,
     debouncedFormData,
     storageQueryType,
     debouncedStorageParams,
@@ -186,6 +221,9 @@ export default function Page() {
       // Reset all dependent state
       resetCallState();
       resetStorageState();
+      resetConstantState();
+      resetErrorState();
+      resetEventState();
       clearAllQueues();
       clearCode();
       resetExecutionState();
@@ -194,6 +232,9 @@ export default function Page() {
       handleNetworkChange,
       resetCallState,
       resetStorageState,
+      resetConstantState,
+      resetErrorState,
+      resetEventState,
       clearAllQueues,
       clearCode,
       resetExecutionState,
@@ -228,18 +269,60 @@ export default function Page() {
     (pallet: string, call: any) => {
       handleCallSelect(pallet, call);
       clearStorageSelection(); // Clear storage when call is selected
+      clearConstantSelection(); // Clear constant when call is selected
+      clearErrorSelection(); // Clear error when call is selected
+      clearEventSelection(); // Clear event when call is selected
       setActiveTab("code"); // Switch to code tab when pallet/call is selected
     },
-    [handleCallSelect, clearStorageSelection, setActiveTab],
+    [handleCallSelect, clearStorageSelection, clearConstantSelection, clearErrorSelection, clearEventSelection, setActiveTab],
   );
 
   const wrappedHandleStorageSelect = useCallback(
     (pallet: string, storage: any) => {
       handleStorageSelect(pallet, storage);
       clearCallSelection(); // Clear call when storage is selected
+      clearConstantSelection(); // Clear constant when storage is selected
+      clearErrorSelection(); // Clear error when storage is selected
+      clearEventSelection(); // Clear event when storage is selected
       setActiveTab("code"); // Switch to code tab when pallet/storage is selected
     },
-    [handleStorageSelect, clearCallSelection, setActiveTab],
+    [handleStorageSelect, clearCallSelection, clearConstantSelection, clearErrorSelection, clearEventSelection, setActiveTab],
+  );
+
+  const wrappedHandleConstantSelect = useCallback(
+    (pallet: string, constant: any) => {
+      handleConstantSelect(pallet, constant);
+      clearCallSelection(); // Clear call when constant is selected
+      clearStorageSelection(); // Clear storage when constant is selected
+      clearErrorSelection(); // Clear error when constant is selected
+      clearEventSelection(); // Clear event when constant is selected
+      setActiveTab("code"); // Switch to code tab when pallet/constant is selected
+    },
+    [handleConstantSelect, clearCallSelection, clearStorageSelection, clearErrorSelection, clearEventSelection, setActiveTab],
+  );
+
+  const wrappedHandleErrorSelect = useCallback(
+    (pallet: string, error: any) => {
+      handleErrorSelect(pallet, error);
+      clearCallSelection(); // Clear call when error is selected
+      clearStorageSelection(); // Clear storage when error is selected
+      clearConstantSelection(); // Clear constant when error is selected
+      clearEventSelection(); // Clear event when error is selected
+      setActiveTab("code"); // Switch to code tab when pallet/error is selected
+    },
+    [handleErrorSelect, clearCallSelection, clearStorageSelection, clearConstantSelection, clearEventSelection, setActiveTab],
+  );
+
+  const wrappedHandleEventSelect = useCallback(
+    (pallet: string, event: any) => {
+      handleEventSelect(pallet, event);
+      clearCallSelection(); // Clear call when event is selected
+      clearStorageSelection(); // Clear storage when event is selected
+      clearConstantSelection(); // Clear constant when event is selected
+      clearErrorSelection(); // Clear error when event is selected
+      setActiveTab("code"); // Switch to code tab when pallet/event is selected
+    },
+    [handleEventSelect, clearCallSelection, clearStorageSelection, clearConstantSelection, clearErrorSelection, setActiveTab],
   );
 
   // Execution handlers
@@ -414,8 +497,35 @@ export default function Page() {
                   }
                 : undefined
             }
+            selectedConstant={
+              selectedConstant
+                ? {
+                    pallet: selectedConstant.pallet,
+                    constant: selectedConstant.constant.name,
+                  }
+                : undefined
+            }
+            selectedError={
+              selectedError
+                ? {
+                    pallet: selectedError.pallet,
+                    error: selectedError.error.name,
+                  }
+                : undefined
+            }
+            selectedEvent={
+              selectedEvent
+                ? {
+                    pallet: selectedEvent.pallet,
+                    event: selectedEvent.event.name,
+                  }
+                : undefined
+            }
             onCallSelect={wrappedHandleCallSelect}
             onStorageSelect={wrappedHandleStorageSelect}
+            onConstantSelect={wrappedHandleConstantSelect}
+            onErrorSelect={wrappedHandleErrorSelect}
+            onEventSelect={wrappedHandleEventSelect}
             isLoading={isLoadingMetadata}
             error={metadataError}
           />
@@ -445,12 +555,48 @@ export default function Page() {
                     }
                   : undefined
               }
+              selectedConstant={
+                selectedConstant
+                  ? {
+                      pallet: selectedConstant.pallet,
+                      constant: selectedConstant.constant.name,
+                    }
+                  : undefined
+              }
+              selectedError={
+                selectedError
+                  ? {
+                      pallet: selectedError.pallet,
+                      error: selectedError.error.name,
+                    }
+                  : undefined
+              }
+              selectedEvent={
+                selectedEvent
+                  ? {
+                      pallet: selectedEvent.pallet,
+                      event: selectedEvent.event.name,
+                    }
+                  : undefined
+              }
               onCallSelect={(pallet, call) => {
                 wrappedHandleCallSelect(pallet, call);
                 setLeftPaneOpen(false);
               }}
               onStorageSelect={(pallet, storage) => {
                 wrappedHandleStorageSelect(pallet, storage);
+                setLeftPaneOpen(false);
+              }}
+              onConstantSelect={(pallet, constant) => {
+                wrappedHandleConstantSelect(pallet, constant);
+                setLeftPaneOpen(false);
+              }}
+              onErrorSelect={(pallet, error) => {
+                wrappedHandleErrorSelect(pallet, error);
+                setLeftPaneOpen(false);
+              }}
+              onEventSelect={(pallet, event) => {
+                wrappedHandleEventSelect(pallet, event);
                 setLeftPaneOpen(false);
               }}
               isLoading={isLoadingMetadata}
@@ -466,10 +612,14 @@ export default function Page() {
             selectedChain={selectedChain}
             selectedCall={selectedCall}
             selectedStorage={selectedStorage}
+            selectedConstant={selectedConstant}
+            selectedError={selectedError}
+            selectedEvent={selectedEvent}
             onFormChange={enhancedHandleFormChange}
             onValidChange={handleValidChange}
             onStorageQueryTypeChange={handleStorageQueryTypeChange}
             onStorageParamsChange={enhancedHandleStorageParamsChange}
+            onStorageValidationChange={handleStorageValidationChange}
             onAddToQueue={handleAddToQueue}
             onAddStorageToQueue={handleAddStorageToQueue}
             onRemoveFromQueue={removeFromMethodQueue}

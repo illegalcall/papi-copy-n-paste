@@ -4,7 +4,7 @@ import { Input } from "@workspace/ui/components/input";
 import { Search } from "lucide-react";
 import { useState, useRef, useImperativeHandle, forwardRef } from "react";
 import { PalletTree } from "@/components/tree/pallet-tree";
-import { PalletInfo, PalletCall } from "@workspace/core";
+import { PalletInfo, PalletCall, PalletConstant, PalletError, PalletEvent } from "@workspace/core";
 
 interface LeftPaneProps {
   isOpen: boolean;
@@ -12,8 +12,14 @@ interface LeftPaneProps {
   pallets: PalletInfo[];
   onCallSelect: (pallet: string, call: PalletCall) => void;
   onStorageSelect: (pallet: string, storage: any) => void;
+  onConstantSelect?: (pallet: string, constant: PalletConstant) => void;
+  onErrorSelect?: (pallet: string, error: PalletError) => void;
+  onEventSelect?: (pallet: string, event: PalletEvent) => void;
   selectedCall?: { pallet: string; call: string };
   selectedStorage?: { pallet: string; storage: string };
+  selectedConstant?: { pallet: string; constant: string };
+  selectedError?: { pallet: string; error: string };
+  selectedEvent?: { pallet: string; event: string };
   isLoading?: boolean;
   error?: string | null;
 }
@@ -27,8 +33,14 @@ export const LeftPane = forwardRef<LeftPaneRef, LeftPaneProps>(({
   pallets,
   onCallSelect,
   onStorageSelect,
+  onConstantSelect,
+  onErrorSelect,
+  onEventSelect,
   selectedCall,
   selectedStorage,
+  selectedConstant,
+  selectedError,
+  selectedEvent,
   isLoading = false,
   error = null,
 }, ref) => {
@@ -93,8 +105,14 @@ export const LeftPane = forwardRef<LeftPaneRef, LeftPaneProps>(({
               searchQuery={searchQuery}
               onCallSelect={onCallSelect}
               onStorageSelect={onStorageSelect}
+              onConstantSelect={onConstantSelect}
+              onErrorSelect={onErrorSelect}
+              onEventSelect={onEventSelect}
               selectedCall={selectedCall}
               selectedStorage={selectedStorage}
+              selectedConstant={selectedConstant}
+              selectedError={selectedError}
+              selectedEvent={selectedEvent}
             />
           )}
         </div>

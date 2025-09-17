@@ -11,6 +11,12 @@ importers:
       '@polkadot-api/descriptors':
         specifier: file:.papi/descriptors
         version: file:.papi/descriptors(polkadot-api@1.14.1(jiti@2.4.2)(postcss@8.5.6)(rxjs@7.8.2)(tsx@4.20.5))
+      '@polkadot-api/smoldot':
+        specifier: ^0.3.10
+        version: 0.3.10
+      '@polkadot-api/substrate-bindings':
+        specifier: ^0.14.0
+        version: 0.14.0
       '@polkadot/api':
         specifier: ^16.4.6
         version: 16.4.6
@@ -20,6 +26,9 @@ importers:
       '@polkadot/util-crypto':
         specifier: ^13.5.6
         version: 13.5.6(@polkadot/util@13.5.6)
+      smoldot:
+        specifier: ^2.0.36
+        version: 2.0.36
     devDependencies:
       '@workspace/eslint-config':
         specifier: workspace:*
@@ -57,6 +66,9 @@ importers:
       '@polkadot-api/smoldot':
         specifier: ^0.3.10
         version: 0.3.10
+      '@polkadot-api/substrate-bindings':
+        specifier: ^0.14.0
+        version: 0.14.0
       '@types/prismjs':
         specifier: ^1.26.5
         version: 1.26.5
@@ -93,6 +105,9 @@ importers:
       smoldot:
         specifier: ^2.0.36
         version: 2.0.36
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@types/node':
         specifier: ^20
