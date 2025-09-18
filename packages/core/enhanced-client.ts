@@ -68,7 +68,7 @@ async function createSmoldotProvider(
 
   if (!networkConfig.chainSpecPath) {
     throw new Error(
-      `Chain spec path not configured for ${networkConfig.chainName}`,
+      `Smoldot not available for ${networkConfig.chainName} - no chain specification found. Use RPC provider instead.`,
     );
   }
 
@@ -281,19 +281,23 @@ export function useEnhancedClient(
           errorMessage,
         );
 
-        // Try fallback provider for smoldot failures
+        // Try fallback provider for smoldot failures or chain spec issues
         const currentProvider = getProvider(chainKey, providerId);
         if (
           currentProvider?.type === "smoldot" &&
-          (errorMessage.includes("smoldot") || errorMessage.includes("timeout"))
+          (errorMessage.includes("smoldot") ||
+           errorMessage.includes("timeout") ||
+           errorMessage.includes("chain specification") ||
+           errorMessage.includes("chainSpecPath"))
         ) {
-          console.log(`🔄 Trying fallback RPC provider for ${chainKey}`);
+          console.log(`🔄 Smoldot failed for ${chainKey}, trying fallback RPC provider`);
           const networkConfig = getNetworkConfig(chainKey);
           const rpcProvider = networkConfig?.providers.find(
-            (p) => p.type === "rpc" && p.reliability === "high",
+            (p) => p.type === "rpc" && (p.isRecommended || p.reliability === "high"),
           );
 
           if (rpcProvider) {
+            console.log(`📡 Using ${rpcProvider.name} as fallback for ${chainKey}`);
             try {
               const fallback = await createEnhancedClient(
                 chainKey,
@@ -307,10 +311,11 @@ export function useEnhancedClient(
                   chainKey,
                   connectionTime: fallback.connectionTime,
                 });
+                console.log(`✅ Successfully connected to ${chainKey} via ${rpcProvider.name}`);
                 return;
               }
             } catch (fallbackError) {
-              // Fallback failed, will use error state
+              console.error(`❌ Fallback RPC also failed: ${fallbackError instanceof Error ? fallbackError.message : 'Unknown error'}`);
             }
           }
         }

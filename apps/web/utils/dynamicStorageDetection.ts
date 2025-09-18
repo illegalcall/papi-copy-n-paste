@@ -34,15 +34,20 @@ export class DynamicStorageDetector {
     const cacheKey = `${chainKey}:${pallet}:${storage}`;
     this.totalRequests++;
 
+
     // Check cache first
     if (this.cache.has(cacheKey)) {
       this.hitRate++;
-      return this.cache.get(cacheKey)!;
+      const result = this.cache.get(cacheKey)!;
+
+
+      return result;
     }
 
     // Try runtime detection first (most accurate)
     const runtimeResult = this.detectFromRuntime(chainKey, pallet, storage);
     if (runtimeResult) {
+
       this.cache.set(cacheKey, runtimeResult);
       return runtimeResult;
     }
@@ -50,6 +55,7 @@ export class DynamicStorageDetector {
     // Fallback to generated metadata
     const metadataResult = this.detectFromMetadata(chainKey, pallet, storage);
     if (metadataResult) {
+
       this.cache.set(cacheKey, metadataResult);
       return metadataResult;
     }
@@ -133,111 +139,111 @@ export class DynamicStorageDetector {
   private getKnownStorageFix(chainKey: string, pallet: string, storage: string): StorageParameterInfo | null {
     const key = `${chainKey}:${pallet}:${storage}`;
 
-    // Known storage entries that require parameters but our metadata shows empty
+    // Known storage entries with parameters - all parameters are optional for UI flexibility
     const knownFixes: Record<string, StorageParameterInfo> = {
-      // Staking pallet fixes - these are multi-key storage entries
+      // Staking pallet fixes - these are multi-key storage entries (parameters optional for flexible querying)
       'polkadot:Staking:ErasStakers': {
-        required: ['u32', 'AccountId'],
-        optional: [],
-        description: 'Exposure of validator at era - takes era number and validator account',
+        required: [], // Optional for UI - allows both getValue(era, account) and getEntries() patterns
+        optional: ['u32', 'AccountId'],
+        description: 'Exposure of validator at era - query with era+account for specific or without for all entries',
         returnType: 'Exposure'
       },
       'polkadot:Staking:ErasStakersClipped': {
-        required: ['u32', 'AccountId'],
-        optional: [],
-        description: 'Clipped exposure of validator at era - takes era number and validator account',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['u32', 'AccountId'],
+        description: 'Clipped exposure of validator at era - query with era+account for specific or without for all entries',
         returnType: 'Exposure'
       },
       'polkadot:Staking:ErasStakersOverview': {
-        required: ['u32', 'AccountId'],
-        optional: [],
-        description: 'Overview of validator exposure at era - takes era number and validator account',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['u32', 'AccountId'],
+        description: 'Overview of validator exposure at era - query with era+account for specific or without for all entries',
         returnType: 'PagedExposureMetadata'
       },
       'polkadot:Staking:ErasStakersPaged': {
-        required: ['u32', 'AccountId', 'u32'],
-        optional: [],
-        description: 'Paged exposure of validator at era - takes era number, validator account, and page',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['u32', 'AccountId', 'u32'],
+        description: 'Paged exposure of validator at era - query with era+account+page for specific or without for all entries',
         returnType: 'ExposurePage'
       },
       'polkadot:Staking:ErasValidatorReward': {
-        required: ['u32'],
-        optional: [],
-        description: 'Validator reward points for era - takes era number',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['u32'],
+        description: 'Validator reward points for era - query with era for specific or without for all entries',
         returnType: 'Balance'
       },
       'polkadot:Staking:ErasRewardPoints': {
-        required: ['u32'],
-        optional: [],
-        description: 'Reward points for era - takes era number',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['u32'],
+        description: 'Reward points for era - query with era for specific or without for all entries',
         returnType: 'EraRewardPoints'
       },
       'polkadot:Staking:ErasValidatorPrefs': {
-        required: ['u32', 'AccountId'],
-        optional: [],
-        description: 'Validator preferences for era - takes era number and validator account',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['u32', 'AccountId'],
+        description: 'Validator preferences for era - query with era+account for specific or without for all entries',
         returnType: 'ValidatorPrefs'
       },
 
       // Apply the same fixes to other chains that have Staking
       'kusama:Staking:ErasStakers': {
-        required: ['u32', 'AccountId'],
-        optional: [],
-        description: 'Exposure of validator at era - takes era number and validator account',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['u32', 'AccountId'],
+        description: 'Exposure of validator at era - query with era+account for specific or without for all entries',
         returnType: 'Exposure'
       },
       'kusama:Staking:ErasStakersClipped': {
-        required: ['u32', 'AccountId'],
-        optional: [],
-        description: 'Clipped exposure of validator at era - takes era number and validator account',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['u32', 'AccountId'],
+        description: 'Clipped exposure of validator at era - query with era+account for specific or without for all entries',
         returnType: 'Exposure'
       },
 
       // Democracy pallet - common multi-key storage entries
       'polkadot:Democracy:VotingOf': {
-        required: ['AccountId'],
-        optional: [],
-        description: 'Voting records for account - takes account ID',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['AccountId'],
+        description: 'Voting records for account - query with account ID for specific or without for all entries',
         returnType: 'Voting'
       },
       'polkadot:Democracy:ReferendumInfoOf': {
-        required: ['u32'],
-        optional: [],
-        description: 'Information about referendum - takes referendum index',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['u32'],
+        description: 'Information about referendum - query with referendum index for specific or without for all entries',
         returnType: 'Option<ReferendumInfo>'
       },
 
       // ConvictionVoting (modern democracy) - from OpenGov
       'polkadot:ConvictionVoting:VotingFor': {
-        required: ['AccountId', 'u16'],
-        optional: [],
-        description: 'Voting records for account and class - takes account ID and class',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['AccountId', 'u16'],
+        description: 'Voting records for account and class - query with account+class for specific or without for all entries',
         returnType: 'Voting'
       },
       'polkadot:ConvictionVoting:ClassLocksFor': {
-        required: ['AccountId'],
-        optional: [],
-        description: 'Class locks for account - takes account ID',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['AccountId'],
+        description: 'Class locks for account - query with account ID for specific or without for all entries',
         returnType: 'Vec<(u16, Balance)>'
       },
 
       // Balances pallet - common cases
       'polkadot:Balances:Account': {
-        required: ['AccountId'],
-        optional: [],
-        description: 'Account balance information - takes account ID',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['AccountId'],
+        description: 'Account balance information - query with account ID for specific or without for all entries',
         returnType: 'AccountData'
       },
       'polkadot:Balances:Locks': {
-        required: ['AccountId'],
-        optional: [],
-        description: 'Balance locks for account - takes account ID',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['AccountId'],
+        description: 'Balance locks for account - query with account ID for specific or without for all entries',
         returnType: 'Vec<BalanceLock>'
       },
       'polkadot:Balances:Reserves': {
-        required: ['AccountId'],
-        optional: [],
-        description: 'Reserved balances for account - takes account ID',
+        required: [], // Optional for UI - allows flexible querying
+        optional: ['AccountId'],
+        description: 'Reserved balances for account - query with account ID for specific or without for all entries',
         returnType: 'Vec<ReserveData>'
       }
     };

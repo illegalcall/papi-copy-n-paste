@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import { z } from 'zod';
 import type { StorageParams } from '../types/forms';
 
-// Validation schema for different parameter types
-const createParameterSchema = (paramTypes: string[]) => {
+// Validation schema for different parameter types (now supports optional parameters)
+const createParameterSchema = (paramTypes: string[], isOptional: boolean = false) => {
   const schemaFields: Record<string, z.ZodType<any>> = {};
 
   paramTypes.forEach((paramType) => {
@@ -12,104 +12,33 @@ const createParameterSchema = (paramTypes: string[]) => {
     switch (paramType) {
       case 'AccountId':
       case 'SS58String':
-        schemaFields[fieldKey] = z.string()
-          .min(1, `${paramType} is required`)
-          .refine(
-            (value) => {
-              // Allow test accounts like //Alice, //Bob
-              if (value.startsWith('//')) {
-                return true;
-              }
-              // Allow full SS58 addresses (typically start with 1, 5, etc and are 47+ chars)
-              if (value.length >= 47 && /^[1-9A-HJ-NP-Za-km-z]+$/.test(value)) {
-                return true;
-              }
-              return false;
-            },
-            {
-              message: `${paramType} must be a test account (//Alice) or valid SS58 address`
-            }
-          );
+        // Since validation is disabled (all params are optional), just use basic string validation
+        schemaFields[fieldKey] = z.string();
         break;
 
       case 'AssetId':
-        schemaFields[fieldKey] = z.string()
-          .min(1, `${paramType} is required`)
-          .refine(
-            (value) => {
-              const num = parseInt(value, 10);
-              return !isNaN(num) && num >= 0;
-            },
-            {
-              message: `${paramType} must be a valid positive number`
-            }
-          );
-        break;
-
       case 'BlockNumber':
       case 'number':
-        schemaFields[fieldKey] = z.string()
-          .min(1, `${paramType} is required`)
-          .refine(
-            (value) => {
-              const num = parseInt(value, 10);
-              return !isNaN(num) && num >= 0;
-            },
-            {
-              message: `${paramType} must be a valid positive number`
-            }
-          );
-        break;
-
       case 'ReferendumIndex':
       case 'ProposalIndex':
       case 'QueryId':
-        schemaFields[fieldKey] = z.string()
-          .min(1, `${paramType} is required`)
-          .refine(
-            (value) => {
-              const num = parseInt(value, 10);
-              return !isNaN(num) && num >= 0;
-            },
-            {
-              message: `${paramType} must be a valid index (0 or positive number)`
-            }
-          );
+        // Since validation is disabled (all params are optional), just use basic string validation
+        schemaFields[fieldKey] = z.string();
         break;
 
       case 'Hash':
-        schemaFields[fieldKey] = z.string()
-          .min(1, `${paramType} is required`)
-          .refine(
-            (value) => {
-              // Must start with 0x and be 66 characters total (32 bytes hex)
-              return /^0x[a-fA-F0-9]{64}$/.test(value);
-            },
-            {
-              message: `${paramType} must be a valid 32-byte hex string starting with 0x`
-            }
-          );
+        // Since validation is disabled (all params are optional), just use basic string validation
+        schemaFields[fieldKey] = z.string();
         break;
 
       case 'bytes':
-        schemaFields[fieldKey] = z.string()
-          .min(1, `${paramType} is required`)
-          .refine(
-            (value) => {
-              // Allow hex strings with or without 0x prefix
-              const hexPattern = /^(0x)?[a-fA-F0-9]+$/;
-              return hexPattern.test(value);
-            },
-            {
-              message: `${paramType} must be a valid hex string`
-            }
-          );
+        // Since validation is disabled (all params are optional), just use basic string validation
+        schemaFields[fieldKey] = z.string();
         break;
 
       default:
-        // Generic string validation for unknown types
-        schemaFields[fieldKey] = z.string()
-          .min(1, `${paramType} is required`);
+        // Since validation is disabled (all params are optional), just use basic string validation
+        schemaFields[fieldKey] = z.string();
         break;
     }
   });
@@ -117,39 +46,49 @@ const createParameterSchema = (paramTypes: string[]) => {
   return z.object(schemaFields);
 };
 
-export function useStorageValidation(requiredParams: string[] | null) {
+export function useStorageValidation(requiredParams: string[] | null, optionalParams: string[] | null = null) {
   const validationSchema = useMemo(() => {
-    if (!requiredParams || requiredParams.length === 0) {
+    const allParams = [...(requiredParams || []), ...(optionalParams || [])];
+
+
+    if (allParams.length === 0) {
       return null;
     }
-    return createParameterSchema(requiredParams);
-  }, [requiredParams]);
+
+    // Create schemas for required and optional parameters
+    const requiredSchema = requiredParams && requiredParams.length > 0
+      ? createParameterSchema(requiredParams, false)
+      : null;
+
+    const optionalSchema = optionalParams && optionalParams.length > 0
+      ? createParameterSchema(optionalParams, true)
+      : null;
+
+
+    // Merge schemas
+    if (requiredSchema && optionalSchema) {
+      return requiredSchema.merge(optionalSchema);
+    } else if (requiredSchema) {
+      return requiredSchema;
+    } else if (optionalSchema) {
+      return optionalSchema;
+    }
+
+    return null;
+  }, [requiredParams, optionalParams]);
 
   const validateParams = useMemo(() => {
     return (params: StorageParams) => {
-      if (!validationSchema) {
-        return { isValid: true, errors: {} };
-      }
-
-      const result = validationSchema.safeParse(params);
-
-      if (result.success) {
-        return { isValid: true, errors: {} };
-      }
-
-      const errors: Record<string, string> = {};
-      result.error.errors.forEach((error) => {
-        const path = error.path[0] as string;
-        errors[path] = error.message;
-      });
-
-      return { isValid: false, errors };
+      // ALL STORAGE PARAMETERS ARE OPTIONAL FOR UI FLEXIBILITY
+      // This enables both getValue(params) and getEntries() patterns
+      return { isValid: true, errors: {} };
     };
   }, [validationSchema]);
 
   return {
     validateParams,
     hasRequiredParams: requiredParams && requiredParams.length > 0,
-    requiredParams: requiredParams || []
+    requiredParams: requiredParams || [],
+    optionalParams: optionalParams || []
   };
 }

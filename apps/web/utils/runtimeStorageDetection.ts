@@ -64,11 +64,10 @@ export class RuntimeStorageDetector {
       // Cache the result
       this.cache.set(cacheKey, parameters);
 
-      console.log(`🎯 Runtime detection complete for ${pallet}.${storage}:`, parameters);
       return parameters;
 
     } catch (error) {
-      console.error(`💥 Failed to detect parameters for ${chainKey}.${pallet}.${storage}:`, error);
+      // Silent fallback for common cases like storage items not available on specific chains
 
       // Return empty parameters as fallback
       const fallback: StorageParameterInfo = {
@@ -108,11 +107,6 @@ export class RuntimeStorageDetector {
 
       // Check if metadata and pallets exist
       if (!metadata || !metadata.pallets || !Array.isArray(metadata.pallets)) {
-        console.warn(`Invalid metadata structure for ${pallet}.${storage}:`, {
-          hasMetadata: !!metadata,
-          hasPallets: !!(metadata && metadata.pallets),
-          palletsType: metadata && typeof metadata.pallets
-        });
         return null;
       }
 
@@ -127,7 +121,6 @@ export class RuntimeStorageDetector {
       return storageEntry || null;
 
     } catch (error) {
-      console.warn(`Error accessing metadata for ${pallet}.${storage}:`, error);
       return null;
     }
   }
@@ -157,13 +150,13 @@ export class RuntimeStorageDetector {
       if (type.tag === "map") {
         const hashers = type.value.hashers || [];
 
-        // Single parameter case - exact papi-console pattern
+        // Single parameter case - treat as optional for UI flexibility
         if (hashers.length === 1) {
           const keyType = this.getTypeInfo(type.value.key, descriptor);
           return {
-            required: [keyType],
-            optional: [],
-            description: docs?.join(' ') || 'Single-key storage item',
+            required: [], // All map parameters are optional for UI - allows both getValue(key) and getEntries()
+            optional: [keyType],
+            description: docs?.join(' ') || 'Single-key storage item - can query with key for specific entry or without for all entries',
             isPlain: false,
             isSingleKey: true,
             isMultiKey: false
@@ -198,9 +191,9 @@ export class RuntimeStorageDetector {
           });
 
           return {
-            required: parameterTypes,
-            optional: [],
-            description: docs?.join(' ') || 'Multi-key storage item',
+            required: [], // All map parameters are optional for UI - allows flexible querying
+            optional: parameterTypes,
+            description: docs?.join(' ') || 'Multi-key storage item - can query with partial/full keys for filtered entries or without for all entries',
             isPlain: false,
             isSingleKey: false,
             isMultiKey: true
@@ -260,7 +253,6 @@ export class RuntimeStorageDetector {
       return formattedType;
 
     } catch (error) {
-      console.warn(`❌ Failed to resolve type ${typeId}:`, error);
       return 'unknown';
     }
   }
