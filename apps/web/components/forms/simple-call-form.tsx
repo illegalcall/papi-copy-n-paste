@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { parseSimpleType, getDefaultValue, createFieldChangeHandler, initializeFormData, hasFormDataChanged } from "../../utils/formHelpers";
+import { parseSimpleType, getDefaultValue, createFieldChangeHandler, initializeFormData, hasValidFormData } from "../../utils/formHelpers";
 import { Input } from "@workspace/ui/components/input";
 import {
   Select,
@@ -37,9 +37,8 @@ export function SimpleCallForm({
   onValidChange,
 }: SimpleCallFormProps) {
   const [formData, setFormData] = useState<FormData>({});
-  const [initialValues, setInitialValues] = useState<FormData>({});
   const [showTypeInfo, setShowTypeInfo] = useState(true);
-  
+
   // Generate TypeScript type information
   const typeInfo = generateCallSignature(pallet, call.name, call.args);
 
@@ -47,19 +46,16 @@ export function SimpleCallForm({
   useEffect(() => {
     const initialData = initializeFormData(call.args);
     setFormData(initialData);
-    setInitialValues(initialData);
   }, [call]);
 
   // Notify parent of changes
   useEffect(() => {
     onFormChange(formData);
 
-    // Validation logic:
-    // - If call has no parameters, disable run button (no input = can't run)
-    // - If call has parameters, check if user has modified any values from defaults
-    const hasUserInput = hasFormDataChanged(formData, initialValues, call.args);
-    onValidChange(hasUserInput);
-  }, [formData, initialValues, call.args, onFormChange, onValidChange]);
+    // Validation logic: Check if form has valid values (default or user-entered)
+    const isValid = hasValidFormData(formData, call.args);
+    onValidChange(isValid);
+  }, [formData, call.args, onFormChange, onValidChange]);
 
   const handleFieldChange = createFieldChangeHandler(setFormData);
 

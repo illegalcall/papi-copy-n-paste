@@ -73,16 +73,32 @@ export function initializeFormData(args: Array<{ name: string; type: string }>):
 }
 
 /**
- * Check if form data has changed from initial values
+ * Check if form has valid values (regardless of whether they're default or user-changed)
  */
-export function hasFormDataChanged(
+export function hasValidFormData(
   currentData: FormData,
-  initialData: FormData,
-  args: Array<{ name: string }>
+  args: Array<{ name: string; type: string }>
 ): boolean {
-  return args.length > 0 && args.some((arg) => {
-    const currentValue = currentData[arg.name];
-    const initialValue = initialData[arg.name];
-    return currentValue !== initialValue;
+  // If no parameters, form is valid
+  if (args.length === 0) return true;
+
+  // Check that all required parameters have valid values
+  return args.every((arg) => {
+    const value = currentData[arg.name];
+    const fieldType = parseSimpleType(arg.type);
+
+    // Check if value is valid based on field type
+    switch (fieldType) {
+      case "bool":
+        return typeof value === "boolean";
+      case "number":
+        return typeof value === "number" && value >= 0;
+      case "account":
+        return typeof value === "string" && value.length > 0;
+      case "string":
+        return typeof value === "string" && value.length > 0;
+      default:
+        return value != null && value !== "";
+    }
   });
 }
