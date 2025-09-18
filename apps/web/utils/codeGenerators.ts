@@ -21,6 +21,7 @@ export function generateStorageQueryByType(
   storageName: string,
   paramString: string,
   hasParams: boolean,
+  isSimpleValue: boolean = false,
 ): string {
   const baseQuery = `typedApi.query.${pallet}.${storageName}`;
   const params = hasParams ? `(${paramString})` : "()";
@@ -49,7 +50,13 @@ import { combineLatest, throttleTime, debounceTime, map, filter, takeUntil, dist
 
   switch (queryType) {
     case "getValue":
-      if (hasParams) {
+      if (isSimpleValue) {
+        return `${rxjsImports}
+
+// Simple storage value
+const result = await ${baseQuery}.getValue()
+console.log('Storage value:', result)`;
+      } else if (hasParams) {
         return `${rxjsImports}
 
 // Get specific entry with provided parameters
@@ -58,12 +65,12 @@ console.log('Specific entry:', result)`;
       } else {
         return `${rxjsImports}
 
-// No parameters provided - getting all entries instead
+// No parameters provided - getting all entries
 const entries = await ${baseQuery}.getEntries()
 console.log('All entries:', entries)
 
 // To get a specific entry, provide parameters:
-// const result = await ${baseQuery}.getValue(accountId) // Replace with actual parameters
+// const result = await ${baseQuery}.getValue(accountId)
 `;
       }
 
@@ -527,6 +534,9 @@ queryStorage().then(result => {
     ? generateStorageParams(storageParams, allPossibleParams)
     : "";
 
+  // Determine if this is a simple storage value (no parameters required)
+  const isSimpleValue = allPossibleParams.length === 0;
+
   // Generate the actual query code based on type
   const queryCode = generateStorageQueryByType(
     queryType,
@@ -534,6 +544,7 @@ queryStorage().then(result => {
     storage.name,
     paramString,
     hasParams,
+    isSimpleValue,
   );
 
   return `import { createClient } from "polkadot-api"
@@ -1127,6 +1138,9 @@ export function generateMultiStorageCode(
           ? generateStorageParams(storage.storageParams, requiresKeys)
           : "";
 
+      // Determine if this is a simple storage value (no parameters required)
+      const isSimpleValue = (!requiresKeys || requiresKeys.length === 0);
+
       // Generate the actual query code based on type
       const queryCode = generateStorageQueryByType(
         storage.queryType,
@@ -1134,6 +1148,7 @@ export function generateMultiStorageCode(
         storage.storage.name,
         paramString,
         hasParams,
+        isSimpleValue,
       );
 
       return `

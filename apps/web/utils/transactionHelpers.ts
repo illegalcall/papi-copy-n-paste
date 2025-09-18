@@ -501,25 +501,31 @@ async function executeRawGetValue(
             ? generateStorageParamValues(storageParams, allParams)
             : [];
 
+          // Determine query strategy: simple values vs storage maps
+          const isSimpleValue = allParams.length === 0;
+          const hasUserParams = paramValues.length > 0;
 
           if (typeof storageFunction === 'function') {
-            result = paramValues.length > 0
+            result = hasUserParams
               ? await storageFunction(...paramValues)
               : await storageFunction();
-          } else if (storageFunction && typeof storageFunction.getValue === 'function') {
-            result = paramValues.length > 0
-              ? await storageFunction.getValue(...paramValues)
-              : await storageFunction.getEntries();
-          } else if (storageFunction && typeof storageFunction.query === 'function') {
-            result = paramValues.length > 0
-              ? await storageFunction.query(...paramValues)
-              : await storageFunction.getEntries();
+          } else if (storageFunction && (storageFunction.getValue || storageFunction.query)) {
+            const queryMethod = storageFunction.getValue || storageFunction.query;
+
+            if (isSimpleValue) {
+              result = await queryMethod();
+            } else {
+              result = hasUserParams
+                ? await queryMethod(...paramValues)
+                : await storageFunction.getEntries();
+            }
           } else {
             throw new Error(`Storage item ${palletName}.${storageName} is not callable: ${typeof storageFunction}`);
           }
 
-          // Handle result display
-          const methodUsed = paramValues.length > 0 ? 'getValue' : 'getEntries';
+          const methodUsed = isSimpleValue
+            ? 'getValue'
+            : (hasUserParams ? 'getValue' : 'getEntries');
           logger.querySuccess(palletName, storageName, methodUsed, result);
 
         } else {
