@@ -516,49 +516,47 @@ queryStorage().then(result => {
 
     const connectionInfo = getChainConnection(chainKey, providerId);
 
-  // Get parameter information from our new flexible system
-  const paramInfo = getAllStorageParameters(pallet, storage.name, chainKey);
-  const allPossibleParams = [...paramInfo.required, ...paramInfo.optional];
+    // Get parameter information from our new flexible system
+    const paramInfo = getAllStorageParameters(pallet, storage.name, chainKey);
+    const allPossibleParams = [...paramInfo.required, ...paramInfo.optional];
 
-  // Check if user provided any parameters
-  const userProvidedParams = Object.keys(storageParams).filter(key =>
-    storageParams[key] && String(storageParams[key]).trim() !== ""
-  );
+    // Check if user provided any parameters
+    const userProvidedParams = Object.keys(storageParams).filter(key =>
+      storageParams[key] && String(storageParams[key]).trim() !== ""
+    );
 
-  const hasParams = Boolean(
-    allPossibleParams.length > 0 && userProvidedParams.length > 0
-  );
+    const hasParams = Boolean(
+      allPossibleParams.length > 0 && userProvidedParams.length > 0
+    );
 
-  // Generate parameter string for the query (only if user provided parameters)
-  const paramString = hasParams && allPossibleParams.length > 0
-    ? generateStorageParams(storageParams, allPossibleParams)
-    : "";
+    // Generate parameter string for the query (only if user provided parameters)
+    const paramString = hasParams && allPossibleParams.length > 0
+      ? generateStorageParams(storageParams, allPossibleParams)
+      : "";
 
-  // Determine if this is a simple storage value (no parameters required)
-  const isSimpleValue = allPossibleParams.length === 0;
+    // Simple, clean code generation - just the essential query
+    let queryCode;
+    if (hasParams) {
+      queryCode = `const result = await typedApi.query.${pallet}.${storage.name}.getValue(${paramString})
+console.log('${pallet}.${storage.name}:', result)`;
+    } else if (allPossibleParams.length === 0) {
+      // Simple storage item with no parameters
+      queryCode = `const result = await typedApi.query.${pallet}.${storage.name}.getValue()
+console.log('${pallet}.${storage.name}:', result)`;
+    } else {
+      // Storage map without parameters - show all entries
+      queryCode = `const entries = await typedApi.query.${pallet}.${storage.name}.getEntries()
+console.log('All entries:', entries)`;
+    }
 
-  // Generate the actual query code based on type
-  const queryCode = generateStorageQueryByType(
-    queryType,
-    pallet,
-    storage.name,
-    paramString,
-    hasParams,
-    isSimpleValue,
-  );
-
-  return `import { createClient } from "polkadot-api"
+    return `import { createClient } from "polkadot-api"
 ${descriptorImport}
 ${connectionInfo.imports}
 
-async function query${pallet}${storage.name}() {
 ${connectionInfo.connection}
-  const typedApi = client.getTypedApi(${descriptorName})
+const typedApi = client.getTypedApi(${descriptorName})
 
-  ${queryCode}${connectionInfo.cleanup || ''}
-}
-
-query${pallet}${storage.name}().catch(console.error)`;
+${queryCode}`;
   } catch (error) {
     return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
 // 💡 This chain may not be supported for typed API queries`;
@@ -635,32 +633,11 @@ function generateInlineCode(
     return `import { createClient } from "polkadot-api"
 ${connectionInfo.imports}
 
-async function executeTransaction() {
 ${connectionInfo.connection}
 
-  try {
-    // Note: Custom RPC - using raw API calls
-    // For transactions on custom chains, you may need to:
-    // 1. Generate proper descriptors with 'papi add <chain>'
-    // 2. Or use raw RPC calls like client.getApi()._request()
-
-    console.log('Connected to custom RPC')
-    console.log('Available pallets and calls depend on the chain')
-
-    // Example raw transaction (uncomment and modify as needed):
-    // const tx = await client.getApi()._request("author_submitExtrinsic", ["0x..."])
-
-    return { success: true, message: 'Connected to custom RPC successfully' }
-  } catch (error) {${connectionInfo.cleanup || ''}
-    console.error('Transaction failed:', error)
-    return { success: false, error: error.message }
-  }
-}
-
-// Execute the transaction
-executeTransaction().then(result => {
-  console.log('Transaction result:', result)
-})`;
+// Note: Custom RPC - may need proper descriptors
+// Use 'papi add <chain>' to generate descriptors
+console.log('Connected to custom RPC')`;
   }
 
   const args = call.args
@@ -696,7 +673,9 @@ executeTransaction().then(result => {
       ) {
         const numValue =
           typeof value === "string" ? value : String(value || "0");
-        return `  ${arg.name}: ${numValue}n`;
+        // Ensure we have a valid number before adding 'n'
+        const cleanValue = numValue.trim() || "0";
+        return `  ${arg.name}: ${cleanValue}n`;
       }
 
       return `  ${arg.name}: ${JSON.stringify(value)}`;
@@ -715,25 +694,20 @@ executeTransaction().then(result => {
 
     const connectionInfo = getChainConnection(chainKey, providerId);
 
-  return `import { createClient } from "polkadot-api"
+    return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
 ${descriptorImport}
 ${connectionInfo.imports}
 
-async function execute${pallet}${call.name}() {
 ${connectionInfo.connection}
-  const typedApi = client.getTypedApi(${descriptorName})
+const typedApi = client.getTypedApi(${descriptorName})
 
-  const call = typedApi.tx.${pallet}.${call.name}({
+const call = typedApi.tx.${pallet}.${call.name}({
 ${args}
-  })
+})
 
-  // You'll need a proper signer here
-  const hash = await call.signAndSubmit(signer)
-  console.log('Transaction hash:', hash)${connectionInfo.cleanup || ''}
-}
-
-execute${pallet}${call.name}().catch(console.error)`;
+console.log('Transaction call created:', call)
+// To actually submit: await call.signAndSubmit(signer)${connectionInfo.cleanup || ''}`;
   } catch (error) {
     return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
 // 💡 This chain may not be supported for typed API queries`;

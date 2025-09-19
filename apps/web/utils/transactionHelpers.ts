@@ -488,7 +488,7 @@ async function executeRawGetValue(
     // Now attempt the proper PAPI integration
     try {
       // Get the correct descriptor based on chain
-      const descriptors = (window as any).papiDescriptors || {};
+      const descriptors = typeof window !== 'undefined' ? (window as any).papiDescriptors || {} : {};
       const descriptorName = getDescriptorName(chainKey);
 
       // Check if descriptor is available for this chain

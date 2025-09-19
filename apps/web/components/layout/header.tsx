@@ -5,6 +5,7 @@ import { Moon, Sun, Github, BookOpen } from "lucide-react";
 import { useTheme } from "next-themes";
 import { NetworkSelector } from "../network/network-selector";
 import { ProviderSelector } from "../network/provider-selector";
+import { WalletConnector } from "../wallet/wallet-connector";
 import {
   networkConfigs,
   getDefaultProvider,
@@ -70,6 +71,11 @@ export function Header({
             />
           </div>
         </div>
+
+        <div className="h-4 border-l border-border"></div>
+
+        {/* Wallet Connector */}
+        <WalletConnector />
 
         <div className="h-4 border-l border-border"></div>
 
