@@ -140,22 +140,71 @@ export function SimpleCallForm({
         )}
 
         {fieldType === "account" && (
-          <div className="space-y-1">
-            <Select
-              value={value}
-              onValueChange={(val) => handleFieldChange(arg.name, val)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select test account" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="//Alice">Alice (5GrwvaEF...)</SelectItem>
-                <SelectItem value="//Bob">Bob (5FHneW46...)</SelectItem>
-                <SelectItem value="//Charlie">Charlie (5FLSigC9...)</SelectItem>
-                <SelectItem value="//Dave">Dave (5DAAnrj7...)</SelectItem>
-                <SelectItem value="//Eve">Eve (5HGjWAeF...)</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-2">
+            <div className="relative">
+              <Input
+                value={value}
+                onChange={(e) => handleFieldChange(arg.name, e.target.value)}
+                placeholder="Enter account address (e.g., 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY)"
+                className={`font-mono text-sm pr-8 ${
+                  value && !value.startsWith('//') && value.length > 0
+                    ? (value.length >= 47 && value.length <= 48 && value.match(/^[1-9A-HJ-NP-Za-km-z]+$/))
+                      ? 'border-green-500 focus:border-green-500'
+                      : 'border-red-500 focus:border-red-500'
+                    : ''
+                }`}
+              />
+              {value && !value.startsWith('//') && value.length > 0 && (
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                  {(value.length >= 47 && value.length <= 48 && value.match(/^[1-9A-HJ-NP-Za-km-z]+$/)) ? (
+                    <span className="text-green-500 text-xs">✓</span>
+                  ) : (
+                    <span className="text-red-500 text-xs">✗</span>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-1">
+              <span className="text-xs text-muted-foreground">Quick select:</span>
+              <button
+                type="button"
+                onClick={() => handleFieldChange(arg.name, "//Alice")}
+                className="text-xs px-2 py-1 bg-muted hover:bg-muted/80 rounded transition-colors"
+              >
+                Alice
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFieldChange(arg.name, "//Bob")}
+                className="text-xs px-2 py-1 bg-muted hover:bg-muted/80 rounded transition-colors"
+              >
+                Bob
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFieldChange(arg.name, "//Charlie")}
+                className="text-xs px-2 py-1 bg-muted hover:bg-muted/80 rounded transition-colors"
+              >
+                Charlie
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFieldChange(arg.name, "//Dave")}
+                className="text-xs px-2 py-1 bg-muted hover:bg-muted/80 rounded transition-colors"
+              >
+                Dave
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFieldChange(arg.name, "//Eve")}
+                className="text-xs px-2 py-1 bg-muted hover:bg-muted/80 rounded transition-colors"
+              >
+                Eve
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              💡 Enter any valid Substrate address or use quick select for test accounts
+            </p>
           </div>
         )}
 

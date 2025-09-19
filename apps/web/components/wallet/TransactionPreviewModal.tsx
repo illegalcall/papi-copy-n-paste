@@ -29,6 +29,7 @@ interface TransactionPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => Promise<void>;
+  onTabSwitch?: (tab: string) => void;
   transactions: TransactionInfo[];
   isTestnet?: boolean;
   chainName: string;
@@ -46,6 +47,7 @@ export function TransactionPreviewModal({
   isOpen,
   onClose,
   onConfirm,
+  onTabSwitch,
   transactions,
   isTestnet = false,
   chainName,
@@ -227,6 +229,12 @@ export function TransactionPreviewModal({
     if (!userConfirmed) return;
 
     setIsExecuting(true);
+
+    // Switch to console tab immediately when transaction starts
+    if (onTabSwitch) {
+      onTabSwitch("console");
+    }
+
     try {
       await onConfirm();
       onClose();

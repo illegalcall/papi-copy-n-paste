@@ -10,7 +10,7 @@ export type ConsoleItem = string | QueryResult | ArrayResult;
 export function useExecution() {
   const [isRunning, setIsRunning] = useState(false);
   const [consoleOutput, setConsoleOutput] = useState<ConsoleItem[]>([]);
-  const [activeTab, setActiveTab] = useState<"setup" | "code" | "console" | "transactions">(
+  const [activeTab, setActiveTab] = useState<"setup" | "code" | "console">(
     "setup",
   );
   const [hasRunCode, setHasRunCode] = useState(false);
