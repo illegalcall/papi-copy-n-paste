@@ -39,6 +39,7 @@ export function useCodeGeneration(
       }
 
       try {
+        console.log('🚀 Code generation path - isWalletConnected:', isWalletConnected);
         const generatedCode = isWalletConnected
           ? generateWalletIntegratedCode(
               selectedChain,

@@ -170,11 +170,38 @@ export class MetadataAnalyzer {
   }
 
   /**
+   * Create fallback parameter info when metadata extraction fails
+   */
+  private createFallbackParameterInfo(fieldName: string): ParameterInfo {
+    return {
+      name: fieldName,
+      type: 'unknown',
+      codec: null,
+      isOptional: false,
+      isComplex: false,
+      description: `Parameter ${fieldName} (metadata extraction failed)`,
+      defaultValue: ''
+    }
+  }
+
+  /**
    * Extract detailed parameter information
    */
   private extractParameterInfo(fieldName: string, fieldData: any): ParameterInfo {
+    // Add null checks to prevent undefined destructuring errors
+    if (!fieldData || fieldData.id === undefined) {
+      console.warn(`⚠️ Invalid field data for ${fieldName}:`, fieldData)
+      return this.createFallbackParameterInfo(fieldName)
+    }
+
     const typeId = fieldData.id
-    const typeInfo = this.lookup(typeId)
+    let typeInfo
+    try {
+      typeInfo = this.lookup(typeId)
+    } catch (error) {
+      console.warn(`⚠️ Failed to lookup type ${typeId} for ${fieldName}:`, error)
+      return this.createFallbackParameterInfo(fieldName)
+    }
 
     // Build codec for this parameter
     let codec = null
@@ -184,20 +211,18 @@ export class MetadataAnalyzer {
       console.warn(`Failed to build codec for ${fieldName}:`, error)
     }
 
-    // Get type description
-    const type = this.getTypeDescription(typeId, typeInfo)
-
-    // Check if optional
-    const isOptional = this.isOptionalType(typeInfo)
-
-    // Check if complex
-    const isComplex = this.isComplexType(typeInfo)
-
-    // Get enum variants if applicable
-    const enumVariants = this.extractEnumVariants(typeInfo)
-
-    // Get default value
-    const defaultValue = this.getDefaultValue(typeInfo)
+    // Get type description with error handling
+    let type, isOptional, isComplex, enumVariants, defaultValue
+    try {
+      type = this.getTypeDescription(typeId, typeInfo)
+      isOptional = this.isOptionalType(typeInfo)
+      isComplex = this.isComplexType(typeInfo)
+      enumVariants = this.extractEnumVariants(typeInfo)
+      defaultValue = this.getDefaultValue(typeInfo)
+    } catch (error) {
+      console.warn(`⚠️ Error processing type info for ${fieldName}:`, error)
+      return this.createFallbackParameterInfo(fieldName)
+    }
 
     return {
       name: fieldName,

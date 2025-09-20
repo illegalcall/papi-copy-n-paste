@@ -19,6 +19,7 @@ import { OptionalParameterField } from "./OptionalParameterField";
 import { getCallParameterInfo } from "@/utils/callParameterDetection";
 import type { CallParameterInfo } from "@/utils/callParameterDetection";
 import type { ParameterInfo } from "@/utils/metadataAnalyzer";
+import type { PalletCall } from "@workspace/core";
 import type { FormData, FormChangeHandler, ValidChangeHandler } from "../../types/forms";
 
 interface EnhancedCallFormProps {
@@ -27,6 +28,7 @@ interface EnhancedCallFormProps {
   onFormChange: FormChangeHandler;
   onValidChange: ValidChangeHandler;
   chainKey: string;
+  selectedCall?: { pallet: string; call: PalletCall } | null;
 }
 
 export function EnhancedCallForm({
@@ -35,6 +37,7 @@ export function EnhancedCallForm({
   onFormChange,
   onValidChange,
   chainKey,
+  selectedCall,
 }: EnhancedCallFormProps) {
   const [formData, setFormData] = useState<FormData>({});
   const [parameterInfo, setParameterInfo] = useState<CallParameterInfo | null>(null);
@@ -66,7 +69,23 @@ export function EnhancedCallForm({
         }
       } catch (err) {
         if (!isCancelled) {
-          setError(err instanceof Error ? err.message : "Failed to load parameter information");
+          console.warn(`⚠️ Metadata analysis failed for ${pallet}.${callName}, using fallback`, err);
+
+          // Fallback: Use call.args directly to preserve parameter names
+          if (selectedCall?.call?.args) {
+            const fallbackInfo = createFallbackParameterInfo(selectedCall.call.args);
+            setParameterInfo(fallbackInfo);
+
+            // Initialize form data with fallback parameter names
+            const initialData: FormData = {};
+            fallbackInfo.required.forEach(param => {
+              initialData[param.name] = param.defaultValue || "";
+            });
+
+            setFormData(initialData);
+          } else {
+            setError(err instanceof Error ? err.message : "Failed to load parameter information");
+          }
         }
       } finally {
         if (!isCancelled) {
@@ -84,6 +103,8 @@ export function EnhancedCallForm({
 
   // Notify parent of form changes
   useEffect(() => {
+    console.log('🔍 [FORM] Sending form data:', formData);
+    console.log('🔍 [FORM] Parameter info:', parameterInfo?.required?.map(p => p.name) || []);
     onFormChange(formData);
 
     // Validate form data
@@ -405,4 +426,40 @@ function validateFormData(formData: FormData, parameterInfo: CallParameterInfo |
   }
 
   return true;
+}
+
+/**
+ * Create fallback parameter info from call.args when metadata analysis fails
+ */
+function createFallbackParameterInfo(callArgs: PalletCall["args"]): CallParameterInfo {
+  const required: ParameterInfo[] = callArgs.map(arg => ({
+    name: arg.name,
+    type: arg.type || 'unknown',
+    codec: null,
+    isOptional: false,
+    isComplex: false,
+    description: `Parameter ${arg.name} (fallback)`,
+    defaultValue: getDefaultValueForType(arg.type)
+  }));
+
+  return {
+    required,
+    optional: [],
+    all: required,
+    description: 'Fallback parameter info (metadata analysis failed)',
+    complexity: 'simple'
+  };
+}
+
+/**
+ * Get default value based on parameter type
+ */
+function getDefaultValueForType(type: string): string {
+  if (type.includes('u') || type.includes('i') || type.includes('Balance') || type.includes('Compact')) {
+    return '0';
+  }
+  if (type.includes('bool')) {
+    return 'false';
+  }
+  return '';
 }
