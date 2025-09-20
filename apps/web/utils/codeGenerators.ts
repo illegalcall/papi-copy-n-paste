@@ -15,9 +15,6 @@ import {
   getAllStorageParameters,
 } from "./storageHelpers";
 import {
-  detectCallParameters,
-  generateCallParams,
-  getAllCallParameters,
   getCallDescription,
 } from "./callHelpers";
 
@@ -646,9 +643,10 @@ ${connectionInfo.connection}
 console.log('Connected to custom RPC')`;
   }
 
-  // Get call parameter information using the new detection system
-  const paramInfo = getAllCallParameters(pallet, call.name, chainKey);
-  const description = getCallDescription(pallet, call.name, chainKey);
+  // Use basic parameter info from call.args for now
+  const paramInfo = { required: call.args.map(arg => arg.name), optional: [] };
+  // Use sync description for now - async descriptions will be handled later
+  const description = `Call ${pallet}.${call.name}`;
 
   const args = call.args
     .map((arg) => {
@@ -744,12 +742,11 @@ function generateFunctionCode(
   let description = `Call ${pallet}.${call.name}`;
   let paramInfo: { required: string[]; optional: string[] } = { required: [], optional: [] };
 
-  try {
-    description = getCallDescription(pallet, call.name, chainKey);
-    paramInfo = getAllCallParameters(pallet, call.name, chainKey);
-  } catch (error) {
-    // Use default values if metadata not available
-  }
+  // Use sync description for now - async descriptions will be handled later
+  description = `Call ${pallet}.${call.name}`;
+
+  // Use basic parameter info from call.args for now
+  paramInfo = { required: call.args.map(arg => arg.name), optional: [] };
 
   const args = call.args
     .map((arg) => {
@@ -918,12 +915,11 @@ export function generateMultiMethodCode(
       let description = `Call ${method.pallet}.${method.call.name}`;
       let paramInfo: { required: string[]; optional: string[] } = { required: [], optional: [] };
 
-      try {
-        description = getCallDescription(method.pallet, method.call.name, chainKey);
-        paramInfo = getAllCallParameters(method.pallet, method.call.name, chainKey);
-      } catch (error) {
-        // Use default values if metadata not available
-      }
+      // Use sync description for now - async descriptions will be handled later
+      description = `Call ${method.pallet}.${method.call.name}`;
+
+      // Use basic parameter info from call.args for now
+      paramInfo = { required: method.call.args.map(arg => arg.name), optional: [] };
 
       const metadataComment = description !== `Call ${method.pallet}.${method.call.name}`
         ? `\n  // ${description}`

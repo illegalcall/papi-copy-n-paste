@@ -15,11 +15,12 @@ import {
   decodeStorageResult,
 } from "./storageHelpers";
 import {
-  getAllCallParameters,
   generateCallParamValues,
   formatTransactionResult,
   getCallDescription,
 } from "./callHelpers";
+import { getAllCallParameters } from "./callParameterDetection";
+import type { ParameterInfo } from "./metadataAnalyzer";
 import { createCleanLogger, QueryResult } from "./cleanLogger";
 import { getDescriptorForChain } from "@workspace/core/descriptors";
 
@@ -58,11 +59,10 @@ function getStorageParameters(chainKey: string, pallet: string, storageName: str
 }
 
 // Helper function to get call parameters using the new dynamic detection system
-function getCallParameters(chainKey: string, pallet: string, callName: string): { required: string[], optional: string[] } {
+async function getCallParameters(chainKey: string, pallet: string, callName: string): Promise<{ required: ParameterInfo[], optional: ParameterInfo[] }> {
   try {
-    // Use the new getAllCallParameters function which returns both required and optional
-    const paramInfo = getAllCallParameters(pallet, callName, chainKey);
-
+    // Use the new getAllCallParameters from callParameterDetection
+    const paramInfo = await getAllCallParameters(pallet, callName, chainKey);
     return paramInfo;
   } catch (error) {
     // Fallback that returns empty arrays
@@ -83,8 +83,9 @@ export async function executeRealTransaction(
 
   try {
     // Get call parameter information using the new detection system
-    const paramInfo = getCallParameters(chainKey, pallet, call.name);
-    const description = getCallDescription(pallet, call.name, chainKey);
+    const paramInfo = await getCallParameters(chainKey, pallet, call.name);
+    // Use sync description for now - async descriptions will be handled later
+    const description = `Call ${pallet}.${call.name}`;
 
     setConsoleOutput((prev) => [
       ...prev,
@@ -169,8 +170,9 @@ export async function executeMultipleTransactions(
 
     try {
       // Get call parameter information using the new detection system
-      const paramInfo = getCallParameters(chainKey, method.pallet, method.call.name);
-      const description = getCallDescription(method.pallet, method.call.name, chainKey);
+      const paramInfo = await getCallParameters(chainKey, method.pallet, method.call.name);
+      // Use sync description for now - async descriptions will be handled later
+      const description = `Call ${method.pallet}.${method.call.name}`;
 
       // Log call information
       if (description !== `Call ${method.pallet}.${method.call.name}`) {

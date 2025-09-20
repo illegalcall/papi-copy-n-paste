@@ -38,6 +38,13 @@ export interface RuntimeCall {
 
 // Import comprehensive metadata for enhanced parsing
 import { papiMetadata } from "./generated/papi-metadata";
+import {
+  callMetadata,
+  getSupportedPallets,
+  getSupportedCalls,
+  getCallParameters,
+  getCallDescription
+} from "./generated/call-metadata";
 
 
 /**
@@ -345,9 +352,7 @@ function mergeGeneratedCallsWithLiveMetadata(
   console.log(`🔄 Merging live metadata with generated calls for ${chainKey}`);
 
   try {
-    // Import our generated call metadata
-    const { callMetadata, getSupportedPallets, getSupportedCalls, getCallParameters, getCallDescription } = require('./generated/call-metadata');
-
+    // Use the imported generated call metadata
     if (!callMetadata[chainKey]) {
       console.warn(`⚠️ No generated call metadata found for ${chainKey}, keeping original calls`);
       return liveMetadata;
@@ -430,9 +435,7 @@ function mergeGeneratedCallsWithLiveMetadata(
  */
 function createMetadataFromGeneratedCalls(chainKey: string): ChainMetadata | null {
   try {
-    // Import our generated call metadata
-    const { callMetadata, getSupportedPallets, getSupportedCalls, getCallParameters, getCallDescription } = require('./generated/call-metadata');
-
+    // Use the imported generated call metadata
     if (!callMetadata[chainKey]) {
       console.log(`❌ No generated call metadata found for chain: ${chainKey}`);
       return null;
@@ -3185,8 +3188,7 @@ function parseMetadata(metadata: any, chainKey: string): ChainMetadata {
           // Try to get enhanced call metadata for better descriptions
           let enhancedDocs = call.docs || [];
           try {
-            // Import call metadata detection
-            const { getCallDescription } = require('./generated/call-metadata');
+            // Use imported call metadata function
             const enhancedDescription = getCallDescription(chainKey, pallet.name, call.name);
 
             // If we have a better description than the default format, add it

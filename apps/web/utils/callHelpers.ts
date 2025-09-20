@@ -1,80 +1,75 @@
 /**
  * Call/Transaction helper functions for parameter detection and formatting
  *
- * Using Dynamic Call Parameter Detection Engine
+ * Updated to use new POC-based metadata approach
  */
 
-import { getCallParameterInfo } from './dynamicCallDetection';
+import { getCallParameterInfo, getAllCallParameters as getParametersFromDetection, isCallValid as isCallValidNew, type CallParameterInfo } from './callParameterDetection'
+import type { ParameterInfo } from './metadataAnalyzer'
 
-export function detectCallParameters(
+export async function detectCallParameters(
   palletName: string,
   callName: string,
   chainKey: string = 'polkadot'
-): string[] {
-  // Use the dynamic detector to get call parameters
-  const info = getCallParameterInfo(chainKey, palletName, callName);
-  // Return required parameters
-  return info.required;
+): Promise<string[]> {
+  try {
+    // Use the new detector to get call parameters
+    const info = await getCallParameterInfo(chainKey, palletName, callName);
+    // Return required parameter names for backward compatibility
+    return info.required.map(p => p.name);
+  } catch (error) {
+    console.error(`Failed to detect parameters for ${chainKey}.${palletName}.${callName}:`, error);
+    throw error; // Re-throw to ensure caller knows about the failure
+  }
 }
 
 // Get all parameters (required + optional) for UI display
-export function getAllCallParameters(
+export async function getAllCallParameters(
   palletName: string,
   callName: string,
   chainKey: string = 'polkadot'
-): { required: string[]; optional: string[] } {
-  const info = getCallParameterInfo(chainKey, palletName, callName);
-
-  return {
-    required: info.required,
-    optional: info.optional
-  };
+): Promise<{ required: ParameterInfo[]; optional: ParameterInfo[] }> {
+  try {
+    const paramInfo = await getParametersFromDetection(chainKey, palletName, callName);
+    return paramInfo;
+  } catch (error) {
+    console.error(`Failed to get all parameters for ${chainKey}.${palletName}.${callName}:`, error);
+    throw error;
+  }
 }
 
-export function isCallValid(
+
+export async function isCallValid(
   selectedCall: { pallet: string; call: any } | undefined,
   callParams: Record<string, any>,
   chainKey: string = 'polkadot'
-): boolean {
+): Promise<boolean> {
   if (!selectedCall) return false;
 
-  // Get required parameters for this call
-  const info = getCallParameterInfo(chainKey, selectedCall.pallet, selectedCall.call.name);
-  const requiredParams = info.required;
-
-  // Check if all required parameters are provided
-  for (const paramType of requiredParams) {
-    const value = callParams[paramType.toLowerCase()] ||
-                   callParams[paramType] ||
-                   callParams["accountid"] ||
-                   callParams["balance"] ||
-                   callParams["param"];
-
-    if (!value || value === '') {
-      return false;
-    }
+  try {
+    return await isCallValidNew(chainKey, selectedCall.pallet, selectedCall.call.name, callParams);
+  } catch (error) {
+    console.error(`Failed to validate call ${chainKey}.${selectedCall.pallet}.${selectedCall.call.name}:`, error);
+    return false;
   }
-
-  return true;
 }
 
 export function generateCallParams(
   callParams: Record<string, any>,
-  requiredParams: string[],
+  requiredParams: ParameterInfo[],
 ): string {
-  const params = requiredParams.map((paramType) => {
+  const params = requiredParams.map((param) => {
+    const paramType = param.type;
+    const paramName = param.name;
     const value =
+      callParams[paramName] ||
+      callParams[paramName.toLowerCase()] ||
       callParams[paramType.toLowerCase()] ||
-      callParams[paramType] ||
-      callParams["accountid"] ||
-      callParams["balance"] ||
-      callParams["assetid"] ||
-      callParams["hash"] ||
-      callParams["param"] ||
       "";
 
-    // Handle different parameter types
-    if (paramType === "AccountId" || paramType === "SS58String") {
+    // Handle different parameter types based on the new metadata type format
+    if (paramType.includes("AccountId") || paramType === "SS58String" ||
+        (paramType.startsWith("Enum(") && paramType.includes("Id|"))) {
       if (typeof value === "string" && value.startsWith("//")) {
         const accountMap: Record<string, string> = {
           "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
@@ -84,7 +79,7 @@ export function generateCallParams(
         return `"${accountMap[value] || accountMap["//Alice"]}"`;
       }
       return `"${value}"`;
-    } else if (paramType === "Balance") {
+    } else if (paramType === "Balance" || paramType.startsWith("Compact<")) {
       // Handle balance amounts - convert to planck if needed
       const balanceValue = parseFloat(value || "0");
       if (balanceValue > 0 && balanceValue < 1000) {
@@ -120,21 +115,16 @@ export function generateCallParams(
 
 export function generateCallParamValues(
   callParams: Record<string, any>,
-  requiredParams: string[],
+  requiredParams: ParameterInfo[],
 ): any[] {
-  return requiredParams.map((paramType) => {
-    const paramValue =
-      callParams[paramType.toLowerCase()] ||
-      callParams[paramType] ||
-      callParams["accountid"] ||
-      callParams["balance"] ||
-      callParams["assetid"] ||
-      callParams["hash"] ||
-      callParams["param"] ||
-      "";
+  return requiredParams.map((param) => {
+    const paramType = param.type;
+    const paramName = param.name;
+    const paramValue = callParams[paramName] || callParams[paramName.toLowerCase()] || "";
 
-    // Handle different parameter types
-    if ((paramType === "AccountId" || paramType === "SS58String") && typeof paramValue === "string") {
+    // Handle different parameter types based on the new metadata type format
+    if ((paramType.includes("AccountId") || paramType === "SS58String" ||
+         (paramType.startsWith("Enum(") && paramType.includes("Id|"))) && typeof paramValue === "string") {
       if (paramValue.startsWith("//")) {
         // Convert test accounts to actual addresses
         const accountMap: Record<string, string> = {
@@ -145,7 +135,18 @@ export function generateCallParamValues(
         return accountMap[paramValue] || accountMap["//Alice"];
       }
       return paramValue;
-    } else if (paramType === "Balance") {
+    } else if ((paramType === "MultiAddress" || paramType.startsWith("Enum(")) && typeof paramValue === "string") {
+      // Handle MultiAddress format for PAPI - return as string, PAPI will encode it
+      if (paramValue.startsWith("//")) {
+        const accountMap: Record<string, string> = {
+          "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+          "//Bob": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
+          "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
+        };
+        return accountMap[paramValue] || accountMap["//Alice"];
+      }
+      return paramValue;
+    } else if (paramType === "Balance" || paramType.startsWith("Compact<")) {
       // Handle balance amounts - convert to planck if needed
       const balanceValue = parseFloat(paramValue || "0");
       if (balanceValue > 0 && balanceValue < 1000) {
@@ -214,28 +215,31 @@ export function formatTransactionResult(result: any): string {
   return String(result);
 }
 
-export function getCallDescription(
+export async function getCallDescription(
   palletName: string,
   callName: string,
   chainKey: string = 'polkadot'
-): string {
+): Promise<string> {
   try {
-    const info = getCallParameterInfo(chainKey, palletName, callName);
+    const info = await getCallParameterInfo(chainKey, palletName, callName);
     return info.description || `Call ${palletName}.${callName}`;
   } catch (error) {
+    console.warn(`Failed to get description for ${chainKey}.${palletName}.${callName}:`, error);
     return `Call ${palletName}.${callName}`;
   }
 }
 
-export function getCallReturnType(
+export async function getCallReturnType(
   palletName: string,
   callName: string,
   chainKey: string = 'polkadot'
-): string {
+): Promise<string> {
   try {
-    const info = getCallParameterInfo(chainKey, palletName, callName);
-    return info.returnType || 'void';
+    // Return type detection is not implemented yet in the current system
+    // Most extrinsics return dispatch results
+    return 'DispatchResult';
   } catch (error) {
-    return 'void';
+    console.warn(`Failed to get return type for ${chainKey}.${palletName}.${callName}:`, error);
+    return 'DispatchResult';
   }
 }

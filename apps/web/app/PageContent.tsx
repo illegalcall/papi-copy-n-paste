@@ -741,7 +741,7 @@ export default function PageContent() {
                   setTransactionHistory((prev) => [newTransaction, ...prev]);
                 }
               },
-              error: (error) => {
+              error: (error: any) => {
                 console.error('🔍 Transaction submission error:', error);
                 setConsoleOutput((prev) => [
                   ...prev,
