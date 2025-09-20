@@ -519,6 +519,27 @@ queryStorage().then(result => {
       ? generateStorageParams(storageParams, allPossibleParams)
       : "";
 
+    // Check if this query type needs RxJS imports
+    const needsRxJS = [
+      StorageQueryType.WATCH_VALUE,
+      StorageQueryType.WATCH_VALUE_FINALIZED,
+      StorageQueryType.WATCH_VALUE_BEST,
+      StorageQueryType.WATCH_ENTRIES,
+      StorageQueryType.WATCH_ENTRIES_PARTIAL,
+      StorageQueryType.COMBINE_MULTIPLE,
+      StorageQueryType.THROTTLED_WATCH,
+      StorageQueryType.DEBOUNCED_WATCH,
+      StorageQueryType.MAP_VALUES,
+      StorageQueryType.FILTER_CHANGES,
+      StorageQueryType.TAKE_UNTIL_CHANGE,
+      StorageQueryType.RESILIENT_WATCH,
+      StorageQueryType.COMPREHENSIVE_WATCH,
+    ].includes(queryType as StorageQueryType);
+
+    const rxjsImports = needsRxJS
+      ? `import { combineLatest, throttleTime, debounceTime, map, filter, takeUntil, distinctUntilChanged, retry, startWith } from 'rxjs'`
+      : "";
+
     // Use the proper query type generation function
     const queryCode = generateStorageQueryByType(
       queryType,
@@ -529,14 +550,18 @@ queryStorage().then(result => {
       allPossibleParams.length === 0
     );
 
+    // Remove RxJS imports from queryCode since we're adding them at the top
+    const cleanQueryCode = queryCode.replace(/^import {[^}]+} from 'rxjs'\s*\n?/gm, '');
+
     return `import { createClient } from "polkadot-api"
 ${descriptorImport}
 ${connectionInfo.imports}
+${rxjsImports}
 
 ${connectionInfo.connection}
 const typedApi = client.getTypedApi(${descriptorName})
 
-${queryCode}`;
+${cleanQueryCode}`;
   } catch (error) {
     return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
 // 💡 This chain may not be supported for typed API queries`;
@@ -585,6 +610,27 @@ function generateFunctionStorageCode(
       ? generateStorageParams(storageParams, allPossibleParams)
       : "";
 
+    // Check if this query type needs RxJS imports
+    const needsRxJS = [
+      StorageQueryType.WATCH_VALUE,
+      StorageQueryType.WATCH_VALUE_FINALIZED,
+      StorageQueryType.WATCH_VALUE_BEST,
+      StorageQueryType.WATCH_ENTRIES,
+      StorageQueryType.WATCH_ENTRIES_PARTIAL,
+      StorageQueryType.COMBINE_MULTIPLE,
+      StorageQueryType.THROTTLED_WATCH,
+      StorageQueryType.DEBOUNCED_WATCH,
+      StorageQueryType.MAP_VALUES,
+      StorageQueryType.FILTER_CHANGES,
+      StorageQueryType.TAKE_UNTIL_CHANGE,
+      StorageQueryType.RESILIENT_WATCH,
+      StorageQueryType.COMPREHENSIVE_WATCH,
+    ].includes(queryType as StorageQueryType);
+
+    const rxjsImports = needsRxJS
+      ? `import { combineLatest, throttleTime, debounceTime, map, filter, takeUntil, distinctUntilChanged, retry, startWith } from 'rxjs'`
+      : "";
+
     // Use the proper query type generation function
     const queryCode = generateStorageQueryByType(
       queryType,
@@ -595,8 +641,11 @@ function generateFunctionStorageCode(
       allPossibleParams.length === 0
     );
 
+    // Remove RxJS imports from queryCode since we're adding them at the top
+    const cleanQueryCode = queryCode.replace(/^import {[^}]+} from 'rxjs'\s*\n?/gm, '');
+
     // Extract just the query part from the generated code (remove imports and setup)
-    const queryOnly = queryCode.split('\n').filter(line => 
+    const queryOnly = cleanQueryCode.split('\n').filter(line => 
       line.includes('typedApi.query') || 
       line.includes('subscription') ||
       line.includes('console.log') ||
@@ -606,6 +655,7 @@ function generateFunctionStorageCode(
   return `import { createClient } from "polkadot-api"
 ${descriptorImport}
 ${connectionInfo.imports}
+${rxjsImports}
 
 export async function query${pallet}${storage.name}(${Object.keys(storageParams).length > 0 ? "params: any" : ""}) {
 ${connectionInfo.connection}
