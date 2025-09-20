@@ -32,13 +32,26 @@ export function WalletConnector() {
     selectAccount,
   } = useWallet();
 
+  // Debug logging for wallet state
+  console.log('🔍 WalletConnector state:', {
+    isAvailable,
+    isConnected,
+    isConnecting,
+    accountsCount: accounts.length,
+    selectedAccount: selectedAccount?.address,
+    error
+  });
+
   const [showError, setShowError] = useState(false);
 
   const handleConnect = async () => {
     try {
       setShowError(false);
+      console.log('🔍 WalletConnector attempting to connect...');
       await connect();
-    } catch {
+      console.log('🔍 WalletConnector connection successful');
+    } catch (error) {
+      console.error('🔍 WalletConnector connection failed:', error);
       setShowError(true);
     }
   };
@@ -56,6 +69,7 @@ export function WalletConnector() {
 
   // If extension is not available, show install prompt
   if (!isAvailable) {
+    const errorMessage = error || 'Install Polkadot.js extension to connect wallet';
     return (
       <TooltipProvider>
         <Tooltip>
@@ -66,7 +80,12 @@ export function WalletConnector() {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Install Polkadot.js extension to connect wallet</p>
+            <p>{errorMessage}</p>
+            {error && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Check browser console for more details
+              </p>
+            )}
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
