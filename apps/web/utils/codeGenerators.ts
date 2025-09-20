@@ -14,6 +14,12 @@ import {
   generateStorageParams,
   getAllStorageParameters,
 } from "./storageHelpers";
+import {
+  detectCallParameters,
+  generateCallParams,
+  getAllCallParameters,
+  getCallDescription,
+} from "./callHelpers";
 
 export function generateStorageQueryByType(
   queryType: string,
@@ -640,6 +646,10 @@ ${connectionInfo.connection}
 console.log('Connected to custom RPC')`;
   }
 
+  // Get call parameter information using the new detection system
+  const paramInfo = getAllCallParameters(pallet, call.name, chainKey);
+  const description = getCallDescription(pallet, call.name, chainKey);
+
   const args = call.args
     .map((arg) => {
       const value = formData[arg.name] || "";
@@ -694,6 +704,15 @@ console.log('Connected to custom RPC')`;
 
     const connectionInfo = getChainConnection(chainKey, providerId);
 
+    // Add metadata comments
+    const metadataComment = description !== `Call ${pallet}.${call.name}`
+      ? `// ${description}\n`
+      : '';
+
+    const paramComment = paramInfo.required.length > 0
+      ? `// Required parameters: ${paramInfo.required.join(', ')}\n`
+      : '';
+
     return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
 ${descriptorImport}
@@ -702,7 +721,7 @@ ${connectionInfo.imports}
 ${connectionInfo.connection}
 const typedApi = client.getTypedApi(${descriptorName})
 
-const call = typedApi.tx.${pallet}.${call.name}({
+${metadataComment}${paramComment}const call = typedApi.tx.${pallet}.${call.name}({
 ${args}
 })
 
@@ -721,6 +740,17 @@ function generateFunctionCode(
   call: PalletCall,
   formData: Record<string, any>,
 ): string {
+  // Get call metadata information
+  let description = `Call ${pallet}.${call.name}`;
+  let paramInfo: { required: string[]; optional: string[] } = { required: [], optional: [] };
+
+  try {
+    description = getCallDescription(pallet, call.name, chainKey);
+    paramInfo = getAllCallParameters(pallet, call.name, chainKey);
+  } catch (error) {
+    // Use default values if metadata not available
+  }
+
   const args = call.args
     .map((arg) => {
       const value = formData[arg.name] || "";
@@ -773,12 +803,21 @@ function generateFunctionCode(
 
     const connectionInfo = getChainConnection(chainKey, providerId);
 
+    // Add metadata comments
+    const metadataComment = description !== `Call ${pallet}.${call.name}`
+      ? `// ${description}\n`
+      : '';
+
+    const paramComment = paramInfo.required.length > 0
+      ? `// Required parameters: ${paramInfo.required.join(', ')}\n`
+      : '';
+
   return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
 ${descriptorImport}
 ${connectionInfo.imports}
 
-export async function execute${pallet}${call.name}(signer: any) {
+${metadataComment}${paramComment}export async function execute${pallet}${call.name}(signer: any) {
   try {
 ${connectionInfo.connection}
     const typedApi = client.getTypedApi(${descriptorName})
@@ -875,13 +914,32 @@ export function generateMultiMethodCode(
         })
         .join(",\n");
 
+      // Get call metadata information for this method
+      let description = `Call ${method.pallet}.${method.call.name}`;
+      let paramInfo: { required: string[]; optional: string[] } = { required: [], optional: [] };
+
+      try {
+        description = getCallDescription(method.pallet, method.call.name, chainKey);
+        paramInfo = getAllCallParameters(method.pallet, method.call.name, chainKey);
+      } catch (error) {
+        // Use default values if metadata not available
+      }
+
+      const metadataComment = description !== `Call ${method.pallet}.${method.call.name}`
+        ? `\n  // ${description}`
+        : '';
+
+      const paramComment = paramInfo.required.length > 0
+        ? `\n  // Required parameters: ${paramInfo.required.join(', ')}`
+        : '';
+
       return `
-  // Method ${index + 1}: ${method.pallet}.${method.call.name}
+  // Method ${index + 1}: ${method.pallet}.${method.call.name}${metadataComment}${paramComment}
   console.log("Creating ${method.pallet}.${method.call.name}...")
   const call${index + 1} = typedApi.tx.${method.pallet}.${method.call.name}({${args ? "\n" + args + "\n  " : ""}})
   const result${index + 1} = await call${index + 1}.signAndSubmit(signer)
   console.log("Result ${index + 1}:", result${index + 1})
-  
+
   // Check if method ${index + 1} succeeded before continuing
   if (!result${index + 1}.success) {
     console.error("Method ${index + 1} failed, stopping execution")
