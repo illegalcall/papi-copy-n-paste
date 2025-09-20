@@ -423,6 +423,7 @@ export function generateStorageQueryCode(
       providerId,
       pallet,
       storage,
+      queryType,
       storageParams,
     );
   } else {
@@ -518,18 +519,15 @@ queryStorage().then(result => {
       ? generateStorageParams(storageParams, allPossibleParams)
       : "";
 
-        let queryCode;
-    if (hasParams) {
-      queryCode = `const result = await typedApi.query.${pallet}.${storage.name}.getValue(${paramString})
-console.log('${pallet}.${storage.name}:', result)`;
-    } else if (allPossibleParams.length === 0) {
-            queryCode = `const result = await typedApi.query.${pallet}.${storage.name}.getValue()
-console.log('${pallet}.${storage.name}:', result)`;
-    } else {
-      // Storage map without parameters - show all entries
-      queryCode = `const entries = await typedApi.query.${pallet}.${storage.name}.getEntries()
-console.log('All entries:', entries)`;
-    }
+    // Use the proper query type generation function
+    const queryCode = generateStorageQueryByType(
+      queryType,
+      pallet,
+      storage.name,
+      paramString,
+      hasParams,
+      allPossibleParams.length === 0
+    );
 
     return `import { createClient } from "polkadot-api"
 ${descriptorImport}
@@ -550,6 +548,7 @@ function generateFunctionStorageCode(
   providerId: string,
   pallet: string,
   storage: any,
+  queryType: string,
   storageParams: Record<string, any>,
 ): string {
   try {
@@ -564,6 +563,46 @@ function generateFunctionStorageCode(
 
     const connectionInfo = getChainConnection(chainKey, providerId);
 
+    // Generate parameter info for the query
+    const detectedParams = getStorageParameterInfo(chainKey, pallet, storage.name);
+    const paramInfo = {
+      required: detectedParams.required,
+      optional: detectedParams.optional || []
+    };
+    const allPossibleParams = [...paramInfo.required, ...paramInfo.optional];
+
+    // Check if user provided any parameters
+    const userProvidedParams = Object.keys(storageParams).filter(key =>
+      storageParams[key] && String(storageParams[key]).trim() !== ""
+    );
+
+    const hasParams = Boolean(
+      allPossibleParams.length > 0 && userProvidedParams.length > 0
+    );
+
+    // Generate parameter string for the query (only if user provided parameters)
+    const paramString = hasParams && allPossibleParams.length > 0
+      ? generateStorageParams(storageParams, allPossibleParams)
+      : "";
+
+    // Use the proper query type generation function
+    const queryCode = generateStorageQueryByType(
+      queryType,
+      pallet,
+      storage.name,
+      paramString,
+      hasParams,
+      allPossibleParams.length === 0
+    );
+
+    // Extract just the query part from the generated code (remove imports and setup)
+    const queryOnly = queryCode.split('\n').filter(line => 
+      line.includes('typedApi.query') || 
+      line.includes('subscription') ||
+      line.includes('console.log') ||
+      line.includes('// Don\'t forget')
+    ).join('\n');
+
   return `import { createClient } from "polkadot-api"
 ${descriptorImport}
 ${connectionInfo.imports}
@@ -573,8 +612,8 @@ ${connectionInfo.connection}
   const typedApi = client.getTypedApi(${descriptorName})
 
   try {
-    const result = await typedApi.query.${pallet}.${storage.name}${Object.keys(storageParams).length > 0 ? "(params)" : ".getValue()"}${connectionInfo.cleanup || ''}
-    return { success: true, result }
+${queryOnly}${connectionInfo.cleanup || ''}
+    return { success: true, result: "Query executed successfully" }
   } catch (error) {${connectionInfo.cleanup || ''}
     return { success: false, error: error.message }
   }
