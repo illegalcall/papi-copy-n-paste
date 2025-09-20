@@ -531,7 +531,7 @@ export default function PageContent() {
             `🔧 [${i + 1}/${pendingTransactions.length}] About to call tx.sign(signer)...`,
           ]);
 
-          let signedExtrinsic;
+          let signedExtrinsic: any;
           try {
             // Try different signing approaches based on the error
             setConsoleOutput((prev) => [
@@ -558,7 +558,7 @@ export default function PageContent() {
             ]);
 
             console.error('🔍 Full signing error:', signError);
-            console.error('🔍 Error stack:', signError.stack);
+            console.error('🔍 Error stack:', (signError as Error)?.stack);
 
             try {
               // Try using signAndSubmit directly (this bypasses the problematic signing step)
