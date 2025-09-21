@@ -16,17 +16,30 @@ import {
 import { Button } from "@workspace/ui/components/button";
 import { Toast } from "@workspace/ui/components/toast";
 import { Badge } from "@workspace/ui/components/badge";
-import { Copy, Terminal, Trash2, Settings, Code, Eye } from "lucide-react";
+import { Copy, Terminal, Trash2, Settings, Code, Eye, Receipt } from "lucide-react";
 import { SyntaxHighlighter } from "@/components/code/syntax-highlighter";
 import { ConsoleItem } from "@/hooks/useExecution";
 import { ArrayResult } from "@/utils/cleanLogger";
+
+interface TransactionResult {
+  hash: string;
+  blockHash?: string;
+  blockNumber?: string;
+  success: boolean;
+  error?: string;
+  events?: any[];
+  fee?: string;
+  timestamp: number;
+}
 
 interface RightPaneProps {
   code: string;
   consoleOutput: ConsoleItem[];
   onClearConsole?: () => void;
-  activeTab?: "setup" | "code" | "console";
+  activeTab?: "setup" | "code" | "console" | "transactions";
   selectedChain?: string;
+  transactionHistory?: TransactionResult[];
+  onClearTransactionHistory?: () => void;
 }
 
 export function RightPane({
@@ -35,8 +48,10 @@ export function RightPane({
   onClearConsole,
   activeTab,
   selectedChain,
+  transactionHistory = [],
+  onClearTransactionHistory,
 }: RightPaneProps) {
-  const [currentTab, setCurrentTab] = useState<"setup" | "code" | "console">(
+  const [currentTab, setCurrentTab] = useState<"setup" | "code" | "console" | "transactions">(
     "setup",
   );
   const [showToast, setShowToast] = useState(false);
@@ -102,6 +117,16 @@ export function RightPane({
         wsUrl: "wss://hydration-rpc.n.dwellir.com",
         description: "Hydration parachain",
         keyName: "hydration",
+      },
+      paseo: {
+        wellKnown: "paseo",
+        description: "Paseo testnet",
+        keyName: "paseo",
+      },
+      paseo_asset_hub: {
+        wsUrl: "wss://asset-hub-paseo-rpc.dwellir.com",
+        description: "Paseo Asset Hub",
+        keyName: "paseo_asset_hub",
       },
     };
 
@@ -652,6 +677,7 @@ export function RightPane({
             </CardContent>
           </Card>
         </TabsContent>
+
       </Tabs>
 
       <Toast

@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "npm run extract-storage-metadata && turbo build",
+    "build": "npx papi && npm run extract-storage-metadata && turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@polkadot-api/descriptors": "file:.papi/descriptors",
+    "@polkadot-api/metadata-builders": "^0.12.2",
     "@polkadot-api/smoldot": "^0.3.10",
     "@polkadot-api/substrate-bindings": "^0.14.0",
     "@polkadot/api": "^16.4.6",

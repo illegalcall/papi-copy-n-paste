@@ -14,6 +14,13 @@ import {
   generateStorageParamValues,
   decodeStorageResult,
 } from "./storageHelpers";
+import {
+  generateCallParamValues,
+  formatTransactionResult,
+  getCallDescription,
+} from "./callHelpers";
+import { getAllCallParameters } from "./callParameterDetection";
+import type { ParameterInfo } from "./metadataAnalyzer";
 import { createCleanLogger, QueryResult } from "./cleanLogger";
 import { getDescriptorForChain } from "@workspace/core/descriptors";
 
@@ -44,7 +51,18 @@ function getStorageParameters(chainKey: string, pallet: string, storageName: str
     // Use the new getAllStorageParameters function which returns both required and optional
     const paramInfo = getAllStorageParameters(pallet, storageName, chainKey);
 
+    return paramInfo;
+  } catch (error) {
+    // Fallback that returns empty arrays
+    return { required: [], optional: [] };
+  }
+}
 
+// Helper function to get call parameters using the new dynamic detection system
+async function getCallParameters(chainKey: string, pallet: string, callName: string): Promise<{ required: ParameterInfo[], optional: ParameterInfo[] }> {
+  try {
+    // Use the new getAllCallParameters from callParameterDetection
+    const paramInfo = await getAllCallParameters(pallet, callName, chainKey);
     return paramInfo;
   } catch (error) {
     // Fallback that returns empty arrays
@@ -64,10 +82,28 @@ export async function executeRealTransaction(
   const { pallet, call } = selectedCall;
 
   try {
+    // Get call parameter information using the new detection system
+    const paramInfo = await getCallParameters(chainKey, pallet, call.name);
+    // Use sync description for now - async descriptions will be handled later
+    const description = `Call ${pallet}.${call.name}`;
+
     setConsoleOutput((prev) => [
       ...prev,
       `🚀 Executing ${pallet}.${call.name} transaction...`,
     ]);
+
+    // Log call information
+    if (description !== `Call ${pallet}.${call.name}`) {
+      setConsoleOutput((prev) => [...prev, `📝 ${description}`]);
+    }
+
+    if (paramInfo.required.length > 0) {
+      const paramValues = generateCallParamValues(formData, paramInfo.required);
+      const serializedParams = JSON.stringify(paramValues, (key, value) =>
+        typeof value === 'bigint' ? value.toString() : value
+      );
+      setConsoleOutput((prev) => [...prev, `🔧 Parameters: ${serializedParams}`]);
+    }
 
     // Use the existing executeTransactionWithSteps function from core
     const result = await executeTransactionWithSteps(
@@ -133,6 +169,24 @@ export async function executeMultipleTransactions(
     ]);
 
     try {
+      // Get call parameter information using the new detection system
+      const paramInfo = await getCallParameters(chainKey, method.pallet, method.call.name);
+      // Use sync description for now - async descriptions will be handled later
+      const description = `Call ${method.pallet}.${method.call.name}`;
+
+      // Log call information
+      if (description !== `Call ${method.pallet}.${method.call.name}`) {
+        setConsoleOutput((prev) => [...prev, `  📝 ${description}`]);
+      }
+
+      if (paramInfo.required.length > 0) {
+        const paramValues = generateCallParamValues(method.formData, paramInfo.required);
+        const serializedParams = JSON.stringify(paramValues, (key, value) =>
+          typeof value === 'bigint' ? value.toString() : value
+        );
+        setConsoleOutput((prev) => [...prev, `  🔧 Parameters: ${serializedParams}`]);
+      }
+
       const result = await executeTransactionWithSteps(
         { pallet: method.pallet, call: method.call },
         method.formData,
@@ -488,7 +542,7 @@ async function executeRawGetValue(
     // Now attempt the proper PAPI integration
     try {
       // Get the correct descriptor based on chain
-      const descriptors = (window as any).papiDescriptors || {};
+      const descriptors = typeof window !== 'undefined' ? (window as any).papiDescriptors || {} : {};
       const descriptorName = getDescriptorName(chainKey);
 
       // Check if descriptor is available for this chain

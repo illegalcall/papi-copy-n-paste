@@ -13,10 +13,15 @@ import {
   generateErrorCode,
   generateEventCode,
 } from "../utils/codeGenerators";
+import {
+  generateWalletIntegratedCode,
+  generateWalletStorageCode,
+} from "../utils/walletCodeGenerators";
 
 export function useCodeGeneration(
   selectedChain: string,
   selectedProvider: string,
+  isWalletConnected: boolean = false,
 ) {
   const [code, setCode] = useState("");
   const [canRun, setCanRun] = useState(false);
@@ -34,13 +39,23 @@ export function useCodeGeneration(
       }
 
       try {
-        const generatedCode = generateCodeSnippet(
-          selectedChain,
-          selectedProvider,
-          selectedCall.pallet,
-          selectedCall.call,
-          formData,
-        );
+        console.log('🚀 Code generation path - isWalletConnected:', isWalletConnected);
+        const generatedCode = isWalletConnected
+          ? generateWalletIntegratedCode(
+              selectedChain,
+              selectedProvider,
+              selectedCall.pallet,
+              selectedCall.call,
+              formData,
+              isWalletConnected,
+            )
+          : generateCodeSnippet(
+              selectedChain,
+              selectedProvider,
+              selectedCall.pallet,
+              selectedCall.call,
+              formData,
+            );
         setCode(generatedCode);
         setCanRun(true);
       } catch (error) {
@@ -50,7 +65,7 @@ export function useCodeGeneration(
         setCanRun(false);
       }
     },
-    [selectedChain, selectedProvider],
+    [selectedChain, selectedProvider, isWalletConnected],
   );
 
   // Generate code for storage query
@@ -66,14 +81,24 @@ export function useCodeGeneration(
       }
 
       try {
-        const generatedCode = generateStorageQueryCode(
-          selectedChain,
-          selectedProvider,
-          selectedStorage.pallet,
-          selectedStorage.storage,
-          storageQueryType,
-          storageParams,
-        );
+        const generatedCode = isWalletConnected
+          ? generateWalletStorageCode(
+              selectedChain,
+              selectedProvider,
+              selectedStorage.pallet,
+              selectedStorage.storage,
+              storageQueryType,
+              storageParams,
+              isWalletConnected,
+            )
+          : generateStorageQueryCode(
+              selectedChain,
+              selectedProvider,
+              selectedStorage.pallet,
+              selectedStorage.storage,
+              storageQueryType,
+              storageParams,
+            );
         setCode(generatedCode);
       } catch (error) {
         setCode(
@@ -81,7 +106,7 @@ export function useCodeGeneration(
         );
       }
     },
-    [selectedChain, selectedProvider],
+    [selectedChain, selectedProvider, isWalletConnected],
   );
 
   // Generate code for multiple methods
@@ -115,7 +140,7 @@ export function useCodeGeneration(
         setCanRun(false);
       }
     },
-    [selectedChain, selectedProvider],
+    [selectedChain, selectedProvider, isWalletConnected],
   );
 
   // Generate code for multiple storage queries
@@ -150,7 +175,7 @@ export function useCodeGeneration(
         setCanRun(false);
       }
     },
-    [selectedChain, selectedProvider],
+    [selectedChain, selectedProvider, isWalletConnected],
   );
 
   // Generate code for constant
@@ -180,7 +205,7 @@ export function useCodeGeneration(
         setCanRun(false);
       }
     },
-    [selectedChain, selectedProvider],
+    [selectedChain, selectedProvider, isWalletConnected],
   );
 
   // Generate code for error
@@ -210,7 +235,7 @@ export function useCodeGeneration(
         setCanRun(false);
       }
     },
-    [selectedChain, selectedProvider],
+    [selectedChain, selectedProvider, isWalletConnected],
   );
 
   // Generate code for event
@@ -240,7 +265,7 @@ export function useCodeGeneration(
         setCanRun(false);
       }
     },
-    [selectedChain, selectedProvider],
+    [selectedChain, selectedProvider, isWalletConnected],
   );
 
   // Update generated code when dependencies change
@@ -300,6 +325,35 @@ export function useCodeGeneration(
     ],
   );
 
+  // Generate wallet execution code (only when actually executing with wallet)
+  const generateWalletExecutionCode = useCallback(
+    (
+      selectedCall: { pallet: string; call: PalletCall } | undefined,
+      formData: Record<string, any>,
+    ) => {
+      if (!selectedCall) {
+        return;
+      }
+
+      try {
+        const generatedCode = generateWalletIntegratedCode(
+          selectedChain,
+          selectedProvider,
+          selectedCall.pallet,
+          selectedCall.call,
+          formData,
+          true, // isExecuting = true
+        );
+        setCode(generatedCode);
+      } catch (error) {
+        setCode(
+          `// Error generating wallet code: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+      }
+    },
+    [selectedChain, selectedProvider],
+  );
+
   // Clear all code
   const clearCode = useCallback(() => {
     setCode("");
@@ -320,6 +374,7 @@ export function useCodeGeneration(
     generateErrorCodeSnippet,
     generateEventCodeSnippet,
     updateGeneratedCode,
+    generateWalletExecutionCode,
     clearCode,
 
     // Manual setters for compatibility

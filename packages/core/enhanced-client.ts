@@ -14,6 +14,20 @@ import {
   getProvider,
 } from "./network-providers";
 
+// Import runtime client registration (only in browser environment)
+let registerClient: any = null;
+let unregisterClient: any = null;
+
+if (typeof window !== 'undefined') {
+  try {
+    const runtimeModule = require('../../apps/web/utils/runtimeClientAccess');
+    registerClient = runtimeModule.registerClient;
+    unregisterClient = runtimeModule.unregisterClient;
+  } catch (error) {
+    console.warn('Runtime client registration not available:', error);
+  }
+}
+
 export interface ConnectionState {
   status: "connecting" | "connected" | "error" | "disconnected";
   client: any | null;
@@ -267,8 +281,17 @@ export function useEnhancedClient(
           connectionTime,
         });
 
+        // Register client for runtime access
+        if (registerClient) {
+          registerClient(chainKey, providerId, client, provider, "connected");
+        }
+
         cleanup = () => {
           console.log(`🧹 Cleaning up connection ${chainKey}:${providerId}`);
+          // Unregister client before destroying
+          if (unregisterClient) {
+            unregisterClient(chainKey);
+          }
           client?.destroy?.();
         };
       } catch (error) {
@@ -311,6 +334,12 @@ export function useEnhancedClient(
                   chainKey,
                   connectionTime: fallback.connectionTime,
                 });
+
+                // Register fallback client for runtime access
+                if (registerClient) {
+                  registerClient(chainKey, rpcProvider.id, fallback.client, fallback.provider, "connected");
+                }
+
                 console.log(`✅ Successfully connected to ${chainKey} via ${rpcProvider.name}`);
                 return;
               }

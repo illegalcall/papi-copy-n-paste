@@ -14,6 +14,9 @@ import {
   generateStorageParams,
   getAllStorageParameters,
 } from "./storageHelpers";
+import {
+  getCallDescription,
+} from "./callHelpers";
 
 export function generateStorageQueryByType(
   queryType: string,
@@ -516,49 +519,47 @@ queryStorage().then(result => {
 
     const connectionInfo = getChainConnection(chainKey, providerId);
 
-  // Get parameter information from our new flexible system
-  const paramInfo = getAllStorageParameters(pallet, storage.name, chainKey);
-  const allPossibleParams = [...paramInfo.required, ...paramInfo.optional];
+    // Get parameter information from our new flexible system
+    const paramInfo = getAllStorageParameters(pallet, storage.name, chainKey);
+    const allPossibleParams = [...paramInfo.required, ...paramInfo.optional];
 
-  // Check if user provided any parameters
-  const userProvidedParams = Object.keys(storageParams).filter(key =>
-    storageParams[key] && String(storageParams[key]).trim() !== ""
-  );
+    // Check if user provided any parameters
+    const userProvidedParams = Object.keys(storageParams).filter(key =>
+      storageParams[key] && String(storageParams[key]).trim() !== ""
+    );
 
-  const hasParams = Boolean(
-    allPossibleParams.length > 0 && userProvidedParams.length > 0
-  );
+    const hasParams = Boolean(
+      allPossibleParams.length > 0 && userProvidedParams.length > 0
+    );
 
-  // Generate parameter string for the query (only if user provided parameters)
-  const paramString = hasParams && allPossibleParams.length > 0
-    ? generateStorageParams(storageParams, allPossibleParams)
-    : "";
+    // Generate parameter string for the query (only if user provided parameters)
+    const paramString = hasParams && allPossibleParams.length > 0
+      ? generateStorageParams(storageParams, allPossibleParams)
+      : "";
 
-  // Determine if this is a simple storage value (no parameters required)
-  const isSimpleValue = allPossibleParams.length === 0;
+    // Simple, clean code generation - just the essential query
+    let queryCode;
+    if (hasParams) {
+      queryCode = `const result = await typedApi.query.${pallet}.${storage.name}.getValue(${paramString})
+console.log('${pallet}.${storage.name}:', result)`;
+    } else if (allPossibleParams.length === 0) {
+      // Simple storage item with no parameters
+      queryCode = `const result = await typedApi.query.${pallet}.${storage.name}.getValue()
+console.log('${pallet}.${storage.name}:', result)`;
+    } else {
+      // Storage map without parameters - show all entries
+      queryCode = `const entries = await typedApi.query.${pallet}.${storage.name}.getEntries()
+console.log('All entries:', entries)`;
+    }
 
-  // Generate the actual query code based on type
-  const queryCode = generateStorageQueryByType(
-    queryType,
-    pallet,
-    storage.name,
-    paramString,
-    hasParams,
-    isSimpleValue,
-  );
-
-  return `import { createClient } from "polkadot-api"
+    return `import { createClient } from "polkadot-api"
 ${descriptorImport}
 ${connectionInfo.imports}
 
-async function query${pallet}${storage.name}() {
 ${connectionInfo.connection}
-  const typedApi = client.getTypedApi(${descriptorName})
+const typedApi = client.getTypedApi(${descriptorName})
 
-  ${queryCode}${connectionInfo.cleanup || ''}
-}
-
-query${pallet}${storage.name}().catch(console.error)`;
+${queryCode}`;
   } catch (error) {
     return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
 // 💡 This chain may not be supported for typed API queries`;
@@ -614,6 +615,10 @@ export function generateCodeSnippet(
 ): string {
   const template = getCodeTemplate();
 
+  // Debug: Log form data to see what's being passed
+  console.log('🔍 Code generation - formData:', formData);
+  console.log('🔍 Code generation - call.args:', call.args);
+
   if (template === "function") {
     return generateFunctionCode(chainKey, providerId, pallet, call, formData);
   } else {
@@ -635,44 +640,41 @@ function generateInlineCode(
     return `import { createClient } from "polkadot-api"
 ${connectionInfo.imports}
 
-async function executeTransaction() {
 ${connectionInfo.connection}
 
-  try {
-    // Note: Custom RPC - using raw API calls
-    // For transactions on custom chains, you may need to:
-    // 1. Generate proper descriptors with 'papi add <chain>'
-    // 2. Or use raw RPC calls like client.getApi()._request()
-
-    console.log('Connected to custom RPC')
-    console.log('Available pallets and calls depend on the chain')
-
-    // Example raw transaction (uncomment and modify as needed):
-    // const tx = await client.getApi()._request("author_submitExtrinsic", ["0x..."])
-
-    return { success: true, message: 'Connected to custom RPC successfully' }
-  } catch (error) {${connectionInfo.cleanup || ''}
-    console.error('Transaction failed:', error)
-    return { success: false, error: error.message }
-  }
-}
-
-// Execute the transaction
-executeTransaction().then(result => {
-  console.log('Transaction result:', result)
-})`;
+// Note: Custom RPC - may need proper descriptors
+// Use 'papi add <chain>' to generate descriptors
+console.log('Connected to custom RPC')`;
   }
 
-  const args = call.args
-    .map((arg) => {
-      const value = formData[arg.name] || "";
+  // Use basic parameter info from call.args for now
+  const paramInfo = { required: call.args.map(arg => arg.name), optional: [] };
+  // Use sync description for now - async descriptions will be handled later
+  const description = `Call ${pallet}.${call.name}`;
 
-      // Handle MultiAddress types properly for dest/target fields
-      if (
-        arg.name === "dest" ||
-        arg.name === "target" ||
-        arg.type.includes("MultiAddress")
-      ) {
+  // Create mapping from parameter name to type using call.args
+  const paramTypeMap = new Map<string, string>();
+  call.args.forEach(arg => {
+    paramTypeMap.set(arg.name, arg.type);
+  });
+
+  // Generate arguments from form data keys with proper type handling
+  const args = Object.entries(formData)
+    .map(([paramName, value]) => {
+      console.log(`🔍 Processing param ${paramName}:`, value, 'type:', typeof value);
+
+      // Get the actual parameter type from call.args
+      const paramType = paramTypeMap.get(paramName) || 'unknown';
+      console.log(`🔍 Parameter ${paramName} has type:`, paramType);
+
+      // Extract actual value from form object structure if needed
+      if (typeof value === 'object' && value?.type === 'Id' && value?.value) {
+        console.log(`🔍 Extracting object value for ${paramName}:`, value, '→', value.value);
+        value = value.value; // Extract the actual address string
+      }
+
+      // Handle MultiAddress types based on actual parameter type
+      if (paramType.includes("MultiAddress") || paramType.includes("AccountId")) {
         if (typeof value === "string" && value.startsWith("//")) {
           const accountMap: Record<string, string> = {
             "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
@@ -680,26 +682,36 @@ executeTransaction().then(result => {
             "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
           };
           const address = accountMap[value] || accountMap["//Alice"];
-          return `  ${arg.name}: MultiAddress.Id("${address}"), // ${value}`;
+          return `  ${paramName}: MultiAddress.Id("${address}"), // ${value}`;
         } else if (typeof value === "string" && value.length > 40) {
-          return `  ${arg.name}: MultiAddress.Id("${value}")`;
+          return `  ${paramName}: MultiAddress.Id("${value}")`;
         } else {
-          return `  ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`;
+          return `  ${paramName}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`;
         }
       }
 
+      // Handle numeric types based on actual parameter type
       if (
-        arg.type.includes("u128") ||
-        arg.type.includes("u64") ||
-        arg.name === "value" ||
-        arg.name === "amount"
+        paramType.includes("u128") ||
+        paramType.includes("u64") ||
+        paramType.includes("u32") ||
+        paramType.includes("Balance") ||
+        paramType.includes("Compact")
       ) {
         const numValue =
           typeof value === "string" ? value : String(value || "0");
-        return `  ${arg.name}: ${numValue}n`;
+        // Ensure we have a valid number before adding 'n'
+        const cleanValue = numValue.trim() || "0";
+        return `  ${paramName}: ${cleanValue}n`;
       }
 
-      return `  ${arg.name}: ${JSON.stringify(value)}`;
+      // Handle boolean types
+      if (paramType.includes("bool")) {
+        return `  ${paramName}: ${Boolean(value)}`;
+      }
+
+      // Default: use JSON stringify
+      return `  ${paramName}: ${JSON.stringify(value)}`;
     })
     .join(",\n");
 
@@ -715,25 +727,29 @@ executeTransaction().then(result => {
 
     const connectionInfo = getChainConnection(chainKey, providerId);
 
-  return `import { createClient } from "polkadot-api"
+    // Add metadata comments
+    const metadataComment = description !== `Call ${pallet}.${call.name}`
+      ? `// ${description}\n`
+      : '';
+
+    const paramComment = paramInfo.required.length > 0
+      ? `// Required parameters: ${paramInfo.required.join(', ')}\n`
+      : '';
+
+    return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
 ${descriptorImport}
 ${connectionInfo.imports}
 
-async function execute${pallet}${call.name}() {
 ${connectionInfo.connection}
-  const typedApi = client.getTypedApi(${descriptorName})
+const typedApi = client.getTypedApi(${descriptorName})
 
-  const call = typedApi.tx.${pallet}.${call.name}({
+${metadataComment}${paramComment}const ${call.name} = typedApi.tx.${pallet}.${call.name}({
 ${args}
-  })
+})
 
-  // You'll need a proper signer here
-  const hash = await call.signAndSubmit(signer)
-  console.log('Transaction hash:', hash)${connectionInfo.cleanup || ''}
-}
-
-execute${pallet}${call.name}().catch(console.error)`;
+console.log('Transaction call created:', ${call.name})
+// To actually submit: await ${call.name}.signAndSubmit(signer)${connectionInfo.cleanup || ''}`;
   } catch (error) {
     return `// ❌ Error generating code: ${error instanceof Error ? error.message : "Unknown error"}
 // 💡 This chain may not be supported for typed API queries`;
@@ -747,16 +763,34 @@ function generateFunctionCode(
   call: PalletCall,
   formData: Record<string, any>,
 ): string {
-  const args = call.args
-    .map((arg) => {
-      const value = formData[arg.name] || "";
+  // Get call metadata information
+  let description = `Call ${pallet}.${call.name}`;
+  let paramInfo: { required: string[]; optional: string[] } = { required: [], optional: [] };
 
-      // Handle MultiAddress types properly for dest/target fields
-      if (
-        arg.name === "dest" ||
-        arg.name === "target" ||
-        arg.type.includes("MultiAddress")
-      ) {
+  // Use sync description for now - async descriptions will be handled later
+  description = `Call ${pallet}.${call.name}`;
+
+  // Use basic parameter info from call.args for now
+  paramInfo = { required: call.args.map(arg => arg.name), optional: [] };
+
+  // Create mapping from parameter name to type using call.args
+  const paramTypeMap = new Map<string, string>();
+  call.args.forEach(arg => {
+    paramTypeMap.set(arg.name, arg.type);
+  });
+
+  const args = Object.entries(formData)
+    .map(([paramName, value]) => {
+      // Get the actual parameter type from call.args
+      const paramType = paramTypeMap.get(paramName) || 'unknown';
+
+      // Extract actual value from form object structure if needed
+      if (typeof value === 'object' && value?.type === 'Id' && value?.value) {
+        value = value.value; // Extract the actual address string
+      }
+
+      // Handle MultiAddress types based on actual parameter type
+      if (paramType.includes("MultiAddress") || paramType.includes("AccountId")) {
         if (typeof value === "string" && value.startsWith("//")) {
           const accountMap: Record<string, string> = {
             "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
@@ -764,26 +798,33 @@ function generateFunctionCode(
             "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
           };
           const address = accountMap[value] || accountMap["//Alice"];
-          return `    ${arg.name}: MultiAddress.Id("${address}"), // ${value}`;
+          return `    ${paramName}: MultiAddress.Id("${address}"), // ${value}`;
         } else if (typeof value === "string" && value.length > 40) {
-          return `    ${arg.name}: MultiAddress.Id("${value}")`;
+          return `    ${paramName}: MultiAddress.Id("${value}")`;
         } else {
-          return `    ${arg.name}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`;
+          return `    ${paramName}: MultiAddress.Id("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY")`;
         }
       }
 
+      // Handle numeric types based on actual parameter type
       if (
-        arg.type.includes("u128") ||
-        arg.type.includes("u64") ||
-        arg.name === "value" ||
-        arg.name === "amount"
+        paramType.includes("u128") ||
+        paramType.includes("u64") ||
+        paramType.includes("u32") ||
+        paramType.includes("Balance") ||
+        paramType.includes("Compact")
       ) {
         const numValue =
           typeof value === "string" ? value : String(value || "0");
-        return `    ${arg.name}: ${numValue}n`;
+        return `    ${paramName}: ${numValue}n`;
       }
 
-      return `    ${arg.name}: ${JSON.stringify(value)}`;
+      // Handle boolean types
+      if (paramType.includes("bool")) {
+        return `    ${paramName}: ${Boolean(value)}`;
+      }
+
+      return `    ${paramName}: ${JSON.stringify(value)}`;
     })
     .join(",\n");
 
@@ -799,12 +840,21 @@ function generateFunctionCode(
 
     const connectionInfo = getChainConnection(chainKey, providerId);
 
+    // Add metadata comments
+    const metadataComment = description !== `Call ${pallet}.${call.name}`
+      ? `// ${description}\n`
+      : '';
+
+    const paramComment = paramInfo.required.length > 0
+      ? `// Required parameters: ${paramInfo.required.join(', ')}\n`
+      : '';
+
   return `import { createClient } from "polkadot-api"
 import { MultiAddress } from "polkadot-api"
 ${descriptorImport}
 ${connectionInfo.imports}
 
-export async function execute${pallet}${call.name}(signer: any) {
+${metadataComment}${paramComment}export async function execute${pallet}${call.name}(signer: any) {
   try {
 ${connectionInfo.connection}
     const typedApi = client.getTypedApi(${descriptorName})
@@ -901,13 +951,31 @@ export function generateMultiMethodCode(
         })
         .join(",\n");
 
+      // Get call metadata information for this method
+      let description = `Call ${method.pallet}.${method.call.name}`;
+      let paramInfo: { required: string[]; optional: string[] } = { required: [], optional: [] };
+
+      // Use sync description for now - async descriptions will be handled later
+      description = `Call ${method.pallet}.${method.call.name}`;
+
+      // Use basic parameter info from call.args for now
+      paramInfo = { required: method.call.args.map(arg => arg.name), optional: [] };
+
+      const metadataComment = description !== `Call ${method.pallet}.${method.call.name}`
+        ? `\n  // ${description}`
+        : '';
+
+      const paramComment = paramInfo.required.length > 0
+        ? `\n  // Required parameters: ${paramInfo.required.join(', ')}`
+        : '';
+
       return `
-  // Method ${index + 1}: ${method.pallet}.${method.call.name}
+  // Method ${index + 1}: ${method.pallet}.${method.call.name}${metadataComment}${paramComment}
   console.log("Creating ${method.pallet}.${method.call.name}...")
   const call${index + 1} = typedApi.tx.${method.pallet}.${method.call.name}({${args ? "\n" + args + "\n  " : ""}})
   const result${index + 1} = await call${index + 1}.signAndSubmit(signer)
   console.log("Result ${index + 1}:", result${index + 1})
-  
+
   // Check if method ${index + 1} succeeded before continuing
   if (!result${index + 1}.success) {
     console.error("Method ${index + 1} failed, stopping execution")
