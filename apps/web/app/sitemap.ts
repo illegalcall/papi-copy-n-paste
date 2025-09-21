@@ -12,11 +12,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     // Add more pages here as your app grows
     // Example:
-    // {
-    //   url: `${baseUrl}/docs`,
-    //   lastModified: new Date(),
-    //   changeFrequency: 'weekly',
-    //   priority: 0.8,
-    // },
   ];
 }

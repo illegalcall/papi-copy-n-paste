@@ -117,7 +117,7 @@ console.log('Multiple values:', results)`;
       if (hasParams) {
         return `${rxjsImports}
 
-// Note: This storage requires parameters
+// Storage requires parameters
 const entries = await ${baseQuery}.getEntries()
 console.log('Storage entries:', entries)`;
       } else {
@@ -483,7 +483,7 @@ async function queryStorage() {
 ${connectionInfo.connection}
 
   try {
-    // Note: Custom RPC - using raw API calls
+    // Custom RPC using raw API calls
     // For storage queries on custom chains, you may need to:
     // 1. Generate proper descriptors with 'papi add <chain>'
     // 2. Or use raw RPC calls like client.getApi()._request()
@@ -642,7 +642,7 @@ ${connectionInfo.imports}
 
 ${connectionInfo.connection}
 
-// Note: Custom RPC - may need proper descriptors
+// Custom RPC may need proper descriptors
 // Use 'papi add <chain>' to generate descriptors
 console.log('Connected to custom RPC')`;
   }
@@ -1025,7 +1025,7 @@ async function getConstant() {
 ${connectionInfo.connection}
 
   try {
-    // Note: Custom RPC - constants may not be accessible via typed API
+    // Custom RPC constants may not be accessible via typed API
     // For constants on custom chains, you may need to:
     // 1. Generate proper descriptors with 'papi add <chain>'
     // 2. Or use raw RPC calls like client.getApi()._request()

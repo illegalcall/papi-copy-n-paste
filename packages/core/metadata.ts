@@ -3117,8 +3117,7 @@ function enhanceRealMetadata(
 }
 
 function parseEventsFromPallet(pallet: any): PalletEvent[] {
-  // Legacy fallback event parsing - only used when comprehensive metadata is unavailable
-  // NOTE: This function should rarely be used now that we have comprehensive metadata
+  // Legacy fallback event parsing
   const events: PalletEvent[] = [];
   const palletName = pallet.name?.toLowerCase() || "";
 
