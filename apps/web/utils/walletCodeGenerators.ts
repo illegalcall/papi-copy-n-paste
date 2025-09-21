@@ -19,9 +19,6 @@ export function generateWalletIntegratedCode(
   isWalletConnected: boolean,
 ): string {
   try {
-    console.log('🔍 Wallet code generation - formData:', formData);
-    console.log('🔍 Wallet code generation - call.args:', call.args);
-
     const descriptorImport = getDescriptorImport(chainKey);
     const descriptorName = getDescriptorName(chainKey);
     const connectionInfo = getChainConnection(chainKey, providerId);

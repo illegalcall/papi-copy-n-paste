@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Badge } from "@workspace/ui/components/badge";
-import { Label } from "@workspace/ui/components/label";
 import { AlertTriangle, Code2, ChevronDown, ChevronUp, Info } from "lucide-react";
 import { PalletError } from "@workspace/core";
 import { generateErrorSignature } from "@/utils/typeExtraction";
@@ -14,7 +13,7 @@ interface ErrorFormProps {
   chainKey: string;
 }
 
-export function ErrorForm({ pallet, error, chainKey }: ErrorFormProps) {
+export function ErrorForm({ pallet, error }: ErrorFormProps) {
   const [showTypeInfo, setShowTypeInfo] = useState(true);
   const [showExamples, setShowExamples] = useState(false);
 

@@ -14,7 +14,7 @@ interface EventFormProps {
   chainKey: string;
 }
 
-export function EventForm({ pallet, event, chainKey }: EventFormProps) {
+export function EventForm({ pallet, event }: EventFormProps) {
   const [showTypeInfo, setShowTypeInfo] = useState(true);
   const [showExamples, setShowExamples] = useState(false);
   const [copied, setCopied] = useState(false);

@@ -95,7 +95,7 @@ export function CustomRPCManager({ chainKey, onRPCSelect, selectedRPCId }: Custo
 
   const handleTestConnection = async (id: string) => {
     setTestingRPCId(id);
-    const success = await retestCustomProvider(id);
+    await retestCustomProvider(id);
     setCustomRPCs(getAllCustomProviders().filter(p => p.chainKey === chainKey));
     setTestingRPCId(null);
   };
@@ -231,7 +231,7 @@ export function CustomRPCManager({ chainKey, onRPCSelect, selectedRPCId }: Custo
           <Card>
             <CardContent className="pt-6">
               <div className="text-center text-sm text-muted-foreground">
-                No custom RPCs added yet. Click "Add RPC" to get started.
+                No custom RPCs added yet. Click &quot;Add RPC&quot; to get started.
               </div>
             </CardContent>
           </Card>

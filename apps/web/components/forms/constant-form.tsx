@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Badge } from "@workspace/ui/components/badge";
-import { Label } from "@workspace/ui/components/label";
 import { Settings, Code2, ChevronDown, ChevronUp, Copy, Check, Loader2 } from "lucide-react";
 import { PalletConstant } from "@workspace/core";
 import { Button } from "@workspace/ui/components/button";
@@ -20,7 +19,7 @@ export function ConstantForm({ pallet, constant, chainKey }: ConstantFormProps) 
   const [showTypeInfo, setShowTypeInfo] = useState(true);
   const [showValue, setShowValue] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [decodedValue, setDecodedValue] = useState<any>(null);
+  const [decodedValue, setDecodedValue] = useState<unknown>(null);
   const [isDecoding, setIsDecoding] = useState(false);
   const [decodingError, setDecodingError] = useState<string | null>(null);
 
@@ -61,21 +60,6 @@ export function ConstantForm({ pallet, constant, chainKey }: ConstantFormProps) 
     }
   };
 
-  const formatConstantValue = (value: string | undefined): string => {
-    if (!value) return "Value not available";
-
-    try {
-      // Try to parse as JSON for better formatting
-      const parsed = JSON.parse(value);
-      return JSON.stringify(parsed, null, 2);
-    } catch {
-      // If not valid JSON, return as-is but with some basic formatting
-      if (value.length > 100) {
-        return value.substring(0, 100) + "...";
-      }
-      return value;
-    }
-  };
 
   // Get helpful context for specific constant types
   const getConstantContext = (constantName: string): string => {
@@ -95,7 +79,7 @@ export function ConstantForm({ pallet, constant, chainKey }: ConstantFormProps) 
   };
 
   // Format the decoded value for display
-  const formatDecodedValue = (value: any): string => {
+  const formatDecodedValue = (value: unknown): string => {
     if (value === null || value === undefined) {
       return 'Not available';
     }

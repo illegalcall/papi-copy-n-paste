@@ -52,7 +52,6 @@ class ChainPalletValidator {
       // Cache the result
       this.cache.set(cacheKey, palletNames);
 
-      console.log(`🔍 ${chainKey} has ${palletNames.size} pallets:`, Array.from(palletNames).slice(0, 10));
 
       return palletNames;
 

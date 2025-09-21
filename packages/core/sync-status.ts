@@ -29,13 +29,13 @@ const EXPECTED_CURRENT_BLOCKS: Record<string, number> = {
 };
 
 const BLOCK_TIMES: Record<string, number> = {
-  polkadot: 6, // seconds per block
-  kusama: 6, // seconds per block
-  acala: 12, // seconds per block
-  moonbeam: 12, // seconds per block
-  astar: 12, // seconds per block
-  bifrost: 12, // seconds per block
-  hydration: 12, // seconds per block
+  polkadot: 6,
+  kusama: 6,
+  acala: 12,
+  moonbeam: 12,
+  astar: 12,
+  bifrost: 12,
+  hydration: 12,
 };
 
 /**

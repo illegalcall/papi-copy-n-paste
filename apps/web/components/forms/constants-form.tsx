@@ -14,7 +14,7 @@ interface ConstantsFormProps {
 export function ConstantsForm({ pallet, constants }: ConstantsFormProps) {
   const [showConstants, setShowConstants] = useState(true);
 
-  const formatConstantValue = (value: any): string => {
+  const formatConstantValue = (value: unknown): string => {
     if (value === null || value === undefined) return "null";
     
     // Handle different value types

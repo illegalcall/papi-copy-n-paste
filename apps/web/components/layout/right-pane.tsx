@@ -16,7 +16,7 @@ import {
 import { Button } from "@workspace/ui/components/button";
 import { Toast } from "@workspace/ui/components/toast";
 import { Badge } from "@workspace/ui/components/badge";
-import { Copy, Terminal, Trash2, Settings, Code, Eye, Receipt } from "lucide-react";
+import { Copy, Terminal, Trash2, Settings, Code, Eye } from "lucide-react";
 import { SyntaxHighlighter } from "@/components/code/syntax-highlighter";
 import { ConsoleItem } from "@/hooks/useExecution";
 import { ArrayResult } from "@/utils/cleanLogger";
@@ -27,7 +27,7 @@ interface TransactionResult {
   blockNumber?: string;
   success: boolean;
   error?: string;
-  events?: any[];
+  events?: Record<string, unknown>[];
   fee?: string;
   timestamp: number;
 }
@@ -48,8 +48,6 @@ export function RightPane({
   onClearConsole,
   activeTab,
   selectedChain,
-  transactionHistory = [],
-  onClearTransactionHistory,
 }: RightPaneProps) {
   const [currentTab, setCurrentTab] = useState<"setup" | "code" | "console" | "transactions">(
     "setup",
@@ -307,7 +305,7 @@ export function RightPane({
       );
     }
 
-    // Legacy transaction hex handling (for backward compatibility)
+    // Legacy transaction hex handling
     const legacyHexMatch = line.match(/> 🔗 Transaction hex: (0x[a-fA-F0-9]+)/);
     if (legacyHexMatch && legacyHexMatch[1]) {
       const fullHex = legacyHexMatch[1];
@@ -449,7 +447,7 @@ export function RightPane({
                     <div className="text-xs text-muted-foreground mt-3 p-3 bg-green-50/50 dark:bg-green-950/20 rounded-md space-y-1">
                       <div>
                         <strong>
-                          Template Options (you'll be prompted to choose):
+                          Template Options (you&apos;ll be prompted to choose):
                         </strong>
                       </div>
                       {getSetupCommands(selectedChain).templates.map(

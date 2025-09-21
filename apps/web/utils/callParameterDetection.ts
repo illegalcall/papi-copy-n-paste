@@ -17,7 +17,7 @@ export interface CallParameterInfo {
   complexity: 'simple' | 'medium' | 'complex'
 }
 
-// Legacy interface for backward compatibility during migration
+// Legacy interface
 export interface LegacyCallParameterInfo {
   required: string[]
   optional: string[]
@@ -250,7 +250,6 @@ export class CallParameterDetector {
           }
         }
 
-        console.log(`🔄 Cache invalidated for ${chainKey} due to metadata update`)
       }
     }
 
@@ -302,7 +301,6 @@ export class CallParameterDetector {
   async preloadChain(chainKey: string): Promise<void> {
     try {
       await this.getMetadataAnalyzer(chainKey)
-      console.log(`✅ Preloaded metadata for ${chainKey}`)
     } catch (error) {
       console.warn(`⚠️ Failed to preload metadata for ${chainKey}:`, error)
     }

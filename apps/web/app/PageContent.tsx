@@ -5,10 +5,10 @@ import { Header } from "@/components/layout/header";
 import { LeftPane, LeftPaneRef } from "@/components/layout/left-pane";
 import { CenterPane } from "@/components/layout/center-pane";
 import { RightPane } from "@/components/layout/right-pane";
+import { MobileWarning } from "@/components/layout/mobile-warning";
 import { Sheet, SheetContent } from "@workspace/ui/components/sheet";
 import { Button } from "@workspace/ui/components/button";
 import { Menu } from "lucide-react";
-import { Binary } from "polkadot-api";
 
 // Import our refactored hooks
 import { useChainConnection } from "../hooks/useChainConnection";
@@ -23,6 +23,7 @@ import { useExecution } from "../hooks/useExecution";
 import { useDebounce } from "../hooks/useDebounce";
 import { useGlobalSearch } from "../hooks/useGlobalSearch";
 import { useWallet } from "../hooks/useWallet";
+import { useMobileDetection } from "../hooks/useMobileDetection";
 import { TransactionPreviewModal } from "../components/wallet";
 
 // Import execution helpers
@@ -33,7 +34,6 @@ import {
   executeStorageQuery,
   stopWatchValue,
 } from "../utils/transactionHelpers";
-import { getDescriptorName } from "../utils/chainConfig";
 
 // Types for transaction history
 interface TransactionResult {
@@ -42,9 +42,23 @@ interface TransactionResult {
   blockNumber?: string;
   success: boolean;
   error?: string;
-  events?: any[];
+  events?: Record<string, unknown>[];
   fee?: string;
   timestamp: number;
+}
+
+interface PendingTransaction {
+  pallet: string;
+  call: string;
+  args: Record<string, unknown>;
+  method?: unknown;
+}
+
+interface TransactionEvent {
+  type: string;
+  txHash?: string;
+  blockHash?: string;
+  blockNumber?: string;
 }
 
 export default function PageContent() {
@@ -67,10 +81,16 @@ export default function PageContent() {
     getSigner,
   } = useWallet();
 
+  // Mobile detection
+  const {
+    showMobileWarning,
+    dismissMobileWarning,
+  } = useMobileDetection();
+
   // Transaction history and preview modal state
   const [transactionHistory, setTransactionHistory] = useState<TransactionResult[]>([]);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [pendingTransactions, setPendingTransactions] = useState<any[]>([]);
+  const [pendingTransactions, setPendingTransactions] = useState<PendingTransaction[]>([]);
 
   // Determine if current chain is a testnet
   const isTestnet = selectedChain?.toLowerCase().includes('test') ||
@@ -204,7 +224,7 @@ export default function PageContent() {
 
   // Enhanced form change handler that switches to code tab
   const enhancedHandleFormChange = useCallback(
-    (formData: Record<string, any>) => {
+    (formData: Record<string, unknown>) => {
       handleFormChange(formData);
       // Switch to code tab when user starts typing/changing form values
       setActiveTab("code");
@@ -214,7 +234,7 @@ export default function PageContent() {
 
   // Enhanced storage params change handler that switches to code tab
   const enhancedHandleStorageParamsChange = useCallback(
-    (params: Record<string, any>) => {
+    (params: Record<string, unknown>) => {
       handleStorageParamsChange(params);
       // Switch to code tab when user changes storage parameters
       setActiveTab("code");
@@ -339,7 +359,7 @@ export default function PageContent() {
   );
 
   const wrappedHandleErrorSelect = useCallback(
-    (pallet: string, error: any) => {
+    (pallet: string, error: unknown) => {
       handleErrorSelect(pallet, error);
       clearCallSelection(); // Clear call when error is selected
       clearStorageSelection(); // Clear storage when error is selected
@@ -351,7 +371,7 @@ export default function PageContent() {
   );
 
   const wrappedHandleEventSelect = useCallback(
-    (pallet: string, event: any) => {
+    (pallet: string, event: unknown) => {
       handleEventSelect(pallet, event);
       clearCallSelection(); // Clear call when event is selected
       clearStorageSelection(); // Clear storage when event is selected
@@ -364,7 +384,7 @@ export default function PageContent() {
 
   // Prepare transactions for preview
   const prepareTransactionsForPreview = useCallback(() => {
-    const transactions: any[] = [];
+    const transactions: PendingTransaction[] = [];
 
     if (selectedCall) {
       // Single transaction
@@ -436,7 +456,6 @@ export default function PageContent() {
 
       // Get typed API for the current chain (no switching)
       const typedApi = getTypedApiForChain(api, selectedChain.toLowerCase());
-      console.log('🔍 Created typed API for chain:', selectedChain.toLowerCase());
 
       const signer = await getSigner();
       if (!signer) {
@@ -471,7 +490,7 @@ export default function PageContent() {
 
           if (txInfo.pallet === "Balances" && txInfo.call === "transfer_allow_death") {
             // Use proper PAPI typed API instead of manual encoding
-            let destAddressRaw = txInfo.args.dest;
+            const destAddressRaw = txInfo.args.dest;
 
             // Extract the actual address string from the form object
             let destAddress: string;
@@ -483,9 +502,6 @@ export default function PageContent() {
               throw new Error(`Invalid destination format: ${JSON.stringify(destAddressRaw)}`);
             }
 
-            console.log('🔍 Original destination from form:', destAddressRaw);
-            console.log('🔍 Extracted address string:', destAddress);
-
             // Handle special cases like //Alice and //Bob for testing
             if (destAddress === "//Alice" || destAddress === "//Bob") {
               destAddress = selectedAccount.address;
@@ -495,13 +511,8 @@ export default function PageContent() {
               ]);
             }
 
-            console.log('🔍 Final destination for transaction:', destAddress);
-
             // Use SS58 address directly - PAPI handles the conversion internally
-            console.log('🔍 Using SS58 address directly for PAPI transaction:', destAddress);
-
             const valueAsBigInt = BigInt(txInfo.args.value || txInfo.args.amount || "0");
-            console.log('🔍 Using BigInt value for transaction:', valueAsBigInt.toString());
 
             setConsoleOutput((prev) => [
               ...prev,
@@ -519,10 +530,6 @@ export default function PageContent() {
               ...prev,
               `✅ [${i + 1}/${pendingTransactions.length}] PAPI typed transaction created successfully!`,
             ]);
-
-            console.log('🔍 PAPI typed transaction created:', tx);
-            console.log('🔍 Destination address:', destAddress);
-            console.log('🔍 Transaction value:', valueAsBigInt.toString())
           } else {
             // For other calls, pass the args object directly
             tx = typedApi.tx[txInfo.pallet][txInfo.call](txInfo.args);
@@ -535,17 +542,13 @@ export default function PageContent() {
           ]);
 
           // Debug signer and transaction before signing
-          console.log('🔍 Signer object:', signer);
-          console.log('🔍 Signer type:', typeof signer);
-          console.log('🔍 Transaction sign method:', tx.sign);
-          console.log('🔍 Transaction sign method type:', typeof tx.sign);
 
           setConsoleOutput((prev) => [
             ...prev,
             `🔧 [${i + 1}/${pendingTransactions.length}] About to call tx.sign(signer)...`,
           ]);
 
-          let signedExtrinsic: any;
+          let signedExtrinsic: unknown;
           try {
             // Try different signing approaches based on the error
             setConsoleOutput((prev) => [
@@ -561,8 +564,6 @@ export default function PageContent() {
               `✅ [${i + 1}/${pendingTransactions.length}] Transaction signed successfully!`,
               `🔧 [${i + 1}/${pendingTransactions.length}] Signed extrinsic type: ${typeof signedExtrinsic}`,
             ]);
-
-            console.log('🔍 Signed extrinsic:', signedExtrinsic);
 
           } catch (signError) {
             setConsoleOutput((prev) => [
@@ -635,8 +636,7 @@ export default function PageContent() {
 
             // Watch for transaction events
             submissionResult.subscribe({
-              next: (event: any) => {
-                console.log('🔍 Transaction event:', event);
+              next: (event: TransactionEvent) => {
                 setConsoleOutput((prev) => [
                   ...prev,
                   `📡 [${i + 1}/${pendingTransactions.length}] ${event.type}: ${event.txHash || 'Processing...'}`,
@@ -668,15 +668,15 @@ export default function PageContent() {
                     }, 500);
 
                     // Store interval reference to clear it later
-                    (window as any).bestBlockInterval = bestBlockInterval;
+                    (window as Window & { bestBlockInterval?: NodeJS.Timeout }).bestBlockInterval = bestBlockInterval;
                   }, 100); // Small delay to ensure proper order
                 }
 
                 // Clear best block animation when we get txBestBlocksState and add finalization loading
                 if (event.type === 'txBestBlocksState') {
-                  if ((window as any).bestBlockInterval) {
-                    clearInterval((window as any).bestBlockInterval);
-                    (window as any).bestBlockInterval = null;
+                  if ((window as Window & { bestBlockInterval?: NodeJS.Timeout }).bestBlockInterval) {
+                    clearInterval((window as Window & { bestBlockInterval?: NodeJS.Timeout }).bestBlockInterval);
+                    (window as Window & { bestBlockInterval?: NodeJS.Timeout }).bestBlockInterval = undefined;
                   }
 
                   // Add loading message after txBestBlocksState
@@ -755,7 +755,7 @@ export default function PageContent() {
                   setTransactionHistory((prev) => [newTransaction, ...prev]);
                 }
               },
-              error: (error: any) => {
+              error: (error: Error) => {
                 console.error('🔍 Transaction submission error:', error);
                 setConsoleOutput((prev) => [
                   ...prev,
@@ -818,7 +818,6 @@ export default function PageContent() {
     getSigner,
     pendingTransactions,
     setConsoleOutput,
-    setActiveTab,
   ]);
 
   // Clear transaction history
@@ -1167,6 +1166,11 @@ export default function PageContent() {
         chainName={selectedChain}
         api={api}
       />
+
+      {/* Mobile Warning */}
+      {showMobileWarning && (
+        <MobileWarning onDismiss={dismissMobileWarning} />
+      )}
     </div>
   );
 }

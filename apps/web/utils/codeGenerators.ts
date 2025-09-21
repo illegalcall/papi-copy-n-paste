@@ -615,10 +615,6 @@ export function generateCodeSnippet(
 ): string {
   const template = getCodeTemplate();
 
-  // Debug: Log form data to see what's being passed
-  console.log('🔍 Code generation - formData:', formData);
-  console.log('🔍 Code generation - call.args:', call.args);
-
   if (template === "function") {
     return generateFunctionCode(chainKey, providerId, pallet, call, formData);
   } else {
@@ -661,15 +657,11 @@ console.log('Connected to custom RPC')`;
   // Generate arguments from form data keys with proper type handling
   const args = Object.entries(formData)
     .map(([paramName, value]) => {
-      console.log(`🔍 Processing param ${paramName}:`, value, 'type:', typeof value);
-
       // Get the actual parameter type from call.args
       const paramType = paramTypeMap.get(paramName) || 'unknown';
-      console.log(`🔍 Parameter ${paramName} has type:`, paramType);
 
       // Extract actual value from form object structure if needed
       if (typeof value === 'object' && value?.type === 'Id' && value?.value) {
-        console.log(`🔍 Extracting object value for ${paramName}:`, value, '→', value.value);
         value = value.value; // Extract the actual address string
       }
 
