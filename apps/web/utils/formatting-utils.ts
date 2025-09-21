@@ -260,10 +260,6 @@ export function generateStorageParamValues(
     const paramValue =
       storageParams[paramType.toLowerCase()] ||
       storageParams[paramType] ||
-      storageParams["ss58string"] ||
-      storageParams["accountid"] ||
-      storageParams["key"] ||
-      storageParams["param"] ||
       "";
 
     // Handle different parameter types
