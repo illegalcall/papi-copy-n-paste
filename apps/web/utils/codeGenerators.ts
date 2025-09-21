@@ -9,14 +9,11 @@ import {
   getChainConnection,
   getParameterDescription,
 } from "./chainConfig";
+import { getStorageParameterInfo } from "./dynamicStorageDetection";
 import {
-  detectStorageParameters,
   generateStorageParams,
-  getAllStorageParameters,
-} from "./storageHelpers";
-import {
   getCallDescription,
-} from "./callHelpers";
+} from "./formatting-utils";
 
 export function generateStorageQueryByType(
   queryType: string,
@@ -520,7 +517,11 @@ queryStorage().then(result => {
     const connectionInfo = getChainConnection(chainKey, providerId);
 
     // Get parameter information from our new flexible system
-    const paramInfo = getAllStorageParameters(pallet, storage.name, chainKey);
+    const detectedParams = getStorageParameterInfo(chainKey, pallet, storage.name);
+    const paramInfo = {
+      required: detectedParams.required,
+      optional: detectedParams.optional || []
+    };
     const allPossibleParams = [...paramInfo.required, ...paramInfo.optional];
 
     // Check if user provided any parameters
@@ -1187,7 +1188,8 @@ export function generateMultiStorageCode(
   // Generate storage queries
   const storageQueries = storageQueue
     .map((storage, index) => {
-      const requiresKeys = detectStorageParameters(storage.pallet, storage.storage.name, chainKey);
+      const detectedParams = getStorageParameterInfo(chainKey, storage.pallet, storage.storage.name);
+      const requiresKeys = detectedParams.required;
       const hasParams = Boolean(
         requiresKeys && Object.keys(storage.storageParams).length > 0,
       );

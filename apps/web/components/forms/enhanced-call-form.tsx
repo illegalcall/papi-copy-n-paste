@@ -6,7 +6,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Badge } from "@workspace/ui/components/badge";
@@ -30,7 +30,7 @@ interface EnhancedCallFormProps {
   selectedCall?: { pallet: string; call: PalletCall } | null;
 }
 
-export function EnhancedCallForm({
+export const EnhancedCallForm = memo(function EnhancedCallForm({
   pallet,
   callName,
   onFormChange,
@@ -109,14 +109,14 @@ export function EnhancedCallForm({
     onValidChange(isValid);
   }, [formData, parameterInfo, onFormChange, onValidChange]);
 
-  const handleFieldChange = (paramName: string, value: unknown) => {
+  const handleFieldChange = useCallback((paramName: string, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       [paramName]: value
     }));
-  };
+  }, []);
 
-  const handleOptionalToggle = (paramName: string, enabled: boolean) => {
+  const handleOptionalToggle = useCallback((paramName: string, enabled: boolean) => {
     if (!enabled) {
       // Remove from form data when disabled
       setFormData(prev => {
@@ -125,7 +125,7 @@ export function EnhancedCallForm({
         return newData;
       });
     }
-  };
+  }, []);
 
   // Loading state
   if (loading) {
@@ -234,12 +234,12 @@ export function EnhancedCallForm({
       )}
     </div>
   );
-}
+});
 
 /**
- * Render appropriate field component based on parameter type
+ * Memoized render appropriate field component based on parameter type
  */
-function renderParameterField(
+const renderParameterField = memo(function renderParameterField(
   param: ParameterInfo,
   value: unknown,
   onChange: (paramName: string, value: unknown) => void
@@ -264,12 +264,12 @@ function renderParameterField(
 
   // Handle simple types
   return renderSimpleParameterField(param, value, handleChange);
-}
+});
 
 /**
- * Render complex parameter field
+ * Memoized render complex parameter field
  */
-function renderComplexParameterField(
+const renderComplexParameterField = memo(function renderComplexParameterField(
   param: ParameterInfo,
   value: unknown,
   onChange: (value: unknown) => void
@@ -299,7 +299,7 @@ function renderComplexParameterField(
       {fieldType === 'array' ? (
         <textarea
           className="w-full p-2 border rounded font-mono text-sm"
-          value={Array.isArray(value) ? JSON.stringify(value, null, 2) : (value || '')}
+          value={Array.isArray(value) ? JSON.stringify(value, null, 2) : (typeof value === 'string' ? value : (value ? JSON.stringify(value, null, 2) : ''))}
           onChange={(e) => {
             try {
               const parsed = JSON.parse(e.target.value);
@@ -313,7 +313,7 @@ function renderComplexParameterField(
         />
       ) : (
         <Input
-          value={value || ''}
+          value={typeof value === 'string' ? value : (value ? String(value) : '')}
           onChange={(e) => onChange(e.target.value)}
           placeholder={`Enter ${param.name}`}
           className={fieldType === 'hex' ? 'font-mono' : ''}
@@ -321,12 +321,12 @@ function renderComplexParameterField(
       )}
     </div>
   );
-}
+});
 
 /**
- * Render simple parameter field
+ * Memoized render simple parameter field
  */
-function renderSimpleParameterField(
+const renderSimpleParameterField = memo(function renderSimpleParameterField(
   param: ParameterInfo,
   value: unknown,
   onChange: (value: unknown) => void
@@ -360,7 +360,7 @@ function renderSimpleParameterField(
       ) : (
         <Input
           type={fieldType === 'number' ? 'number' : 'text'}
-          value={value || ''}
+          value={typeof value === 'string' ? value : (value ? String(value) : '')}
           onChange={(e) => onChange(fieldType === 'number' ? e.target.value : e.target.value)}
           placeholder={getPlaceholderForType(param.type)}
           className={fieldType === 'hex' ? 'font-mono' : ''}
@@ -369,10 +369,10 @@ function renderSimpleParameterField(
       )}
     </div>
   );
-}
+});
 
 /**
- * Get field type from parameter type
+ * Get field type from parameter type - pure function, no memo needed
  */
 function getFieldTypeFromParameterType(type: string): 'text' | 'number' | 'boolean' | 'hex' | 'array' {
   if (type === 'bool') return 'boolean';
@@ -386,7 +386,7 @@ function getFieldTypeFromParameterType(type: string): 'text' | 'number' | 'boole
 }
 
 /**
- * Get placeholder text for parameter type
+ * Get placeholder text for parameter type - pure function, no memo needed
  */
 function getPlaceholderForType(type: string): string {
   if (type.includes('AccountId') || type.includes('Address')) {

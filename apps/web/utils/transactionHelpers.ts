@@ -9,16 +9,14 @@ import {
 } from "@workspace/core";
 import { getDescriptorName } from "./chainConfig";
 import type { StorageParams } from "../types/forms";
+import { getStorageParameterInfo } from "./dynamicStorageDetection";
 import {
-  getAllStorageParameters,
   generateStorageParamValues,
   decodeStorageResult,
-} from "./storageHelpers";
-import {
   generateCallParamValues,
   formatTransactionResult,
   getCallDescription,
-} from "./callHelpers";
+} from "./formatting-utils";
 import { getAllCallParameters } from "./callParameterDetection";
 import type { ParameterInfo } from "./metadataAnalyzer";
 import { createCleanLogger, QueryResult } from "./cleanLogger";
@@ -48,8 +46,12 @@ let activeWatchSubscriptions = new Map<string, any>();
 // Helper function to get storage parameters using the new dynamic detection system
 function getStorageParameters(chainKey: string, pallet: string, storageName: string): { required: string[], optional: string[] } {
   try {
-    // Use the new getAllStorageParameters function which returns both required and optional
-    const paramInfo = getAllStorageParameters(pallet, storageName, chainKey);
+    // Use the storage parameter detector directly
+    const detectedParams = getStorageParameterInfo(chainKey, pallet, storageName);
+    const paramInfo = {
+      required: detectedParams.required,
+      optional: detectedParams.optional || []
+    };
 
     return paramInfo;
   } catch (error) {

@@ -323,17 +323,20 @@ export function StorageForm({
   let displayType = "unknown";
 
   try {
-    actualTypeInfo = extractActualTypes(chainKey, pallet, storage.name);
+    const storageName = storage && typeof storage === 'object' && 'name' in storage ? (storage as any).name : 'unknown';
+    actualTypeInfo = extractActualTypes(chainKey, pallet, storageName);
     actualType = actualTypeInfo.actualType;
     displayType = formatTypeForDisplay(actualTypeInfo);
   } catch (error) {
-    console.error(`Type extraction failed for ${chainKey}.${pallet}.${storage.name}:`, error);
+    const storageName = storage && typeof storage === 'object' && 'name' in storage ? (storage as any).name : 'unknown';
+    console.error(`Type extraction failed for ${chainKey}.${pallet}.${storageName}:`, error);
   }
 
   // Memoize parameter detection to prevent infinite re-renders
   parameterInfo = useMemo(() => {
     try {
-      const detectedInfo = getStorageParameterInfo(chainKey, pallet, storage.name);
+      const storageName = storage && typeof storage === 'object' && 'name' in storage ? (storage as any).name : 'unknown';
+      const detectedInfo = getStorageParameterInfo(chainKey, pallet, storageName);
 
       // FORCE ALL PARAMETERS TO BE OPTIONAL FOR UI FLEXIBILITY
       // This ensures getValue(params) and getEntries() patterns both work
@@ -346,7 +349,8 @@ export function StorageForm({
         returnType: detectedInfo.returnType
       };
     } catch (fallbackError) {
-      console.error(`Parameter detection failed for ${chainKey}.${pallet}.${storage.name}:`, fallbackError);
+      const storageName = storage && typeof storage === 'object' && 'name' in storage ? (storage as any).name : 'unknown';
+      console.error(`Parameter detection failed for ${chainKey}.${pallet}.${storageName}:`, fallbackError);
       return {
         required: [],
         optional: [],
@@ -354,7 +358,7 @@ export function StorageForm({
         returnType: undefined
       };
     }
-  }, [chainKey, pallet, storage.name]);
+  }, [chainKey, pallet, storage]);
 
   // Memoize computed values to prevent re-renders
   const optionalParams = useMemo(() =>
@@ -380,17 +384,17 @@ export function StorageForm({
     displayType,
     queryType,
     pallet,
-    storage.name,
+    storage && typeof storage === 'object' && 'name' in storage ? (storage as any).name : 'unknown',
     actualTypeInfo,
-  ) : `// Type information not available for ${chainKey}.${pallet}.${storage.name}
+  ) : `// Type information not available for ${chainKey}.${pallet}.${storage && typeof storage === 'object' && 'name' in storage ? (storage as any).name : 'unknown'}
 // This storage query requires proper metadata to determine return type structure
-const result = await typedApi.query.${pallet}.${storage.name}(/* parameters */);
+const result = await typedApi.query.${pallet}.${storage && typeof storage === 'object' && 'name' in storage ? (storage as any).name : 'unknown'}(/* parameters */);
 console.log('Result:', result);`;
   
   // Generate TypeScript type information for storage
   const storageTypeInfo = generateStorageSignature(
     pallet,
-    storage.name,
+    storage && typeof storage === 'object' && 'name' in storage ? (storage as any).name : 'unknown',
     actualTypeInfo?.paramTypes || [],
     actualType
   );
@@ -451,12 +455,12 @@ console.log('Result:', result);`;
         <div className="flex items-center space-x-2">
           <Database className="w-4 h-4 text-muted-foreground" />
           <h3 className="text-lg font-semibold text-foreground">
-            {pallet}.{storage.name}
+            {pallet}.{storage && typeof storage === 'object' && 'name' in storage ? (storage as any).name : 'unknown'}
           </h3>
           <Badge variant="outline" className="text-xs">Storage Query</Badge>
         </div>
         <p className="text-sm text-muted-foreground">
-          {storage.docs?.[0] || "Storage entry in the blockchain state"}
+          {storage && typeof storage === 'object' && 'docs' in storage && Array.isArray((storage as any).docs) ? (storage as any).docs[0] : "Storage entry in the blockchain state"}
         </p>
       </div>
 
@@ -470,7 +474,7 @@ console.log('Result:', result);`;
           <div className="flex items-center space-x-2 flex-1 min-w-0">
             <Code2 className="w-3 h-3 text-muted-foreground" />
             <div className="font-mono text-xs text-foreground truncate">
-              <span className="text-pink-600">{storage.name}</span>
+              <span className="text-pink-600">{storage && typeof storage === 'object' && 'name' in storage ? (storage as any).name : 'unknown'}</span>
               <span className="text-muted-foreground">: </span>
               <span className="text-purple-600">StorageDescriptor</span>
               <span className="text-gray-400">&lt;</span>
@@ -489,7 +493,7 @@ console.log('Result:', result);`;
           <div className="max-h-48 overflow-y-auto p-3 bg-muted/10 rounded-md border border-muted/50">
             <CallSignature 
               typeInfo={storageTypeInfo}
-              description={storage.docs?.[0] || "Storage entry in the blockchain state"}
+              description={storage && typeof storage === 'object' && 'docs' in storage && Array.isArray((storage as any).docs) ? (storage as any).docs[0] : "Storage entry in the blockchain state"}
             />
           </div>
         )}
@@ -501,7 +505,7 @@ console.log('Result:', result);`;
           <EnhancedQuerySelector
             value={queryType}
             onValueChange={onQueryTypeChange}
-            storageName={storage.name}
+            storageName={storage && typeof storage === 'object' && 'name' in storage ? (storage as any).name : 'unknown'}
           />
         </div>
 
@@ -623,7 +627,7 @@ console.log('Result:', result);`;
         {/* Storage Info */}
         <div className="text-xs text-muted-foreground space-y-1">
           <div>
-            <strong>Type:</strong> {storage.type || actualType}
+            <strong>Type:</strong> {storage && typeof storage === 'object' && 'type' in storage ? (storage as any).type : actualType}
           </div>
           {optionalParams ? (
             <div>

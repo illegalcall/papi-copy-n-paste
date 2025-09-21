@@ -3,7 +3,7 @@
  */
 
 import { useState, useCallback } from "../utils/reactImports";
-import { isStorageQueryValid } from "../utils/storageHelpers";
+// Note: isStorageQueryValid was removed as it just returned true
 import type { StorageParams } from "../types/forms";
 import { createStateClearer } from "../utils/stateHelpers";
 
@@ -22,7 +22,7 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
     setStorageParams({}); // Reset params when selecting new storage
 
     // Update validation state with dynamic detection
-    const isValid = isStorageQueryValid({ pallet, storage }, {}, chainKey);
+    const isValid = true; // All storage queries are considered valid (previously from isStorageQueryValid)
     setCanRunStorage(isValid);
   }, [chainKey]);
 
@@ -32,7 +32,7 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
       setStorageQueryType(newQueryType);
 
       // Re-validate with current params using dynamic detection
-      const isValid = isStorageQueryValid(selectedStorage, storageParams, chainKey);
+      const isValid = true; // All storage queries are considered valid (previously from isStorageQueryValid)
       setCanRunStorage(isValid);
     },
     [selectedStorage, storageParams, chainKey],
@@ -44,7 +44,7 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
       setStorageParams(newParams);
 
       // Update validation state with dynamic detection
-      const isValid = isStorageQueryValid(selectedStorage, newParams, chainKey);
+      const isValid = true; // All storage queries are considered valid (previously from isStorageQueryValid)
       setCanRunStorage(isValid);
     },
     [selectedStorage, chainKey],

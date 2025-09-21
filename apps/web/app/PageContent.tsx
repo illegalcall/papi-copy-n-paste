@@ -25,6 +25,7 @@ import { useGlobalSearch } from "../hooks/useGlobalSearch";
 import { useWallet } from "../hooks/useWallet";
 import { useMobileDetection } from "../hooks/useMobileDetection";
 import { TransactionPreviewModal } from "../components/wallet";
+import { PalletError, PalletEvent } from "@workspace/core";
 
 // Import execution helpers
 import {
@@ -359,7 +360,7 @@ export default function PageContent() {
   );
 
   const wrappedHandleErrorSelect = useCallback(
-    (pallet: string, error: unknown) => {
+    (pallet: string, error: PalletError) => {
       handleErrorSelect(pallet, error);
       clearCallSelection(); // Clear call when error is selected
       clearStorageSelection(); // Clear storage when error is selected
@@ -371,7 +372,7 @@ export default function PageContent() {
   );
 
   const wrappedHandleEventSelect = useCallback(
-    (pallet: string, event: unknown) => {
+    (pallet: string, event: PalletEvent) => {
       handleEventSelect(pallet, event);
       clearCallSelection(); // Clear call when event is selected
       clearStorageSelection(); // Clear storage when event is selected
@@ -476,6 +477,11 @@ export default function PageContent() {
       for (let i = 0; i < pendingTransactions.length; i++) {
         const txInfo = pendingTransactions[i];
 
+        if (!txInfo) {
+          console.error(`Transaction info missing at index ${i}`);
+          continue;
+        }
+
         setConsoleOutput((prev) => [
           ...prev,
           `📝 [${i + 1}/${pendingTransactions.length}] Creating PAPI transaction: ${txInfo.pallet}.${txInfo.call}`,
@@ -494,8 +500,10 @@ export default function PageContent() {
 
             // Extract the actual address string from the form object
             let destAddress: string;
-            if (typeof destAddressRaw === 'object' && destAddressRaw?.type === 'Id' && destAddressRaw?.value) {
-              destAddress = destAddressRaw.value;
+            if (typeof destAddressRaw === 'object' && destAddressRaw !== null &&
+                'type' in destAddressRaw && 'value' in destAddressRaw &&
+                (destAddressRaw as any).type === 'Id' && (destAddressRaw as any).value) {
+              destAddress = (destAddressRaw as any).value;
             } else if (typeof destAddressRaw === 'string') {
               destAddress = destAddressRaw;
             } else {
@@ -512,7 +520,8 @@ export default function PageContent() {
             }
 
             // Use SS58 address directly - PAPI handles the conversion internally
-            const valueAsBigInt = BigInt(txInfo.args.value || txInfo.args.amount || "0");
+            const rawValue = txInfo.args.value || txInfo.args.amount || "0";
+            const valueAsBigInt = BigInt(typeof rawValue === 'string' || typeof rawValue === 'number' || typeof rawValue === 'bigint' ? rawValue : "0");
 
             setConsoleOutput((prev) => [
               ...prev,
@@ -737,7 +746,7 @@ export default function PageContent() {
                     }
                   };
 
-                  const explorerLink = getExplorerLink(selectedChain, event.txHash);
+                  const explorerLink = event.txHash ? getExplorerLink(selectedChain, event.txHash) : null;
 
                   setConsoleOutput((prev) => [
                     ...prev,
@@ -746,13 +755,15 @@ export default function PageContent() {
                   ].filter(Boolean));
 
                   // Add to transaction history
-                  const newTransaction: TransactionResult = {
-                    hash: event.txHash,
-                    success: true,
-                    events: [],
-                    timestamp: Date.now(),
-                  };
-                  setTransactionHistory((prev) => [newTransaction, ...prev]);
+                  if (event.txHash) {
+                    const newTransaction: TransactionResult = {
+                      hash: event.txHash,
+                      success: true,
+                      events: [],
+                      timestamp: Date.now(),
+                    };
+                    setTransactionHistory((prev) => [newTransaction, ...prev]);
+                  }
                 }
               },
               error: (error: Error) => {
