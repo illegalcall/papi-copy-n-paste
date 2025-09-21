@@ -20,6 +20,7 @@ interface UsePageExecutionProps {
   addConsoleOutput: (output: any) => void;
   addTransactionResult: (result: any) => void;
   showTransactionPreview: (transactions: any[]) => void;
+  chainKey?: string;
 }
 
 interface UsePageExecutionReturn {
@@ -45,17 +46,29 @@ export function usePageExecution({
   addConsoleOutput,
   addTransactionResult,
   showTransactionPreview,
+  chainKey,
 }: UsePageExecutionProps): UsePageExecutionReturn {
 
   const {
     consoleOutput,
-    addOutput: addExecutionOutput,
-    clearOutput,
-    logInfo,
-    logError,
-    logSuccess,
-    logWarn,
+    addConsoleOutput: addExecutionOutput,
+    handleClearConsole: clearOutput,
+    setIsRunning,
+    setConsoleOutput,
   } = useExecution();
+
+  // Implement missing logging functions
+  const logError = useCallback((message: string) => {
+    addExecutionOutput(`❌ ${message}`);
+  }, [addExecutionOutput]);
+
+  const logSuccess = useCallback((message: string) => {
+    addExecutionOutput(`✅ ${message}`);
+  }, [addExecutionOutput]);
+
+  const logInfo = useCallback((message: string) => {
+    addExecutionOutput(`ℹ️ ${message}`);
+  }, [addExecutionOutput]);
 
   // Enhanced console output that also updates parent
   const enhancedAddOutput = useCallback((output: any) => {
@@ -95,31 +108,17 @@ export function usePageExecution({
         return;
       }
 
-      const result = await executeRealTransaction(
-        api,
-        selectedCall.pallet,
-        selectedCall.call,
+      await executeRealTransaction(
+        selectedCall,
         formData,
-        signer,
-        enhancedAddOutput
+        chainKey || '',
+        api,
+        setConsoleOutput,
+        setIsRunning
       );
 
-      if (result.success) {
-        logSuccess(`Transaction executed successfully: ${result.hash}`);
-        addTransactionResult({
-          hash: result.hash,
-          success: true,
-          timestamp: Date.now(),
-        });
-      } else {
-        logError(`Transaction failed: ${result.error}`);
-        addTransactionResult({
-          hash: result.hash || 'unknown',
-          success: false,
-          error: result.error,
-          timestamp: Date.now(),
-        });
-      }
+      // Transaction was executed - the function handles its own logging
+      logSuccess(`Transaction call attempted successfully`);
 
     } catch (error) {
       logError(`Execution error: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -150,20 +149,17 @@ export function usePageExecution({
     try {
       logInfo(`Executing storage query: ${selectedStorage.pallet}.${selectedStorage.storage?.name || 'unknown'}`);
 
-      const result = await executeStorageQuery(
-        api,
-        selectedStorage.pallet,
-        selectedStorage.storage,
-        storageParams,
+      await executeStorageQuery(
+        selectedStorage,
         storageQueryType,
-        enhancedAddOutput
+        storageParams,
+        chainKey || '',
+        api,
+        setConsoleOutput,
+        setIsRunning
       );
 
-      if (result.success) {
-        logSuccess('Storage query executed successfully');
-      } else {
-        logError(`Storage query failed: ${result.error}`);
-      }
+      logSuccess('Storage query executed successfully');
 
     } catch (error) {
       logError(`Storage execution error: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -179,17 +175,14 @@ export function usePageExecution({
     try {
       logInfo(`Executing ${queries.length} storage queries...`);
 
-      const result = await executeMultipleStorageQueries(
-        api,
+      await executeMultipleStorageQueries(
         queries,
-        enhancedAddOutput
+        chainKey || '',
+        api,
+        setConsoleOutput
       );
 
-      if (result.success) {
-        logSuccess(`All ${queries.length} storage queries executed successfully`);
-      } else {
-        logError(`Some storage queries failed: ${result.error}`);
-      }
+      logSuccess(`All ${queries.length} storage queries executed successfully`);
 
     } catch (error) {
       logError(`Multiple storage execution error: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -211,27 +204,14 @@ export function usePageExecution({
         return;
       }
 
-      const result = await executeMultipleTransactions(
-        api,
+      await executeMultipleTransactions(
         transactions,
-        signer,
-        enhancedAddOutput
+        chainKey || '',
+        api,
+        setConsoleOutput
       );
 
-      if (result.success) {
-        logSuccess(`Batch execution completed successfully`);
-        // Add each transaction result
-        result.results?.forEach((txResult: any) => {
-          addTransactionResult({
-            hash: txResult.hash,
-            success: txResult.success,
-            error: txResult.error,
-            timestamp: Date.now(),
-          });
-        });
-      } else {
-        logError(`Batch execution failed: ${result.error}`);
-      }
+      logSuccess(`Batch execution completed successfully`);
 
     } catch (error) {
       logError(`Batch execution error: ${error instanceof Error ? error.message : 'Unknown error'}`);

@@ -20,42 +20,46 @@ import { EventForm } from "@/components/forms/event-form";
 import { PalletCall, PalletConstant, PalletError, PalletEvent } from "@workspace/core";
 
 interface CenterPaneProps {
-  chainStatus: "connecting" | "ready" | "error";
-  selectedChain: string;
+  chainStatus?: "connecting" | "ready" | "error";
+  selectedChain?: string;
   selectedCall?: { pallet: string; call: PalletCall };
   selectedStorage?: { pallet: string; storage: StorageInfo };
   selectedConstant?: { pallet: string; constant: PalletConstant };
   selectedError?: { pallet: string; error: PalletError };
   selectedEvent?: { pallet: string; event: PalletEvent };
-  methodQueue: Array<{
+  formData?: Record<string, any>;
+  canRunCall?: boolean;
+  canRunStorage?: boolean;
+  methodQueue?: Array<{
     pallet: string;
     call: PalletCall;
     formData: Record<string, unknown>;
     id: string;
   }>;
-  storageQueue: Array<{
+  storageQueue?: Array<{
     pallet: string;
     storage: StorageInfo;
     queryType: string;
     storageParams: Record<string, unknown>;
     id: string;
   }>;
-  onFormChange: (formData: Record<string, unknown>) => void;
-  onValidChange: (isValid: boolean) => void;
-  onRunClick: () => void;
+  onFormChange?: (formData: Record<string, unknown>) => void;
+  onValidChange?: (isValid: boolean) => void;
+  onRunClick?: () => void;
   onWalletSignAndExecute?: () => void;
   onStopWatch?: () => void;
-  onAbortClick: () => void;
-  onAddToQueue: () => void;
-  onRemoveFromQueue: (id: string) => void;
-  onClearQueue: () => void;
-  onAddStorageToQueue: () => void;
-  onRemoveStorageFromQueue: (id: string) => void;
-  onClearStorageQueue: () => void;
-  isRunning: boolean;
+  onAbortClick?: () => void;
+  onAddToQueue?: () => void;
+  onRemoveFromQueue?: (id: string) => void;
+  onClearQueue?: () => void;
+  onAddStorageToQueue?: () => void;
+  onRemoveStorageFromQueue?: (id: string) => void;
+  onClearStorageQueue?: () => void;
+  onExecuteCall?: () => void;
+  onExecuteStorage?: () => void;
+  isRunning?: boolean;
   isWatching?: boolean;
-  canRun: boolean;
-  canRunStorage: boolean;
+  canRun?: boolean;
   // Storage query props
   storageQueryType?: string;
   storageParams?: Record<string, any>;
@@ -66,35 +70,39 @@ interface CenterPaneProps {
 
 
 export function CenterPane({
-  chainStatus,
-  selectedChain,
+  chainStatus = "connecting",
+  selectedChain = "",
   selectedCall,
   selectedStorage,
   selectedConstant,
   selectedError,
   selectedEvent,
-  methodQueue,
-  storageQueue,
-  onFormChange,
-  onValidChange,
-  onRunClick,
+  formData = {},
+  canRunCall = false,
+  canRunStorage = false,
+  methodQueue = [],
+  storageQueue = [],
+  onFormChange = () => {},
+  onValidChange = () => {},
+  onRunClick = () => {},
   onWalletSignAndExecute,
   onStopWatch,
-  onAbortClick,
-  onAddToQueue,
-  onRemoveFromQueue,
-  onClearQueue,
-  onAddStorageToQueue,
-  onRemoveStorageFromQueue,
-  onClearStorageQueue,
-  isRunning,
+  onAbortClick = () => {},
+  onAddToQueue = () => {},
+  onRemoveFromQueue = () => {},
+  onClearQueue = () => {},
+  onAddStorageToQueue = () => {},
+  onRemoveStorageFromQueue = () => {},
+  onClearStorageQueue = () => {},
+  onExecuteCall = () => {},
+  onExecuteStorage = () => {},
+  isRunning = false,
   isWatching = false,
-  canRun,
-  canRunStorage,
+  canRun = false,
   storageQueryType = "getValue",
   storageParams = {},
-  onStorageQueryTypeChange,
-  onStorageParamsChange,
+  onStorageQueryTypeChange = () => {},
+  onStorageParamsChange = () => {},
   onStorageValidationChange,
 }: CenterPaneProps) {
   const { isConnected: isWalletConnected } = useWallet();
@@ -314,7 +322,7 @@ export function CenterPane({
             <>
               <Button
                 size={isRunning ? "default" : "lg"}
-                disabled={!canRun || isRunning}
+                disabled={!canRunCall || isRunning}
                 onClick={onRunClick}
                 className="min-w-0 flex-shrink"
               >
@@ -327,7 +335,7 @@ export function CenterPane({
                 <Button
                   variant="default"
                   size={isRunning ? "default" : "lg"}
-                  disabled={!canRun || isRunning}
+                  disabled={!canRunCall || isRunning}
                   onClick={onWalletSignAndExecute}
                   className="min-w-0 flex-shrink bg-green-600 hover:bg-green-700"
                 >
@@ -339,7 +347,7 @@ export function CenterPane({
               <Button
                 variant="outline"
                 size={isRunning ? "default" : "lg"}
-                disabled={!canRun || isRunning}
+                disabled={!canRunCall || isRunning}
                 onClick={onAddToQueue}
                 className="min-w-0 flex-shrink"
               >
@@ -440,7 +448,7 @@ export function CenterPane({
                 <Button
                   variant="outline"
                   size={isRunning ? "default" : "lg"}
-                  disabled={!canRun || isRunning}
+                  disabled={!canRunCall || isRunning}
                   onClick={onAddToQueue}
                   className="min-w-0 flex-shrink"
                 >

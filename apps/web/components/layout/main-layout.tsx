@@ -17,6 +17,9 @@ interface MainLayoutProps {
   isMobileSheetOpen: boolean;
   onMobileSheetOpenChange: (open: boolean) => void;
   mobileLeftPaneContent?: React.ReactNode;
+  selectedChain: string;
+  selectedProvider: string;
+  onNetworkChange: (chainKey: string, providerId: string) => void;
 }
 
 export const MainLayout = memo(({
@@ -26,10 +29,17 @@ export const MainLayout = memo(({
   isMobileSheetOpen,
   onMobileSheetOpenChange,
   mobileLeftPaneContent,
+  selectedChain,
+  selectedProvider,
+  onNetworkChange,
 }: MainLayoutProps) => {
   return (
     <div className="flex h-screen flex-col">
-      <Header />
+      <Header
+        selectedChain={selectedChain}
+        selectedProvider={selectedProvider}
+        onNetworkChange={onNetworkChange}
+      />
 
       {showMobileWarning && (
         <MobileWarning onDismiss={onDismissMobileWarning} />

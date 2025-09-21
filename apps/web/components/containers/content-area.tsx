@@ -83,6 +83,7 @@ export const ContentArea = memo(({
   isLoadingMetadata,
   metadataError,
   chainStatus,
+  selectedChain,
 }: ContentAreaProps) => {
   const leftPaneRef = useRef<LeftPaneRef>(null);
 
@@ -121,22 +122,21 @@ export const ContentArea = memo(({
           onStorageParamsChange={onStorageParamsChange}
           onStorageQueryTypeChange={onStorageQueryTypeChange}
           onStorageValidationChange={onStorageValidationChange}
+          onRunClick={onExecuteCall}
           onExecuteCall={onExecuteCall}
           onExecuteStorage={onExecuteStorage}
+          chainStatus={chainStatus as "connecting" | "ready" | "error"}
+          selectedChain={selectedChain}
         />
       </div>
 
       {/* Right Pane - Hidden on mobile below lg breakpoint */}
       <div className="hidden lg:flex w-96">
         <RightPane
-          generatedCode={generatedCode}
-          storageCode={storageCode}
+          code={generatedCode}
           consoleOutput={consoleOutput}
-          transactionHistory={transactionHistory}
-          isLoadingMetadata={isLoadingMetadata}
-          metadataError={metadataError}
-          chainStatus={chainStatus}
           selectedChain={selectedChain}
+          transactionHistory={transactionHistory}
         />
       </div>
     </div>

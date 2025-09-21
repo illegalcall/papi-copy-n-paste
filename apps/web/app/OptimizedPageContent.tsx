@@ -67,6 +67,7 @@ export default function OptimizedPageContent() {
       // This will be handled by TransactionContainer
       console.log('Show preview for transactions:', transactions);
     },
+    chainKey: chainConnection.selectedChain,
   });
 
   // Optimized event handlers with useCallback
@@ -200,6 +201,9 @@ export default function OptimizedPageContent() {
           isMobileSheetOpen={isMobileSheetOpen}
           onMobileSheetOpenChange={setIsMobileSheetOpen}
           mobileLeftPaneContent={mobileLeftPaneContent}
+          selectedChain={chainConnection.selectedChain}
+          selectedProvider={chainConnection.selectedProvider}
+          onNetworkChange={chainConnection.handleNetworkChange}
         >
           <ContentArea
             // Left pane props

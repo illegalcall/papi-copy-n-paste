@@ -237,9 +237,9 @@ export const EnhancedCallForm = memo(function EnhancedCallForm({
 });
 
 /**
- * Memoized render appropriate field component based on parameter type
+ * Render appropriate field component based on parameter type
  */
-const renderParameterField = memo(function renderParameterField(
+function renderParameterField(
   param: ParameterInfo,
   value: unknown,
   onChange: (paramName: string, value: unknown) => void
@@ -264,12 +264,12 @@ const renderParameterField = memo(function renderParameterField(
 
   // Handle simple types
   return renderSimpleParameterField(param, value, handleChange);
-});
+}
 
 /**
- * Memoized render complex parameter field
+ * Render complex parameter field
  */
-const renderComplexParameterField = memo(function renderComplexParameterField(
+function renderComplexParameterField(
   param: ParameterInfo,
   value: unknown,
   onChange: (value: unknown) => void
@@ -321,12 +321,12 @@ const renderComplexParameterField = memo(function renderComplexParameterField(
       )}
     </div>
   );
-});
+}
 
 /**
- * Memoized render simple parameter field
+ * Render simple parameter field
  */
-const renderSimpleParameterField = memo(function renderSimpleParameterField(
+function renderSimpleParameterField(
   param: ParameterInfo,
   value: unknown,
   onChange: (value: unknown) => void
@@ -369,7 +369,7 @@ const renderSimpleParameterField = memo(function renderSimpleParameterField(
       )}
     </div>
   );
-});
+}
 
 /**
  * Get field type from parameter type - pure function, no memo needed
