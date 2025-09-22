@@ -4,8 +4,9 @@
 
 import { useState, useCallback } from "react";
 import { PalletCall } from "@workspace/core";
-import { generateId } from "../utils/generateId";
 import type { MethodQueueItem, StorageQueueItem } from "../types/forms";
+
+const generateId = (): string => Math.random().toString(36).substr(2, 9);
 
 export function useTransactionQueue() {
   // Method queue state
