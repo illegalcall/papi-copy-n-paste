@@ -1,12 +1,8 @@
 
-// Core business logic hooks
 export { useBalanceFetcher } from './useBalanceFetcher';
 export { useFeeEstimator } from './useFeeEstimator';
 export { useCustomProviders } from './useCustomProviders';
 export { useTransactionConfirmation } from './useTransactionConfirmation';
-export { useClipboard } from './useClipboard';
-
-// Existing hooks
 export { useChainConnection } from './useChainConnection';
 export { useCallSelection } from './useCallSelection';
 export { useStorageQuery } from './useStorageQuery';
@@ -21,5 +17,3 @@ export { useGlobalSearch } from './useGlobalSearch';
 export { useWallet } from './useWallet';
 export { useMobileDetection } from './useMobileDetection';
 
-// Core error handling hooks
-export { useErrorHandler } from './core/useErrorHandler';
