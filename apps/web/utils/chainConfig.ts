@@ -2,13 +2,8 @@
  * Chain configuration utilities for PAPI setup commands and descriptors
  */
 
-import { getAllCustomProviders, CustomProvider } from "./customRpc";
+import { getAllCustomProviders } from "./customRpc";
 
-export function getSetupCommands(chainKey: string): string {
-  // This function is kept for backward compatibility but should not be used for code generation
-  // Setup instructions are now handled by the Setup tab in RightPane
-  return "";
-}
 
 export function getChainSpecImport(chainKey: string): string {
   // Only major relay chains have built-in chainSpecs
