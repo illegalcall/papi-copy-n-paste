@@ -527,8 +527,6 @@ function mapParameterType(paramType: string): string {
   return paramType;
 }
 
-// Unused constant signature functions removed - not referenced anywhere in codebase
-
 /**
  * Gets parameter descriptions based on common parameter names
  */
@@ -631,5 +629,3 @@ export function generateEventSignature(
     complexity
   };
 }
-
-// Unused type highlighting function removed - not referenced anywhere in codebase

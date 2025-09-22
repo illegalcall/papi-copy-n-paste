@@ -17,14 +17,6 @@ export interface CallParameterInfo {
   complexity: 'simple' | 'medium' | 'complex'
 }
 
-// Legacy interface
-export interface LegacyCallParameterInfo {
-  required: string[]
-  optional: string[]
-  description?: string
-  returnType?: string
-}
-
 export class CallParameterDetector {
   private static instance: CallParameterDetector
   private analyzerCache = new Map<string, MetadataAnalyzer>()
@@ -76,23 +68,6 @@ export class CallParameterDetector {
     } catch (error) {
       console.error(`❌ Failed to get parameter info for ${chainKey}.${pallet}.${call}:`, error)
       throw error
-    }
-  }
-
-  /**
-   * Get legacy parameter information (for backward compatibility)
-   */
-  async getLegacyCallParameterInfo(
-    chainKey: string,
-    pallet: string,
-    call: string
-  ): Promise<LegacyCallParameterInfo> {
-    const richInfo = await this.getCallParameterInfo(chainKey, pallet, call)
-
-    return {
-      required: richInfo.required.map(p => p.name),
-      optional: richInfo.optional.map(p => p.name),
-      description: richInfo.description
     }
   }
 
@@ -348,14 +323,3 @@ export async function isCallValid(
   return callParameterDetector.isCallValid(chainKey, pallet, call, callParams)
 }
 
-/**
- * Legacy compatibility function
- */
-export async function detectCallParameters(
-  palletName: string,
-  callName: string,
-  chainKey: string = 'polkadot'
-): Promise<string[]> {
-  const legacyInfo = await callParameterDetector.getLegacyCallParameterInfo(chainKey, palletName, callName)
-  return legacyInfo.required
-}

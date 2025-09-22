@@ -2,7 +2,7 @@
  * Hook for managing error selection
  */
 
-import { useState, useCallback } from "../utils/reactImports";
+import { useState, useCallback } from "react";
 import { PalletError } from "@workspace/core";
 
 export function useErrorSelection() {
