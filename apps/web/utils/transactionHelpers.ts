@@ -1,6 +1,3 @@
-/**
- * Transaction execution helper functions
- */
 
 import {
   PalletCall,
@@ -9,22 +6,18 @@ import {
 } from "@workspace/core";
 import { getDescriptorName } from "./chainConfig";
 import type { StorageParams } from "../types/forms";
+import { getStorageParameterInfo } from "./dynamicStorageDetection";
 import {
-  getAllStorageParameters,
   generateStorageParamValues,
   decodeStorageResult,
-} from "./storageHelpers";
-import {
   generateCallParamValues,
-  formatTransactionResult,
-  getCallDescription,
-} from "./callHelpers";
+} from "./formatting-utils";
 import { getAllCallParameters } from "./callParameterDetection";
 import type { ParameterInfo } from "./metadataAnalyzer";
 import { createCleanLogger, QueryResult } from "./cleanLogger";
 import { getDescriptorForChain } from "@workspace/core/descriptors";
+import { StorageQueryType } from "../types/enums";
 
-// BigInt serialization helper
 function serializeBigInt(value: any): any {
   if (typeof value === 'bigint') {
     return value.toString();
@@ -42,14 +35,15 @@ function serializeBigInt(value: any): any {
   return value;
 }
 
-// Observable subscriptions storage for watch functionality
 let activeWatchSubscriptions = new Map<string, any>();
 
-// Helper function to get storage parameters using the new dynamic detection system
 function getStorageParameters(chainKey: string, pallet: string, storageName: string): { required: string[], optional: string[] } {
   try {
-    // Use the new getAllStorageParameters function which returns both required and optional
-    const paramInfo = getAllStorageParameters(pallet, storageName, chainKey);
+    const detectedParams = getStorageParameterInfo(chainKey, pallet, storageName);
+    const paramInfo = {
+      required: detectedParams.required,
+      optional: detectedParams.optional || []
+    };
 
     return paramInfo;
   } catch (error) {
@@ -62,7 +56,7 @@ function getStorageParameters(chainKey: string, pallet: string, storageName: str
 async function getCallParameters(chainKey: string, pallet: string, callName: string): Promise<{ required: ParameterInfo[], optional: ParameterInfo[] }> {
   try {
     // Use the new getAllCallParameters from callParameterDetection
-    const paramInfo = await getAllCallParameters(pallet, callName, chainKey);
+    const paramInfo = await getAllCallParameters(chainKey, pallet, callName);
     return paramInfo;
   } catch (error) {
     // Fallback that returns empty arrays
@@ -302,7 +296,7 @@ export async function executeMultipleStorageQueries(
 // Execute a single storage query
 export async function executeStorageQuery(
   selectedStorage: { pallet: string; storage: any },
-  queryType: string,
+  queryType: StorageQueryType | string,
   storageParams: Record<string, any>,
   chainKey: string,
   client: any,
@@ -379,7 +373,7 @@ export async function executeStorageQuery(
       logger,
     );
     // Return watch result if it's a watchValue operation
-    if (queryType === 'watchValue' && rawResult) {
+    if ((queryType === StorageQueryType.WATCH_VALUE || queryType === 'watchValue' || queryType === 'watchValue') && rawResult) {
       return rawResult;
     }
 
@@ -391,7 +385,7 @@ export async function executeStorageQuery(
     logger.queryError(pallet, storage.name, queryType, errorMessage);
 
     // Return failed state for watchValue operations
-    if (queryType === 'watchValue') {
+    if (queryType === StorageQueryType.WATCH_VALUE || queryType === 'watchValue') {
       return { watchKey: '', isWatching: false };
     }
     return undefined;
@@ -415,21 +409,6 @@ async function executeGetValue(
       ? await storageQuery(...paramValues)
       : await storageQuery();
 
-    // Enhanced logging for account balances
-    if (pallet === "System" && storageName === "Account" && result?.data) {
-      const free = result.data.free;
-      const reserved = result.data.reserved;
-      if (typeof free === 'bigint' && typeof reserved === 'bigint') {
-        const freeTokens = (Number(free) / 10**10).toFixed(4);
-        const reservedTokens = (Number(reserved) / 10**10).toFixed(4);
-        const totalTokens = (Number(free + reserved) / 10**10).toFixed(4);
-        logger.info(`💰 Native token balance (System.Account):`);
-        logger.info(`  Free: ${free} planck (${freeTokens} tokens)`);
-        logger.info(`  Reserved: ${reserved} planck (${reservedTokens} tokens)`);
-        logger.info(`  Total: ${free + reserved} planck (${totalTokens} tokens)`);
-        logger.info(`💡 For asset tokens, query Assets.Account with asset ID`);
-      }
-    }
 
     // Serialize BigInt values before logging
     const serializedResult = serializeBigInt(result);
@@ -458,7 +437,8 @@ async function executeRawStorageQuery(
 
       // Execute basic query based on type
       switch (queryType) {
-        case "getValue":
+        case StorageQueryType.GET_VALUE:
+        case 'getValue':
           await executeRawGetValue(
             client,
             palletName,
@@ -468,7 +448,8 @@ async function executeRawStorageQuery(
             storageParams,
           );
           break;
-        case "getValueAt":
+        case StorageQueryType.GET_VALUE_AT:
+        case 'getValueAt':
           await executeGetValueAt(
             client,
             undefined,
@@ -477,7 +458,8 @@ async function executeRawStorageQuery(
             logger,
           );
           break;
-        case "watchValue":
+        case StorageQueryType.WATCH_VALUE:
+        case 'watchValue':
           const watchResult = await executeWatchValue(
             client,
             undefined,
@@ -509,7 +491,7 @@ async function executeRawStorageQuery(
     logger.error(`Raw storage query failed: ${errorMessage}`);
 
     // Return failed state for watchValue operations
-    if (queryType === 'watchValue') {
+    if (queryType === StorageQueryType.WATCH_VALUE || queryType === 'watchValue') {
       return { watchKey: '', isWatching: false };
     }
     return undefined;
@@ -783,10 +765,6 @@ export function isWatching(watchKey: string): boolean {
   return activeWatchSubscriptions.has(watchKey);
 }
 
-// Get all active watches
-export function getActiveWatches(): string[] {
-  return Array.from(activeWatchSubscriptions.keys());
-}
 
 // Helper function to format storage results consistently for PAPI
 function formatPapiStorageResult(value: any): string {

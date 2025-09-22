@@ -1,8 +1,3 @@
-/**
- * EnumParameterField - Complete enum parameter input with variant selection and data input
- *
- * Handles both void and data variants following PAPI Console patterns
- */
 
 import React, { useState, useEffect } from 'react'
 import { Input } from '@workspace/ui/components/input'
@@ -31,9 +26,9 @@ export function EnumParameterField({
 
   // Initialize from value
   useEffect(() => {
-    if (value && typeof value === 'object' && value.type) {
-      setSelectedVariant(value.type)
-      setVariantData(value.value || null)
+    if (value && typeof value === 'object' && 'type' in value) {
+      setSelectedVariant((value as any).type)
+      setVariantData((value as any).value || null)
     } else if (typeof value === 'string') {
       setSelectedVariant(value)
       setVariantData(null)
@@ -85,7 +80,7 @@ export function EnumParameterField({
           </Badge>
         </Label>
         <Input
-          value={value || ''}
+          value={typeof value === 'string' ? value : (value ? String(value) : '')}
           onChange={(e) => onChange(e.target.value)}
           placeholder={`Enter ${parameter.name}`}
         />
@@ -146,7 +141,7 @@ function renderDataInput(variant: EnumVariant, value: unknown, onChange: (value:
     return (
       <Input
         type="text"
-        value={value || ''}
+        value={typeof value === 'string' ? value : (value ? String(value) : '')}
         onChange={(e) => onChange(e.target.value)}
         placeholder="5GrwvaEF5zXb26Fz... or //Alice"
         className="font-mono text-sm"
@@ -159,7 +154,7 @@ function renderDataInput(variant: EnumVariant, value: unknown, onChange: (value:
     return (
       <Input
         type="number"
-        value={value || ''}
+        value={typeof value === 'string' ? value : (value ? String(value) : '')}
         onChange={(e) => onChange(e.target.value)}
         placeholder="0"
         min="0"
@@ -170,7 +165,7 @@ function renderDataInput(variant: EnumVariant, value: unknown, onChange: (value:
   if (dataType === 'bool') {
     return (
       <select
-        value={value || 'false'}
+        value={typeof value === 'boolean' ? String(value) : (value ? String(value) : 'false')}
         onChange={(e) => onChange(e.target.value === 'true')}
         className="w-full p-2 border rounded"
       >
@@ -184,7 +179,7 @@ function renderDataInput(variant: EnumVariant, value: unknown, onChange: (value:
     return (
       <Input
         type="text"
-        value={value || ''}
+        value={typeof value === 'string' ? value : (value ? String(value) : '')}
         onChange={(e) => onChange(e.target.value)}
         placeholder="0x..."
         className="font-mono text-sm"
@@ -195,7 +190,7 @@ function renderDataInput(variant: EnumVariant, value: unknown, onChange: (value:
   if (dataType.startsWith('Vec<')) {
     return (
       <Textarea
-        value={Array.isArray(value) ? JSON.stringify(value, null, 2) : (value || '')}
+        value={Array.isArray(value) ? JSON.stringify(value, null, 2) : (typeof value === 'string' ? value : (value ? String(value) : ''))}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
           try {
             const parsed = JSON.parse(e.target.value)
@@ -215,7 +210,7 @@ function renderDataInput(variant: EnumVariant, value: unknown, onChange: (value:
   return (
     <Input
       type="text"
-      value={value || ''}
+      value={typeof value === 'string' ? value : (value ? String(value) : '')}
       onChange={(e) => onChange(e.target.value)}
       placeholder={`Enter ${variant.name} data`}
     />

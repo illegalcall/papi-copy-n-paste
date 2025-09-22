@@ -10,18 +10,6 @@ export interface CustomProvider {
 }
 
 const CUSTOM_PROVIDERS_STORAGE_KEY = 'papi-custom-providers';
-const LEGACY_CUSTOM_RPC_STORAGE_KEY = 'papi-custom-rpcs'; // For backward compatibility
-
-// Legacy interface
-export interface CustomRPC {
-  id: string;
-  name: string;
-  wsUrl: string;
-  description?: string;
-  dateAdded: string;
-  lastTested?: string;
-  isWorking?: boolean;
-}
 
 /**
  * Test connection to a WebSocket RPC endpoint

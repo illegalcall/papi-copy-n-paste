@@ -1,18 +1,3 @@
-/**
- * MetadataService - Live metadata fetching with local caching and background updates
- *
- * Features:
- * - Live metadata fetching from chains
- * - Local caching with IndexedDB/localStorage fallback
- * - Background refresh strategy
- * - Cache invalidation and updates
- *
- * Strategy:
- * 1. Check cache first (fast response)
- * 2. Return cached metadata immediately
- * 3. Background fetch new metadata
- * 4. Update cache when fresh metadata arrives
- */
 
 import { createClient } from 'polkadot-api'
 import { getWsProvider } from 'polkadot-api/ws-provider/web'

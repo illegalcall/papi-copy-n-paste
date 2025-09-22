@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback, memo } from "react";
 import {
   ChevronRight,
   ChevronDown,
@@ -29,7 +29,7 @@ interface PalletTreeProps {
   selectedEvent?: { pallet: string; event: string };
 }
 
-export function PalletTree({
+export const PalletTree = memo(function PalletTree({
   pallets,
   searchQuery,
   onCallSelect,
@@ -43,26 +43,26 @@ export function PalletTree({
   selectedError,
   selectedEvent,
 }: PalletTreeProps) {
-  // Start with essential pallets expanded for better UX and scrollable content
+  // Start with no pallets expanded - user can expand what they need
   const [expandedPallets, setExpandedPallets] = useState<Set<string>>(
-    new Set(["System", "Balances", "Timestamp"]),
+    new Set(),
   );
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(["System-calls", "Balances-calls", "Timestamp-calls"]),
+    new Set(),
   );
 
-  // Filter function for individual items within pallets
-  const filterItems = <T extends { name: string }>(
+  // Memoized filter function for individual items within pallets
+  const filterItems = useCallback(<T extends { name: string }>(
     items: T[],
     query: string,
   ): T[] => {
     if (!query) return items;
     const lowerQuery = query.toLowerCase();
     return items.filter((item) => item.name.toLowerCase().includes(lowerQuery));
-  };
+  }, []);
 
-  // Enhanced filtering that searches in method arguments and descriptions
-  const enhancedFilterItems = <T extends { name: string; args?: unknown[] }>(
+  // Memoized enhanced filtering that searches in method arguments and descriptions
+  const enhancedFilterItems = useCallback(<T extends { name: string; args?: unknown[] }>(
     items: T[],
     query: string,
   ): T[] => {
@@ -71,59 +71,61 @@ export function PalletTree({
     return items.filter((item) => {
       // Search in item name
       if (item.name.toLowerCase().includes(lowerQuery)) return true;
-      
+
       // Search in arguments if available
       if (item.args) {
-        return item.args.some((arg) => 
-          arg.name?.toLowerCase().includes(lowerQuery) ||
-          arg.type?.toLowerCase().includes(lowerQuery)
+        return item.args.some((arg) =>
+          (arg && typeof arg === 'object' && 'name' in arg && typeof (arg as any).name === 'string' && (arg as any).name.toLowerCase().includes(lowerQuery)) ||
+          (arg && typeof arg === 'object' && 'type' in arg && typeof (arg as any).type === 'string' && (arg as any).type.toLowerCase().includes(lowerQuery))
         );
       }
-      
+
       return false;
     });
-  };
+  }, []);
 
-  // Enhanced filtering that also filters items within pallets
-  const filteredPallets = pallets
-    .map((pallet) => {
-      if (!searchQuery) return pallet;
+  // Memoized enhanced filtering that also filters items within pallets
+  const filteredPallets = useMemo(() => {
+    return pallets
+      .map((pallet) => {
+        if (!searchQuery) return pallet;
 
-      const query = searchQuery.toLowerCase();
-      const palletNameMatches = pallet.name.toLowerCase().includes(query);
+        const query = searchQuery.toLowerCase();
+        const palletNameMatches = pallet.name.toLowerCase().includes(query);
 
-      // If pallet name matches, show ALL items within it (no filtering)
-      // Otherwise, filter individual items within the pallet using enhanced search
-      const filteredCalls = palletNameMatches ? pallet.calls : enhancedFilterItems(pallet.calls, searchQuery);
-      const filteredStorage = palletNameMatches ? pallet.storage : enhancedFilterItems(pallet.storage, searchQuery);
-      const filteredEvents = palletNameMatches ? pallet.events : filterItems(pallet.events, searchQuery);
-      const filteredConstants = palletNameMatches ? (pallet.constants || []) : filterItems(pallet.constants || [], searchQuery);
-      const filteredErrors = palletNameMatches ? (pallet.errors || []) : filterItems(pallet.errors || [], searchQuery);
+        // If pallet name matches, show ALL items within it (no filtering)
+        // Otherwise, filter individual items within the pallet using enhanced search
+        const filteredCalls = palletNameMatches ? pallet.calls : enhancedFilterItems(pallet.calls, searchQuery);
+        const filteredStorage = palletNameMatches ? pallet.storage : enhancedFilterItems(pallet.storage, searchQuery);
+        const filteredEvents = palletNameMatches ? pallet.events : filterItems(pallet.events, searchQuery);
+        const filteredConstants = palletNameMatches ? (pallet.constants || []) : filterItems(pallet.constants || [], searchQuery);
+        const filteredErrors = palletNameMatches ? (pallet.errors || []) : filterItems(pallet.errors || [], searchQuery);
 
-      // Include pallet if name matches OR if any items within it match
-      const hasMatches =
-        palletNameMatches ||
-        filteredCalls.length > 0 ||
-        filteredStorage.length > 0 ||
-        filteredEvents.length > 0 ||
-        filteredConstants.length > 0 ||
-        filteredErrors.length > 0;
+        // Include pallet if name matches OR if any items within it match
+        const hasMatches =
+          palletNameMatches ||
+          filteredCalls.length > 0 ||
+          filteredStorage.length > 0 ||
+          filteredEvents.length > 0 ||
+          filteredConstants.length > 0 ||
+          filteredErrors.length > 0;
 
-      if (!hasMatches) return null;
+        if (!hasMatches) return null;
 
-      // Return pallet with filtered items
-      return {
-        ...pallet,
-        calls: filteredCalls,
-        storage: filteredStorage,
-        events: filteredEvents,
-        constants: filteredConstants,
-        errors: filteredErrors,
-      };
-    })
-    .filter((pallet): pallet is PalletInfo => pallet !== null);
+        // Return pallet with filtered items
+        return {
+          ...pallet,
+          calls: filteredCalls,
+          storage: filteredStorage,
+          events: filteredEvents,
+          constants: filteredConstants,
+          errors: filteredErrors,
+        };
+      })
+      .filter((pallet): pallet is PalletInfo => pallet !== null);
+  }, [pallets, searchQuery, enhancedFilterItems, filterItems]);
 
-  const togglePallet = (palletName: string) => {
+  const togglePallet = useCallback((palletName: string) => {
     const newExpanded = new Set(expandedPallets);
     if (newExpanded.has(palletName)) {
       newExpanded.delete(palletName);
@@ -131,9 +133,9 @@ export function PalletTree({
       newExpanded.add(palletName);
     }
     setExpandedPallets(newExpanded);
-  };
+  }, [expandedPallets]);
 
-  const toggleSection = (sectionKey: string) => {
+  const toggleSection = useCallback((sectionKey: string) => {
     const newExpanded = new Set(expandedSections);
     if (newExpanded.has(sectionKey)) {
       newExpanded.delete(sectionKey);
@@ -141,30 +143,30 @@ export function PalletTree({
       newExpanded.add(sectionKey);
     }
     setExpandedSections(newExpanded);
-  };
+  }, [expandedSections]);
 
-  const handleCallClick = (pallet: PalletInfo, call: PalletCall) => {
+  const handleCallClick = useCallback((pallet: PalletInfo, call: PalletCall) => {
     onCallSelect(pallet.name, call);
-  };
+  }, [onCallSelect]);
 
-  const handleStorageClick = (pallet: PalletInfo, storage: unknown) => {
+  const handleStorageClick = useCallback((pallet: PalletInfo, storage: unknown) => {
     onStorageSelect(pallet.name, storage);
-  };
+  }, [onStorageSelect]);
 
-  const handleConstantClick = (pallet: PalletInfo, constant: PalletConstant) => {
+  const handleConstantClick = useCallback((pallet: PalletInfo, constant: PalletConstant) => {
     onConstantSelect?.(pallet.name, constant);
-  };
+  }, [onConstantSelect]);
 
-  const handleErrorClick = (pallet: PalletInfo, error: PalletError) => {
+  const handleErrorClick = useCallback((pallet: PalletInfo, error: PalletError) => {
     onErrorSelect?.(pallet.name, error);
-  };
+  }, [onErrorSelect]);
 
-  // Auto-expand pallets that have search matches
-  const shouldAutoExpand = (pallet: PalletInfo): boolean => {
+  // Memoized auto-expand pallets that have search matches
+  const shouldAutoExpand = useCallback((pallet: PalletInfo): boolean => {
     if (!searchQuery) return false;
     const query = searchQuery.toLowerCase();
     const palletNameMatches = pallet.name.toLowerCase().includes(query);
-    
+
     // Auto-expand if pallet name matches OR if items inside match
     return (
       palletNameMatches ||
@@ -174,26 +176,30 @@ export function PalletTree({
         (pallet.constants || []).length > 0 ||
         (pallet.errors || []).length > 0)
     );
-  };
+  }, [searchQuery]);
 
-  // Auto-expand sections when pallet name matches search
-  const shouldAutoExpandSection = (palletName: string): boolean => {
+  // Memoized auto-expand sections when pallet name matches search
+  const shouldAutoExpandSection = useCallback((palletName: string): boolean => {
     if (!searchQuery) return false;
     return palletName.toLowerCase().includes(searchQuery.toLowerCase());
-  };
+  }, [searchQuery]);
 
-  // Highlight matching text in names
-  const highlightMatch = (text: string, query: string) => {
-    if (!query) return text;
-
-    const regex = new RegExp(
-      `(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+  // Memoized highlight matching text in names with regex caching
+  const highlightRegex = useMemo(() => {
+    if (!searchQuery) return null;
+    return new RegExp(
+      `(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
       "gi",
     );
-    const parts = text.split(regex);
+  }, [searchQuery]);
+
+  const highlightMatch = useCallback((text: string, query: string) => {
+    if (!query || !highlightRegex) return text;
+
+    const parts = text.split(highlightRegex);
 
     return parts.map((part, index) =>
-      regex.test(part) ? (
+      highlightRegex.test(part) ? (
         <span
           key={index}
           className="bg-yellow-200 dark:bg-yellow-800 px-0.5 rounded"
@@ -204,7 +210,7 @@ export function PalletTree({
         part
       ),
     );
-  };
+  }, [highlightRegex]);
 
   if (filteredPallets.length === 0) {
     return (
@@ -486,4 +492,4 @@ export function PalletTree({
       })}
     </div>
   );
-}
+});

@@ -471,14 +471,8 @@ function extractFromMetadata(
       returnType = defaultReturnTypes[storageName];
       actualType = defaultReturnTypes[storageName];
     } else {
-      // Generic fallback based on pallet patterns
-      if (pallet === 'Balances' && storageName.toLowerCase().includes('account')) {
-        returnType = 'AccountInfo';
-        actualType = 'AccountInfo';
-      } else if (pallet === 'System' && storageName === 'Number') {
-        returnType = 'u32';
-        actualType = 'u32';
-      } else if (storageName.toLowerCase().includes('balance')) {
+      // Generic fallback based on storage name patterns
+      if (storageName.toLowerCase().includes('balance')) {
         returnType = 'bigint';
         actualType = 'bigint';
       } else {
@@ -532,8 +526,6 @@ function mapParameterType(paramType: string): string {
   // Return as-is if no mapping found
   return paramType;
 }
-
-// Unused constant signature functions removed - not referenced anywhere in codebase
 
 /**
  * Gets parameter descriptions based on common parameter names
@@ -637,5 +629,3 @@ export function generateEventSignature(
     complexity
   };
 }
-
-// Unused type highlighting function removed - not referenced anywhere in codebase

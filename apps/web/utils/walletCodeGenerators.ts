@@ -9,6 +9,8 @@ import {
   getDescriptorName,
   getChainConnection,
 } from "./chainConfig";
+import { getStorageParameterInfo } from "./dynamicStorageDetection";
+import { isBigIntType } from "./typeCheckers";
 
 export function generateWalletIntegratedCode(
   chainKey: string,
@@ -63,13 +65,7 @@ export function generateWalletIntegratedCode(
         }
 
         // Handle numeric types based on actual parameter type
-        if (
-          paramType.includes("u128") ||
-          paramType.includes("u64") ||
-          paramType.includes("u32") ||
-          paramType.includes("Balance") ||
-          paramType.includes("Compact")
-        ) {
+        if (isBigIntType(paramType)) {
           const numValue = typeof value === "string" ? value : String(value || "0");
           const cleanValue = numValue.trim() || "0";
           return `  ${paramName}: ${cleanValue}n`;
@@ -154,17 +150,21 @@ console.log('${pallet}.${storage.name}:', result)`;
 console.log('All entries:', entries)`;
     }
 
-    // Add wallet account querying for relevant storage items
-    const walletQuery = (pallet === "System" && storage.name === "Account")
+    // Add wallet account querying for storage items that take AccountId parameters
+    const storageInfo = getStorageParameterInfo(chainKey, pallet, storage.name);
+    const needsAccountId = storageInfo.required.includes("AccountId") ||
+                          storageInfo.optional.includes("AccountId");
+
+    const walletQuery = needsAccountId
       ? `
-// Get wallet account
+// Get wallet account for ${pallet}.${storage.name} query
 const extension = await window.injectedWeb3["polkadot-js"].enable("app")
 const accounts = await extension.accounts.get()
 const walletAddress = accounts[0]?.address
 
 if (walletAddress) {
-  const accountInfo = await typedApi.query.System.Account.getValue(walletAddress)
-  console.log('Wallet account info:', accountInfo)
+  const accountInfo = await typedApi.query.${pallet}.${storage.name}.getValue(walletAddress)
+  console.log('Wallet ${pallet}.${storage.name}:', accountInfo)
 }
 ` : "";
 

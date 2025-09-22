@@ -166,7 +166,6 @@ class PreDecodedConstantsService {
 // Singleton instance
 export const preDecodedConstantsService = new PreDecodedConstantsService();
 
-// Export for backwards compatibility
 export interface DecodeResult {
   success: boolean;
   value?: any;

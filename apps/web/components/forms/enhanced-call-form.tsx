@@ -1,12 +1,7 @@
-/**
- * EnhancedCallForm - New call form using rich metadata approach
- *
- * Replaces SimpleCallForm with POC-based parameter detection
- */
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Badge } from "@workspace/ui/components/badge";
@@ -30,7 +25,7 @@ interface EnhancedCallFormProps {
   selectedCall?: { pallet: string; call: PalletCall } | null;
 }
 
-export function EnhancedCallForm({
+export const EnhancedCallForm = memo(function EnhancedCallForm({
   pallet,
   callName,
   onFormChange,
@@ -109,14 +104,14 @@ export function EnhancedCallForm({
     onValidChange(isValid);
   }, [formData, parameterInfo, onFormChange, onValidChange]);
 
-  const handleFieldChange = (paramName: string, value: unknown) => {
+  const handleFieldChange = useCallback((paramName: string, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       [paramName]: value
     }));
-  };
+  }, []);
 
-  const handleOptionalToggle = (paramName: string, enabled: boolean) => {
+  const handleOptionalToggle = useCallback((paramName: string, enabled: boolean) => {
     if (!enabled) {
       // Remove from form data when disabled
       setFormData(prev => {
@@ -125,7 +120,7 @@ export function EnhancedCallForm({
         return newData;
       });
     }
-  };
+  }, []);
 
   // Loading state
   if (loading) {
@@ -234,7 +229,7 @@ export function EnhancedCallForm({
       )}
     </div>
   );
-}
+});
 
 /**
  * Render appropriate field component based on parameter type
@@ -299,7 +294,7 @@ function renderComplexParameterField(
       {fieldType === 'array' ? (
         <textarea
           className="w-full p-2 border rounded font-mono text-sm"
-          value={Array.isArray(value) ? JSON.stringify(value, null, 2) : (value || '')}
+          value={Array.isArray(value) ? JSON.stringify(value, null, 2) : (typeof value === 'string' ? value : (value ? JSON.stringify(value, null, 2) : ''))}
           onChange={(e) => {
             try {
               const parsed = JSON.parse(e.target.value);
@@ -313,7 +308,7 @@ function renderComplexParameterField(
         />
       ) : (
         <Input
-          value={value || ''}
+          value={typeof value === 'string' ? value : (value ? String(value) : '')}
           onChange={(e) => onChange(e.target.value)}
           placeholder={`Enter ${param.name}`}
           className={fieldType === 'hex' ? 'font-mono' : ''}
@@ -360,7 +355,7 @@ function renderSimpleParameterField(
       ) : (
         <Input
           type={fieldType === 'number' ? 'number' : 'text'}
-          value={value || ''}
+          value={typeof value === 'string' ? value : (value ? String(value) : '')}
           onChange={(e) => onChange(fieldType === 'number' ? e.target.value : e.target.value)}
           placeholder={getPlaceholderForType(param.type)}
           className={fieldType === 'hex' ? 'font-mono' : ''}
@@ -372,7 +367,7 @@ function renderSimpleParameterField(
 }
 
 /**
- * Get field type from parameter type
+ * Get field type from parameter type - pure function, no memo needed
  */
 function getFieldTypeFromParameterType(type: string): 'text' | 'number' | 'boolean' | 'hex' | 'array' {
   if (type === 'bool') return 'boolean';
@@ -386,7 +381,7 @@ function getFieldTypeFromParameterType(type: string): 'text' | 'number' | 'boole
 }
 
 /**
- * Get placeholder text for parameter type
+ * Get placeholder text for parameter type - pure function, no memo needed
  */
 function getPlaceholderForType(type: string): string {
   if (type.includes('AccountId') || type.includes('Address')) {
@@ -412,13 +407,45 @@ function getPlaceholderForType(type: string): string {
  * Validate form data against parameter requirements
  */
 function validateFormData(formData: FormData, parameterInfo: CallParameterInfo | null): boolean {
-  if (!parameterInfo) return false;
+  if (!parameterInfo) {
+    return false;
+  }
 
   // Check all required parameters are provided
   for (const param of parameterInfo.required) {
     const value = formData[param.name];
-    if (value === undefined || value === null || value === '') {
+
+    // Handle different value types
+    if (value === undefined || value === null) {
       return false;
+    }
+
+    // Handle PAPI enum objects like {type: "Id", value: "address"}
+    if (typeof value === 'object' && value !== null) {
+      if ('type' in value && 'value' in value) {
+        // PAPI enum structure - check the inner value
+        if (value.value === undefined || value.value === null || value.value === '') {
+          return false;
+        }
+        continue;
+      }
+      // Other object types are considered valid if they exist
+      continue;
+    }
+
+    // For string values, check if empty
+    if (typeof value === 'string' && value === '') {
+      return false;
+    }
+
+    // For number values, 0 is valid
+    if (typeof value === 'number') {
+      continue;
+    }
+
+    // For boolean values, false is valid
+    if (typeof value === 'boolean') {
+      continue;
     }
   }
 
