@@ -14,10 +14,6 @@ export class DynamicStorageDetector {
   private hitRate = 0;
   private totalRequests = 0;
 
-  /**
-   * Detect storage parameters for a given chain, pallet, and storage item
-   * Uses runtime introspection first, then fallback to generated metadata
-   */
   detectParameters(
     chainKey: string,
     pallet: string,
@@ -27,7 +23,6 @@ export class DynamicStorageDetector {
     this.totalRequests++;
 
 
-    // Check cache first
     if (this.cache.has(cacheKey)) {
       this.hitRate++;
       const result = this.cache.get(cacheKey)!;
@@ -37,7 +32,6 @@ export class DynamicStorageDetector {
     }
 
 
-    // Try generated metadata first (most reliable for known storage items)
     const metadataResult = this.detectFromMetadata(chainKey, pallet, storage);
     if (metadataResult) {
 
@@ -45,7 +39,6 @@ export class DynamicStorageDetector {
       return metadataResult;
     }
 
-    // Fallback to live metadata detection (from UI data)
     const liveResult = this.detectFromLiveMetadata(chainKey, pallet, storage);
     if (liveResult) {
 
@@ -56,13 +49,8 @@ export class DynamicStorageDetector {
   }
 
 
-  /**
-   * Enhanced live metadata detection: Extract from UI metadata if available
-   */
   private detectFromLiveMetadata(chainKey: string, pallet: string, storage: string): StorageParameterInfo | null {
     try {
-      // Access the live metadata that's already loaded for the UI
-      // This is available in the global app state
       if (typeof window !== 'undefined' && (window as any).__PAPI_LIVE_METADATA__) {
         const liveMetadata = (window as any).__PAPI_LIVE_METADATA__[chainKey];
 
@@ -73,7 +61,6 @@ export class DynamicStorageDetector {
             const storageItem = palletData.storage.find((s: any) => s.name === storage);
 
             if (storageItem) {
-              // Infer parameters from storage type
               const parameters = this.inferParametersFromStorageType(storageItem.type);
 
               return {
@@ -93,13 +80,8 @@ export class DynamicStorageDetector {
     }
   }
 
-  /**
-   * Infer storage parameters from type definition
-   */
   private inferParametersFromStorageType(storageType: string): { required: string[], optional: string[] } {
-    // Basic type inference - can be enhanced
     if (storageType.includes('Map<')) {
-      // Extract key type from Map<Key, Value>
       const match = storageType.match(/Map<([^,]+),/);
       if (match && match[1]) {
         return { required: [match[1].trim()], optional: [] };
@@ -107,23 +89,17 @@ export class DynamicStorageDetector {
     }
 
     if (storageType.includes('DoubleMap<')) {
-      // Extract key types from DoubleMap<Key1, Key2, Value>
       const match = storageType.match(/DoubleMap<([^,]+),\s*([^,]+),/);
       if (match && match[1] && match[2]) {
         return { required: [match[1].trim(), match[2].trim()], optional: [] };
       }
     }
 
-    // Plain storage item - no parameters required
     return { required: [], optional: [] };
   }
 
-  /**
-   * Fallback detection: Use generated metadata with known fixes for the specific chain
-   */
   private detectFromMetadata(chainKey: string, pallet: string, storage: string): StorageParameterInfo | null {
     try {
-      // Apply known fixes for incorrect generated metadata
       const knownFix = this.getKnownStorageFix(chainKey, pallet, storage);
       if (knownFix) {
         return knownFix;
@@ -145,128 +121,116 @@ export class DynamicStorageDetector {
         };
       }
     } catch (error) {
-      // Silent fallback on metadata errors
     }
 
     return null;
   }
 
-  /**
-   * Known fixes for storage entries where our generated metadata is incorrect
-   * This provides a scalable way to fix specific known issues while the generation is improved
-   */
   private getKnownStorageFix(chainKey: string, pallet: string, storage: string): StorageParameterInfo | null {
     const key = `${chainKey}:${pallet}:${storage}`;
 
-    // Known storage entries with parameters - all parameters are optional for UI flexibility
     const knownFixes: Record<string, StorageParameterInfo> = {
-      // Staking pallet fixes - these are multi-key storage entries (parameters optional for flexible querying)
       'polkadot:Staking:ErasStakers': {
-        required: [], // Optional for UI - allows both getValue(era, account) and getEntries() patterns
+        required: [],
         optional: ['u32', 'AccountId'],
         description: 'Exposure of validator at era - query with era+account for specific or without for all entries',
         returnType: 'Exposure'
       },
       'polkadot:Staking:ErasStakersClipped': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['u32', 'AccountId'],
         description: 'Clipped exposure of validator at era - query with era+account for specific or without for all entries',
         returnType: 'Exposure'
       },
       'polkadot:Staking:ErasStakersOverview': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['u32', 'AccountId'],
         description: 'Overview of validator exposure at era - query with era+account for specific or without for all entries',
         returnType: 'PagedExposureMetadata'
       },
       'polkadot:Staking:ErasStakersPaged': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['u32', 'AccountId', 'u32'],
         description: 'Paged exposure of validator at era - query with era+account+page for specific or without for all entries',
         returnType: 'ExposurePage'
       },
       'polkadot:Staking:ErasValidatorReward': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['u32'],
         description: 'Validator reward points for era - query with era for specific or without for all entries',
         returnType: 'Balance'
       },
       'polkadot:Staking:ErasRewardPoints': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['u32'],
         description: 'Reward points for era - query with era for specific or without for all entries',
         returnType: 'EraRewardPoints'
       },
       'polkadot:Staking:ErasValidatorPrefs': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['u32', 'AccountId'],
         description: 'Validator preferences for era - query with era+account for specific or without for all entries',
         returnType: 'ValidatorPrefs'
       },
 
-      // Apply the same fixes to other chains that have Staking
       'kusama:Staking:ErasStakers': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['u32', 'AccountId'],
         description: 'Exposure of validator at era - query with era+account for specific or without for all entries',
         returnType: 'Exposure'
       },
       'kusama:Staking:ErasStakersClipped': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['u32', 'AccountId'],
         description: 'Clipped exposure of validator at era - query with era+account for specific or without for all entries',
         returnType: 'Exposure'
       },
 
-      // Democracy pallet - common multi-key storage entries
       'polkadot:Democracy:VotingOf': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['AccountId'],
         description: 'Voting records for account - query with account ID for specific or without for all entries',
         returnType: 'Voting'
       },
       'polkadot:Democracy:ReferendumInfoOf': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['u32'],
         description: 'Information about referendum - query with referendum index for specific or without for all entries',
         returnType: 'Option<ReferendumInfo>'
       },
 
-      // ConvictionVoting (modern democracy) - from OpenGov
       'polkadot:ConvictionVoting:VotingFor': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['AccountId', 'u16'],
         description: 'Voting records for account and class - query with account+class for specific or without for all entries',
         returnType: 'Voting'
       },
       'polkadot:ConvictionVoting:ClassLocksFor': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['AccountId'],
         description: 'Class locks for account - query with account ID for specific or without for all entries',
         returnType: 'Vec<(u16, Balance)>'
       },
 
-      // Balances pallet - common cases
       'polkadot:Balances:Account': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['AccountId'],
         description: 'Account balance information - query with account ID for specific or without for all entries',
         returnType: 'AccountData'
       },
       'polkadot:Balances:Locks': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['AccountId'],
         description: 'Balance locks for account - query with account ID for specific or without for all entries',
         returnType: 'Vec<BalanceLock>'
       },
       'polkadot:Balances:Reserves': {
-        required: [], // Optional for UI - allows flexible querying
+        required: [],
         optional: ['AccountId'],
         description: 'Reserved balances for account - query with account ID for specific or without for all entries',
         returnType: 'Vec<ReserveData>'
       },
 
-      // Claims pallet - specific fix for Paseo Asset Hub and other chains with Claims
       'paseo_asset_hub:Claims:Claims': {
         required: ['bytes'],
         optional: [],
@@ -291,9 +255,6 @@ export class DynamicStorageDetector {
   }
 
 
-  /**
-   * Get cache performance statistics
-   */
   getCacheStats() {
     return {
       hitRate: this.totalRequests > 0 ? (this.hitRate / this.totalRequests) * 100 : 0,
@@ -302,37 +263,22 @@ export class DynamicStorageDetector {
     };
   }
 
-  /**
-   * Get supported chains
-   */
   getSupportedChains(): string[] {
     return getSupportedChains();
   }
 
-  /**
-   * Get supported pallets for a chain
-   */
   getSupportedPallets(chainKey: string): string[] {
     return getSupportedPallets(chainKey);
   }
 
-  /**
-   * Get supported storage items for a pallet
-   */
   getSupportedStorage(chainKey: string, pallet: string): string[] {
     return getSupportedStorage(chainKey, pallet);
   }
 
-  /**
-   * Check if a storage item exists
-   */
   hasStorage(chainKey: string, pallet: string, storage: string): boolean {
     return hasStorage(chainKey, pallet, storage);
   }
 
-  /**
-   * Clear the cache (useful for testing)
-   */
   clearCache(): void {
     this.cache.clear();
     this.hitRate = 0;
@@ -340,31 +286,24 @@ export class DynamicStorageDetector {
   }
 }
 
-// Create a singleton instance for use across the application
 export const dynamicStorageDetector = new DynamicStorageDetector();
 
-// Initialize client-side functionality when needed
 let clientInitialized = false;
 
 function initializeClientSide() {
   if (clientInitialized || typeof window === 'undefined') return;
   clientInitialized = true;
 
-  // Clear cache on client initialization
   dynamicStorageDetector.clearCache();
 
 }
 
 
-/**
- * Enhanced function with full parameter information
- */
 export function getStorageParameterInfo(
   chainKey: string,
   pallet: string,
   storage: string
 ): StorageParameterInfo {
-  // Initialize client-side functionality on first use
   initializeClientSide();
 
   return dynamicStorageDetector.detectParameters(chainKey, pallet, storage);

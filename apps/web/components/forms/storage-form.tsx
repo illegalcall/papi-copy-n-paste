@@ -25,6 +25,7 @@ import {
   generateStorageSignature,
 } from "../../utils/typeExtraction";
 import { getStorageParameterInfo } from "../../utils/dynamicStorageDetection";
+import { isIndexType } from "../../utils/typeCheckers";
 import { CallSignature } from "@/components/type-display";
 
 interface StorageFormProps {
@@ -567,7 +568,7 @@ console.log('Result:', result);`;
                       "Asset identifier (varies by chain)"}
                     {(paramType === "BlockNumber" || paramType === "number") &&
                       "Block number to query (empty uses latest)"}
-                    {paramType.includes("Index") &&
+                    {isIndexType(paramType) &&
                       "Index number for this entry type"}
                     {paramType === "Hash" && "32-byte hash (0x prefix required)"}
                   </div>

@@ -1,14 +1,7 @@
-/**
- * Call Parameter Detection - New POC-based approach
- *
- * Replaces dynamicCallDetection.ts with the proven POC metadata approach.
- * Integrates with MetadataService for caching and MetadataAnalyzer for extraction.
- */
 
 import { MetadataAnalyzer, type CallInfo, type ParameterInfo } from './metadataAnalyzer'
-import { metadataService, getChainConfig, type ChainConfig } from '../services/metadataService'
+import { metadataService, getChainConfig } from '../services/metadataService'
 
-// Enhanced interface with rich parameter information
 export interface CallParameterInfo {
   required: ParameterInfo[]
   optional: ParameterInfo[]
@@ -41,26 +34,21 @@ export class CallParameterDetector {
   ): Promise<CallParameterInfo> {
     const cacheKey = `${chainKey}:${pallet}:${call}`
 
-    // Check call info cache first
     if (this.callInfoCache.has(cacheKey)) {
       return this.callInfoCache.get(cacheKey)!
     }
 
     try {
-      // Get metadata analyzer for this chain
       const analyzer = await this.getMetadataAnalyzer(chainKey)
 
-      // Extract call information
       const callInfo = analyzer.getCallInfo(pallet, call)
 
       if (!callInfo) {
         throw new Error(`Call ${pallet}.${call} not found`)
       }
 
-      // Convert to parameter info
       const parameterInfo = this.convertToParameterInfo(callInfo)
 
-      // Cache the result
       this.callInfoCache.set(cacheKey, parameterInfo)
 
       return parameterInfo
@@ -99,7 +87,6 @@ export class CallParameterDetector {
     try {
       const parameterInfo = await this.getCallParameterInfo(chainKey, pallet, call)
 
-      // Check if all required parameters are provided
       for (const param of parameterInfo.required) {
         const value = callParams[param.name]
         if (value === undefined || value === null || value === '') {
@@ -153,28 +140,22 @@ export class CallParameterDetector {
    * Get metadata analyzer for a chain (with caching)
    */
   private async getMetadataAnalyzer(chainKey: string): Promise<MetadataAnalyzer> {
-    // Check analyzer cache first
     if (this.analyzerCache.has(chainKey)) {
       return this.analyzerCache.get(chainKey)!
     }
 
-    // Get chain configuration
     const chainConfig = getChainConfig(chainKey)
     if (!chainConfig) {
       throw new Error(`Unsupported chain: ${chainKey}`)
     }
 
     try {
-      // Get metadata from service (with caching)
       const metadata = await metadataService.getMetadata(chainConfig)
 
-      // Create analyzer
       const analyzer = new MetadataAnalyzer(metadata)
 
-      // Cache the analyzer
       this.analyzerCache.set(chainKey, analyzer)
 
-      // Listen for metadata updates to invalidate cache
       this.setupMetadataUpdateListener(chainKey)
 
       return analyzer
@@ -215,10 +196,8 @@ export class CallParameterDetector {
   private setupMetadataUpdateListener(chainKey: string): void {
     const handleMetadataUpdate = (event: CustomEvent) => {
       if (event.detail.chainKey === chainKey) {
-        // Invalidate caches for this chain
         this.analyzerCache.delete(chainKey)
 
-        // Clear call info cache for this chain
         for (const [cacheKey] of this.callInfoCache) {
           if (cacheKey.startsWith(`${chainKey}:`)) {
             this.callInfoCache.delete(cacheKey)
@@ -228,10 +207,8 @@ export class CallParameterDetector {
       }
     }
 
-    // Remove existing listener to prevent duplicates
     window.removeEventListener('metadataUpdated', handleMetadataUpdate as EventListener)
 
-    // Add new listener
     window.addEventListener('metadataUpdated', handleMetadataUpdate as EventListener)
   }
 
@@ -240,7 +217,6 @@ export class CallParameterDetector {
    */
   clearCache(chainKey?: string): void {
     if (chainKey) {
-      // Clear specific chain cache
       this.analyzerCache.delete(chainKey)
 
       for (const [cacheKey] of this.callInfoCache) {
@@ -249,7 +225,6 @@ export class CallParameterDetector {
         }
       }
     } else {
-      // Clear all caches
       this.analyzerCache.clear()
       this.callInfoCache.clear()
     }
@@ -282,12 +257,8 @@ export class CallParameterDetector {
   }
 }
 
-// Singleton instance
 export const callParameterDetector = CallParameterDetector.getInstance()
 
-/**
- * Main API functions for backward compatibility
- */
 
 /**
  * Detect call parameters for a given chain, pallet, and call

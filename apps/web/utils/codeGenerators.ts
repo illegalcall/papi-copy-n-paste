@@ -7,6 +7,7 @@ import {
   getChainConnection,
   getParameterDescription,
 } from "./chainConfig";
+import { isBigIntType, isAccountType, isBoolType } from "./typeCheckers";
 import { getStorageParameterInfo } from "./dynamicStorageDetection";
 import {
   generateStorageParams,
@@ -621,9 +622,7 @@ ${connectionInfo.connection}
 console.log('Connected to custom RPC')`;
   }
 
-  // Use basic parameter info from call.args for now
   const paramInfo = { required: call.args.map(arg => arg.name), optional: [] };
-  // Use sync description for now - async descriptions will be handled later
   const description = `Call ${pallet}.${call.name}`;
 
     const paramTypeMap = new Map<string, string>();
@@ -642,7 +641,7 @@ console.log('Connected to custom RPC')`;
       }
 
       // Handle MultiAddress types based on actual parameter type
-      if (paramType.includes("MultiAddress") || paramType.includes("AccountId")) {
+      if (isAccountType(paramType)) {
         if (typeof value === "string" && value.startsWith("//")) {
           const accountMap: Record<string, string> = {
             "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
@@ -659,13 +658,7 @@ console.log('Connected to custom RPC')`;
       }
 
       // Handle numeric types based on actual parameter type
-      if (
-        paramType.includes("u128") ||
-        paramType.includes("u64") ||
-        paramType.includes("u32") ||
-        paramType.includes("Balance") ||
-        paramType.includes("Compact")
-      ) {
+      if (isBigIntType(paramType)) {
         const numValue =
           typeof value === "string" ? value : String(value || "0");
         // Ensure we have a valid number before adding 'n'
@@ -674,7 +667,7 @@ console.log('Connected to custom RPC')`;
       }
 
       // Handle boolean types
-      if (paramType.includes("bool")) {
+      if (isBoolType(paramType)) {
         return `  ${paramName}: ${Boolean(value)}`;
       }
 
@@ -731,14 +724,8 @@ function generateFunctionCode(
   call: PalletCall,
   formData: Record<string, any>,
 ): string {
-    let description = `Call ${pallet}.${call.name}`;
-  let paramInfo: { required: string[]; optional: string[] } = { required: [], optional: [] };
-
-  // Use sync description for now - async descriptions will be handled later
-  description = `Call ${pallet}.${call.name}`;
-
-  // Use basic parameter info from call.args for now
-  paramInfo = { required: call.args.map(arg => arg.name), optional: [] };
+  const description = `Call ${pallet}.${call.name}`;
+  const paramInfo = { required: call.args.map(arg => arg.name), optional: [] };
 
     const paramTypeMap = new Map<string, string>();
   call.args.forEach(arg => {
@@ -755,7 +742,7 @@ function generateFunctionCode(
       }
 
       // Handle MultiAddress types based on actual parameter type
-      if (paramType.includes("MultiAddress") || paramType.includes("AccountId")) {
+      if (isAccountType(paramType)) {
         if (typeof value === "string" && value.startsWith("//")) {
           const accountMap: Record<string, string> = {
             "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
@@ -772,20 +759,14 @@ function generateFunctionCode(
       }
 
       // Handle numeric types based on actual parameter type
-      if (
-        paramType.includes("u128") ||
-        paramType.includes("u64") ||
-        paramType.includes("u32") ||
-        paramType.includes("Balance") ||
-        paramType.includes("Compact")
-      ) {
+      if (isBigIntType(paramType)) {
         const numValue =
           typeof value === "string" ? value : String(value || "0");
         return `    ${paramName}: ${numValue}n`;
       }
 
       // Handle boolean types
-      if (paramType.includes("bool")) {
+      if (isBoolType(paramType)) {
         return `    ${paramName}: ${Boolean(value)}`;
       }
 
@@ -875,7 +856,7 @@ export function generateMultiMethodCode(
           if (
             arg.name === "dest" ||
             arg.name === "target" ||
-            arg.type.includes("MultiAddress")
+            isAccountType(arg.type)
           ) {
             if (typeof value === "string" && value.startsWith("//")) {
               const accountMap: Record<string, string> = {
@@ -916,15 +897,8 @@ export function generateMultiMethodCode(
         })
         .join(",\n");
 
-      // Get call metadata information for this method
-      let description = `Call ${method.pallet}.${method.call.name}`;
-      let paramInfo: { required: string[]; optional: string[] } = { required: [], optional: [] };
-
-      // Use sync description for now - async descriptions will be handled later
-      description = `Call ${method.pallet}.${method.call.name}`;
-
-      // Use basic parameter info from call.args for now
-      paramInfo = { required: method.call.args.map(arg => arg.name), optional: [] };
+      const description = `Call ${method.pallet}.${method.call.name}`;
+      const paramInfo = { required: method.call.args.map(arg => arg.name), optional: [] };
 
       const metadataComment = description !== `Call ${method.pallet}.${method.call.name}`
         ? `\n  // ${description}`

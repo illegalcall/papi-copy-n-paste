@@ -10,6 +10,7 @@ import {
   getChainConnection,
 } from "./chainConfig";
 import { getStorageParameterInfo } from "./dynamicStorageDetection";
+import { isBigIntType } from "./typeCheckers";
 
 export function generateWalletIntegratedCode(
   chainKey: string,
@@ -64,13 +65,7 @@ export function generateWalletIntegratedCode(
         }
 
         // Handle numeric types based on actual parameter type
-        if (
-          paramType.includes("u128") ||
-          paramType.includes("u64") ||
-          paramType.includes("u32") ||
-          paramType.includes("Balance") ||
-          paramType.includes("Compact")
-        ) {
+        if (isBigIntType(paramType)) {
           const numValue = typeof value === "string" ? value : String(value || "0");
           const cleanValue = numValue.trim() || "0";
           return `  ${paramName}: ${cleanValue}n`;

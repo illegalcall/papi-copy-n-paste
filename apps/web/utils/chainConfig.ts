@@ -1,44 +1,34 @@
-/**
- * Chain configuration utilities for PAPI setup commands and descriptors
- */
-
 import { getAllCustomProviders } from "./customRpc";
 
+const DESCRIPTOR_MAP = {
+  polkadot: "polkadot",
+  kusama: "kusama",
+  moonbeam: "moonbeam",
+  bifrost: "bifrost",
+  astar: "astar",
+  paseo: "paseo",
+  paseo_asset_hub: "paseo_asset_hub",
+  westend: "westend",
+  rococo: "rococo",
+  hydration: "hydration",
+  acala: null,
+} as const;
+
+const BUILT_IN_CHAIN_SPECS = {
+  polkadot: "polkadot",
+  kusama: "ksmcc3",
+} as const;
 
 export function getChainSpecImport(chainKey: string): string {
-  // Only major relay chains have built-in chainSpecs
-  const builtInChainSpecs = {
-    polkadot: "polkadot",
-    kusama: "ksmcc3",
-  };
-
-  const specName =
-    builtInChainSpecs[chainKey as keyof typeof builtInChainSpecs];
+  const specName = BUILT_IN_CHAIN_SPECS[chainKey as keyof typeof BUILT_IN_CHAIN_SPECS];
   if (specName) {
     return `import { chainSpec } from "polkadot-api/chains/${specName}"`;
   }
-
-  // For parachains, we need to connect via RPC (no built-in chainSpec)
   return `// ${chainKey} connects via RPC endpoint`;
 }
 
 export function getDescriptorImport(chainKey: string): string {
-  const descriptorMap = {
-    polkadot: "polkadot",
-    kusama: "kusama",
-    moonbeam: "moonbeam",
-    bifrost: "bifrost",
-    astar: "astar",
-    paseo: "paseo",
-    paseo_asset_hub: "paseo_asset_hub",
-    westend: "westend",
-    rococo: "rococo",
-    hydration: "hydration",
-    // Chains without descriptors - will show error in UI
-    acala: null,
-  };
-
-  const descriptorName = descriptorMap[chainKey as keyof typeof descriptorMap];
+  const descriptorName = DESCRIPTOR_MAP[chainKey as keyof typeof DESCRIPTOR_MAP];
   if (!descriptorName) {
     throw new Error(`No descriptor available for chain: ${chainKey}`);
   }
@@ -46,22 +36,7 @@ export function getDescriptorImport(chainKey: string): string {
 }
 
 export function getDescriptorName(chainKey: string): string | null {
-  const descriptorMap = {
-    polkadot: "polkadot",
-    kusama: "kusama",
-    moonbeam: "moonbeam",
-    bifrost: "bifrost",
-    astar: "astar",
-    paseo: "paseo",
-    paseo_asset_hub: "paseo_asset_hub",
-    westend: "westend",
-    rococo: "rococo",
-    hydration: "hydration",
-    // Chains without descriptors - will return null
-    acala: null,
-  };
-
-  return descriptorMap[chainKey as keyof typeof descriptorMap] || null;
+  return DESCRIPTOR_MAP[chainKey as keyof typeof DESCRIPTOR_MAP] || null;
 }
 
 export function getCustomRPCConnection(rpcId: string): {
@@ -87,12 +62,31 @@ export function getCustomRPCConnection(rpcId: string): {
   };
 }
 
+const SMOLDOT_CHAINS = ["polkadot", "kusama", "paseo", "westend"];
+
+const CHAIN_CONFIGS = {
+  polkadot: { chainSpec: "polkadot" },
+  kusama: { chainSpec: "ksmcc3" },
+  paseo: { chainSpec: "paseo" },
+  westend: { chainSpec: "westend" },
+} as const;
+
+const RPC_URLS = {
+  moonbeam: "wss://wss.api.moonbeam.network",
+  bifrost: "wss://hk.p.bifrost-rpc.liebi.com/ws",
+  astar: "wss://rpc.astar.network",
+  acala: "wss://acala-rpc.dwellir.com",
+  hydration: "wss://hydration-rpc.n.dwellir.com",
+  paseo_asset_hub: "wss://asset-hub-paseo-rpc.dwellir.com",
+  westend: "wss://westend-rpc.polkadot.io",
+  rococo: "wss://rococo-rpc.polkadot.io",
+} as const;
+
 export function getChainConnection(chainKey: string, providerId?: string): {
   imports: string;
   connection: string;
   cleanup?: string;
 } {
-  // Handle custom RPC connections
   if (chainKey === "custom" && providerId) {
     const customConnection = getCustomRPCConnection(providerId);
     if (customConnection) {
@@ -100,21 +94,8 @@ export function getChainConnection(chainKey: string, providerId?: string): {
     }
   }
 
-  // Chains that use smoldot as default
-  const smoldotChains = ["polkadot", "kusama", "paseo", "westend"];
-
-  if (smoldotChains.includes(chainKey)) {
-    // Use smoldot connection for relay chains
-    const chainConfigs = {
-      polkadot: { chainSpec: "polkadot" },
-      kusama: { chainSpec: "ksmcc3" },
-      paseo: { chainSpec: "paseo" },
-      westend: { chainSpec: "westend" },
-    };
-
-    const config =
-      chainConfigs[chainKey as keyof typeof chainConfigs] ||
-      chainConfigs.polkadot;
+  if (SMOLDOT_CHAINS.includes(chainKey)) {
+    const config = CHAIN_CONFIGS[chainKey as keyof typeof CHAIN_CONFIGS] || CHAIN_CONFIGS.polkadot;
 
     return {
       imports: `import { start } from "polkadot-api/smoldot"
@@ -124,33 +105,22 @@ import { chainSpec } from "polkadot-api/chains/${config.chainSpec}"`,
   const chain = await smoldot.addChain({ chainSpec })
   const client = createClient(getSmProvider(chain))`,
       cleanup: `
-  // Cleanup
   smoldot.terminate()`,
     };
-  } else {
-    // Use WebSocket RPC for parachains and other chains
-    const rpcUrls = {
-      moonbeam: "wss://wss.api.moonbeam.network",
-      bifrost: "wss://hk.p.bifrost-rpc.liebi.com/ws",
-      astar: "wss://rpc.astar.network",
-      acala: "wss://acala-rpc.dwellir.com",
-      hydration: "wss://hydration-rpc.n.dwellir.com",
-      paseo_asset_hub: "wss://asset-hub-paseo-rpc.dwellir.com",
-      westend: "wss://westend-rpc.polkadot.io",
-      rococo: "wss://rococo-rpc.polkadot.io",
-    };
-
-    const rpcUrl = rpcUrls[chainKey as keyof typeof rpcUrls] || rpcUrls.moonbeam;
-
-    return {
-      imports: `import { getWsProvider } from "polkadot-api/ws-provider/web"`,
-      connection: `  const wsProvider = getWsProvider("${rpcUrl}")
-  const client = createClient(wsProvider)`,
-      cleanup: `
-  // Cleanup WebSocket connection
-  client.destroy()`,
-    };
   }
+
+  const rpcUrl = RPC_URLS[chainKey as keyof typeof RPC_URLS];
+  if (!rpcUrl) {
+    throw new Error(`No RPC URL configured for chain: ${chainKey}`);
+  }
+
+  return {
+    imports: `import { getWsProvider } from "polkadot-api/ws-provider/web"`,
+    connection: `  const wsProvider = getWsProvider("${rpcUrl}")
+  const client = createClient(wsProvider)`,
+    cleanup: `
+  client.destroy()`,
+  };
 }
 
 export function getParameterDescription(

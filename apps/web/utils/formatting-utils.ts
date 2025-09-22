@@ -1,5 +1,12 @@
 
 import type { ParameterInfo } from './metadataAnalyzer'
+import { isAccountType, isBalanceType, isIndexType } from './typeCheckers'
+
+const TEST_ACCOUNTS = {
+  "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+  "//Bob": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
+  "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
+} as const;
 
 /**
  * Generate formatted call parameters from raw form data
@@ -18,18 +25,13 @@ export function generateCallParams(
       "";
 
     // Handle different parameter types based on the new metadata type format
-    if (paramType.includes("AccountId") || paramType === "SS58String" ||
+    if (isAccountType(paramType) || paramType === "SS58String" ||
         (paramType.startsWith("Enum(") && paramType.includes("Id|"))) {
       if (typeof value === "string" && value.startsWith("//")) {
-        const accountMap: Record<string, string> = {
-          "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-          "//Bob": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
-          "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
-        };
-        return `"${accountMap[value] || accountMap["//Alice"]}"`;
+        return `"${TEST_ACCOUNTS[value as keyof typeof TEST_ACCOUNTS] || TEST_ACCOUNTS["//Alice"]}"`;
       }
       return `"${value}"`;
-    } else if (paramType === "Balance" || paramType.startsWith("Compact<")) {
+    } else if (isBalanceType(paramType)) {
       // Handle balance amounts - convert to planck if needed
       const balanceValue = parseFloat(value || "0");
       if (balanceValue > 0 && balanceValue < 1000) {
@@ -87,18 +89,13 @@ export function generateCallParamValues(
     let value = callParams[paramName] || callParams[paramName.toLowerCase()] || "";
 
     // Handle different parameter types for actual values (not string representation)
-    if (paramType.includes("AccountId") || paramType === "SS58String") {
+    if (isAccountType(paramType) || paramType === "SS58String") {
       if (typeof value === "string" && value.startsWith("//")) {
-        const accountMap: Record<string, string> = {
-          "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-          "//Bob": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
-          "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
-        };
-        result[paramName] = accountMap[value] || accountMap["//Alice"];
+        result[paramName] = TEST_ACCOUNTS[value as keyof typeof TEST_ACCOUNTS] || TEST_ACCOUNTS["//Alice"];
       } else {
         result[paramName] = value || "";
       }
-    } else if (paramType === "Balance" || paramType.startsWith("Compact<")) {
+    } else if (isBalanceType(paramType)) {
       // Handle balance amounts
       const balanceValue = parseFloat(value || "0");
       if (balanceValue > 0 && balanceValue < 1000) {
@@ -217,15 +214,10 @@ export function generateStorageParams(
     // Handle different parameter types
     if (paramType === "AccountId" || paramType === "SS58String") {
       if (typeof value === "string" && value.startsWith("//")) {
-        const accountMap: Record<string, string> = {
-          "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-          "//Bob": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
-          "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
-        };
-        return `"${accountMap[value] || accountMap["//Alice"]}"`;
+        return `"${TEST_ACCOUNTS[value as keyof typeof TEST_ACCOUNTS] || TEST_ACCOUNTS["//Alice"]}"`;
       }
       return `"${value}"`;
-    } else if (paramType.includes("Number") || paramType.includes("Index")) {
+    } else if (isIndexType(paramType)) {
       return String(parseInt(value || "0"));
     } else if (paramType === "Hash") {
       return `"${value || "0x0000000000000000000000000000000000000000000000000000000000000000"}"`;
@@ -258,16 +250,10 @@ export function generateStorageParamValues(
     // Handle different parameter types
     if ((paramType === "AccountId" || paramType === "SS58String") && typeof paramValue === "string") {
       if (paramValue.startsWith("//")) {
-        // Convert test accounts to actual addresses
-        const accountMap: Record<string, string> = {
-          "//Alice": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-          "//Bob": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
-          "//Charlie": "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
-        };
-        return accountMap[paramValue] || accountMap["//Alice"];
+        return TEST_ACCOUNTS[paramValue as keyof typeof TEST_ACCOUNTS] || TEST_ACCOUNTS["//Alice"];
       }
       return paramValue;
-    } else if (paramType.includes("Number") || paramType.includes("Index")) {
+    } else if (isIndexType(paramType)) {
       return parseInt(paramValue || "0");
     } else if (paramType === "Hash") {
       return (
