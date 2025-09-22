@@ -1,24 +1,6 @@
-/**
- * API and blockchain interaction types
- * Strongly typed interfaces for PAPI operations
- */
 
 import { ChainKey, StorageQueryType, TransactionStatus, ConnectionStatus, ParameterType, ComplexityLevel } from './enums';
 
-/**
- * Chain configuration interface
- * Defines the structure for blockchain network configuration
- */
-export interface ChainConfig {
-  readonly chainKey: ChainKey;
-  readonly wsUrl: string;
-  readonly name: string;
-  readonly description?: string;
-  readonly environment?: 'mainnet' | 'testnet' | 'local';
-  readonly explorerUrl?: string;
-  readonly tokenSymbol?: string;
-  readonly tokenDecimals?: number;
-}
 
 /**
  * Storage parameter information
@@ -161,48 +143,4 @@ export interface AccountInfo {
   readonly nonce?: number;
 }
 
-/**
- * API client interface
- * Standardized interface for blockchain API clients
- */
-export interface ApiClient {
-  readonly isConnected: boolean;
-  readonly chainKey: ChainKey;
 
-  // Connection management
-  connect(): Promise<void>;
-  disconnect(): Promise<void>;
-  getConnectionState(): ConnectionState;
-
-  // Query operations
-  getStorageValue<T = unknown>(config: StorageQueryConfig, parameters?: Record<string, unknown>): Promise<StorageQueryResult<T>>;
-  watchStorageValue<T = unknown>(config: StorageQueryConfig, callback: (result: StorageQueryResult<T>) => void, parameters?: Record<string, unknown>): Promise<WatchSubscription>;
-
-  // Transaction operations
-  executeTransaction(config: TransactionCallConfig, parameters: Record<string, unknown>, signer: AccountInfo): Promise<ApiTransactionResult>;
-
-  // Metadata operations
-  getPalletMetadata(palletName: string): Promise<PalletMetadata>;
-  getChainMetadata(): Promise<readonly PalletMetadata[]>;
-}
-
-/**
- * Type guards for runtime type checking
- */
-export namespace TypeGuards {
-  export function isChainKey(value: string): value is ChainKey {
-    return Object.values(ChainKey).includes(value as ChainKey);
-  }
-
-  export function isStorageQueryType(value: string): value is StorageQueryType {
-    return Object.values(StorageQueryType).includes(value as StorageQueryType);
-  }
-
-  export function isTransactionStatus(value: string): value is TransactionStatus {
-    return Object.values(TransactionStatus).includes(value as TransactionStatus);
-  }
-
-  export function isConnectionStatus(value: string): value is ConnectionStatus {
-    return Object.values(ConnectionStatus).includes(value as ConnectionStatus);
-  }
-}

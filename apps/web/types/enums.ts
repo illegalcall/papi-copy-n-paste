@@ -72,16 +72,6 @@ export enum ConnectionStatus {
   ERROR = 'error'
 }
 
-/**
- * Validation states for forms and inputs
- * Used for form validation feedback
- */
-export enum ValidationStatus {
-  VALID = 'valid',
-  INVALID = 'invalid',
-  PENDING = 'pending',
-  UNKNOWN = 'unknown'
-}
 
 
 /**

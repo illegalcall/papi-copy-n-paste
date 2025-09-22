@@ -948,12 +948,6 @@ export default function PageContent() {
     }
   }, [selectedStorage, storageQueryType, handleWatchClick, executeWatchOperation, handleRunClick, executeCurrentOperation]);
 
-  // Determine if we can run anything
-  const canRunAny =
-    canRunCall ||
-    canRunStorage ||
-    methodQueue.length > 0 ||
-    storageQueue.length > 0;
 
   return (
     <div className="h-screen flex flex-col">

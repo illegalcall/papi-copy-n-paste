@@ -77,11 +77,8 @@ export const ContentArea = memo(({
 
   // Right pane props
   generatedCode,
-  storageCode,
   consoleOutput,
   transactionHistory,
-  isLoadingMetadata,
-  metadataError,
   chainStatus,
   selectedChain,
 }: ContentAreaProps) => {
