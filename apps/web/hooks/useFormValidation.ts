@@ -212,9 +212,6 @@ export function useFormValidation({
   };
 }
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
 
 /**
  * Prepares form data for validation by cleaning and converting values

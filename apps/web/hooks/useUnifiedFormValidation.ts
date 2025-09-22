@@ -19,9 +19,6 @@ import {
   isEmpty
 } from '../utils/validation/helpers';
 
-// ============================================================================
-// TYPES
-// ============================================================================
 
 export interface FormField {
   name: string;
@@ -77,9 +74,6 @@ export interface UseUnifiedFormValidationReturn {
   schema: z.ZodObject<any>;
 }
 
-// ============================================================================
-// MAIN HOOK
-// ============================================================================
 
 export function useUnifiedFormValidation({
   fields,
@@ -94,9 +88,6 @@ export function useUnifiedFormValidation({
     showTypeHints = true
   } = options;
 
-  // ============================================================================
-  // STATE
-  // ============================================================================
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -104,9 +95,6 @@ export function useUnifiedFormValidation({
   const [isValidating, setIsValidating] = useState<boolean>(false);
   const [fieldValues, setFieldValues] = useState<Record<string, any>>({});
 
-  // ============================================================================
-  // MEMOIZED VALUES
-  // ============================================================================
 
   // Separate required and optional fields
   const { requiredFields, optionalFields, fieldMap } = useMemo(() => {
@@ -143,9 +131,6 @@ export function useUnifiedFormValidation({
     return requiredFields.map(f => f.name);
   }, [requiredFields]);
 
-  // ============================================================================
-  // VALIDATION FUNCTIONS
-  // ============================================================================
 
   const validateForm = useCallback((formData: Record<string, any>): ValidationResult => {
     setIsValidating(true);
@@ -310,9 +295,6 @@ export function useUnifiedFormValidation({
     }
   }, [fields, fieldMap]);
 
-  // ============================================================================
-  // STATE MANAGEMENT FUNCTIONS
-  // ============================================================================
 
   const setFieldValue = useCallback((fieldName: string, value: any) => {
     setFieldValues(prev => ({
@@ -381,9 +363,6 @@ export function useUnifiedFormValidation({
     setIsValidating(false);
   }, []);
 
-  // ============================================================================
-  // UTILITY FUNCTIONS
-  // ============================================================================
 
   const getFieldError = useCallback((fieldName: string): string | undefined => {
     return errors[fieldName];
@@ -415,9 +394,6 @@ export function useUnifiedFormValidation({
     return convertFormValues(cleanData, fieldTypes);
   }, [requiredFieldNames, fieldTypes]);
 
-  // ============================================================================
-  // EFFECTS
-  // ============================================================================
 
   // Update validation state when errors change
   useEffect(() => {
@@ -434,9 +410,6 @@ export function useUnifiedFormValidation({
     }
   }, [errors, isValidating, isValid, onValidationChange]);
 
-  // ============================================================================
-  // RETURN
-  // ============================================================================
 
   return {
     // Validation functions

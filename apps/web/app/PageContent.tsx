@@ -10,7 +10,6 @@ import { Sheet, SheetContent } from "@workspace/ui/components/sheet";
 import { Button } from "@workspace/ui/components/button";
 import { Menu } from "lucide-react";
 
-// Import our refactored hooks
 import { useChainConnection } from "../hooks/useChainConnection";
 import { useCallSelection } from "../hooks/useCallSelection";
 import { useStorageQuery } from "../hooks/useStorageQuery";
@@ -27,7 +26,6 @@ import { useMobileDetection } from "../hooks/useMobileDetection";
 import { TransactionPreviewModal } from "../components/wallet";
 import { PalletError, PalletEvent } from "@workspace/core";
 
-// Import execution helpers
 import {
   executeRealTransaction,
   executeMultipleTransactions,
@@ -36,7 +34,6 @@ import {
   stopWatchValue,
 } from "../utils/transactionHelpers";
 
-// Types for transaction history
 interface TransactionResult {
   hash: string;
   blockHash?: string;
@@ -63,7 +60,6 @@ interface TransactionEvent {
 }
 
 export default function PageContent() {
-  // Chain connection and metadata
   const {
     selectedChain,
     selectedProvider,
@@ -75,20 +71,17 @@ export default function PageContent() {
     handleNetworkChange,
   } = useChainConnection();
 
-  // Wallet connection
   const {
     isConnected: isWalletConnected,
     selectedAccount,
     getSigner,
   } = useWallet();
 
-  // Mobile detection
   const {
     showMobileWarning,
     dismissMobileWarning,
   } = useMobileDetection();
 
-  // Transaction history and preview modal state
   const [transactionHistory, setTransactionHistory] = useState<TransactionResult[]>([]);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [pendingTransactions, setPendingTransactions] = useState<PendingTransaction[]>([]);
@@ -100,7 +93,6 @@ export default function PageContent() {
                    selectedChain === 'westend';
 
 
-  // Call selection and form handling
   const {
     selectedCall,
     formData,
@@ -112,7 +104,6 @@ export default function PageContent() {
     resetCallState,
   } = useCallSelection();
 
-  // Storage query handling
   const {
     selectedStorage,
     storageQueryType,
@@ -126,7 +117,6 @@ export default function PageContent() {
     resetStorageState,
   } = useStorageQuery(selectedChain);
 
-  // Constant selection handling
   const {
     selectedConstant,
     handleConstantSelect,
@@ -134,7 +124,6 @@ export default function PageContent() {
     resetConstantState,
   } = useConstantSelection();
 
-  // Error selection handling
   const {
     selectedError,
     handleErrorSelect,
@@ -142,7 +131,6 @@ export default function PageContent() {
     resetErrorState,
   } = useErrorSelection();
 
-  // Event selection handling
   const {
     selectedEvent,
     handleEventSelect,

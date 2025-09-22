@@ -1,7 +1,3 @@
-/**
- * Centralized enums for type safety and magic string elimination
- * This file contains all enums used throughout the application
- */
 
 /**
  * Storage query operation types
@@ -48,17 +44,6 @@ export enum ChainKey {
   PASEO_ASSET_HUB = 'paseo_asset_hub'
 }
 
-/**
- * Task execution states
- * Used for progress tracking and workflow management
- */
-export enum TaskStatus {
-  PENDING = 'pending',
-  IN_PROGRESS = 'in_progress',
-  COMPLETED = 'completed',
-  BLOCKED = 'blocked',
-  FAILED = 'failed'
-}
 
 /**
  * Transaction execution states
@@ -98,17 +83,6 @@ export enum ValidationStatus {
   UNKNOWN = 'unknown'
 }
 
-/**
- * Log message types for consistent logging
- * Used throughout the application for structured logging
- */
-export enum LogLevel {
-  SUCCESS = 'success',
-  ERROR = 'error',
-  WARNING = 'warning',
-  INFO = 'info',
-  DEBUG = 'debug'
-}
 
 /**
  * Component complexity indicators
@@ -159,16 +133,6 @@ export enum Theme {
   SYSTEM = 'system'
 }
 
-/**
- * Network environment types
- * Used for deployment and configuration
- */
-export enum NetworkEnvironment {
-  MAINNET = 'mainnet',
-  TESTNET = 'testnet',
-  LOCAL = 'local',
-  DEVELOPMENT = 'development'
-}
 
 
 /**

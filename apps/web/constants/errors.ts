@@ -1,7 +1,3 @@
-/**
- * Error message constants and configuration for PAPI Copy-Paste application
- * Centralized error messages for consistency and internationalization
- */
 
 import {
   ErrorCode,

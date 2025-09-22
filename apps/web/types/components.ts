@@ -1,6 +1,3 @@
-/**
- * Shared component type definitions
- */
 
 // Core blockchain types
 export interface PalletInfo {

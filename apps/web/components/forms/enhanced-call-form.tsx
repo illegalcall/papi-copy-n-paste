@@ -1,8 +1,3 @@
-/**
- * EnhancedCallForm - New call form using rich metadata approach
- *
- * Replaces SimpleCallForm with POC-based parameter detection
- */
 
 "use client";
 

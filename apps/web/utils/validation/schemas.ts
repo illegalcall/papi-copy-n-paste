@@ -6,9 +6,6 @@
 import { z } from 'zod';
 import { getSs58AddressInfo } from 'polkadot-api';
 
-// ============================================================================
-// BASE VALIDATORS
-// ============================================================================
 
 /**
  * SS58 Address validator using PAPI's built-in validation
@@ -97,9 +94,6 @@ export const jsonStringValidator = z
     'Must be valid JSON'
   );
 
-// ============================================================================
-// PARAMETER TYPE MAPPING
-// ============================================================================
 
 /**
  * Maps PAPI parameter types to appropriate validators
@@ -161,9 +155,6 @@ export const parameterTypeValidators = {
   'Option<Balance>': balanceValidator.optional().or(z.literal('')),
 } as const;
 
-// ============================================================================
-// DYNAMIC SCHEMA CREATION
-// ============================================================================
 
 /**
  * Creates a validation schema for a parameter type
@@ -239,9 +230,6 @@ export function createFormSchema(
   return z.object(schemaFields);
 }
 
-// ============================================================================
-// VALIDATION RESULT TYPES
-// ============================================================================
 
 export interface ValidationResult {
   isValid: boolean;

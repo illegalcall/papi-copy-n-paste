@@ -1,7 +1,3 @@
-/**
- * Clean, precise logging utility for PAPI operations
- * Replaces verbose emoji-heavy logs with clear, actionable information
- */
 
 export type LogLevel = 'info' | 'success' | 'error' | 'warning';
 
@@ -190,30 +186,3 @@ export function createCleanLogger(
   return new CleanLogger(setOutput, options);
 }
 
-// Utility for migration from old logging
-export function cleanLogMessage(oldMessage: string): string {
-  // Remove excessive emojis and verbose prefixes
-  return oldMessage
-    .replace(/^🔍\s*Executing\s*/, '')
-    .replace(/^📊\s*Query Type:\s*/, '')
-    .replace(/^🔍\s*Attempting\s*/, '')
-    .replace(/^📡\s*Fetching\s*/, '')
-    .replace(/^✅\s*Dynamic parameter detection\s*/, '')
-    .replace(/^📋\s*Analysis Results:\s*/, '')
-    .replace(/^🚀\s*Attempting\s*/, '')
-    .replace(/^📦\s*Loading\s*/, '')
-    .replace(/^🔄\s*Importing\s*/, '')
-    .replace(/^✅\s*Descriptor imported\s*/, '')
-    .replace(/^🔗\s*Creating\s*/, '')
-    .replace(/^📊\s*Accessing\s*/, '')
-    .replace(/^✅\s*Found\s*/, '')
-    .replace(/^🔍\s*Storage function type:\s*/, '')
-    .replace(/^🔍\s*Is function:\s*/, '')
-    .replace(/^🔍\s*Executing storage query\s*/, '')
-    .replace(/^🔧\s*Using parameters:\s*/, '')
-    .replace(/^📋\s*Raw Result:\s*/, 'Result: ')
-    .replace(/^🎉\s*SUCCESS:\s*/, '')
-    .replace(/^💎\s*Value:\s*/, 'Value: ')
-    .replace(/^✅\s*COMPLETE SUCCESS:\s*/, 'Complete')
-    .trim();
-}

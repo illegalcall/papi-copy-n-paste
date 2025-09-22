@@ -1,8 +1,3 @@
-/**
- * EnumVariantSelector - Dropdown selection for enum variants
- *
- * Based on PAPI Console's CEnum component pattern with SearchableSelect
- */
 
 import React, { useState } from 'react'
 import { Check, ChevronsUpDown } from 'lucide-react'

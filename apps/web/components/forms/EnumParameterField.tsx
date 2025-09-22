@@ -1,8 +1,3 @@
-/**
- * EnumParameterField - Complete enum parameter input with variant selection and data input
- *
- * Handles both void and data variants following PAPI Console patterns
- */
 
 import React, { useState, useEffect } from 'react'
 import { Input } from '@workspace/ui/components/input'

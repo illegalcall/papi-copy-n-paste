@@ -1,7 +1,3 @@
-/**
- * Consolidated form helper utilities
- * Extracted from repeated patterns across components
- */
 
 import type { FormData } from '../types/forms';
 

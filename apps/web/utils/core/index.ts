@@ -1,7 +1,3 @@
-/**
- * Core utilities barrel exports
- * Provides centralized access to core utility functions
- */
 
 export * from './error-handler';
 

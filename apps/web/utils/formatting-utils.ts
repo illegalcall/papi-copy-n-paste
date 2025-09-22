@@ -1,7 +1,3 @@
-/**
- * Consolidated formatting utilities for PAPI parameters and results
- * Moved from callHelpers.ts and storageHelpers.ts to eliminate redundancy
- */
 
 import type { ParameterInfo } from './metadataAnalyzer'
 
@@ -200,9 +196,6 @@ export async function getCallReturnType(
   return 'DispatchResult';
 }
 
-// ============================================================================
-// STORAGE FORMATTING UTILITIES (moved from storageHelpers.ts)
-// ============================================================================
 
 /**
  * Generate formatted storage parameters from raw form data

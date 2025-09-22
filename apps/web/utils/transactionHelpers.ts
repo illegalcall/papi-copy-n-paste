@@ -1,6 +1,3 @@
-/**
- * Transaction execution helper functions
- */
 
 import {
   PalletCall,
@@ -14,8 +11,6 @@ import {
   generateStorageParamValues,
   decodeStorageResult,
   generateCallParamValues,
-  formatTransactionResult,
-  getCallDescription,
 } from "./formatting-utils";
 import { getAllCallParameters } from "./callParameterDetection";
 import type { ParameterInfo } from "./metadataAnalyzer";
@@ -23,7 +18,6 @@ import { createCleanLogger, QueryResult } from "./cleanLogger";
 import { getDescriptorForChain } from "@workspace/core/descriptors";
 import { StorageQueryType } from "../types/enums";
 
-// BigInt serialization helper
 function serializeBigInt(value: any): any {
   if (typeof value === 'bigint') {
     return value.toString();
@@ -41,13 +35,10 @@ function serializeBigInt(value: any): any {
   return value;
 }
 
-// Observable subscriptions storage for watch functionality
 let activeWatchSubscriptions = new Map<string, any>();
 
-// Helper function to get storage parameters using the new dynamic detection system
 function getStorageParameters(chainKey: string, pallet: string, storageName: string): { required: string[], optional: string[] } {
   try {
-    // Use the storage parameter detector directly
     const detectedParams = getStorageParameterInfo(chainKey, pallet, storageName);
     const paramInfo = {
       required: detectedParams.required,
@@ -774,10 +765,6 @@ export function isWatching(watchKey: string): boolean {
   return activeWatchSubscriptions.has(watchKey);
 }
 
-// Get all active watches
-export function getActiveWatches(): string[] {
-  return Array.from(activeWatchSubscriptions.keys());
-}
 
 // Helper function to format storage results consistently for PAPI
 function formatPapiStorageResult(value: any): string {

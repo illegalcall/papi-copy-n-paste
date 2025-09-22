@@ -1,13 +1,6 @@
-/**
- * Validation helper functions and utilities
- * Provides common validation patterns and form utilities
- */
 
 import { getSs58AddressInfo } from 'polkadot-api';
 
-// ============================================================================
-// VALIDATION UTILITIES
-// ============================================================================
 
 /**
  * Check if a value is empty (null, undefined, empty string, or whitespace)
@@ -70,9 +63,6 @@ export function isValidBalance(value: string): boolean {
   return /^\d+(\.\d+)?$/.test(value);
 }
 
-// ============================================================================
-// PARAMETER TYPE HELPERS
-// ============================================================================
 
 /**
  * Convert a type string to human-readable format
@@ -207,9 +197,6 @@ export function getParameterHelpText(type: string): string {
   return helpMap[type] || 'Enter a valid value for this parameter';
 }
 
-// ============================================================================
-// FORM DATA UTILITIES
-// ============================================================================
 
 /**
  * Clean form data by trimming strings and removing empty optional fields
@@ -338,9 +325,6 @@ export function createRequiredFieldErrors(
   return errors;
 }
 
-// ============================================================================
-// VALIDATION MESSAGE UTILITIES
-// ============================================================================
 
 /**
  * Create user-friendly validation error messages

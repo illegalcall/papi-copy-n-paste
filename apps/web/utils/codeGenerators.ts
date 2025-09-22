@@ -1,6 +1,3 @@
-/**
- * Code generation utilities for PAPI transactions and storage queries
- */
 
 import { PalletCall } from "@workspace/core";
 import { StorageQueryType } from "../types/enums";
@@ -27,12 +24,10 @@ export function generateStorageQueryByType(
   const baseQuery = `typedApi.query.${pallet}.${storageName}`;
   const params = hasParams ? `(${paramString})` : "()";
 
-  // Convert string to enum if necessary
   const normalizedQueryType = typeof queryType === 'string'
     ? Object.values(StorageQueryType).find(enumValue => enumValue === queryType) || StorageQueryType.GET_VALUE
     : queryType;
 
-  // Check if this query type needs RxJS
   const needsRxJS = [
     StorageQueryType.WATCH_VALUE,
     StorageQueryType.WATCH_VALUE_FINALIZED,
@@ -59,19 +54,16 @@ import { combineLatest, throttleTime, debounceTime, map, filter, takeUntil, dist
       if (isSimpleValue) {
         return `${rxjsImports}
 
-// Simple storage value
 const result = await ${baseQuery}.getValue()
 console.log('Storage value:', result)`;
       } else if (hasParams) {
         return `${rxjsImports}
 
-// Get specific entry with provided parameters
 const result = await ${baseQuery}.getValue${params}
 console.log('Specific entry:', result)`;
       } else {
         return `${rxjsImports}
 
-// No parameters provided - getting all entries
 const entries = await ${baseQuery}.getEntries()
 console.log('All entries:', entries)
 
@@ -83,7 +75,6 @@ console.log('All entries:', entries)
     case StorageQueryType.GET_VALUE_AT:
       return `${rxjsImports}
 
-// Get value at specific block states
 const resultFinalized = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ", " : ""}{ at: "finalized" })
 const resultBest = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams ? ", " : ""}{ at: "best" })
 console.log('At finalized block:', resultFinalized)
@@ -93,7 +84,6 @@ console.log('At best block:', resultBest)`;
       if (hasParams) {
         return `${rxjsImports}
 
-// Get all entries (ignoring provided parameters - this shows all entries)
 const entries = await ${baseQuery}.getEntries()
 console.log('All entries:', entries)
 
@@ -103,7 +93,6 @@ console.log('All entries:', entries)
       } else {
         return `${rxjsImports}
 
-// Get all entries for this storage map
 const entries = await ${baseQuery}.getEntries()
 console.log('All entries:', entries)`;
       }
@@ -111,7 +100,6 @@ console.log('All entries:', entries)`;
     case StorageQueryType.GET_VALUES:
       return `${rxjsImports}
 
-// Get multiple values (batch query)
 const keys = [${paramString}, "//Bob", "//Charlie"] // Add more keys as needed
 const results = await ${baseQuery}.getValues(keys)
 console.log('Multiple values:', results)`;
@@ -120,13 +108,11 @@ console.log('Multiple values:', results)`;
       if (hasParams) {
         return `${rxjsImports}
 
-// Storage requires parameters
 const entries = await ${baseQuery}.getEntries()
 console.log('Storage entries:', entries)`;
       } else {
         return `${rxjsImports}
 
-// Get entries with pagination
 const entries = await ${baseQuery}.getEntries()
 console.log('Paged entries:', entries)`;
       }
@@ -134,7 +120,6 @@ console.log('Paged entries:', entries)`;
     case StorageQueryType.WATCH_VALUE:
       return `${rxjsImports}
 
-// Watch for value changes
 const subscription = ${baseQuery}.watchValue${params}.subscribe({
   next: (value) => {
     console.log('Value changed:', value)
@@ -151,7 +136,6 @@ const subscription = ${baseQuery}.watchValue${params}.subscribe({
     case StorageQueryType.WATCH_VALUE_FINALIZED:
       return `${rxjsImports}
 
-// Watch for value changes at finalized blocks only
 const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ", " : ""}"finalized").subscribe({
   next: (value) => {
     console.log('Finalized value changed:', value)
@@ -168,7 +152,6 @@ const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? 
     case StorageQueryType.WATCH_VALUE_BEST:
       return `${rxjsImports}
 
-// Watch for value changes at best blocks
 const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? ", " : ""}"best").subscribe({
   next: (value) => {
     console.log('Best block value changed:', value)
@@ -185,7 +168,6 @@ const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? 
     case StorageQueryType.WATCH_ENTRIES:
       return `${rxjsImports}
 
-// Watch for entry changes across the entire storage map
 const subscription = ${baseQuery}.watchEntries().subscribe({
   next: (entries) => {
     console.log('Entries changed:', entries)
@@ -202,7 +184,6 @@ const subscription = ${baseQuery}.watchEntries().subscribe({
     case StorageQueryType.WATCH_ENTRIES_PARTIAL:
       return `${rxjsImports}
 
-// Watch for partial entry changes (useful for large storage maps)
 const subscription = ${baseQuery}.watchEntries().subscribe({
   next: (entries) => {
     console.log('Partial entries changed:', entries)
@@ -247,7 +228,6 @@ const subscription = combined$.subscribe({
     case StorageQueryType.THROTTLED_WATCH:
       return `${rxjsImports}
 
-// Watch with throttling (limit update frequency)
 const subscription = ${baseQuery}.watchValue${params}.pipe(
   throttleTime(1000) // Throttle to at most once per second
 ).subscribe({
@@ -266,7 +246,6 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
     case StorageQueryType.DEBOUNCED_WATCH:
       return `${rxjsImports}
 
-// Watch with debouncing (wait for pause in changes)
 const subscription = ${baseQuery}.watchValue${params}.pipe(
   debounceTime(500) // Wait 500ms after last change
 ).subscribe({
@@ -285,7 +264,6 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
     case StorageQueryType.MAP_VALUES:
       return `${rxjsImports}
 
-// Watch and transform values
 const subscription = ${baseQuery}.watchValue${params}.pipe(
   map(value => {
     // Transform the value here
@@ -313,7 +291,6 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
     case StorageQueryType.FILTER_CHANGES:
       return `${rxjsImports}
 
-// Watch and filter specific changes
 const subscription = ${baseQuery}.watchValue${params}.pipe(
   filter(value => {
     // Add your filter condition here
@@ -339,7 +316,6 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
     case StorageQueryType.TAKE_UNTIL_CHANGE:
       return `${rxjsImports}
 
-// Watch until a specific condition is met
 const subscription = ${baseQuery}.watchValue${params}.pipe(
   takeUntil(
     // Define your termination condition here
@@ -372,7 +348,6 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
     case StorageQueryType.RESILIENT_WATCH:
       return `${rxjsImports}
 
-// Watch with error recovery and retry logic
 const resilientWatch$ = ${baseQuery}.watchValue${params}.pipe(
   retry({ count: 3, delay: 1000 }), // Retry up to 3 times with 1s delay
   startWith(null) // Start with null value
@@ -505,7 +480,6 @@ ${connectionInfo.connection}
   }
 }
 
-// Execute the query
 queryStorage().then(result => {
   console.log('Query result:', result)
 })`;
@@ -522,8 +496,7 @@ queryStorage().then(result => {
 
     const connectionInfo = getChainConnection(chainKey, providerId);
 
-    // Get parameter information from our new flexible system
-    const detectedParams = getStorageParameterInfo(chainKey, pallet, storage.name);
+        const detectedParams = getStorageParameterInfo(chainKey, pallet, storage.name);
     const paramInfo = {
       required: detectedParams.required,
       optional: detectedParams.optional || []
@@ -544,14 +517,12 @@ queryStorage().then(result => {
       ? generateStorageParams(storageParams, allPossibleParams)
       : "";
 
-    // Simple, clean code generation - just the essential query
-    let queryCode;
+        let queryCode;
     if (hasParams) {
       queryCode = `const result = await typedApi.query.${pallet}.${storage.name}.getValue(${paramString})
 console.log('${pallet}.${storage.name}:', result)`;
     } else if (allPossibleParams.length === 0) {
-      // Simple storage item with no parameters
-      queryCode = `const result = await typedApi.query.${pallet}.${storage.name}.getValue()
+            queryCode = `const result = await typedApi.query.${pallet}.${storage.name}.getValue()
 console.log('${pallet}.${storage.name}:', result)`;
     } else {
       // Storage map without parameters - show all entries
@@ -655,8 +626,7 @@ console.log('Connected to custom RPC')`;
   // Use sync description for now - async descriptions will be handled later
   const description = `Call ${pallet}.${call.name}`;
 
-  // Create mapping from parameter name to type using call.args
-  const paramTypeMap = new Map<string, string>();
+    const paramTypeMap = new Map<string, string>();
   call.args.forEach(arg => {
     paramTypeMap.set(arg.name, arg.type);
   });
@@ -664,8 +634,7 @@ console.log('Connected to custom RPC')`;
   // Generate arguments from form data keys with proper type handling
   const args = Object.entries(formData)
     .map(([paramName, value]) => {
-      // Get the actual parameter type from call.args
-      const paramType = paramTypeMap.get(paramName) || 'unknown';
+            const paramType = paramTypeMap.get(paramName) || 'unknown';
 
       // Extract actual value from form object structure if needed
       if (typeof value === 'object' && value?.type === 'Id' && value?.value) {
@@ -762,8 +731,7 @@ function generateFunctionCode(
   call: PalletCall,
   formData: Record<string, any>,
 ): string {
-  // Get call metadata information
-  let description = `Call ${pallet}.${call.name}`;
+    let description = `Call ${pallet}.${call.name}`;
   let paramInfo: { required: string[]; optional: string[] } = { required: [], optional: [] };
 
   // Use sync description for now - async descriptions will be handled later
@@ -772,16 +740,14 @@ function generateFunctionCode(
   // Use basic parameter info from call.args for now
   paramInfo = { required: call.args.map(arg => arg.name), optional: [] };
 
-  // Create mapping from parameter name to type using call.args
-  const paramTypeMap = new Map<string, string>();
+    const paramTypeMap = new Map<string, string>();
   call.args.forEach(arg => {
     paramTypeMap.set(arg.name, arg.type);
   });
 
   const args = Object.entries(formData)
     .map(([paramName, value]) => {
-      // Get the actual parameter type from call.args
-      const paramType = paramTypeMap.get(paramName) || 'unknown';
+            const paramType = paramTypeMap.get(paramName) || 'unknown';
 
       // Extract actual value from form object structure if needed
       if (typeof value === 'object' && value?.type === 'Id' && value?.value) {
@@ -1042,7 +1008,6 @@ ${connectionInfo.connection}
   }
 }
 
-// Execute the query
 getConstant().then(result => {
   console.log('Constant result:', result)
 })`;

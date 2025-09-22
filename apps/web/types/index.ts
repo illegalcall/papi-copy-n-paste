@@ -1,7 +1,3 @@
-/**
- * Types barrel exports
- * Provides centralized access to all TypeScript type definitions
- */
 
 // Enums and constants
 export * from './enums';

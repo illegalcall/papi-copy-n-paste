@@ -1,7 +1,3 @@
-/**
- * Standardized React import patterns
- * Centralizes commonly used React imports for consistency
- */
 
 // Most common hook combination
 export { useState, useCallback, useEffect } from 'react';

@@ -1,7 +1,3 @@
-/**
- * React Error Boundary component for PAPI Copy-Paste application
- * Catches React errors and displays user-friendly error messages
- */
 
 "use client";
 

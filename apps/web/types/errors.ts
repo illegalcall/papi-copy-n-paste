@@ -1,7 +1,3 @@
-/**
- * Comprehensive error type system for PAPI Copy-Paste application
- * Provides standardized error handling across all domains
- */
 
 // Base error interface that all errors extend
 export interface BaseError {

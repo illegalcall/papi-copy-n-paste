@@ -1,11 +1,4 @@
-/**
- * Common state management helper utilities
- * Extracted from repeated patterns across hooks and components
- */
 
-/**
- * Generic clear state function factory
- */
 export function createStateClearer<T>(
   setState: React.Dispatch<React.SetStateAction<T>>,
   initialValue: T

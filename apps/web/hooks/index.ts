@@ -1,6 +1,3 @@
-/**
- * Barrel exports for all custom hooks
- */
 
 // Core business logic hooks
 export { useBalanceFetcher } from './useBalanceFetcher';

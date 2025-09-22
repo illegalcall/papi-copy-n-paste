@@ -1,11 +1,3 @@
-/**
- * Dynamic Storage Parameter Detection Engine
- *
- * Replaces hard-coded storage parameter detection with a metadata-driven approach
- * that automatically supports all PAPI chains and storage items.
- *
- * This is Phase 2 of the Dynamic Storage Detection Plan implementation.
- */
 
 import { storageMetadata, getStorageParameters, hasStorage, getSupportedChains, getSupportedPallets, getSupportedStorage } from '../../../packages/core/generated/storage-metadata';
 
@@ -44,13 +36,6 @@ export class DynamicStorageDetector {
       return result;
     }
 
-    // Try runtime detection first (most accurate)
-    const runtimeResult = this.detectFromRuntime(chainKey, pallet, storage);
-    if (runtimeResult) {
-
-      this.cache.set(cacheKey, runtimeResult);
-      return runtimeResult;
-    }
 
     // Try generated metadata first (most reliable for known storage items)
     const metadataResult = this.detectFromMetadata(chainKey, pallet, storage);
@@ -70,42 +55,6 @@ export class DynamicStorageDetector {
     throw new Error(`No metadata available for ${chainKey}.${pallet}.${storage} - metadata may be incomplete or missing`);
   }
 
-  /**
-   * Primary detection: Use PAPI runtime introspection (like papi-console)
-   */
-  private detectFromRuntime(chainKey: string, pallet: string, storage: string): StorageParameterInfo | null {
-    try {
-      // Import runtime detector dynamically to avoid circular dependencies
-      const { runtimeStorageDetector } = require('./runtimeStorageDetection');
-
-      // Use async detection but handle it synchronously for now
-      // In a real implementation, you might want to make this method async
-      const result = runtimeStorageDetector.detectParameters(chainKey, pallet, storage);
-
-      // If runtime detection returns a failure result, don't use it - let metadata fallback handle it
-      if (result.description && result.description.includes('Failed to analyze')) {
-        return null;
-      }
-
-      // Only use runtime result if it has actual parameters or is explicitly known to be parameterless
-      if (result.required.length > 0 || result.isPlain) {
-        // Convert to our format
-        return {
-          required: result.required,
-          optional: result.optional,
-          description: result.description || `Runtime storage for ${pallet}.${storage}`,
-          returnType: result.returnType || 'unknown'
-        };
-      }
-
-      // If runtime shows 0 parameters but we're not sure it's correct, fall back to metadata
-      return null;
-
-    } catch (error) {
-      // Silent fallback on runtime detection errors
-      return null;
-    }
-  }
 
   /**
    * Enhanced live metadata detection: Extract from UI metadata if available
@@ -404,12 +353,6 @@ function initializeClientSide() {
   // Clear cache on client initialization
   dynamicStorageDetector.clearCache();
 
-  // Also clear runtime detector cache
-  import('./runtimeStorageDetection').then(({ runtimeStorageDetector }) => {
-    runtimeStorageDetector.clearCache();
-  }).catch(() => {
-    // Silently handle import errors
-  });
 }
 
 

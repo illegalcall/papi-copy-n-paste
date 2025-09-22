@@ -1,10 +1,3 @@
-/**
- * Optimized PageContent component with improved architecture
- * - Separated concerns using container components
- * - Extracted business logic into custom hooks
- * - Improved performance with memoization
- * - Better maintainability and testability
- */
 
 "use client";
 
@@ -14,7 +7,6 @@ import { ContentArea } from "@/components/containers/content-area";
 import { TransactionContainer } from "@/components/containers/transaction-container";
 import { LeftPane, LeftPaneRef } from "@/components/layout/left-pane";
 
-// Import optimized hooks
 import { useChainConnection } from "../hooks/useChainConnection";
 import { useCallSelection } from "../hooks/useCallSelection";
 import { useStorageQuery } from "../hooks/useStorageQuery";
@@ -30,19 +22,16 @@ import { usePageExecution } from "../hooks/usePageExecution";
 export default function OptimizedPageContent() {
   const leftPaneRef = useRef<LeftPaneRef>(null);
 
-  // Core application state
   const chainConnection = useChainConnection();
   const wallet = useWallet();
   const mobileDetection = useMobileDetection();
 
-  // Selection state management
   const callSelection = useCallSelection();
   const storageQuery = useStorageQuery(chainConnection.selectedChain);
   const constantSelection = useConstantSelection();
   const errorSelection = useErrorSelection();
   const eventSelection = useEventSelection();
 
-  // Code generation and execution
   const codeGeneration = useCodeGeneration(
     chainConnection.selectedChain || '',
     chainConnection.selectedProvider || '',

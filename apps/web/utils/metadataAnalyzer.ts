@@ -1,13 +1,3 @@
-/**
- * MetadataAnalyzer - Enhanced metadata parameter extraction for UI
- *
- * Ported from POC script with UI-specific enhancements:
- * - Rich parameter information for forms
- * - Enum variant extraction for dropdowns
- * - Optional parameter detection
- * - Type complexity assessment
- * - UI-ready parameter descriptions
- */
 
 import { getDynamicBuilder, getLookupFn } from '@polkadot-api/metadata-builders'
 import {
@@ -437,27 +427,6 @@ export class MetadataAnalyzer {
     return 'complex'
   }
 
-  /**
-   * Get pallet name from type information
-   */
-  private getPalletNameFromType(palletCallType: any, palletIndex: number): string | null {
-    // Try to get name from path
-    if (palletCallType.path && palletCallType.path.length > 0) {
-      const pathSegments = palletCallType.path
-      // Look for pallet name in path segments
-      const palletSegment = pathSegments.find((segment: string) =>
-        segment.includes('pallet') || segment.endsWith('Call')
-      )
-      if (palletSegment) {
-        return palletSegment.replace(/pallet_?/i, '').replace(/Call$/, '')
-      }
-      // Use last segment as fallback
-      return pathSegments[pathSegments.length - 1]
-    }
-
-    // Fallback to pallet index
-    return `Pallet${palletIndex}`
-  }
 
   /**
    * Get specific call information
