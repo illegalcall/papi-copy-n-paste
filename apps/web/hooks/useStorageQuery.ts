@@ -6,12 +6,13 @@ import { useState, useCallback } from "../utils/reactImports";
 // Note: isStorageQueryValid was removed as it just returned true
 import type { StorageParams } from "../types/forms";
 import { createStateClearer } from "../utils/stateHelpers";
+import { StorageQueryType, ChainKey } from "../types/enums";
 
-export function useStorageQuery(chainKey: string = 'polkadot') {
+export function useStorageQuery(chainKey: ChainKey | string = ChainKey.POLKADOT) {
   const [selectedStorage, setSelectedStorage] = useState<
     { pallet: string; storage: any } | undefined
   >();
-  const [storageQueryType, setStorageQueryType] = useState<string>("getValue");
+  const [storageQueryType, setStorageQueryType] = useState<StorageQueryType | string>(StorageQueryType.GET_VALUE);
   const [storageParams, setStorageParams] = useState<StorageParams>({});
   const [canRunStorage, setCanRunStorage] = useState(false);
   const [storageValidationErrors, setStorageValidationErrors] = useState<Record<string, string>>({});
@@ -28,7 +29,7 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
 
   // Handle storage query type change
   const handleStorageQueryTypeChange = useCallback(
-    (newQueryType: string) => {
+    (newQueryType: StorageQueryType | string) => {
       setStorageQueryType(newQueryType);
 
       // Re-validate with current params using dynamic detection
@@ -63,7 +64,7 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
   const clearStorageSelection = useCallback(() => {
     setSelectedStorage(undefined);
     setStorageParams({});
-    setStorageQueryType("getValue");
+    setStorageQueryType(StorageQueryType.GET_VALUE);
     setCanRunStorage(false);
   }, []);
 
@@ -71,7 +72,7 @@ export function useStorageQuery(chainKey: string = 'polkadot') {
   const resetStorageState = useCallback(() => {
     setSelectedStorage(undefined);
     setStorageParams({});
-    setStorageQueryType("getValue");
+    setStorageQueryType(StorageQueryType.GET_VALUE);
     setCanRunStorage(false);
   }, []);
 

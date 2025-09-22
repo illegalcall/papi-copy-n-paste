@@ -185,16 +185,7 @@ function generateResponseStructure(
   }
 ]`;
 
-      // Context-specific examples
       default:
-        // Try to infer from context
-        if (pallet === "System" && storageName === "Number") return "12345678";
-        if (pallet === "Timestamp" && storageName === "Now")
-          return "1640995200000";
-        if (pallet === "Balances" && storageName === "TotalIssuance")
-          return "21000000000000000000n";
-        if (pallet === "Balances" && storageName === "InactiveIssuance")
-          return "500000000000000000n";
 
         // Staking-specific types
         if (pallet === "Staking" && storageName.includes("Validator")) {

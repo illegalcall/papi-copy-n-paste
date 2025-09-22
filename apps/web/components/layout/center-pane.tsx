@@ -15,6 +15,7 @@ import { EnhancedCallForm } from "@/components/forms/enhanced-call-form";
 import { StorageForm } from "@/components/forms/storage-form";
 import type { StorageInfo } from "@/types/components";
 import { ConstantForm } from "@/components/forms/constant-form";
+import { StorageQueryType } from "../../types/enums";
 import { ErrorForm } from "@/components/forms/error-form";
 import { EventForm } from "@/components/forms/event-form";
 import { PalletCall, PalletConstant, PalletError, PalletEvent } from "@workspace/core";
@@ -61,9 +62,9 @@ interface CenterPaneProps {
   isWatching?: boolean;
   canRun?: boolean;
   // Storage query props
-  storageQueryType?: string;
+  storageQueryType?: StorageQueryType | string;
   storageParams?: Record<string, any>;
-  onStorageQueryTypeChange?: (queryType: string) => void;
+  onStorageQueryTypeChange?: (queryType: StorageQueryType | string) => void;
   onStorageParamsChange?: (params: Record<string, any>) => void;
   onStorageValidationChange?: (isValid: boolean, errors: Record<string, string>) => void;
 }
@@ -99,7 +100,7 @@ export function CenterPane({
   isRunning = false,
   isWatching = false,
   canRun = false,
-  storageQueryType = "getValue",
+  storageQueryType = StorageQueryType.GET_VALUE,
   storageParams = {},
   onStorageQueryTypeChange = () => {},
   onStorageParamsChange = () => {},
@@ -269,7 +270,7 @@ export function CenterPane({
           pallet={selectedStorage.pallet}
           storage={selectedStorage.storage}
           chainKey={selectedChain}
-          queryType={storageQueryType || "getValue"}
+          queryType={storageQueryType || StorageQueryType.GET_VALUE}
           storageParams={storageParams || {}}
           onQueryTypeChange={onStorageQueryTypeChange || (() => {})}
           onParamsChange={onStorageParamsChange || (() => {})}
@@ -364,7 +365,7 @@ export function CenterPane({
             storageQueue.length === 0 && (
               <>
                 {/* Watch Value - Special handling */}
-                {storageQueryType === 'watchValue' && (
+                {(storageQueryType === StorageQueryType.WATCH_VALUE || storageQueryType === 'watchValue') && (
                   <>
                     {!isWatching ? (
                       <Button
@@ -391,7 +392,7 @@ export function CenterPane({
                 )}
 
                 {/* Regular queries */}
-                {storageQueryType !== 'watchValue' && (
+                {storageQueryType !== StorageQueryType.WATCH_VALUE && storageQueryType !== 'watchValue' && (
                   <Button
                     size={isRunning ? "default" : "lg"}
                     disabled={isRunning || !canRunStorage}

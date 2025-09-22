@@ -43,12 +43,12 @@ export const PalletTree = memo(function PalletTree({
   selectedError,
   selectedEvent,
 }: PalletTreeProps) {
-  // Start with essential pallets expanded for better UX and scrollable content
+  // Start with no pallets expanded - user can expand what they need
   const [expandedPallets, setExpandedPallets] = useState<Set<string>>(
-    new Set(["System", "Balances", "Timestamp"]),
+    new Set(),
   );
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(["System-calls", "Balances-calls", "Timestamp-calls"]),
+    new Set(),
   );
 
   // Memoized filter function for individual items within pallets

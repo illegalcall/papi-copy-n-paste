@@ -347,44 +347,6 @@ export function decodeStorageResult(
       ? hexResult.slice(2)
       : hexResult;
 
-    // Special case for known storage types
-    if (palletName === "Balances" && storageName === "TotalIssuance") {
-      // Decode as u128 (16 bytes, little endian)
-      const bytes =
-        hexValue
-          .slice(0, 32)
-          .match(/.{1,2}/g)
-          ?.reverse()
-          .join("") || "0";
-      const totalIssuance = BigInt("0x" + bytes);
-      const dotAmount = (Number(totalIssuance) / 10000000000).toFixed(4);
-      return `${totalIssuance.toString()} planck (${dotAmount} DOT)`;
-    }
-
-    if (palletName === "System" && storageName === "Number") {
-      // Decode as u32 (4 bytes, little endian)
-      const bytes =
-        hexValue
-          .slice(0, 8)
-          .match(/.{1,2}/g)
-          ?.reverse()
-          .join("") || "0";
-      const blockNumber = parseInt(bytes, 16);
-      return `Block #${blockNumber}`;
-    }
-
-    if (palletName === "Timestamp" && storageName === "Now") {
-      // Decode as u64 timestamp (8 bytes, little endian)
-      const bytes =
-        hexValue
-          .slice(0, 16)
-          .match(/.{1,2}/g)
-          ?.reverse()
-          .join("") || "0";
-      const timestamp = parseInt(bytes, 16);
-      const date = new Date(timestamp);
-      return `${timestamp} ms (${date.toISOString()})`;
-    }
 
     // Generic hex display for unknown types
     return `0x${hexValue} (${hexValue.length / 2} bytes)`;

@@ -412,13 +412,45 @@ function getPlaceholderForType(type: string): string {
  * Validate form data against parameter requirements
  */
 function validateFormData(formData: FormData, parameterInfo: CallParameterInfo | null): boolean {
-  if (!parameterInfo) return false;
+  if (!parameterInfo) {
+    return false;
+  }
 
   // Check all required parameters are provided
   for (const param of parameterInfo.required) {
     const value = formData[param.name];
-    if (value === undefined || value === null || value === '') {
+
+    // Handle different value types
+    if (value === undefined || value === null) {
       return false;
+    }
+
+    // Handle PAPI enum objects like {type: "Id", value: "address"}
+    if (typeof value === 'object' && value !== null) {
+      if ('type' in value && 'value' in value) {
+        // PAPI enum structure - check the inner value
+        if (value.value === undefined || value.value === null || value.value === '') {
+          return false;
+        }
+        continue;
+      }
+      // Other object types are considered valid if they exist
+      continue;
+    }
+
+    // For string values, check if empty
+    if (typeof value === 'string' && value === '') {
+      return false;
+    }
+
+    // For number values, 0 is valid
+    if (typeof value === 'number') {
+      continue;
+    }
+
+    // For boolean values, false is valid
+    if (typeof value === 'boolean') {
+      continue;
     }
   }
 

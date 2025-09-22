@@ -3,6 +3,7 @@
  */
 
 import { PalletCall } from "@workspace/core";
+import { StorageQueryType } from "../types/enums";
 import {
   getDescriptorImport,
   getDescriptorName,
@@ -16,7 +17,7 @@ import {
 } from "./formatting-utils";
 
 export function generateStorageQueryByType(
-  queryType: string,
+  queryType: StorageQueryType | string,
   pallet: string,
   storageName: string,
   paramString: string,
@@ -26,30 +27,35 @@ export function generateStorageQueryByType(
   const baseQuery = `typedApi.query.${pallet}.${storageName}`;
   const params = hasParams ? `(${paramString})` : "()";
 
+  // Convert string to enum if necessary
+  const normalizedQueryType = typeof queryType === 'string'
+    ? Object.values(StorageQueryType).find(enumValue => enumValue === queryType) || StorageQueryType.GET_VALUE
+    : queryType;
+
   // Check if this query type needs RxJS
   const needsRxJS = [
-    "watchValue",
-    "watchValueFinalized",
-    "watchValueBest",
-    "watchEntries",
-    "watchEntriesPartial",
-    "combineMultiple",
-    "throttledWatch",
-    "debouncedWatch",
-    "mapValues",
-    "filterChanges",
-    "takeUntilChange",
-    "resilientWatch",
-    "comprehensiveWatch",
-  ].includes(queryType);
+    StorageQueryType.WATCH_VALUE,
+    StorageQueryType.WATCH_VALUE_FINALIZED,
+    StorageQueryType.WATCH_VALUE_BEST,
+    StorageQueryType.WATCH_ENTRIES,
+    StorageQueryType.WATCH_ENTRIES_PARTIAL,
+    StorageQueryType.COMBINE_MULTIPLE,
+    StorageQueryType.THROTTLED_WATCH,
+    StorageQueryType.DEBOUNCED_WATCH,
+    StorageQueryType.MAP_VALUES,
+    StorageQueryType.FILTER_CHANGES,
+    StorageQueryType.TAKE_UNTIL_CHANGE,
+    StorageQueryType.RESILIENT_WATCH,
+    StorageQueryType.COMPREHENSIVE_WATCH,
+  ].includes(normalizedQueryType);
 
   const rxjsImports = needsRxJS
     ? `
 import { combineLatest, throttleTime, debounceTime, map, filter, takeUntil, distinctUntilChanged, retry, startWith } from 'rxjs'`
     : "";
 
-  switch (queryType) {
-    case "getValue":
+  switch (normalizedQueryType) {
+    case StorageQueryType.GET_VALUE:
       if (isSimpleValue) {
         return `${rxjsImports}
 
@@ -74,7 +80,7 @@ console.log('All entries:', entries)
 `;
       }
 
-    case "getValueAt":
+    case StorageQueryType.GET_VALUE_AT:
       return `${rxjsImports}
 
 // Get value at specific block states
@@ -83,7 +89,7 @@ const resultBest = await ${baseQuery}.getValue${params.slice(0, -1)}${hasParams 
 console.log('At finalized block:', resultFinalized)
 console.log('At best block:', resultBest)`;
 
-    case "getEntries":
+    case StorageQueryType.GET_ENTRIES:
       if (hasParams) {
         return `${rxjsImports}
 
@@ -102,7 +108,7 @@ const entries = await ${baseQuery}.getEntries()
 console.log('All entries:', entries)`;
       }
 
-    case "getValues":
+    case StorageQueryType.GET_VALUES:
       return `${rxjsImports}
 
 // Get multiple values (batch query)
@@ -110,7 +116,7 @@ const keys = [${paramString}, "//Bob", "//Charlie"] // Add more keys as needed
 const results = await ${baseQuery}.getValues(keys)
 console.log('Multiple values:', results)`;
 
-    case "getEntriesPaged":
+    case StorageQueryType.GET_ENTRIES_PAGED:
       if (hasParams) {
         return `${rxjsImports}
 
@@ -125,7 +131,7 @@ const entries = await ${baseQuery}.getEntries()
 console.log('Paged entries:', entries)`;
       }
 
-    case "watchValue":
+    case StorageQueryType.WATCH_VALUE:
       return `${rxjsImports}
 
 // Watch for value changes
@@ -142,7 +148,7 @@ const subscription = ${baseQuery}.watchValue${params}.subscribe({
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "watchValueFinalized":
+    case StorageQueryType.WATCH_VALUE_FINALIZED:
       return `${rxjsImports}
 
 // Watch for value changes at finalized blocks only
@@ -159,7 +165,7 @@ const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? 
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "watchValueBest":
+    case StorageQueryType.WATCH_VALUE_BEST:
       return `${rxjsImports}
 
 // Watch for value changes at best blocks
@@ -176,7 +182,7 @@ const subscription = ${baseQuery}.watchValue${params.slice(0, -1)}${hasParams ? 
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "watchEntries":
+    case StorageQueryType.WATCH_ENTRIES:
       return `${rxjsImports}
 
 // Watch for entry changes across the entire storage map
@@ -193,7 +199,7 @@ const subscription = ${baseQuery}.watchEntries().subscribe({
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "watchEntriesPartial":
+    case StorageQueryType.WATCH_ENTRIES_PARTIAL:
       return `${rxjsImports}
 
 // Watch for partial entry changes (useful for large storage maps)
@@ -210,7 +216,7 @@ const subscription = ${baseQuery}.watchEntries().subscribe({
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "combineMultiple":
+    case StorageQueryType.COMBINE_MULTIPLE:
       return `${rxjsImports}
 
 // Combine multiple storage queries
@@ -238,7 +244,7 @@ const subscription = combined$.subscribe({
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "throttledWatch":
+    case StorageQueryType.THROTTLED_WATCH:
       return `${rxjsImports}
 
 // Watch with throttling (limit update frequency)
@@ -257,7 +263,7 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "debouncedWatch":
+    case StorageQueryType.DEBOUNCED_WATCH:
       return `${rxjsImports}
 
 // Watch with debouncing (wait for pause in changes)
@@ -276,7 +282,7 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "mapValues":
+    case StorageQueryType.MAP_VALUES:
       return `${rxjsImports}
 
 // Watch and transform values
@@ -304,7 +310,7 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "filterChanges":
+    case StorageQueryType.FILTER_CHANGES:
       return `${rxjsImports}
 
 // Watch and filter specific changes
@@ -330,7 +336,7 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "takeUntilChange":
+    case StorageQueryType.TAKE_UNTIL_CHANGE:
       return `${rxjsImports}
 
 // Watch until a specific condition is met
@@ -363,7 +369,7 @@ const subscription = ${baseQuery}.watchValue${params}.pipe(
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "resilientWatch":
+    case StorageQueryType.RESILIENT_WATCH:
       return `${rxjsImports}
 
 // Watch with error recovery and retry logic
@@ -385,7 +391,7 @@ const subscription = resilientWatch$.subscribe({
 // Don't forget to unsubscribe when done
 // subscription.unsubscribe()`;
 
-    case "comprehensiveWatch":
+    case StorageQueryType.COMPREHENSIVE_WATCH:
       return `${rxjsImports}
 
 // Comprehensive watching with multiple strategies

@@ -1137,7 +1137,7 @@ export default function PageContent() {
             onRemoveStorageFromQueue={removeFromStorageQueue}
             onClearQueue={clearMethodQueue}
             onClearStorageQueue={clearStorageQueue}
-            canRun={canRunAny}
+            canRunCall={canRunCall}
             canRunStorage={canRunStorage}
             isRunning={isRunning}
             isWatching={isWatching}

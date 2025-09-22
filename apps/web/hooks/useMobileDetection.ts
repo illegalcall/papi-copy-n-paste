@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { BooleanString } from "../types/enums";
 
 interface MobileDetectionHook {
   isMobile: boolean;
@@ -33,7 +34,7 @@ export function useMobileDetection(): MobileDetectionHook {
 
       // Show warning if screen is smaller than desktop breakpoint
       // and user hasn't dismissed it yet (check localStorage)
-      const hasUserDismissed = localStorage.getItem("mobile-warning-dismissed") === "true";
+      const hasUserDismissed = localStorage.getItem("mobile-warning-dismissed") === BooleanString.TRUE;
 
       if (width < BREAKPOINTS.desktop && !hasUserDismissed) {
         setShowMobileWarning(true);

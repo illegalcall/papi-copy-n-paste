@@ -165,7 +165,6 @@ export interface RightPaneProps extends PaneProps {
 }
 
 // Utility types
-export type ChainKey = string;
 export type PalletName = string;
 export type CallName = string;
 export type StorageName = string;

@@ -52,12 +52,20 @@ export class DynamicStorageDetector {
       return runtimeResult;
     }
 
-    // Fallback to generated metadata
+    // Try generated metadata first (most reliable for known storage items)
     const metadataResult = this.detectFromMetadata(chainKey, pallet, storage);
     if (metadataResult) {
 
       this.cache.set(cacheKey, metadataResult);
       return metadataResult;
+    }
+
+    // Fallback to live metadata detection (from UI data)
+    const liveResult = this.detectFromLiveMetadata(chainKey, pallet, storage);
+    if (liveResult) {
+
+      this.cache.set(cacheKey, liveResult);
+      return liveResult;
     }
     throw new Error(`No metadata available for ${chainKey}.${pallet}.${storage} - metadata may be incomplete or missing`);
   }
@@ -97,6 +105,68 @@ export class DynamicStorageDetector {
       // Silent fallback on runtime detection errors
       return null;
     }
+  }
+
+  /**
+   * Enhanced live metadata detection: Extract from UI metadata if available
+   */
+  private detectFromLiveMetadata(chainKey: string, pallet: string, storage: string): StorageParameterInfo | null {
+    try {
+      // Access the live metadata that's already loaded for the UI
+      // This is available in the global app state
+      if (typeof window !== 'undefined' && (window as any).__PAPI_LIVE_METADATA__) {
+        const liveMetadata = (window as any).__PAPI_LIVE_METADATA__[chainKey];
+
+        if (liveMetadata?.pallets) {
+          const palletData = liveMetadata.pallets.find((p: any) => p.name === pallet);
+
+          if (palletData?.storage) {
+            const storageItem = palletData.storage.find((s: any) => s.name === storage);
+
+            if (storageItem) {
+              // Infer parameters from storage type
+              const parameters = this.inferParametersFromStorageType(storageItem.type);
+
+              return {
+                required: parameters.required,
+                optional: parameters.optional,
+                description: `Live metadata for ${chainKey}.${pallet}.${storage}`,
+                returnType: storageItem.type || 'unknown'
+              };
+            }
+          }
+        }
+      }
+
+      return null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /**
+   * Infer storage parameters from type definition
+   */
+  private inferParametersFromStorageType(storageType: string): { required: string[], optional: string[] } {
+    // Basic type inference - can be enhanced
+    if (storageType.includes('Map<')) {
+      // Extract key type from Map<Key, Value>
+      const match = storageType.match(/Map<([^,]+),/);
+      if (match && match[1]) {
+        return { required: [match[1].trim()], optional: [] };
+      }
+    }
+
+    if (storageType.includes('DoubleMap<')) {
+      // Extract key types from DoubleMap<Key1, Key2, Value>
+      const match = storageType.match(/DoubleMap<([^,]+),\s*([^,]+),/);
+      if (match && match[1] && match[2]) {
+        return { required: [match[1].trim(), match[2].trim()], optional: [] };
+      }
+    }
+
+    // Plain storage item - no parameters required
+    return { required: [], optional: [] };
   }
 
   /**
@@ -245,6 +315,26 @@ export class DynamicStorageDetector {
         optional: ['AccountId'],
         description: 'Reserved balances for account - query with account ID for specific or without for all entries',
         returnType: 'Vec<ReserveData>'
+      },
+
+      // Claims pallet - specific fix for Paseo Asset Hub and other chains with Claims
+      'paseo_asset_hub:Claims:Claims': {
+        required: ['bytes'],
+        optional: [],
+        description: 'Claims storage for Paseo Asset Hub - query with ethereum signature/address',
+        returnType: 'bigint'
+      },
+      'polkadot:Claims:Claims': {
+        required: ['bytes'],
+        optional: [],
+        description: 'Claims storage for Polkadot - query with ethereum signature/address',
+        returnType: 'bigint'
+      },
+      'kusama:Claims:Claims': {
+        required: ['bytes'],
+        optional: [],
+        description: 'Claims storage for Kusama - query with ethereum signature/address',
+        returnType: 'bigint'
       }
     };
 
