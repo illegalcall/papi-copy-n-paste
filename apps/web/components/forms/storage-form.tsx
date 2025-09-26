@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, memo } from "react";
 import type { StorageParams, StorageParamsChangeHandler } from "../../types/forms";
 import { Badge } from "@workspace/ui/components/badge";
 import { Input } from "@workspace/ui/components/input";
@@ -284,7 +284,7 @@ function generateResponseStructure(
   }
 }
 
-export function StorageForm({
+export const StorageForm = memo(function StorageForm({
   pallet,
   storage,
   chainKey,
@@ -653,4 +653,4 @@ console.log('Result:', result);`;
         </div>
     </div>
   );
-}
+});

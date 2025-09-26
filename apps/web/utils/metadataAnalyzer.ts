@@ -5,6 +5,7 @@ import {
   decAnyMetadata,
   type UnifiedMetadata
 } from '@polkadot-api/substrate-bindings'
+import { logger } from './logger'
 
 export interface ParameterInfo {
   name: string
@@ -95,7 +96,7 @@ export class MetadataAnalyzer {
       return extrinsicInfo
 
     } catch (error) {
-      console.error('❌ Failed to extract extrinsic info:', error)
+      logger.error('❌ Failed to extract extrinsic info:', error)
       throw error
     }
   }
@@ -115,7 +116,7 @@ export class MetadataAnalyzer {
         const callInfo = this.extractSingleCallInfo(palletName, callName, callData)
         calls.push(callInfo)
       } catch (error) {
-        console.warn(`⚠️ Failed to extract call ${palletName}.${callName}:`, error)
+        logger.warn(`⚠️ Failed to extract call ${palletName}.${callName}:`, error)
       }
     })
 
@@ -135,7 +136,7 @@ export class MetadataAnalyzer {
           const parameter = this.extractParameterInfo(fieldName, fieldData)
           parameters.push(parameter)
         } catch (error) {
-          console.warn(`⚠️ Failed to extract parameter ${fieldName}:`, error)
+          logger.warn(`⚠️ Failed to extract parameter ${fieldName}:`, error)
         }
       })
     }
@@ -173,7 +174,7 @@ export class MetadataAnalyzer {
   private extractParameterInfo(fieldName: string, fieldData: any): ParameterInfo {
     // Add null checks to prevent undefined destructuring errors
     if (!fieldData || fieldData.id === undefined) {
-      console.warn(`⚠️ Invalid field data for ${fieldName}:`, fieldData)
+      logger.warn(`⚠️ Invalid field data for ${fieldName}:`, fieldData)
       return this.createFallbackParameterInfo(fieldName)
     }
 
@@ -182,7 +183,7 @@ export class MetadataAnalyzer {
     try {
       typeInfo = this.lookup(typeId)
     } catch (error) {
-      console.warn(`⚠️ Failed to lookup type ${typeId} for ${fieldName}:`, error)
+      logger.warn(`⚠️ Failed to lookup type ${typeId} for ${fieldName}:`, error)
       return this.createFallbackParameterInfo(fieldName)
     }
 
@@ -191,7 +192,7 @@ export class MetadataAnalyzer {
     try {
       codec = this.dynamicBuilder.buildDefinition(typeId)
     } catch (error) {
-      console.warn(`Failed to build codec for ${fieldName}:`, error)
+      logger.warn(`Failed to build codec for ${fieldName}:`, error)
     }
 
     // Get type description with error handling
@@ -203,7 +204,7 @@ export class MetadataAnalyzer {
       enumVariants = this.extractEnumVariants(typeInfo)
       defaultValue = this.getDefaultValue(typeInfo)
     } catch (error) {
-      console.warn(`⚠️ Error processing type info for ${fieldName}:`, error)
+      logger.warn(`⚠️ Error processing type info for ${fieldName}:`, error)
       return this.createFallbackParameterInfo(fieldName)
     }
 

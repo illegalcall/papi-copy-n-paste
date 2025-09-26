@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -70,7 +71,7 @@ interface CenterPaneProps {
 }
 
 
-export function CenterPane({
+const CenterPane = memo(function CenterPane({
   chainStatus = "connecting",
   selectedChain = "",
   selectedCall,
@@ -502,4 +503,6 @@ export function CenterPane({
       </div>
     </div>
   );
-}
+});
+
+export { CenterPane };

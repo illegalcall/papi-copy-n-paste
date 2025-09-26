@@ -1,7 +1,8 @@
 "use client";
 
+import { memo } from "react";
 import { Button } from "@workspace/ui/components/button";
-import { Moon, Sun, Github, BookOpen } from "lucide-react";
+import { Moon, Sun, BookOpen, ExternalLink } from "lucide-react";
 import { useTheme } from "next-themes";
 import { NetworkSelector } from "../network/network-selector";
 import { ProviderSelector } from "../network/provider-selector";
@@ -19,7 +20,7 @@ interface HeaderProps {
   hasError?: boolean;
 }
 
-export function Header({
+export const Header = memo(function Header({
   selectedChain,
   selectedProvider,
   onNetworkChange,
@@ -96,7 +97,7 @@ export function Header({
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Github className="h-4 w-4" />
+              <ExternalLink className="h-4 w-4" />
               <span className="sr-only">GitHub</span>
             </a>
           </Button>
@@ -115,4 +116,4 @@ export function Header({
       </div>
     </header>
   );
-}
+});

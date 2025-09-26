@@ -17,6 +17,7 @@ import type { ParameterInfo } from "./metadataAnalyzer";
 import { createCleanLogger, QueryResult } from "./cleanLogger";
 import { getDescriptorForChain } from "@workspace/core/descriptors";
 import { StorageQueryType } from "../types/enums";
+import { subscriptionManager } from "./subscriptionManager";
 
 function serializeBigInt(value: any): any {
   if (typeof value === 'bigint') {
@@ -35,7 +36,6 @@ function serializeBigInt(value: any): any {
   return value;
 }
 
-let activeWatchSubscriptions = new Map<string, any>();
 
 function getStorageParameters(chainKey: string, pallet: string, storageName: string): { required: string[], optional: string[] } {
   try {
@@ -93,7 +93,7 @@ export async function executeRealTransaction(
 
     if (paramInfo.required.length > 0) {
       const paramValues = generateCallParamValues(formData, paramInfo.required);
-      const serializedParams = JSON.stringify(paramValues, (key, value) =>
+      const serializedParams = JSON.stringify(paramValues, (_, value) =>
         typeof value === 'bigint' ? value.toString() : value
       );
       setConsoleOutput((prev) => [...prev, `🔧 Parameters: ${serializedParams}`]);
@@ -175,7 +175,7 @@ export async function executeMultipleTransactions(
 
       if (paramInfo.required.length > 0) {
         const paramValues = generateCallParamValues(method.formData, paramInfo.required);
-        const serializedParams = JSON.stringify(paramValues, (key, value) =>
+        const serializedParams = JSON.stringify(paramValues, (_, value) =>
           typeof value === 'bigint' ? value.toString() : value
         );
         setConsoleOutput((prev) => [...prev, `  🔧 Parameters: ${serializedParams}`]);
@@ -243,7 +243,6 @@ export async function executeMultipleStorageQueries(
   chainKey: string,
   client: any,
   setConsoleOutput: React.Dispatch<React.SetStateAction<any[]>>,
-  addResultDisplay?: (result: QueryResult) => void,
 ) {
   setConsoleOutput((prev) => [
     ...prev,
@@ -302,7 +301,6 @@ export async function executeStorageQuery(
   client: any,
   setConsoleOutput: React.Dispatch<React.SetStateAction<any[]>>,
   setIsRunning: React.Dispatch<React.SetStateAction<boolean>>,
-  addResultDisplay?: (result: QueryResult) => void,
 ): Promise<{ watchKey: string; isWatching: boolean } | undefined> {
   const logger = createCleanLogger(setConsoleOutput);
   const { pallet, storage } = selectedStorage;
@@ -310,11 +308,7 @@ export async function executeStorageQuery(
   try {
     logger.startQuery(pallet, storage.name, queryType);
 
-    // Import the appropriate descriptor dynamically
-    const descriptorName = getDescriptorName(chainKey);
-
-    // For the web interface, we'll focus on demonstrating the raw client capabilities
-    // The typed API with descriptors is used in the generated code that users copy
+    // Using raw client capabilities for demonstration
 
     const palletName = selectedStorage.pallet;
     const storageName = selectedStorage.storage.name;
@@ -354,7 +348,7 @@ export async function executeStorageQuery(
       }
 
       if (hasParams && paramValues.length > 0) {
-        const serializedParams = JSON.stringify(paramValues, (key, value) =>
+        const serializedParams = JSON.stringify(paramValues, (_, value) =>
           typeof value === 'bigint' ? value.toString() : value
         );
         logger.info(`Parameters provided: ${serializedParams}`);
@@ -394,30 +388,6 @@ export async function executeStorageQuery(
   }
 }
 
-// Execute getValue query
-async function executeGetValue(
-  storageQuery: any,
-  paramValues: any[],
-  logger: any,
-  hasParams: boolean,
-  pallet: string,
-  storageName: string,
-  queryType: string,
-) {
-  try {
-    const result = hasParams
-      ? await storageQuery(...paramValues)
-      : await storageQuery();
-
-
-    // Serialize BigInt values before logging
-    const serializedResult = serializeBigInt(result);
-    logger.querySuccess(pallet, storageName, queryType, serializedResult);
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    logger.queryError(pallet, storageName, queryType, `Get value failed: ${errorMessage}`);
-  }
-}
 
 // Execute raw storage query using modern PAPI typed API
 async function executeRawStorageQuery(
@@ -657,12 +627,11 @@ async function executeWatchValue(
     const watchKey = `${chainKey}-${palletName}-${storageName}`;
 
     // Check if already watching
-    if (activeWatchSubscriptions.has(watchKey)) {
+    if (subscriptionManager.has(watchKey)) {
       logger.info(`Already watching ${palletName}.${storageName}. Click Stop to end current watch.`);
       return { watchKey, isWatching: true };
     }
 
-    // Get the appropriate descriptor for the current chain
     let descriptor: any;
     try {
       descriptor = getDescriptorForChain(chainKey);
@@ -704,22 +673,16 @@ async function executeWatchValue(
           error: (error: any) => {
             const errorMessage = error instanceof Error ? error.message : "Unknown error";
             logger.error(`Observable error: ${errorMessage}`);
-            activeWatchSubscriptions.delete(watchKey);
+            subscriptionManager.remove(watchKey);
           },
           complete: () => {
             logger.info('Observable completed');
-            activeWatchSubscriptions.delete(watchKey);
+            subscriptionManager.remove(watchKey);
           }
         });
 
         // Store subscription for manual control
-        activeWatchSubscriptions.set(watchKey, {
-          subscription,
-          palletName,
-          storageName,
-          valueCount,
-          startTime: Date.now()
-        });
+        subscriptionManager.add(watchKey, () => subscription.unsubscribe(), `Storage watch: ${palletName}.${storageName}`);
 
         return { watchKey, isWatching: true };
 
@@ -742,19 +705,13 @@ async function executeWatchValue(
 
 // Stop watching a specific storage value
 export function stopWatchValue(watchKey: string, logger: any): boolean {
-  const watchData = activeWatchSubscriptions.get(watchKey);
+  const watchData = subscriptionManager.get(watchKey);
 
   if (watchData) {
-    const { subscription, palletName, storageName, valueCount, startTime } = watchData;
-    const duration = Math.round((Date.now() - startTime) / 1000);
+    logger.success(`🛑 Stopped watching subscription: ${watchKey}`);
+    logger.info(`📊 Subscription cleanup completed`);
 
-    subscription.unsubscribe();
-    activeWatchSubscriptions.delete(watchKey);
-
-    logger.success(`🛑 Stopped watching ${palletName}.${storageName}`);
-    logger.info(`📊 Watched for ${duration}s, received ${valueCount} updates`);
-
-    return true;
+    return subscriptionManager.remove(watchKey);
   }
 
   return false;
@@ -762,7 +719,7 @@ export function stopWatchValue(watchKey: string, logger: any): boolean {
 
 // Check if currently watching
 export function isWatching(watchKey: string): boolean {
-  return activeWatchSubscriptions.has(watchKey);
+  return subscriptionManager.has(watchKey);
 }
 
 
