@@ -36,3 +36,6 @@ npm-debug.log*
 # Misc
 .DS_Store
 *.pem
+
+# Snyk Security Extension - AI Rules (auto-generated)
+.cursor/rules/snyk_rules.mdc
