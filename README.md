@@ -26,13 +26,12 @@ A web-based tool for generating ready-to-use PAPI (Polkadot API) code snippets w
 - **⚖️ Staking Details**: Retrieve validator, nominator, and era information
 - **🏗️ System State**: Query block numbers, hashes, and runtime versions
 
-### Educational Features
+### Developer Experience
 
-- **🎓 Learning Mode**: Interactive educational interface with explanations
+- **🎓 Interactive Interface**: Clean, intuitive interface for parameter input
 - **📚 Parameter Help**: Detailed explanations for each PAPI parameter
-- **🛠️ Mock Simulator**: Safe testing environment without real transactions
-- **📈 Progress Tracking**: Visual learning progress with structured paths
-- **📖 Code Templates**: Multiple code styles from beginner to production-ready
+- **🛠️ Type Safety**: Full TypeScript support with proper type definitions
+- **📖 Code Templates**: Production-ready code with best practices
 
 ## 🚀 Quick Start
 
@@ -45,7 +44,7 @@ A web-based tool for generating ready-to-use PAPI (Polkadot API) code snippets w
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/illegalcall/papi-copy-paste-setup.git
 cd papi-copy-paste
 
 # Install dependencies
@@ -66,19 +65,17 @@ This project uses a monorepo structure with the following packages:
 ### Applications
 
 - **`apps/web`**: Next.js web application with the main UI
-- **`create-papi-app`**: CLI tool for scaffolding PAPI projects (published as separate npm package)
 
 ### Core Packages
 
-- **`@workspace/core`**: Core PAPI functionality and chain configurations
-- **`@workspace/ui`**: Shared UI components using shadcn/ui
-- **`@workspace/learning-engine`**: Educational features and mock simulator
-- **`@workspace/eslint-config`**: Shared ESLint configuration
-- **`@workspace/typescript-config`**: Shared TypeScript configuration
+- **`packages/core`**: Core PAPI functionality and chain configurations
+- **`packages/ui`**: Shared UI components using shadcn/ui
+- **`packages/eslint-config`**: Shared ESLint configuration
+- **`packages/typescript-config`**: Shared TypeScript configuration
 
 ### Key Technologies
 
-- **Next.js 14**: React framework with App Router
+- **Next.js 15**: React framework with App Router
 - **TypeScript**: Type-safe development
 - **Tailwind CSS**: Utility-first styling
 - **shadcn/ui**: Modern component library
@@ -104,13 +101,13 @@ This project uses a monorepo structure with the following packages:
 5. **Configure Parameters**: Provide any required storage parameters
 6. **Copy Code**: Get the complete storage query code
 
-### Using Learning Mode
+### Using the Interface
 
-1. **Enable Learning Mode**: Click the 🎓 graduation cap icon in the header
-2. **Explore Concepts**: Read explanations about pallets, calls, and parameters
-3. **Track Progress**: Monitor your learning journey across different topics
-4. **Test Safely**: Use the mock simulator to practice without real transactions
-5. **Choose Templates**: Select code complexity level from beginner to production
+1. **Select Network**: Choose your target blockchain from supported networks
+2. **Browse Pallets**: Explore available pallets and their functionality
+3. **Configure Parameters**: Use the interactive forms to set parameters
+4. **Generate Code**: Get production-ready TypeScript code instantly
+5. **Copy & Use**: One-click copying with setup instructions included
 
 ## 🛠️ Development
 
@@ -127,8 +124,8 @@ papi-copy-paste/
 ├── packages/
 │   ├── core/                # Core PAPI functionality
 │   ├── ui/                  # Shared UI components
-│   ├── learning-engine/     # Educational features
-│   └── create-papi-app/     # CLI scaffolding tool (published separately)
+│   ├── eslint-config/       # Shared ESLint configuration
+│   └── typescript-config/   # Shared TypeScript configuration
 └── turbo.json               # Turbo monorepo configuration
 ```
 
@@ -141,17 +138,18 @@ pnpm build                   # Build all packages
 pnpm lint                    # Run linting
 pnpm format                  # Format code with Prettier
 
-# Package management
-pnpm create-app              # Run the CLI scaffolding tool (via npm)
+# Additional scripts
+pnpm extract-storage-metadata # Extract storage metadata for chain analysis
+pnpm constants               # Extract all constants from chain metadata
 ```
 
 ### Adding New Chains
 
 To add support for a new blockchain:
 
-1. **Update Core Package**: Add chain configuration in `packages/core/src/networks.ts`
+1. **Update Core Package**: Add chain configuration in `packages/core/src/`
 2. **Add Providers**: Configure RPC providers in the network configuration
-3. **Update Code Generation**: Add chain-specific setup commands in code generators
+3. **Update Metadata**: Run `pnpm extract-storage-metadata` to update chain metadata
 4. **Test Integration**: Verify the chain works with both transactions and storage queries
 
 ### Contributing
@@ -194,12 +192,12 @@ pnpm test:e2e
 - [Polkadot Developer Hub](https://developers.polkadot.network/)
 - [Substrate Documentation](https://docs.substrate.io/)
 
-### Educational Features
+### Developer Resources
 
-- **Parameter Education**: Learn about each PAPI parameter type with examples
-- **Learning Paths**: Structured progression from beginner to advanced concepts
-- **Code Templates**: Different complexity levels for various skill levels
-- **Mock Simulator**: Practice transactions safely without spending tokens
+- **Parameter Documentation**: Comprehensive guides for each PAPI parameter type
+- **Code Examples**: Real-world examples and best practices
+- **Type Definitions**: Full TypeScript support with auto-completion
+- **Testing Tools**: Built-in validation and error checking
 
 ## 🤝 Contributing
 
@@ -222,7 +220,7 @@ We welcome contributions! This project is designed to be maintainable and contri
 
 ## 📄 License
 
-This project is licensed under [LICENSE TYPE] - see the LICENSE file for details.
+This project is open source and available under the MIT License.
 
 ## 🙏 Acknowledgments
 
@@ -233,10 +231,9 @@ This project is licensed under [LICENSE TYPE] - see the LICENSE file for details
 
 ## 🆘 Support
 
-- **Documentation**: Check the inline help and learning mode
+- **Documentation**: Check the inline help and parameter explanations
 - **Issues**: Report bugs and feature requests on GitHub
 - **Discussions**: Join community discussions for questions and ideas
-- **Discord/Telegram**: [Add community links when available]
 
 ---
 
