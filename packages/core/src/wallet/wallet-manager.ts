@@ -1,5 +1,5 @@
 import type { WalletAdapter, Account, WalletState, TransactionPreview } from './types';
-import { PapiSignerAdapter } from './papi-signer-adapter';
+import { PapiSignerAdapter, MultipleWalletsError } from './papi-signer-adapter';
 
 export class WalletManager {
   private adapter: WalletAdapter;
@@ -17,30 +17,15 @@ export class WalletManager {
 
   constructor(adapter?: WalletAdapter) {
     this.adapter = adapter || new PapiSignerAdapter();
-    console.log('🔍 WalletManager initialized with adapter:', this.adapter.name);
-    console.log('🔍 WalletManager initialization context:', {
-      timestamp: new Date().toISOString(),
-      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'server',
-      location: typeof window !== 'undefined' ? window.location.href : 'server',
-      isProduction: process.env.NODE_ENV === 'production',
-      isDevelopment: process.env.NODE_ENV === 'development'
-    });
     this.checkAvailability();
   }
 
   private async checkAvailability() {
     try {
-      console.log('🔍 WalletManager checking availability with adapter:', this.adapter.name);
       const isAvailable = await this.adapter.isAvailable();
-      console.log('🔍 WalletManager availability result:', isAvailable);
       this.updateState({ isAvailable });
     } catch (error) {
-      console.error('WalletManager availability check failed:', error);
-      console.log('🔍 WalletManager error details:', {
-        adapter: this.adapter.name,
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined
-      });
+      console.error('Wallet availability check failed:', error);
       this.updateState({
         isAvailable: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -90,9 +75,59 @@ export class WalletManager {
         error: null,
       });
 
-      // Get signer for the first account
       if (accounts.length > 0 && accounts[0]) {
         await this.selectAccount(accounts[0]);
+      }
+    } catch (error) {
+      // If it's a MultipleWalletsError, re-throw it for the UI to handle
+      if (error instanceof MultipleWalletsError) {
+        this.updateState({ isConnecting: false });
+        throw error;
+      }
+
+      this.updateState({
+        isConnecting: false,
+        isConnected: false,
+        error: error instanceof Error ? error.message : 'Failed to connect wallet',
+      });
+      throw error;
+    }
+  }
+
+  async connectToWallet(walletId: string): Promise<void> {
+    if (this.state.isConnecting || this.state.isConnected) {
+      return;
+    }
+
+    this.updateState({ isConnecting: true, error: null });
+
+    try {
+      if (this.adapter instanceof PapiSignerAdapter) {
+        const injectedAccounts = await this.adapter.connectToWallet(walletId);
+
+        const accounts: Account[] = injectedAccounts.map(account => ({
+          address: account.address,
+          meta: {
+            name: account.name,
+            source: walletId,
+            genesisHash: account.genesisHash || undefined,
+          },
+          type: account.type,
+        }));
+
+        this.updateState({
+          isConnected: true,
+          isConnecting: false,
+          accounts,
+          selectedAccount: accounts[0] || null,
+          error: null,
+        });
+
+        if (accounts.length > 0 && accounts[0]) {
+          await this.selectAccount(accounts[0]);
+        }
+      } else {
+        throw new Error('Current adapter does not support wallet selection');
       }
     } catch (error) {
       this.updateState({
@@ -139,37 +174,31 @@ export class WalletManager {
     return this.adapter.getSigner(targetAddress);
   }
 
-  // Utility method to check if a specific account is connected
   isAccountConnected(address: string): boolean {
     return this.state.accounts.some(account => account.address === address);
   }
 
-  // Get account by address
   getAccount(address: string): Account | undefined {
     return this.state.accounts.find(account => account.address === address);
   }
 
-  // Validate transaction before signing
   validateTransaction(preview: TransactionPreview): { isValid: boolean; warnings: string[] } {
     const warnings: string[] = [];
 
-    // Check if account is connected
     if (!this.isAccountConnected(preview.from)) {
       return { isValid: false, warnings: ['Account not connected'] };
     }
 
-    // Add fee warning for large transactions
     if (preview.estimatedFee) {
       const feeAmount = parseFloat(preview.estimatedFee);
-      if (feeAmount > 1) { // More than 1 token in fees
+      if (feeAmount > 1) {
         warnings.push(`High transaction fee: ${preview.estimatedFee}`);
       }
     }
 
-    // Add warning for large transfers
     if (preview.value) {
       const value = parseFloat(preview.value);
-      if (value > 100) { // More than 100 tokens
+      if (value > 100) {
         warnings.push(`Large transfer amount: ${preview.value}`);
       }
     }

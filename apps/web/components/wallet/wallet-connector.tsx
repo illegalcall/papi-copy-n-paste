@@ -18,6 +18,8 @@ import {
 } from "@workspace/ui/components/tooltip";
 import { Wallet, ChevronDown, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 import { useWallet } from "../../hooks/useWallet";
+import { WalletSelectorModal, type WalletInfo } from "./wallet-selector-modal";
+import { WalletDetector, MultipleWalletsError } from "@workspace/core";
 
 export function WalletConnector() {
   const {
@@ -28,32 +30,33 @@ export function WalletConnector() {
     selectedAccount,
     error,
     connect,
+    connectToWallet,
     disconnect,
     selectAccount,
   } = useWallet();
 
-  // Debug logging for wallet state
-  console.log('🔍 WalletConnector state:', {
-    isAvailable,
-    isConnected,
-    isConnecting,
-    accountsCount: accounts.length,
-    selectedAccount: selectedAccount?.address,
-    error
-  });
-
   const [showError, setShowError] = useState(false);
+  const [showWalletSelector, setShowWalletSelector] = useState(false);
+  const [availableWallets, setAvailableWallets] = useState<WalletInfo[]>([]);
 
   const handleConnect = async () => {
     try {
       setShowError(false);
-      console.log('🔍 WalletConnector attempting to connect...');
       await connect();
-      console.log('🔍 WalletConnector connection successful');
     } catch (error) {
-      console.error('🔍 WalletConnector connection failed:', error);
-      setShowError(true);
+      if (error instanceof MultipleWalletsError) {
+        const detector = new WalletDetector();
+        const wallets = await detector.detectWallets();
+        setAvailableWallets(wallets);
+        setShowWalletSelector(true);
+      } else {
+        setShowError(true);
+      }
     }
+  };
+
+  const handleWalletSelect = async (walletId: string) => {
+    await connectToWallet(walletId);
   };
 
   const handleDisconnect = () => {
@@ -61,75 +64,90 @@ export function WalletConnector() {
     setShowError(false);
   };
 
-  // Format address for display (show first 6 and last 4 characters)
   const formatAddress = (address: string) => {
     if (address.length <= 16) return address;
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  // If extension is not available, show install prompt
+  const walletSelectorModal = (
+    <WalletSelectorModal
+      open={showWalletSelector}
+      onClose={() => setShowWalletSelector(false)}
+      onSelectWallet={handleWalletSelect}
+      wallets={availableWallets}
+    />
+  );
+
   if (!isAvailable) {
     const errorMessage = error || 'Install Polkadot.js extension to connect wallet';
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="outline" size="sm" disabled>
-              <Wallet className="h-4 w-4 mr-2" />
-              No Wallet
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{errorMessage}</p>
-            {error && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Check browser console for more details
-              </p>
-            )}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <>
+        {walletSelectorModal}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="sm" disabled>
+                <Wallet className="h-4 w-4 mr-2" />
+                No Wallet
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{errorMessage}</p>
+              {error && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Check browser console for more details
+                </p>
+              )}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </>
     );
   }
 
-  // If connecting, show loading state
   if (isConnecting) {
     return (
-      <Button variant="outline" size="sm" disabled>
-        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-        Connecting...
-      </Button>
+      <>
+        {walletSelectorModal}
+        <Button variant="outline" size="sm" disabled>
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          Connecting...
+        </Button>
+      </>
     );
   }
 
-  // If not connected, show connect button
   if (!isConnected) {
     return (
-      <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" onClick={handleConnect}>
-          <Wallet className="h-4 w-4 mr-2" />
-          Connect Wallet
-        </Button>
-        {showError && error && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <AlertCircle className="h-4 w-4 text-destructive" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="max-w-xs">{error}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-      </div>
+      <>
+        {walletSelectorModal}
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleConnect}>
+            <Wallet className="h-4 w-4 mr-2" />
+            Connect Wallet
+          </Button>
+          {showError && error && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="max-w-xs">{error}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
+      </>
     );
   }
 
-  // If connected, show account dropdown
   return (
-    <div className="flex items-center gap-2">
-      <DropdownMenu>
+    <>
+      {walletSelectorModal}
+      <div className="flex items-center gap-2">
+        <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="min-w-0">
             <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
@@ -184,6 +202,7 @@ export function WalletConnector() {
           </Tooltip>
         </TooltipProvider>
       )}
-    </div>
+      </div>
+    </>
   );
 }

@@ -9,25 +9,15 @@ export class PolkadotJsAdapter implements WalletAdapter {
 
   async isAvailable(): Promise<boolean> {
     try {
-      // Check if the extension is available
-      console.log('🔍 Checking wallet availability...');
-
-      // First check if injected web3 exists
       if (typeof window !== 'undefined' && window.injectedWeb3) {
         const injectedWallets = Object.keys(window.injectedWeb3);
-        console.log('🔍 Found injected wallets:', injectedWallets);
-
-        // If we have any injected wallets, try to enable them
         if (injectedWallets.length > 0) {
           const extensions = await web3Enable('PAPI Copy-Paste');
-          console.log('🔍 Enabled extensions:', extensions.length, extensions.map(ext => ext.name));
           return extensions.length > 0;
         }
       }
 
-      // Fallback: try to enable extensions anyway
       const extensions = await web3Enable('PAPI Copy-Paste');
-      console.log('🔍 Found extensions (fallback):', extensions.length, extensions.map(ext => ext.name));
       return extensions.length > 0;
     } catch (error) {
       console.warn('Polkadot.js extension not available:', error);
@@ -37,14 +27,12 @@ export class PolkadotJsAdapter implements WalletAdapter {
 
   async connect(): Promise<InjectedAccount[]> {
     try {
-      // Enable the extension
       const extensions = await web3Enable('PAPI Copy-Paste');
 
       if (extensions.length === 0) {
         throw new Error('No Polkadot.js extension found. Please install the extension and refresh the page.');
       }
 
-      // Get accounts
       const accounts = await web3Accounts();
 
       if (accounts.length === 0) {

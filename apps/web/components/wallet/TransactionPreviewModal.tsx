@@ -51,7 +51,6 @@ export function TransactionPreviewModal({
 }: TransactionPreviewModalProps) {
   const { selectedAccount } = useWallet();
 
-  // Use custom hooks for business logic
   const { balance, isLoading: isLoadingBalance, fetchBalance } = useBalanceFetcher();
   const {
     feeEstimates,
@@ -68,9 +67,6 @@ export function TransactionPreviewModal({
     resetConfirmation
   } = useTransactionConfirmation();
 
-
-
-  // Reset state when modal opens/closes and fetch data
   useEffect(() => {
     if (isOpen && api && selectedAccount) {
       resetConfirmation();
@@ -79,7 +75,6 @@ export function TransactionPreviewModal({
     }
   }, [isOpen, api, selectedAccount, transactions, chainName, resetConfirmation, estimateFees, fetchBalance]);
 
-  // Get total fee from hook
   const totalFee = getTotalFee();
 
   return (
