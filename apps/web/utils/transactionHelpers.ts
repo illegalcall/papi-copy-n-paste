@@ -688,8 +688,14 @@ async function executeWatchValue(
         subscription = storageQuery.watchValue().subscribe({
           next: (value: any) => {
             valueCount++;
-            const formattedValue = formatPapiStorageResult(value);
             const timestamp = new Date().toLocaleTimeString();
+
+            // Update the stored valueCount in the subscription data
+            const watchData = activeWatchSubscriptions.get(watchKey);
+            if (watchData) {
+              watchData.valueCount = valueCount;
+              activeWatchSubscriptions.set(watchKey, watchData);
+            }
 
             if (valueCount === 1) {
               // Serialize BigInt values before logging
@@ -763,59 +769,4 @@ export function stopWatchValue(watchKey: string, logger: any): boolean {
 // Check if currently watching
 export function isWatching(watchKey: string): boolean {
   return activeWatchSubscriptions.has(watchKey);
-}
-
-
-// Helper function to format storage results consistently for PAPI
-function formatPapiStorageResult(value: any): string {
-  if (value === null || value === undefined) {
-    return 'null';
-  }
-
-  if (typeof value === 'bigint') {
-    return value.toString();
-  }
-
-  if (Array.isArray(value)) {
-    if (value.length === 0) {
-      return '[]';
-    }
-    // Option 1: Always show summary for large arrays (current behavior)
-    if (value.length > 5) {
-      return `[Array with ${value.length} items]`;
-    }
-
-    // Option 2: Show first few items + summary (you can uncomment this)
-    // if (value.length > 5) {
-    //   try {
-    //     const preview = value.slice(0, 2);
-    //     const previewStr = JSON.stringify(preview, (_, val) =>
-    //       typeof val === 'bigint' ? val.toString() : val
-    //     );
-    //     return `${previewStr.slice(0, -1)}, ... +${value.length - 2} more items]`;
-    //   } catch {
-    //     return `[Array with ${value.length} items]`;
-    //   }
-    // }
-
-    try {
-      return JSON.stringify(value, (_, val) =>
-        typeof val === 'bigint' ? val.toString() : val
-      );
-    } catch {
-      return `[Array with ${value.length} items]`;
-    }
-  }
-
-  if (typeof value === 'object') {
-    try {
-      return JSON.stringify(value, (_, val) =>
-        typeof val === 'bigint' ? val.toString() : val, 2
-      );
-    } catch {
-      return '[Complex Object]';
-    }
-  }
-
-  return String(value);
 }

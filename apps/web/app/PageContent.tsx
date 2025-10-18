@@ -231,6 +231,16 @@ export default function PageContent() {
     [handleStorageParamsChange, setActiveTab],
   );
 
+  // Enhanced storage query type change handler that switches to code tab
+  const enhancedHandleStorageQueryTypeChange = useCallback(
+    (queryType: string) => {
+      handleStorageQueryTypeChange(queryType);
+      // Switch to code tab when user changes storage query type
+      setActiveTab("code");
+    },
+    [handleStorageQueryTypeChange, setActiveTab],
+  );
+
   // Update generated code when dependencies change (with debounced form data)
   useEffect(() => {
     updateGeneratedCode(
@@ -1110,7 +1120,7 @@ export default function PageContent() {
             selectedEvent={selectedEvent}
             onFormChange={enhancedHandleFormChange}
             onValidChange={handleValidChange}
-            onStorageQueryTypeChange={handleStorageQueryTypeChange}
+            onStorageQueryTypeChange={enhancedHandleStorageQueryTypeChange}
             onStorageParamsChange={enhancedHandleStorageParamsChange}
             onStorageValidationChange={handleStorageValidationChange}
             onAddToQueue={handleAddToQueue}
