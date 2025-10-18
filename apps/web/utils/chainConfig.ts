@@ -101,9 +101,9 @@ export function getChainConnection(chainKey: string, providerId?: string): {
       imports: `import { start } from "polkadot-api/smoldot"
 import { getSmProvider } from "polkadot-api/sm-provider"
 import { chainSpec } from "polkadot-api/chains/${config.chainSpec}"`,
-      connection: `  const smoldot = start()
-  const chain = await smoldot.addChain({ chainSpec })
-  const client = createClient(getSmProvider(chain))`,
+      connection: `const smoldot = start()
+const chain = await smoldot.addChain({ chainSpec })
+const client = createClient(getSmProvider(chain))`,
       cleanup: `
   smoldot.terminate()`,
     };
@@ -116,8 +116,8 @@ import { chainSpec } from "polkadot-api/chains/${config.chainSpec}"`,
 
   return {
     imports: `import { getWsProvider } from "polkadot-api/ws-provider/web"`,
-    connection: `  const wsProvider = getWsProvider("${rpcUrl}")
-  const client = createClient(wsProvider)`,
+    connection: `const wsProvider = getWsProvider("${rpcUrl}")
+const client = createClient(wsProvider)`,
     cleanup: `
   client.destroy()`,
   };
