@@ -675,6 +675,10 @@ async function executeWatchValue(
     const typedApi = client.getTypedApi(descriptor);
     const storageQuery = typedApi.query?.[palletName]?.[storageName];
 
+    logger.info(`Debug: Chain ${chainKey}, Descriptor: ${descriptor?.name || 'unknown'}`);
+    logger.info(`Debug: Storage query exists: ${!!storageQuery}`);
+    logger.info(`Debug: watchValue function exists: ${!!(storageQuery && typeof storageQuery.watchValue === 'function')}`);
+
     if (storageQuery && typeof storageQuery.watchValue === 'function') {
       logger.info(`🔴 Starting continuous watch for ${palletName}.${storageName}`);
       logger.info('📡 Using PAPI observable - will log every value change');
@@ -710,10 +714,12 @@ async function executeWatchValue(
           error: (error: any) => {
             const errorMessage = error instanceof Error ? error.message : "Unknown error";
             logger.error(`Observable error: ${errorMessage}`);
+            logger.error(`Error details: ${JSON.stringify(error)}`);
             activeWatchSubscriptions.delete(watchKey);
           },
           complete: () => {
-            logger.info('Observable completed');
+            logger.info('Observable completed - this should not happen for watchValue');
+            logger.info('This usually means the subscription ended unexpectedly');
             activeWatchSubscriptions.delete(watchKey);
           }
         });
