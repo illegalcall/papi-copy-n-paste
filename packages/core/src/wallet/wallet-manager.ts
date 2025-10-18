@@ -17,15 +17,30 @@ export class WalletManager {
 
   constructor(adapter?: WalletAdapter) {
     this.adapter = adapter || new PapiSignerAdapter();
+    console.log('🔍 WalletManager initialized with adapter:', this.adapter.name);
+    console.log('🔍 WalletManager initialization context:', {
+      timestamp: new Date().toISOString(),
+      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'server',
+      location: typeof window !== 'undefined' ? window.location.href : 'server',
+      isProduction: process.env.NODE_ENV === 'production',
+      isDevelopment: process.env.NODE_ENV === 'development'
+    });
     this.checkAvailability();
   }
 
   private async checkAvailability() {
     try {
+      console.log('🔍 WalletManager checking availability with adapter:', this.adapter.name);
       const isAvailable = await this.adapter.isAvailable();
+      console.log('🔍 WalletManager availability result:', isAvailable);
       this.updateState({ isAvailable });
     } catch (error) {
       console.error('WalletManager availability check failed:', error);
+      console.log('🔍 WalletManager error details:', {
+        adapter: this.adapter.name,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       this.updateState({
         isAvailable: false,
         error: error instanceof Error ? error.message : 'Unknown error'

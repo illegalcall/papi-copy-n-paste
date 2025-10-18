@@ -14,12 +14,80 @@ export class PapiSignerAdapter implements WalletAdapter {
   private accounts: InjectedPolkadotAccount[] = [];
 
   async isAvailable(): Promise<boolean> {
+    const startTime = Date.now();
     try {
+      console.log('🔍 PAPI Signer checking availability...');
+      console.log('🔍 Environment info:', {
+        userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'server',
+        location: typeof window !== 'undefined' ? window.location.href : 'server',
+        isProduction: process.env.NODE_ENV === 'production',
+        isDevelopment: process.env.NODE_ENV === 'development',
+        timestamp: new Date().toISOString()
+      });
+      
       // Get available extensions using PAPI's method
+      console.log('🔍 PAPI Signer calling getInjectedExtensions()...');
       const availableExtensions = getInjectedExtensions();
-      return availableExtensions.length > 0;
+      console.log('🔍 PAPI Signer getInjectedExtensions() result:', {
+        type: typeof availableExtensions,
+        isArray: Array.isArray(availableExtensions),
+        length: availableExtensions.length,
+        extensions: availableExtensions,
+        stringified: JSON.stringify(availableExtensions)
+      });
+      
+      // Also check window.injectedWeb3 as fallback
+      if (typeof window !== 'undefined' && window.injectedWeb3) {
+        const injectedWallets = Object.keys(window.injectedWeb3);
+        console.log('🔍 PAPI Signer window.injectedWeb3 check:', {
+          injectedWeb3: !!window.injectedWeb3,
+          injectedWallets,
+          hasExtensions: availableExtensions.length > 0,
+          injectedWeb3Keys: Object.keys(window.injectedWeb3)
+        });
+        
+        // Log each wallet's details
+        injectedWallets.forEach(walletName => {
+          const wallet = window.injectedWeb3?.[walletName];
+          if (wallet) {
+            console.log(`🔍 Wallet ${walletName}:`, {
+              hasEnable: typeof wallet.enable === 'function',
+              walletType: typeof wallet,
+              walletKeys: Object.keys(wallet)
+            });
+          }
+        });
+      } else {
+        console.log('🔍 PAPI Signer: window.injectedWeb3 not available');
+      }
+      
+      // Check if extensions might be loading asynchronously
+      console.log('🔍 PAPI Signer checking for async extension loading...');
+      if (typeof window !== 'undefined') {
+        // Check if there are any extension-related events or promises
+        const extensionChecks = {
+          hasPolkadotJS: !!(window as any).polkadotJS,
+          hasTalisman: !!(window as any).talismanEth,
+          hasSubWallet: !!(window as any).SubWallet,
+          hasInjectedWeb3: !!window.injectedWeb3,
+          injectedWeb3Keys: window.injectedWeb3 ? Object.keys(window.injectedWeb3) : []
+        };
+        console.log('🔍 PAPI Signer extension checks:', extensionChecks);
+      }
+      
+      const isAvailable = availableExtensions.length > 0;
+      const duration = Date.now() - startTime;
+      console.log('🔍 PAPI Signer availability result:', isAvailable, `(took ${duration}ms)`);
+      return isAvailable;
     } catch (error) {
+      const duration = Date.now() - startTime;
       console.warn('PAPI Signer not available:', error);
+      console.log('🔍 PAPI Signer error details:', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        name: error instanceof Error ? error.name : 'Unknown',
+        duration: `${duration}ms`
+      });
       return false;
     }
   }
