@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { WalletManager, type WalletState, type Account } from '@workspace/core';
 
-// Global wallet manager instance to ensure consistency across components
 let globalWalletManager: WalletManager | null = null;
 
 function getWalletManager(): WalletManager {
@@ -12,20 +11,16 @@ function getWalletManager(): WalletManager {
 }
 
 export interface UseWalletReturn {
-  // State
   isAvailable: boolean;
   isConnected: boolean;
   isConnecting: boolean;
   accounts: Account[];
   selectedAccount: Account | null;
   error: string | null;
-
-  // Actions
   connect: () => Promise<void>;
+  connectToWallet: (walletId: string) => Promise<void>;
   disconnect: () => void;
   selectAccount: (account: Account) => Promise<void>;
-
-  // Utilities
   getSigner: (address?: string) => Promise<any>;
   isAccountConnected: (address: string) => boolean;
   getAccount: (address: string) => Account | undefined;
@@ -48,7 +43,18 @@ export function useWallet(): UseWalletReturn {
       await walletManager.connect();
     } catch (error) {
       console.error('Failed to connect wallet:', error);
-      // Error is already stored in state by wallet manager
+      // Re-throw the error so the UI can handle it (e.g., show wallet selector)
+      throw error;
+    }
+  }, [walletManager]);
+
+  const connectToWallet = useCallback(async (walletId: string) => {
+    try {
+      await walletManager.connectToWallet(walletId);
+    } catch (error) {
+      console.error('Failed to connect to wallet:', error);
+      // Re-throw the error so the UI can handle it
+      throw error;
     }
   }, [walletManager]);
 
@@ -88,6 +94,7 @@ export function useWallet(): UseWalletReturn {
 
     // Actions
     connect,
+    connectToWallet,
     disconnect,
     selectAccount,
 
