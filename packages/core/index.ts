@@ -10,3 +10,4 @@ export * from "./sync-status";
 export * from "./descriptors";
 export * from "./src/wallet";
 export { default as chains } from "./chains.json";
+export * from "./contracts";

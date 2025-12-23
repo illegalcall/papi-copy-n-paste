@@ -18,31 +18,35 @@
  * Working chains: polkadot, kusama, moonbeam, bifrost, astar
  */
 
-// Import real generated descriptors following PAPI documentation pattern
-import {
-  polkadot,
-  kusama,
-  moonbeam,
-  bifrost,
-  astar,
-  paseo_asset_hub,
-  hydration,
-} from "@polkadot-api/descriptors";
+// Import generated descriptors — only chains that were added via `npx papi add` will exist.
+// If a chain hasn't been added, it won't be in the generated bundle.
+import * as descriptorExports from "@polkadot-api/descriptors";
 
-// Type-safe mapping of chain keys to descriptors
-// Note: polkadot_asset_hub and polkadot_people are configured in chains.json
-// and chainConfig.ts. After running `npx papi` with connectivity to those chains,
-// add their imports above and entries below.
-const CHAIN_DESCRIPTORS: Record<string, any> = {
-  polkadot,
-  kusama,
-  moonbeam,
-  bifrost,
-  astar,
-  paseo_asset_hub,
-  hydration,
-  // Note: acala not included - will throw error if used
-} as const;
+// Re-export individual descriptors with safe fallbacks for chains not yet generated
+const polkadot = (descriptorExports as any).polkadot;
+const kusama = (descriptorExports as any).kusama;
+const moonbeam = (descriptorExports as any).moonbeam;
+const bifrost = (descriptorExports as any).bifrost;
+const astar = (descriptorExports as any).astar;
+const paseo_asset_hub = (descriptorExports as any).paseo_asset_hub;
+const polkadot_asset_hub = (descriptorExports as any).polkadot_asset_hub;
+const polkadot_people = (descriptorExports as any).polkadot_people;
+const hydration = (descriptorExports as any).hydration;
+
+// Type-safe mapping of chain keys to descriptors (only includes chains that exist)
+const CHAIN_DESCRIPTORS: Record<string, any> = Object.fromEntries(
+  Object.entries({
+    polkadot,
+    kusama,
+    moonbeam,
+    bifrost,
+    astar,
+    paseo_asset_hub,
+    polkadot_asset_hub,
+    polkadot_people,
+    hydration,
+  }).filter(([, v]) => v !== undefined)
+);
 
 type SupportedChainKey = keyof typeof CHAIN_DESCRIPTORS;
 
@@ -75,7 +79,7 @@ export function getTypedApiForChain(client: any, chainKey: string): any {
 }
 
 // Export the descriptors for direct use if needed
-export { polkadot, kusama, moonbeam, bifrost, astar, paseo_asset_hub, hydration };
+export { polkadot, kusama, moonbeam, bifrost, astar, paseo_asset_hub, polkadot_asset_hub, polkadot_people, hydration };
 export type { SupportedChainKey };
 
 // List of chains with real descriptors vs unsupported
@@ -86,6 +90,8 @@ export const CHAINS_WITH_REAL_DESCRIPTORS = [
   "bifrost",
   "astar",
   "paseo_asset_hub",
+  "polkadot_asset_hub",
+  "polkadot_people",
   "hydration",
 ] as const;
 export const UNSUPPORTED_CHAINS = ["acala"] as const;
