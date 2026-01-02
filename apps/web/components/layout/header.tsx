@@ -1,8 +1,9 @@
 "use client";
 
 import { Button } from "@workspace/ui/components/button";
-import { Moon, Sun, Github, BookOpen } from "lucide-react";
+import { Moon, Sun, Github, BookOpen, FileCode } from "lucide-react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 import { NetworkSelector } from "../network/network-selector";
 import { ProviderSelector } from "../network/provider-selector";
 import { WalletConnector } from "../wallet/wallet-connector";
@@ -42,8 +43,17 @@ export function Header({
 
   return (
     <header className="flex justify-between items-center px-6 h-12 border-b bg-background">
-      <div className="font-bold text-lg whitespace-nowrap">
-        Copy‑n‑Paste PAPI
+      <div className="flex items-center gap-3">
+        <div className="font-bold text-lg whitespace-nowrap">
+          Copy‑n‑Paste PAPI
+        </div>
+        <div className="h-4 border-l border-border"></div>
+        <Link href="/contracts">
+          <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
+            <FileCode className="h-3.5 w-3.5" />
+            Contracts
+          </Button>
+        </Link>
       </div>
 
       <div className="flex items-center gap-3">

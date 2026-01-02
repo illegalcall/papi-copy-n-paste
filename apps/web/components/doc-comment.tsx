@@ -11,10 +11,10 @@ interface DocCommentProps {
 export function DocComment({ docs }: DocCommentProps) {
   const [expanded, setExpanded] = useState(false);
 
-  if (!docs || docs.length === 0 || docs.every((d) => !d.trim())) return null;
+  if (!docs?.length || docs.every((d) => !d.trim())) return null;
 
-  const firstLine = docs[0]!.replace(/^#+\s*/, "").trim();
-  const hasMore = docs.length > 1 || docs[0]!.length > 200;
+  const firstLine = docs[0].replace(/^#+\s*/, "").trim();
+  const hasMore = docs.length > 1 || docs[0].length > 200;
   const fullText = docs.join("\n").trim();
 
   return (

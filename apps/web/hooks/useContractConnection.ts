@@ -1,0 +1,203 @@
+/**
+ * Hook for managing WebSocket connections to contract-capable chains
+ * and instantiating InkContractClient / EvmContractClient
+ */
+
+import { useState, useEffect, useCallback, useRef } from "react";
+import { createClient } from "polkadot-api";
+import { getWsProvider } from "polkadot-api/ws-provider/web";
+import { findContractChain } from "@workspace/core/contracts/chains";
+import { InkContractClient } from "@workspace/core/contracts/ink-client";
+import { EvmContractClient } from "@workspace/core/contracts/evm-client";
+import type {
+  ContractType,
+  InkMetadata,
+  EvmAbi,
+  ContractCallResult,
+} from "@workspace/core/contracts/types";
+
+interface ContractConnection {
+  isConnected: boolean;
+  isConnecting: boolean;
+  error: string | null;
+  queryContract: (
+    methodName: string,
+    args: unknown[],
+    caller?: string,
+  ) => Promise<ContractCallResult>;
+  executeContract: (
+    methodName: string,
+    args: unknown[],
+    options?: { value?: bigint },
+  ) => Promise<ContractCallResult>;
+  disconnect: () => void;
+}
+
+export function useContractConnection(
+  contractType: ContractType | null,
+  chainKey: string | null,
+  contractAddress: string | null,
+  rawMetadata: InkMetadata | EvmAbi | null,
+): ContractConnection {
+  const [isConnected, setIsConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const clientRef = useRef<ReturnType<typeof createClient> | null>(null);
+  const inkClientRef = useRef<InkContractClient | null>(null);
+  const evmClientRef = useRef<EvmContractClient | null>(null);
+
+  const disconnect = useCallback(() => {
+    if (clientRef.current) {
+      clientRef.current.destroy();
+      clientRef.current = null;
+    }
+    inkClientRef.current = null;
+    evmClientRef.current = null;
+    setIsConnected(false);
+    setError(null);
+  }, []);
+
+  // Connect when chain/address/metadata change
+  useEffect(() => {
+    if (!contractType || !chainKey || !contractAddress || !rawMetadata) {
+      disconnect();
+      return;
+    }
+
+    const chain = findContractChain(chainKey);
+    if (!chain) {
+      setError(`Chain '${chainKey}' not found in contract chain registry`);
+      return;
+    }
+
+    let cancelled = false;
+    setIsConnecting(true);
+    setError(null);
+
+    const connect = async () => {
+      try {
+        // Disconnect previous
+        if (clientRef.current) {
+          clientRef.current.destroy();
+        }
+
+        const provider = getWsProvider(chain.ws);
+        const client = createClient(provider);
+        clientRef.current = client;
+
+        // Get a generic typed API (no descriptor needed for contract calls)
+        const typedApi = client.getUnsafeApi();
+
+        if (cancelled) return;
+
+        if (contractType === "ink") {
+          inkClientRef.current = new InkContractClient(
+            typedApi as any,
+            contractAddress,
+            rawMetadata as InkMetadata,
+          );
+          evmClientRef.current = null;
+        } else {
+          evmClientRef.current = new EvmContractClient(
+            typedApi as any,
+            contractAddress,
+            rawMetadata as EvmAbi,
+          );
+          inkClientRef.current = null;
+        }
+
+        setIsConnected(true);
+        setIsConnecting(false);
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : String(err));
+          setIsConnecting(false);
+        }
+      }
+    };
+
+    connect();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [contractType, chainKey, contractAddress, rawMetadata, disconnect]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      disconnect();
+    };
+  }, [disconnect]);
+
+  const queryContract = useCallback(
+    async (
+      methodName: string,
+      args: unknown[],
+      caller?: string,
+    ): Promise<ContractCallResult> => {
+      if (inkClientRef.current) {
+        return inkClientRef.current.query(methodName, args, { caller });
+      }
+      if (evmClientRef.current) {
+        return evmClientRef.current.query(methodName, args, { from: caller });
+      }
+      return {
+        success: false,
+        error: "No contract client connected. Load a contract first.",
+      };
+    },
+    [],
+  );
+
+  const executeContract = useCallback(
+    async (
+      methodName: string,
+      args: unknown[],
+      options?: { value?: bigint },
+    ): Promise<ContractCallResult> => {
+      // For execute, we return a message since signing requires wallet integration
+      // The actual tx object is built but needs a signer
+      try {
+        if (inkClientRef.current) {
+          const tx = inkClientRef.current.execute(methodName, args, options);
+          return {
+            success: true,
+            value: tx,
+            decodedValue:
+              "Transaction built successfully. Connect a wallet and sign to submit.",
+          };
+        }
+        if (evmClientRef.current) {
+          const tx = evmClientRef.current.execute(methodName, args, options);
+          return {
+            success: true,
+            value: tx,
+            decodedValue:
+              "Transaction built successfully. Connect a wallet and sign to submit.",
+          };
+        }
+        return {
+          success: false,
+          error: "No contract client connected.",
+        };
+      } catch (err) {
+        return {
+          success: false,
+          error: err instanceof Error ? err.message : String(err),
+        };
+      }
+    },
+    [],
+  );
+
+  return {
+    isConnected,
+    isConnecting,
+    error,
+    queryContract,
+    executeContract,
+    disconnect,
+  };
+}
