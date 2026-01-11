@@ -1,0 +1,41 @@
+{
+  "name": "@papi/mcp-server",
+  "version": "0.1.0",
+  "description": "PAPI-native MCP server for AI agents to interact with Polkadot/Substrate chains",
+  "type": "module",
+  "bin": {
+    "papi-mcp": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "polkadot-api": "^1.14.1",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@workspace/typescript-config": "workspace:*",
+    "tsx": "^4.20.5",
+    "typescript": "^5.7.3"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "polkadot",
+    "substrate",
+    "papi",
+    "mcp",
+    "ai",
+    "claude",
+    "cursor"
+  ],
+  "license": "MIT"
+}
