@@ -1,4 +1,4 @@
-import Fuse, { type IFuseOptions } from "fuse.js";
+import Fuse from "fuse.js";
 import type { PalletInfo } from "@workspace/core";
 
 export type SearchItemType =
@@ -85,7 +85,7 @@ export function buildSearchItems(pallets: PalletInfo[]): SearchItem[] {
   return items;
 }
 
-const FUSE_OPTIONS: IFuseOptions<SearchItem> = {
+const FUSE_OPTIONS: Fuse.IFuseOptions<SearchItem> = {
   keys: [
     { name: "fullPath", weight: 0.4 },
     { name: "name", weight: 0.3 },
