@@ -3,14 +3,30 @@ FROM node:20-alpine AS base
 RUN corepack enable && corepack prepare pnpm@10.4.1 --activate
 WORKDIR /app
 
-# ── Stage 2: Build ────────────────────────────────────────────
-FROM base AS builder
-COPY . .
+# ── Stage 2: Dependencies ─────────────────────────────────────
+FROM base AS deps
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/web/package.json apps/web/
+COPY packages/core/package.json packages/core/
+COPY packages/ui/package.json packages/ui/
+COPY packages/eslint-config/package.json packages/eslint-config/
+COPY packages/typescript-config/package.json packages/typescript-config/
+# Both root and apps/web reference file:.papi/descriptors
+COPY .papi/descriptors/package.json .papi/descriptors/
+COPY apps/web/.papi/descriptors/package.json apps/web/.papi/descriptors/
 RUN pnpm install --frozen-lockfile
-# Generate PAPI descriptors then build Next.js (standalone mode)
-RUN npx papi && cd apps/web && npx next build
 
-# ── Stage 3: Runner ───────────────────────────────────────────
+# ── Stage 3: Build ────────────────────────────────────────────
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=deps /app/packages/core/node_modules ./packages/core/node_modules
+COPY --from=deps /app/packages/ui/node_modules ./packages/ui/node_modules
+COPY . .
+# Generate PAPI descriptors then build Next.js
+RUN npx papi && pnpm build
+
+# ── Stage 4: Runner ───────────────────────────────────────────
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production

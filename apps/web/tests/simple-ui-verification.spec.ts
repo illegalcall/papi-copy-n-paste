@@ -15,7 +15,7 @@ test.describe("Simple UI Load Test", () => {
     });
 
     // Navigate to the page
-    await page.goto("http://localhost:3001");
+    await page.goto("/");
 
     // Wait for main header to appear
     await expect(page.locator("text=PAPI Copy-n-Paste")).toBeVisible({
@@ -45,7 +45,7 @@ test.describe("Simple UI Load Test", () => {
   });
 
   test("network selector is functional", async ({ page }) => {
-    await page.goto("http://localhost:3001");
+    await page.goto("/");
 
     // Wait for page to load
     await expect(page.locator("text=PAPI Copy-n-Paste")).toBeVisible({
