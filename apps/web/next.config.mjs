@@ -2,6 +2,7 @@ import path from 'path';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
   transpilePackages: ["@workspace/ui"],
   skipTrailingSlashRedirect: true,
   trailingSlash: false,

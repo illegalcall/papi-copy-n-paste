@@ -15,6 +15,12 @@ import { Button } from "@workspace/ui/components/button";
 import { PalletInfo, PalletCall, PalletConstant, PalletError, PalletEvent } from "@workspace/core";
 import { exportPallet } from "@/utils/markdownExport";
 import { ExportMarkdownButton } from "@/components/export-button";
+import {
+  buildSearchItems,
+  createFuseIndex,
+  fuzzySearch,
+  type FuzzyMatchSet,
+} from "@/utils/searchIndex";
 
 interface PalletTreeProps {
   pallets: PalletInfo[];
@@ -33,6 +39,14 @@ interface PalletTreeProps {
   onPalletExport?: (markdown: string) => void;
 }
 
+/** Get the first non-empty doc string from a docs array, truncated for preview. */
+function getDocPreview(docs: string[] | undefined, maxLen = 80): string {
+  if (!docs || docs.length === 0) return "";
+  const first = docs[0]!.replace(/^#+\s*/, "").trim();
+  if (first.length <= maxLen) return first;
+  return first.slice(0, maxLen) + "...";
+}
+
 export const PalletTree = memo(function PalletTree({
   pallets,
   searchQuery,
@@ -49,7 +63,6 @@ export const PalletTree = memo(function PalletTree({
   selectedChain,
   onPalletExport,
 }: PalletTreeProps) {
-  // Start with no pallets expanded - user can expand what they need
   const [expandedPallets, setExpandedPallets] = useState<Set<string>>(
     new Set(),
   );
@@ -57,99 +70,80 @@ export const PalletTree = memo(function PalletTree({
     new Set(),
   );
 
-  // Memoized filter function for individual items within pallets
-  const filterItems = useCallback(<T extends { name: string }>(
-    items: T[],
-    query: string,
-  ): T[] => {
-    if (!query) return items;
-    const lowerQuery = query.toLowerCase();
-    return items.filter((item) => item.name.toLowerCase().includes(lowerQuery));
-  }, []);
+  // Build Fuse index once when pallets change
+  const fuseIndex = useMemo(() => {
+    const items = buildSearchItems(pallets);
+    return createFuseIndex(items);
+  }, [pallets]);
 
-  // Memoized enhanced filtering that searches in method arguments and descriptions
-  const enhancedFilterItems = useCallback(<T extends { name: string; args?: unknown[] }>(
-    items: T[],
-    query: string,
-  ): T[] => {
-    if (!query) return items;
-    const lowerQuery = query.toLowerCase();
-    return items.filter((item) => {
-      // Search in item name
-      if (item.name.toLowerCase().includes(lowerQuery)) return true;
+  // Fuzzy match set computed from search query
+  const matchSet: FuzzyMatchSet | null = useMemo(() => {
+    if (!searchQuery || searchQuery.length < 1) return null;
+    return fuzzySearch(fuseIndex, searchQuery);
+  }, [fuseIndex, searchQuery]);
 
-      // Search in arguments if available
-      if (item.args) {
-        return item.args.some((arg) =>
-          (arg && typeof arg === 'object' && 'name' in arg && typeof (arg as any).name === 'string' && (arg as any).name.toLowerCase().includes(lowerQuery)) ||
-          (arg && typeof arg === 'object' && 'type' in arg && typeof (arg as any).type === 'string' && (arg as any).type.toLowerCase().includes(lowerQuery))
-        );
-      }
+  // Filter pallets using fuzzy match results
+  const filteredPallets = useMemo(() => {
+    if (!matchSet) return pallets;
 
-      return false;
+    return pallets
+      .map((pallet) => {
+        if (!matchSet.pallets.has(pallet.name)) return null;
+
+        // If the pallet itself was a direct fuzzy match (not just via children),
+        // check if it has matched children — if not, show all items
+        const matchedCalls = matchSet.calls.get(pallet.name);
+        const matchedStorage = matchSet.storage.get(pallet.name);
+        const matchedEvents = matchSet.events.get(pallet.name);
+        const matchedConstants = matchSet.constants.get(pallet.name);
+        const matchedErrors = matchSet.errors.get(pallet.name);
+
+        const hasChildMatches =
+          matchedCalls || matchedStorage || matchedEvents || matchedConstants || matchedErrors;
+
+        // If no child matches, this pallet was matched by name — show all items
+        if (!hasChildMatches) return pallet;
+
+        // Otherwise filter to matched items only
+        return {
+          ...pallet,
+          calls: matchedCalls
+            ? pallet.calls.filter((c) => matchedCalls.has(c.name))
+            : [],
+          storage: matchedStorage
+            ? pallet.storage.filter((s) => matchedStorage.has(s.name))
+            : [],
+          events: matchedEvents
+            ? pallet.events.filter((e) => matchedEvents.has(e.name))
+            : [],
+          constants: matchedConstants
+            ? (pallet.constants ?? []).filter((c) => matchedConstants.has(c.name))
+            : [],
+          errors: matchedErrors
+            ? (pallet.errors ?? []).filter((e) => matchedErrors.has(e.name))
+            : [],
+        };
+      })
+      .filter((p): p is PalletInfo => p !== null);
+  }, [pallets, matchSet]);
+
+  const togglePallet = useCallback((palletName: string) => {
+    setExpandedPallets((prev) => {
+      const next = new Set(prev);
+      if (next.has(palletName)) next.delete(palletName);
+      else next.add(palletName);
+      return next;
     });
   }, []);
 
-  // Memoized enhanced filtering that also filters items within pallets
-  const filteredPallets = useMemo(() => {
-    return pallets
-      .map((pallet) => {
-        if (!searchQuery) return pallet;
-
-        const query = searchQuery.toLowerCase();
-        const palletNameMatches = pallet.name.toLowerCase().includes(query);
-
-        // If pallet name matches, show ALL items within it (no filtering)
-        // Otherwise, filter individual items within the pallet using enhanced search
-        const filteredCalls = palletNameMatches ? pallet.calls : enhancedFilterItems(pallet.calls, searchQuery);
-        const filteredStorage = palletNameMatches ? pallet.storage : enhancedFilterItems(pallet.storage, searchQuery);
-        const filteredEvents = palletNameMatches ? pallet.events : filterItems(pallet.events, searchQuery);
-        const filteredConstants = palletNameMatches ? (pallet.constants || []) : filterItems(pallet.constants || [], searchQuery);
-        const filteredErrors = palletNameMatches ? (pallet.errors || []) : filterItems(pallet.errors || [], searchQuery);
-
-        // Include pallet if name matches OR if any items within it match
-        const hasMatches =
-          palletNameMatches ||
-          filteredCalls.length > 0 ||
-          filteredStorage.length > 0 ||
-          filteredEvents.length > 0 ||
-          filteredConstants.length > 0 ||
-          filteredErrors.length > 0;
-
-        if (!hasMatches) return null;
-
-        // Return pallet with filtered items
-        return {
-          ...pallet,
-          calls: filteredCalls,
-          storage: filteredStorage,
-          events: filteredEvents,
-          constants: filteredConstants,
-          errors: filteredErrors,
-        };
-      })
-      .filter((pallet): pallet is PalletInfo => pallet !== null);
-  }, [pallets, searchQuery, enhancedFilterItems, filterItems]);
-
-  const togglePallet = useCallback((palletName: string) => {
-    const newExpanded = new Set(expandedPallets);
-    if (newExpanded.has(palletName)) {
-      newExpanded.delete(palletName);
-    } else {
-      newExpanded.add(palletName);
-    }
-    setExpandedPallets(newExpanded);
-  }, [expandedPallets]);
-
   const toggleSection = useCallback((sectionKey: string) => {
-    const newExpanded = new Set(expandedSections);
-    if (newExpanded.has(sectionKey)) {
-      newExpanded.delete(sectionKey);
-    } else {
-      newExpanded.add(sectionKey);
-    }
-    setExpandedSections(newExpanded);
-  }, [expandedSections]);
+    setExpandedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(sectionKey)) next.delete(sectionKey);
+      else next.add(sectionKey);
+      return next;
+    });
+  }, []);
 
   const handleCallClick = useCallback((pallet: PalletInfo, call: PalletCall) => {
     onCallSelect(pallet.name, call);
@@ -167,30 +161,18 @@ export const PalletTree = memo(function PalletTree({
     onErrorSelect?.(pallet.name, error);
   }, [onErrorSelect]);
 
-  // Memoized auto-expand pallets that have search matches
-  const shouldAutoExpand = useCallback((pallet: PalletInfo): boolean => {
-    if (!searchQuery) return false;
-    const query = searchQuery.toLowerCase();
-    const palletNameMatches = pallet.name.toLowerCase().includes(query);
+  // Auto-expand pallets/sections when searching
+  const shouldAutoExpand = useCallback(
+    (_pallet: PalletInfo): boolean => !!searchQuery,
+    [searchQuery],
+  );
 
-    // Auto-expand if pallet name matches OR if items inside match
-    return (
-      palletNameMatches ||
-      (pallet.calls.length > 0 ||
-        pallet.storage.length > 0 ||
-        pallet.events.length > 0 ||
-        (pallet.constants || []).length > 0 ||
-        (pallet.errors || []).length > 0)
-    );
-  }, [searchQuery]);
+  const shouldAutoExpandSection = useCallback(
+    (_palletName: string): boolean => !!searchQuery,
+    [searchQuery],
+  );
 
-  // Memoized auto-expand sections when pallet name matches search
-  const shouldAutoExpandSection = useCallback((palletName: string): boolean => {
-    if (!searchQuery) return false;
-    return palletName.toLowerCase().includes(searchQuery.toLowerCase());
-  }, [searchQuery]);
-
-  // Memoized highlight matching text in names with regex caching
+  // Highlight matching text — works with fuzzy by highlighting the query substring
   const highlightRegex = useMemo(() => {
     if (!searchQuery) return null;
     return new RegExp(
@@ -199,24 +181,25 @@ export const PalletTree = memo(function PalletTree({
     );
   }, [searchQuery]);
 
-  const highlightMatch = useCallback((text: string, query: string) => {
-    if (!query || !highlightRegex) return text;
-
-    const parts = text.split(highlightRegex);
-
-    return parts.map((part, index) =>
-      highlightRegex.test(part) ? (
-        <span
-          key={index}
-          className="bg-yellow-200 dark:bg-yellow-800 px-0.5 rounded"
-        >
-          {part}
-        </span>
-      ) : (
-        part
-      ),
-    );
-  }, [highlightRegex]);
+  const highlightMatch = useCallback(
+    (text: string, query: string) => {
+      if (!query || !highlightRegex) return text;
+      const parts = text.split(highlightRegex);
+      return parts.map((part, index) =>
+        highlightRegex.test(part) ? (
+          <span
+            key={index}
+            className="bg-yellow-200 dark:bg-yellow-800 px-0.5 rounded"
+          >
+            {part}
+          </span>
+        ) : (
+          part
+        ),
+      );
+    },
+    [highlightRegex],
+  );
 
   if (filteredPallets.length === 0) {
     return (
@@ -228,12 +211,20 @@ export const PalletTree = memo(function PalletTree({
 
   return (
     <div className="space-y-1" data-testid="pallet-tree">
+      {searchQuery && (
+        <div className="text-xs text-muted-foreground px-2 pb-1">
+          {filteredPallets.length} pallets matched
+        </div>
+      )}
       {filteredPallets.map((pallet) => {
         const isExpanded =
           expandedPallets.has(pallet.name) || shouldAutoExpand(pallet);
         const totalItems =
-          pallet.calls.length + pallet.storage.length + pallet.events.length +
-          (pallet.constants || []).length + (pallet.errors || []).length;
+          pallet.calls.length +
+          pallet.storage.length +
+          pallet.events.length +
+          (pallet.constants || []).length +
+          (pallet.errors || []).length;
 
         return (
           <div key={pallet.name} data-testid="pallet-item" className="group">
@@ -277,7 +268,8 @@ export const PalletTree = memo(function PalletTree({
                       className="w-full justify-start h-7 px-2 font-normal text-xs"
                       onClick={() => toggleSection(`${pallet.name}-calls`)}
                     >
-                      {(expandedSections.has(`${pallet.name}-calls`) || shouldAutoExpandSection(pallet.name)) ? (
+                      {expandedSections.has(`${pallet.name}-calls`) ||
+                      shouldAutoExpandSection(pallet.name) ? (
                         <ChevronDown className="w-3 h-3 mr-1" />
                       ) : (
                         <ChevronRight className="w-3 h-3 mr-1" />
@@ -286,18 +278,14 @@ export const PalletTree = memo(function PalletTree({
                       <span>Calls ({pallet.calls.length})</span>
                     </Button>
 
-                    {(expandedSections.has(`${pallet.name}-calls`) || shouldAutoExpandSection(pallet.name)) && (
+                    {(expandedSections.has(`${pallet.name}-calls`) ||
+                      shouldAutoExpandSection(pallet.name)) && (
                       <div className="ml-4 space-y-0.5">
                         {pallet.calls.map((call) => {
                           const isSelected =
                             selectedCall?.pallet === pallet.name &&
                             selectedCall?.call === call.name;
-                          
-                          // Check if this call was matched by argument search
-                          const argumentMatched = searchQuery && call.args.some((arg) => 
-                            arg.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            arg.type?.toLowerCase().includes(searchQuery.toLowerCase())
-                          ) && !call.name.toLowerCase().includes(searchQuery.toLowerCase());
+                          const docPreview = getDocPreview(call.docs);
 
                           return (
                             <Button
@@ -317,16 +305,9 @@ export const PalletTree = memo(function PalletTree({
                                     </span>
                                   )}
                                 </div>
-                                {argumentMatched && (
-                                  <div className="text-xs text-muted-foreground mt-0.5 text-left">
-                                    Found in: {call.args
-                                      .filter(arg => 
-                                        arg.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                        arg.type?.toLowerCase().includes(searchQuery.toLowerCase())
-                                      )
-                                      .map(arg => arg.name || arg.type)
-                                      .slice(0, 2)
-                                      .join(', ')}
+                                {docPreview && searchQuery && (
+                                  <div className="text-xs text-muted-foreground mt-0.5 text-left truncate w-full">
+                                    {docPreview}
                                   </div>
                                 )}
                               </div>
@@ -346,7 +327,8 @@ export const PalletTree = memo(function PalletTree({
                       className="w-full justify-start h-7 px-2 font-normal text-xs"
                       onClick={() => toggleSection(`${pallet.name}-storage`)}
                     >
-                      {(expandedSections.has(`${pallet.name}-storage`) || shouldAutoExpandSection(pallet.name)) ? (
+                      {expandedSections.has(`${pallet.name}-storage`) ||
+                      shouldAutoExpandSection(pallet.name) ? (
                         <ChevronDown className="w-3 h-3 mr-1" />
                       ) : (
                         <ChevronRight className="w-3 h-3 mr-1" />
@@ -355,24 +337,31 @@ export const PalletTree = memo(function PalletTree({
                       <span>Storage ({pallet.storage.length})</span>
                     </Button>
 
-                    {(expandedSections.has(`${pallet.name}-storage`) || shouldAutoExpandSection(pallet.name)) && (
+                    {(expandedSections.has(`${pallet.name}-storage`) ||
+                      shouldAutoExpandSection(pallet.name)) && (
                       <div className="ml-4 space-y-0.5">
                         {pallet.storage.map((storage) => {
                           const isSelected =
                             selectedStorage?.pallet === pallet.name &&
                             selectedStorage?.storage === storage.name;
+                          const docPreview = getDocPreview(storage.docs);
                           return (
                             <Button
                               key={storage.name}
                               variant={isSelected ? "secondary" : "ghost"}
-                              className="w-full justify-start h-6 px-2 font-normal text-xs"
-                              onClick={() =>
-                                handleStorageClick(pallet, storage)
-                              }
+                              className="w-full justify-start h-auto min-h-6 px-2 py-1 font-normal text-xs"
+                              onClick={() => handleStorageClick(pallet, storage)}
                             >
-                              <span className="truncate">
-                                {highlightMatch(storage.name, searchQuery)}
-                              </span>
+                              <div className="flex flex-col items-start w-full">
+                                <span className="truncate">
+                                  {highlightMatch(storage.name, searchQuery)}
+                                </span>
+                                {docPreview && searchQuery && (
+                                  <div className="text-xs text-muted-foreground mt-0.5 text-left truncate w-full">
+                                    {docPreview}
+                                  </div>
+                                )}
+                              </div>
                             </Button>
                           );
                         })}
@@ -389,7 +378,8 @@ export const PalletTree = memo(function PalletTree({
                       className="w-full justify-start h-7 px-2 font-normal text-xs"
                       onClick={() => toggleSection(`${pallet.name}-events`)}
                     >
-                      {(expandedSections.has(`${pallet.name}-events`) || shouldAutoExpandSection(pallet.name)) ? (
+                      {expandedSections.has(`${pallet.name}-events`) ||
+                      shouldAutoExpandSection(pallet.name) ? (
                         <ChevronDown className="w-3 h-3 mr-1" />
                       ) : (
                         <ChevronRight className="w-3 h-3 mr-1" />
@@ -398,24 +388,38 @@ export const PalletTree = memo(function PalletTree({
                       <span>Events ({pallet.events.length})</span>
                     </Button>
 
-                    {(expandedSections.has(`${pallet.name}-events`) || shouldAutoExpandSection(pallet.name)) && (
+                    {(expandedSections.has(`${pallet.name}-events`) ||
+                      shouldAutoExpandSection(pallet.name)) && (
                       <div className="ml-4 space-y-0.5">
-                        {pallet.events.map((event) => (
-                          <Button
-                            key={event.name}
-                            variant="ghost"
-                            className={`w-full justify-start h-6 px-2 font-normal text-xs ${
-                              selectedEvent?.pallet === pallet.name && selectedEvent?.event === event.name
-                                ? "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100"
-                                : ""
-                            }`}
-                            onClick={() => onEventSelect?.(pallet.name, event)}
-                          >
-                            <span className="truncate">
-                              {highlightMatch(event.name, searchQuery)}
-                            </span>
-                          </Button>
-                        ))}
+                        {pallet.events.map((event) => {
+                          const docPreview = getDocPreview(event.docs);
+                          return (
+                            <Button
+                              key={event.name}
+                              variant="ghost"
+                              className={`w-full justify-start h-auto min-h-6 px-2 py-1 font-normal text-xs ${
+                                selectedEvent?.pallet === pallet.name &&
+                                selectedEvent?.event === event.name
+                                  ? "bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100"
+                                  : ""
+                              }`}
+                              onClick={() =>
+                                onEventSelect?.(pallet.name, event)
+                              }
+                            >
+                              <div className="flex flex-col items-start w-full">
+                                <span className="truncate">
+                                  {highlightMatch(event.name, searchQuery)}
+                                </span>
+                                {docPreview && searchQuery && (
+                                  <div className="text-xs text-muted-foreground mt-0.5 text-left truncate w-full">
+                                    {docPreview}
+                                  </div>
+                                )}
+                              </div>
+                            </Button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -427,33 +431,52 @@ export const PalletTree = memo(function PalletTree({
                     <Button
                       variant="ghost"
                       className="w-full justify-start h-7 px-2 font-normal text-xs"
-                      onClick={() => toggleSection(`${pallet.name}-constants`)}
+                      onClick={() =>
+                        toggleSection(`${pallet.name}-constants`)
+                      }
                     >
-                      {(expandedSections.has(`${pallet.name}-constants`) || shouldAutoExpandSection(pallet.name)) ? (
+                      {expandedSections.has(`${pallet.name}-constants`) ||
+                      shouldAutoExpandSection(pallet.name) ? (
                         <ChevronDown className="w-3 h-3 mr-1" />
                       ) : (
                         <ChevronRight className="w-3 h-3 mr-1" />
                       )}
                       <Settings className="w-3 h-3 mr-2" />
-                      <span>Constants ({(pallet.constants || []).length})</span>
+                      <span>
+                        Constants ({(pallet.constants || []).length})
+                      </span>
                     </Button>
 
-                    {(expandedSections.has(`${pallet.name}-constants`) || shouldAutoExpandSection(pallet.name)) && (
+                    {(expandedSections.has(`${pallet.name}-constants`) ||
+                      shouldAutoExpandSection(pallet.name)) && (
                       <div className="ml-4 space-y-0.5">
                         {(pallet.constants || []).map((constant) => {
                           const isSelected =
                             selectedConstant?.pallet === pallet.name &&
                             selectedConstant?.constant === constant.name;
+                          const docPreview = getDocPreview(constant.docs);
                           return (
                             <Button
                               key={constant.name}
                               variant={isSelected ? "secondary" : "ghost"}
-                              className="w-full justify-start h-6 px-2 font-normal text-xs"
-                              onClick={() => handleConstantClick(pallet, constant)}
+                              className="w-full justify-start h-auto min-h-6 px-2 py-1 font-normal text-xs"
+                              onClick={() =>
+                                handleConstantClick(pallet, constant)
+                              }
                             >
-                              <span className="truncate">
-                                {highlightMatch(constant.name, searchQuery)}
-                              </span>
+                              <div className="flex flex-col items-start w-full">
+                                <span className="truncate">
+                                  {highlightMatch(
+                                    constant.name,
+                                    searchQuery,
+                                  )}
+                                </span>
+                                {docPreview && searchQuery && (
+                                  <div className="text-xs text-muted-foreground mt-0.5 text-left truncate w-full">
+                                    {docPreview}
+                                  </div>
+                                )}
+                              </div>
                             </Button>
                           );
                         })}
@@ -470,7 +493,8 @@ export const PalletTree = memo(function PalletTree({
                       className="w-full justify-start h-7 px-2 font-normal text-xs"
                       onClick={() => toggleSection(`${pallet.name}-errors`)}
                     >
-                      {(expandedSections.has(`${pallet.name}-errors`) || shouldAutoExpandSection(pallet.name)) ? (
+                      {expandedSections.has(`${pallet.name}-errors`) ||
+                      shouldAutoExpandSection(pallet.name) ? (
                         <ChevronDown className="w-3 h-3 mr-1" />
                       ) : (
                         <ChevronRight className="w-3 h-3 mr-1" />
@@ -479,22 +503,33 @@ export const PalletTree = memo(function PalletTree({
                       <span>Errors ({(pallet.errors || []).length})</span>
                     </Button>
 
-                    {(expandedSections.has(`${pallet.name}-errors`) || shouldAutoExpandSection(pallet.name)) && (
+                    {(expandedSections.has(`${pallet.name}-errors`) ||
+                      shouldAutoExpandSection(pallet.name)) && (
                       <div className="ml-4 space-y-0.5">
                         {(pallet.errors || []).map((error) => {
                           const isSelected =
                             selectedError?.pallet === pallet.name &&
                             selectedError?.error === error.name;
+                          const docPreview = getDocPreview(error.docs);
                           return (
                             <Button
                               key={error.name}
                               variant={isSelected ? "secondary" : "ghost"}
-                              className="w-full justify-start h-6 px-2 font-normal text-xs"
-                              onClick={() => handleErrorClick(pallet, error)}
+                              className="w-full justify-start h-auto min-h-6 px-2 py-1 font-normal text-xs"
+                              onClick={() =>
+                                handleErrorClick(pallet, error)
+                              }
                             >
-                              <span className="truncate">
-                                {highlightMatch(error.name, searchQuery)}
-                              </span>
+                              <div className="flex flex-col items-start w-full">
+                                <span className="truncate">
+                                  {highlightMatch(error.name, searchQuery)}
+                                </span>
+                                {docPreview && searchQuery && (
+                                  <div className="text-xs text-muted-foreground mt-0.5 text-left truncate w-full">
+                                    {docPreview}
+                                  </div>
+                                )}
+                              </div>
                             </Button>
                           );
                         })}

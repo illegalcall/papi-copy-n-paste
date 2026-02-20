@@ -85,6 +85,30 @@
     "explorerName": "Subscan"
   },
   {
+    "key": "polkadot_asset_hub",
+    "name": "Polkadot Asset Hub",
+    "ws": "wss://polkadot-asset-hub-rpc.polkadot.io",
+    "specVersion": 1003000,
+    "paraId": 1000,
+    "genesisHash": "0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f",
+    "icon": "/icons/polkadot-asset-hub.svg",
+    "color": "#E6007A",
+    "explorerUrl": "https://assethub-polkadot.subscan.io",
+    "explorerName": "Subscan"
+  },
+  {
+    "key": "polkadot_people",
+    "name": "Polkadot People",
+    "ws": "wss://polkadot-people-rpc.polkadot.io",
+    "specVersion": 1003000,
+    "paraId": 1004,
+    "genesisHash": "0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46571571b528571cdc7b",
+    "icon": "/icons/polkadot-people.svg",
+    "color": "#E6007A",
+    "explorerUrl": "https://people-polkadot.subscan.io",
+    "explorerName": "Subscan"
+  },
+  {
     "key": "westend",
     "name": "Westend",
     "ws": "wss://westend-rpc.polkadot.io",
