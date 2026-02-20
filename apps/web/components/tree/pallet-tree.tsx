@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { PalletInfo, PalletCall, PalletConstant, PalletError, PalletEvent } from "@workspace/core";
+import { exportPallet } from "@/utils/markdownExport";
+import { ExportMarkdownButton } from "@/components/export-button";
 
 interface PalletTreeProps {
   pallets: PalletInfo[];
@@ -27,6 +29,8 @@ interface PalletTreeProps {
   selectedConstant?: { pallet: string; constant: string };
   selectedError?: { pallet: string; error: string };
   selectedEvent?: { pallet: string; event: string };
+  selectedChain?: string;
+  onPalletExport?: (markdown: string) => void;
 }
 
 export const PalletTree = memo(function PalletTree({
@@ -42,6 +46,8 @@ export const PalletTree = memo(function PalletTree({
   selectedConstant,
   selectedError,
   selectedEvent,
+  selectedChain,
+  onPalletExport,
 }: PalletTreeProps) {
   // Start with no pallets expanded - user can expand what they need
   const [expandedPallets, setExpandedPallets] = useState<Set<string>>(
@@ -230,25 +236,36 @@ export const PalletTree = memo(function PalletTree({
           (pallet.constants || []).length + (pallet.errors || []).length;
 
         return (
-          <div key={pallet.name} data-testid="pallet-item">
-            <Button
-              variant="ghost"
-              className="w-full justify-start h-8 px-2 font-normal"
-              onClick={() => togglePallet(pallet.name)}
-            >
-              {isExpanded ? (
-                <ChevronDown className="w-4 h-4 mr-1" />
-              ) : (
-                <ChevronRight className="w-4 h-4 mr-1" />
+          <div key={pallet.name} data-testid="pallet-item" className="group">
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                className="flex-1 justify-start h-8 px-2 font-normal"
+                onClick={() => togglePallet(pallet.name)}
+              >
+                {isExpanded ? (
+                  <ChevronDown className="w-4 h-4 mr-1" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 mr-1" />
+                )}
+                <Package className="w-4 h-4 mr-2" />
+                <span className="truncate">
+                  {highlightMatch(pallet.name, searchQuery)}
+                </span>
+                <span className="ml-auto text-xs text-muted-foreground">
+                  {totalItems}
+                </span>
+              </Button>
+              {selectedChain && (
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ExportMarkdownButton
+                    getMarkdown={() => exportPallet(selectedChain, pallet)}
+                    onExported={onPalletExport}
+                    label={`Export ${pallet.name} as Markdown`}
+                  />
+                </div>
               )}
-              <Package className="w-4 h-4 mr-2" />
-              <span className="truncate">
-                {highlightMatch(pallet.name, searchQuery)}
-              </span>
-              <span className="ml-auto text-xs text-muted-foreground">
-                {totalItems}
-              </span>
-            </Button>
+            </div>
 
             {isExpanded && (
               <div className="ml-4 space-y-1">

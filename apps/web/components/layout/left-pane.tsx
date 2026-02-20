@@ -22,6 +22,8 @@ interface LeftPaneProps {
   selectedEvent?: { pallet: string; event: string };
   isLoading?: boolean;
   error?: string | null;
+  selectedChain?: string;
+  onPalletExport?: (markdown: string) => void;
 }
 
 export interface LeftPaneRef {
@@ -43,6 +45,8 @@ export const LeftPane = forwardRef<LeftPaneRef, LeftPaneProps>(({
   selectedEvent,
   isLoading = false,
   error = null,
+  selectedChain,
+  onPalletExport,
 }, ref) => {
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -113,6 +117,8 @@ export const LeftPane = forwardRef<LeftPaneRef, LeftPaneProps>(({
               selectedConstant={selectedConstant}
               selectedError={selectedError}
               selectedEvent={selectedEvent}
+              selectedChain={selectedChain}
+              onPalletExport={onPalletExport}
             />
           )}
         </div>
