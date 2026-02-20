@@ -16,10 +16,21 @@ import {
 import { Button } from "@workspace/ui/components/button";
 import { Toast } from "@workspace/ui/components/toast";
 import { Badge } from "@workspace/ui/components/badge";
-import { Copy, Terminal, Trash2, Settings, Code, Eye } from "lucide-react";
+import { Copy, Terminal, Trash2, Settings, Code, Eye, FileText } from "lucide-react";
 import { SyntaxHighlighter } from "@/components/code/syntax-highlighter";
 import { ConsoleItem } from "@/hooks/useExecution";
 import { ArrayResult } from "@/utils/cleanLogger";
+import { ExportMarkdownButton } from "@/components/export-button";
+import { PalletCall, PalletStorage, PalletConstant, PalletError as PalletErrorType, PalletEvent } from "@workspace/core";
+import {
+  exportStorageQuery,
+  exportTransaction,
+  exportConstant,
+  exportEvent,
+  exportError,
+  exportBatchCode,
+  ExportContext,
+} from "@/utils/markdownExport";
 
 interface TransactionResult {
   hash: string;
@@ -40,6 +51,20 @@ interface RightPaneProps {
   selectedChain?: string;
   transactionHistory?: TransactionResult[];
   onClearTransactionHistory?: () => void;
+  // Markdown export props
+  selectedCall?: { pallet: string; call: PalletCall };
+  selectedStorage?: { pallet: string; storage: PalletStorage };
+  selectedConstant?: { pallet: string; constant: PalletConstant };
+  selectedEvent?: { pallet: string; event: PalletEvent };
+  selectedError?: { pallet: string; error: PalletErrorType };
+  storageQueryType?: string;
+  storageParams?: Record<string, any>;
+  formData?: Record<string, any>;
+  methodQueue?: Array<{ pallet: string; call: PalletCall; formData: Record<string, any>; id: string }>;
+  storageQueue?: Array<{ pallet: string; storage: any; queryType: string; storageParams: Record<string, any>; id: string }>;
+  onMarkdownExported?: (markdown: string) => void;
+  sessionEntryCount?: number;
+  onExportSession?: () => string;
 }
 
 export const RightPane = memo(function RightPane({
@@ -48,6 +73,19 @@ export const RightPane = memo(function RightPane({
   onClearConsole,
   activeTab,
   selectedChain,
+  selectedCall,
+  selectedStorage,
+  selectedConstant,
+  selectedEvent,
+  selectedError,
+  storageQueryType,
+  storageParams,
+  formData,
+  methodQueue,
+  storageQueue,
+  onMarkdownExported,
+  sessionEntryCount,
+  onExportSession,
 }: RightPaneProps) {
   const [currentTab, setCurrentTab] = useState<"setup" | "code" | "console" | "transactions">(
     "setup",
@@ -169,6 +207,39 @@ export const RightPane = memo(function RightPane({
       setShowToast(true);
     }
   }, [code]);
+
+  const getMarkdown = useCallback(() => {
+    const chain = selectedChain || "Unknown";
+    if (methodQueue && methodQueue.length > 0) {
+      return exportBatchCode(chain, "Batch Transaction", code);
+    }
+    if (storageQueue && storageQueue.length > 0) {
+      return exportBatchCode(chain, "Batch Storage Query", code);
+    }
+    if (selectedCall) {
+      const ctx: ExportContext = { chain, pallet: selectedCall.pallet };
+      return exportTransaction(ctx, selectedCall.call, formData || {}, code);
+    }
+    if (selectedStorage) {
+      const ctx: ExportContext = { chain, pallet: selectedStorage.pallet };
+      return exportStorageQuery(ctx, selectedStorage.storage, storageQueryType || "getValue", storageParams || {}, code);
+    }
+    if (selectedConstant) {
+      const ctx: ExportContext = { chain, pallet: selectedConstant.pallet };
+      return exportConstant(ctx, selectedConstant.constant, code);
+    }
+    if (selectedError) {
+      const ctx: ExportContext = { chain, pallet: selectedError.pallet };
+      return exportError(ctx, selectedError.error, code);
+    }
+    if (selectedEvent) {
+      const ctx: ExportContext = { chain, pallet: selectedEvent.pallet };
+      return exportEvent(ctx, selectedEvent.event, code);
+    }
+    return "";
+  }, [selectedChain, selectedCall, selectedStorage, selectedConstant, selectedError, selectedEvent, methodQueue, storageQueue, code, formData, storageQueryType, storageParams]);
+
+  const hasExportableContent = !!(selectedCall || selectedStorage || selectedConstant || selectedError || selectedEvent || (methodQueue && methodQueue.length > 0) || (storageQueue && storageQueue.length > 0));
 
   const handleCopyCommand = useCallback(async (command: string) => {
     try {
@@ -380,11 +451,19 @@ export const RightPane = memo(function RightPane({
         className="flex-1 flex flex-col min-h-0 max-h-full"
       >
         <div className="p-4 border-b">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="setup">Setup</TabsTrigger>
-            <TabsTrigger value="code">Code</TabsTrigger>
-            <TabsTrigger value="console">Console</TabsTrigger>
-          </TabsList>
+          <div className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="setup">Setup</TabsTrigger>
+              <TabsTrigger value="code">Code</TabsTrigger>
+              <TabsTrigger value="console">Console</TabsTrigger>
+            </TabsList>
+            {sessionEntryCount && sessionEntryCount > 0 && onExportSession && (
+              <ExportMarkdownButton
+                getMarkdown={onExportSession}
+                label="Export session"
+              />
+            )}
+          </div>
         </div>
 
         <TabsContent
@@ -520,15 +599,23 @@ export const RightPane = memo(function RightPane({
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm">Generated Code</CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCopyCode}
-                  disabled={!code}
-                >
-                  <Copy className="w-3 h-3 mr-1" />
-                  Copy
-                </Button>
+                <div className="flex items-center gap-2">
+                  {hasExportableContent && (
+                    <ExportMarkdownButton
+                      getMarkdown={getMarkdown}
+                      onExported={onMarkdownExported}
+                    />
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopyCode}
+                    disabled={!code}
+                  >
+                    <Copy className="w-3 h-3 mr-1" />
+                    Copy
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="p-0 flex-1 flex flex-col">
@@ -618,6 +705,22 @@ export const RightPane = memo(function RightPane({
                             >
                               <Copy className="w-3 h-3" />
                             </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
+                              onClick={() => {
+                                const md = getMarkdown();
+                                if (md) {
+                                  navigator.clipboard.writeText(md);
+                                  onMarkdownExported?.(md);
+                                  setShowToast(true);
+                                }
+                              }}
+                              title="Copy as Markdown"
+                            >
+                              <FileText className="w-3 h-3" />
+                            </Button>
                             {copiedArrayResult === copyId && (
                               <span className="text-xs text-green-500">Copied!</span>
                             )}
@@ -647,6 +750,22 @@ export const RightPane = memo(function RightPane({
                               title="Copy result"
                             >
                               <Copy className="w-3 h-3" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="opacity-0 group-hover:opacity-100 h-6 w-6 p-0 transition-opacity"
+                              onClick={() => {
+                                const md = getMarkdown();
+                                if (md) {
+                                  navigator.clipboard.writeText(md);
+                                  onMarkdownExported?.(md);
+                                  setShowToast(true);
+                                }
+                              }}
+                              title="Copy as Markdown"
+                            >
+                              <FileText className="w-3 h-3" />
                             </Button>
                             {copiedResult === resultValue && (
                               <span className="text-xs text-green-500">Copied!</span>
