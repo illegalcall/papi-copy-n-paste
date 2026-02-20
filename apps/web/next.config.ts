@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   transpilePackages: ["@workspace/ui", "@workspace/core"],
   experimental: {
     optimizePackageImports: ["@workspace/ui", "lucide-react"],

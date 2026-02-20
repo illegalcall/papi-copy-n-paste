@@ -1,0 +1,13 @@
+node_modules
+.next
+.turbo
+.git
+.gitignore
+.env*
+.vscode
+.worktrees
+*.md
+!README.md
+coverage
+test-results
+playwright-report

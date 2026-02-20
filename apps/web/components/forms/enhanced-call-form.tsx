@@ -15,6 +15,7 @@ import type { CallParameterInfo } from "@/utils/callParameterDetection";
 import type { ParameterInfo } from "@/utils/metadataAnalyzer";
 import type { PalletCall } from "@workspace/core";
 import type { FormData, FormChangeHandler, ValidChangeHandler } from "../../types/forms";
+import { DocComment } from "@/components/doc-comment";
 
 interface EnhancedCallFormProps {
   pallet: string;
@@ -185,6 +186,11 @@ export const EnhancedCallForm = memo(function EnhancedCallForm({
           </Button>
         )}
       </div>
+
+      {/* Rust doc comment */}
+      {selectedCall?.call?.docs && selectedCall.call.docs.length > 0 && (
+        <DocComment docs={selectedCall.call.docs} />
+      )}
 
       {/* Call description */}
       {parameterInfo.description && (

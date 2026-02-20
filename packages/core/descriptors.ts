@@ -30,6 +30,9 @@ import {
 } from "@polkadot-api/descriptors";
 
 // Type-safe mapping of chain keys to descriptors
+// Note: polkadot_asset_hub and polkadot_people are configured in chains.json
+// and chainConfig.ts. After running `npx papi` with connectivity to those chains,
+// add their imports above and entries below.
 const CHAIN_DESCRIPTORS: Record<string, any> = {
   polkadot,
   kusama,

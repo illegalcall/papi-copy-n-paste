@@ -8,6 +8,8 @@ const DESCRIPTOR_MAP = {
   astar: "astar",
   paseo: "paseo",
   paseo_asset_hub: "paseo_asset_hub",
+  polkadot_asset_hub: "polkadot_asset_hub",
+  polkadot_people: "polkadot_people",
   westend: "westend",
   rococo: "rococo",
   hydration: "hydration",
@@ -78,6 +80,8 @@ const RPC_URLS = {
   acala: "wss://acala-rpc.dwellir.com",
   hydration: "wss://hydration-rpc.n.dwellir.com",
   paseo_asset_hub: "wss://asset-hub-paseo-rpc.dwellir.com",
+  polkadot_asset_hub: "wss://polkadot-asset-hub-rpc.polkadot.io",
+  polkadot_people: "wss://polkadot-people-rpc.polkadot.io",
   westend: "wss://westend-rpc.polkadot.io",
   rococo: "wss://rococo-rpc.polkadot.io",
 } as const;
