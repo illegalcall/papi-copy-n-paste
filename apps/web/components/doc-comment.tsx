@@ -13,8 +13,8 @@ export function DocComment({ docs }: DocCommentProps) {
 
   if (!docs?.length || docs.every((d) => !d.trim())) return null;
 
-  const firstLine = docs[0].replace(/^#+\s*/, "").trim();
-  const hasMore = docs.length > 1 || docs[0].length > 200;
+  const firstLine = (docs[0] ?? "").replace(/^#+\s*/, "").trim();
+  const hasMore = docs.length > 1 || (docs[0] ?? "").length > 200;
   const fullText = docs.join("\n").trim();
 
   return (
