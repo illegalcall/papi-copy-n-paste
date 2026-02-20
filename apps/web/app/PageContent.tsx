@@ -19,6 +19,7 @@ import { useEventSelection } from "../hooks/useEventSelection";
 import { useTransactionQueue } from "../hooks/useTransactionQueue";
 import { useCodeGeneration } from "../hooks/useCodeGeneration";
 import { useExecution } from "../hooks/useExecution";
+import { useSessionExport } from "../hooks/useSessionExport";
 import { useDebounce } from "../hooks/useDebounce";
 import { useGlobalSearch } from "../hooks/useGlobalSearch";
 import { useWallet } from "../hooks/useWallet";
@@ -176,6 +177,8 @@ export default function PageContent() {
     setLeftPaneOpen,
     setActiveTab,
   } = useExecution();
+
+  const { addEntry, exportSession, clearSession, entryCount } = useSessionExport();
 
   // Refs for left pane to enable global search functionality
   const leftPaneRef = useRef<LeftPaneRef>(null);
@@ -1031,6 +1034,8 @@ export default function PageContent() {
             onEventSelect={wrappedHandleEventSelect}
             isLoading={isLoadingMetadata}
             error={metadataError}
+            selectedChain={selectedChain}
+            onPalletExport={addEntry}
           />
         </div>
 
@@ -1104,6 +1109,8 @@ export default function PageContent() {
               }}
               isLoading={isLoadingMetadata}
               error={metadataError}
+              selectedChain={selectedChain}
+              onPalletExport={addEntry}
             />
           </SheetContent>
         </Sheet>
@@ -1154,6 +1161,19 @@ export default function PageContent() {
             selectedChain={selectedChain}
             transactionHistory={transactionHistory}
             onClearTransactionHistory={clearTransactionHistory}
+            selectedCall={selectedCall}
+            selectedStorage={selectedStorage}
+            selectedConstant={selectedConstant}
+            selectedEvent={selectedEvent}
+            selectedError={selectedError}
+            storageQueryType={storageQueryType}
+            storageParams={storageParams}
+            formData={formData}
+            methodQueue={methodQueue}
+            storageQueue={storageQueue}
+            onMarkdownExported={addEntry}
+            sessionEntryCount={entryCount}
+            onExportSession={exportSession}
           />
         </div>
       </div>
