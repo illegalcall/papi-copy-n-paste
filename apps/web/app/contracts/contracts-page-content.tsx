@@ -21,6 +21,8 @@ import { MethodForm } from "./components/method-form";
 import { ResultPanel } from "./components/result-panel";
 import { EventMonitor, type ContractEventLog } from "./components/event-monitor";
 import { DeployForm } from "./components/deploy-form";
+import { ExampleContracts } from "./components/example-contracts";
+import type { ExampleContract } from "./data/example-contracts";
 
 import {
   parseInkMetadata,
@@ -158,21 +160,25 @@ export default function ContractsPageContent() {
     setUploadError(null);
 
     try {
-      if (!metadataFile) {
-        setUploadError("Please upload contract metadata/ABI first");
-        setIsLoadingContract(false);
-        return;
-      }
-
       let contract: LoadedContract;
       let metadata: InkMetadata | EvmAbi;
 
-      if (contractType === "ink") {
-        metadata = await parseInkMetadata(metadataFile);
-        contract = createLoadedContract("ink", contractAddress, selectedChain, metadata);
+      if (rawMetadata) {
+        // Metadata already loaded (e.g. from an example) — just update the address
+        metadata = rawMetadata;
+        contract = createLoadedContract(contractType, contractAddress, selectedChain, metadata);
+      } else if (metadataFile) {
+        if (contractType === "ink") {
+          metadata = await parseInkMetadata(metadataFile);
+          contract = createLoadedContract("ink", contractAddress, selectedChain, metadata);
+        } else {
+          metadata = await parseEvmAbi(metadataFile);
+          contract = createLoadedContract("evm", contractAddress, selectedChain, metadata);
+        }
       } else {
-        metadata = await parseEvmAbi(metadataFile);
-        contract = createLoadedContract("evm", contractAddress, selectedChain, metadata);
+        setUploadError("Please upload contract metadata/ABI first, or select an example below.");
+        setIsLoadingContract(false);
+        return;
       }
 
       setLoadedContract(contract);
@@ -188,7 +194,36 @@ export default function ContractsPageContent() {
     } finally {
       setIsLoadingContract(false);
     }
-  }, [contractAddress, contractType, selectedChain, metadataFile]);
+  }, [contractAddress, contractType, selectedChain, metadataFile, rawMetadata]);
+
+  const handleLoadExample = useCallback(
+    (example: ExampleContract) => {
+      // Set contract type and chain
+      setContractType(example.contractType);
+      setSelectedChain(example.chainKey);
+      setContractAddress(example.address);
+      setUploadError(null);
+      setMetadataFile(null);
+
+      // Load the contract directly from the example metadata
+      const contract = createLoadedContract(
+        example.contractType,
+        example.address,
+        example.chainKey,
+        example.metadata,
+      );
+      setLoadedContract(contract);
+      setRawMetadata(example.metadata);
+      setSelectedMethod(null);
+      setLastResult(null);
+
+      const chain = findContractChain(example.chainKey);
+      if (chain) {
+        setGeneratedCode(generateContractExample(contract.type, chain.ws));
+      }
+    },
+    [],
+  );
 
   const handleMethodSelect = useCallback(
     (method: UnifiedMethod) => {
@@ -459,21 +494,32 @@ export default function ContractsPageContent() {
                   isRunning={isRunning}
                   error={interactionError}
                 />
-              ) : (
+              ) : loadedContract ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
                     <FileCode className="h-12 w-12 mx-auto mb-3 text-muted-foreground/30" />
                     <p className="text-sm text-muted-foreground">
-                      {loadedContract
-                        ? "Select a method from the left panel"
-                        : "Load a contract to get started"}
+                      Select a method from the left panel
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {loadedContract
-                        ? `${loadedContract.methods.length} methods available`
-                        : "Upload metadata and enter a contract address"}
+                      {loadedContract.methods.length} methods available
                     </p>
                   </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full gap-8 max-w-2xl mx-auto px-4">
+                  <div className="text-center space-y-2">
+                    <h2 className="text-lg font-semibold">
+                      Explore Smart Contracts
+                    </h2>
+                    <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                      Pick a contract below to visualize its methods, or upload your own metadata file above.
+                    </p>
+                  </div>
+                  <ExampleContracts
+                    contractType={contractType}
+                    onSelectExample={handleLoadExample}
+                  />
                 </div>
               )}
             </div>
