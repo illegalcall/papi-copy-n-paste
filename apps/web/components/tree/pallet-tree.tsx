@@ -231,24 +231,24 @@ export const PalletTree = memo(function PalletTree({
             <div className="flex items-center">
               <Button
                 variant="ghost"
-                className="flex-1 justify-start h-8 px-2 font-normal"
+                className="flex-1 justify-start h-7 px-1.5 font-normal text-sm"
                 onClick={() => togglePallet(pallet.name)}
               >
                 {isExpanded ? (
-                  <ChevronDown className="w-4 h-4 mr-1" />
+                  <ChevronDown className="w-3.5 h-3.5 mr-1 shrink-0" />
                 ) : (
-                  <ChevronRight className="w-4 h-4 mr-1" />
+                  <ChevronRight className="w-3.5 h-3.5 mr-1 shrink-0" />
                 )}
-                <Package className="w-4 h-4 mr-2" />
-                <span className="truncate">
+                <Package className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+                <span className="truncate text-xs">
                   {highlightMatch(pallet.name, searchQuery)}
                 </span>
-                <span className="ml-auto text-xs text-muted-foreground">
+                <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">
                   {totalItems}
                 </span>
               </Button>
               {selectedChain && (
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                   <ExportMarkdownButton
                     getMarkdown={() => exportPallet(selectedChain, pallet)}
                     onExported={onPalletExport}

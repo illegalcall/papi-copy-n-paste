@@ -984,7 +984,7 @@ export default function PageContent() {
         </div>
 
         {/* Left pane - always visible on desktop, sheet on mobile */}
-        <div className="hidden lg:block lg:w-[25%] lg:flex-shrink-0">
+        <div className="hidden lg:block lg:w-[18%] lg:flex-shrink-0">
           <LeftPane
             ref={leftPaneRef}
             isOpen={true}
@@ -1116,7 +1116,7 @@ export default function PageContent() {
         </Sheet>
 
         {/* Center pane */}
-        <div className="w-full lg:w-[25%] lg:flex-shrink-0 h-full">
+        <div className="w-full lg:w-[30%] lg:flex-shrink-0 h-full">
           <CenterPane
             chainStatus={chainStatus}
             selectedChain={selectedChain}
@@ -1152,7 +1152,7 @@ export default function PageContent() {
         </div>
 
         {/* Right pane */}
-        <div className="w-full lg:w-[50%] lg:flex-shrink-0">
+        <div className="w-full lg:w-[52%] lg:flex-shrink-0">
           <RightPane
             code={code}
             consoleOutput={consoleOutput}

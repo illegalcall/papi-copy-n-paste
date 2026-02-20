@@ -33,13 +33,13 @@ export function ExportMarkdownButton({
   return (
     <>
       <Button
-        variant="outline"
-        size="sm"
+        variant="ghost"
+        size="icon"
+        className="h-6 w-6"
         onClick={handleClick}
         title={label}
       >
-        <FileText className="w-3 h-3 mr-1" />
-        Markdown
+        <FileText className="w-3 h-3" />
       </Button>
       <Toast
         message="Markdown copied to clipboard!"

@@ -63,22 +63,22 @@ export const LeftPane = forwardRef<LeftPaneRef, LeftPaneProps>(({
 
   return (
     <div className="w-full h-full bg-muted/40 border-r flex flex-col">
-      <div className="p-4 border-b shrink-0">
+      <div className="px-2 py-2 border-b shrink-0">
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             ref={searchInputRef}
-            placeholder="Search pallets, methods, args... (⌘K)"
+            placeholder="Search pallets... (⌘K)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8"
+            className="pl-8 h-8 text-xs"
           />
         </div>
       </div>
 
-      {/* Scrollable content area - uses native CSS scrolling with overscroll containment */}
-      <div className="flex-1 min-h-0 max-h-[calc(100vh-120px)] overflow-y-auto overscroll-contain">
-        <div className="p-4">
+      {/* Scrollable content area - thin scrollbar */}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollbar-thin">
+        <div className="px-1 py-1">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center space-y-2 py-8">
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>

@@ -468,7 +468,7 @@ export const RightPane = memo(function RightPane({
 
         <TabsContent
           value="setup"
-          className="flex-1 p-4 m-0 h-0 max-h-full overflow-auto"
+          className="flex-1 p-4 m-0 h-0 max-h-full overflow-auto scrollbar-thin"
         >
           <Card className="h-full flex flex-col max-h-full">
             <CardHeader className="pb-3">
@@ -481,7 +481,7 @@ export const RightPane = memo(function RightPane({
                 </CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="p-4 flex-1 overflow-auto">
+            <CardContent className="p-4 flex-1 overflow-auto scrollbar-thin">
               {selectedChain ? (
                 <div className="space-y-6">
                   <div className="space-y-3">
@@ -619,7 +619,7 @@ export const RightPane = memo(function RightPane({
               </div>
             </CardHeader>
             <CardContent className="p-0 flex-1 flex flex-col">
-              <div className="overflow-auto p-4 bg-muted rounded-md h-[calc(100vh-20rem)]">
+              <div className="overflow-auto scrollbar-thin p-4 bg-muted rounded-md h-[calc(100vh-20rem)]">
                 <SyntaxHighlighter
                   code={code}
                   language="typescript"
@@ -675,7 +675,7 @@ export const RightPane = memo(function RightPane({
               )}
             </CardHeader>
             <CardContent className="p-0 flex-1 flex flex-col">
-              <div className="overflow-auto p-4 pr-6 font-mono text-xs space-y-1 h-[calc(100vh-20rem)]">
+              <div className="overflow-auto scrollbar-thin p-4 pr-6 font-mono text-xs space-y-1 h-[calc(100vh-20rem)]">
                 {consoleOutput.length === 0 ? (
                   <div className="text-muted-foreground">No output yet...</div>
                 ) : (
