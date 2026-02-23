@@ -47,21 +47,21 @@ export function useContractConnection(
   const inkClientRef = useRef<InkContractClient | null>(null);
   const evmClientRef = useRef<EvmContractClient | null>(null);
 
-  const disconnect = useCallback(() => {
-    if (clientRef.current) {
-      clientRef.current.destroy();
-      clientRef.current = null;
-    }
-    inkClientRef.current = null;
-    evmClientRef.current = null;
-    setIsConnected(false);
-    setError(null);
-  }, []);
-
-  // Connect when chain/address/metadata change
+  // Single effect: connect when params are present, disconnect + cleanup on
+  // dependency change or unmount.  Merging into one effect avoids a race where
+  // a separate unmount-cleanup effect calls disconnect() and clears refs
+  // *after* the connection effect has already set them (React 18 Strict Mode).
   useEffect(() => {
     if (!contractType || !chainKey || !contractAddress || !rawMetadata) {
-      disconnect();
+      // Params incomplete — tear down any existing connection
+      if (clientRef.current) {
+        clientRef.current.destroy();
+        clientRef.current = null;
+      }
+      inkClientRef.current = null;
+      evmClientRef.current = null;
+      setIsConnected(false);
+      setError(null);
       return;
     }
 
@@ -75,61 +75,73 @@ export function useContractConnection(
     setIsConnecting(true);
     setError(null);
 
-    const connect = async () => {
-      try {
-        // Disconnect previous
-        if (clientRef.current) {
-          clientRef.current.destroy();
-        }
+    // Tear down previous connection before creating a new one
+    if (clientRef.current) {
+      clientRef.current.destroy();
+      clientRef.current = null;
+    }
+    inkClientRef.current = null;
+    evmClientRef.current = null;
 
-        const provider = getWsProvider(chain.ws);
-        const client = createClient(provider);
-        clientRef.current = client;
+    try {
+      const provider = getWsProvider(chain.ws);
+      const client = createClient(provider);
+      clientRef.current = client;
 
-        // Get a generic typed API (no descriptor needed for contract calls)
-        const typedApi = client.getUnsafeApi();
+      // Get a generic typed API (no descriptor needed for contract calls)
+      const typedApi = client.getUnsafeApi();
 
-        if (cancelled) return;
+      if (contractType === "ink") {
+        inkClientRef.current = new InkContractClient(
+          typedApi as any,
+          contractAddress,
+          rawMetadata as InkMetadata,
+        );
+        evmClientRef.current = null;
+      } else {
+        evmClientRef.current = new EvmContractClient(
+          typedApi as any,
+          contractAddress,
+          rawMetadata as EvmAbi,
+        );
+        inkClientRef.current = null;
+      }
 
-        if (contractType === "ink") {
-          inkClientRef.current = new InkContractClient(
-            typedApi as any,
-            contractAddress,
-            rawMetadata as InkMetadata,
-          );
-          evmClientRef.current = null;
-        } else {
-          evmClientRef.current = new EvmContractClient(
-            typedApi as any,
-            contractAddress,
-            rawMetadata as EvmAbi,
-          );
-          inkClientRef.current = null;
-        }
-
+      if (!cancelled) {
         setIsConnected(true);
         setIsConnecting(false);
-      } catch (err) {
-        if (!cancelled) {
-          setError(err instanceof Error ? err.message : String(err));
-          setIsConnecting(false);
-        }
       }
-    };
-
-    connect();
+    } catch (err) {
+      if (!cancelled) {
+        setError(err instanceof Error ? err.message : String(err));
+        setIsConnecting(false);
+      }
+    }
 
     return () => {
       cancelled = true;
+      // Full cleanup: destroy client and clear refs so a Strict Mode
+      // remount starts from a clean slate.
+      if (clientRef.current) {
+        clientRef.current.destroy();
+        clientRef.current = null;
+      }
+      inkClientRef.current = null;
+      evmClientRef.current = null;
+      setIsConnected(false);
     };
-  }, [contractType, chainKey, contractAddress, rawMetadata, disconnect]);
+  }, [contractType, chainKey, contractAddress, rawMetadata]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      disconnect();
-    };
-  }, [disconnect]);
+  const disconnect = useCallback(() => {
+    if (clientRef.current) {
+      clientRef.current.destroy();
+      clientRef.current = null;
+    }
+    inkClientRef.current = null;
+    evmClientRef.current = null;
+    setIsConnected(false);
+    setError(null);
+  }, []);
 
   const queryContract = useCallback(
     async (
@@ -157,8 +169,6 @@ export function useContractConnection(
       args: unknown[],
       options?: { value?: bigint },
     ): Promise<ContractCallResult> => {
-      // For execute, we return a message since signing requires wallet integration
-      // The actual tx object is built but needs a signer
       try {
         if (inkClientRef.current) {
           const tx = inkClientRef.current.execute(methodName, args, options);
