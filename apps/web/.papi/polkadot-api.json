@@ -19,6 +19,12 @@
       "metadata": ".papi/metadata/polkadot_people.scale",
       "genesis": "0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008",
       "codeHash": "0xd7c36a7e033a490726c28d29ff83c192001ba8ade2e39d04940354cf15245a10"
+    },
+    "bifrost": {
+      "wsUrl": "wss://hk.p.bifrost-rpc.liebi.com/ws",
+      "metadata": ".papi/metadata/bifrost.scale",
+      "genesis": "0x262e1b2ad728475fd6fe88e62d34c200abe6fd693931ddad144059b1eb884e5b",
+      "codeHash": "0x5fe740de6babeb53d9ce665c4a2bdc942ca51be4aaa3d8882d2cf00cecaf2b3d"
     }
   }
 }
