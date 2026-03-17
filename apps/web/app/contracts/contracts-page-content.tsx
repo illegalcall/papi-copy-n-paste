@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 import {
   Moon,
@@ -12,6 +13,7 @@ import {
   BookOpen,
   FileCode,
   ArrowLeft,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -22,6 +24,7 @@ import { ResultPanel } from "./components/result-panel";
 import { EventMonitor, type ContractEventLog } from "./components/event-monitor";
 import { DeployForm } from "./components/deploy-form";
 import { ExampleContracts } from "./components/example-contracts";
+import { ContractsErrorBoundary } from "./components/error-boundary";
 import type { ExampleContract } from "./data/example-contracts";
 
 import {
@@ -34,6 +37,7 @@ import { generateContractCode, generateContractExample } from "@/utils/contractC
 import { getDefaultTestnet, findContractChain } from "@workspace/core/contracts/chains";
 import { MAX_METADATA_FILE_SIZE, isValidEvmAddress, isValidSs58Address } from "@workspace/core/contracts/utils";
 import { useContractConnection } from "@/hooks/useContractConnection";
+import { useWallet } from "@/hooks/useWallet";
 import type {
   ContractType,
   LoadedContract,
@@ -43,8 +47,9 @@ import type {
   EvmAbi,
 } from "@workspace/core/contracts/types";
 
-export default function ContractsPageContent() {
+function ContractsPageContentInner() {
   const { theme, setTheme } = useTheme();
+  const { getSigner, isConnected: isWalletConnected } = useWallet();
 
   // ── Contract Selection State ──
   const [contractType, setContractType] = useState<ContractType>("ink");
@@ -68,6 +73,8 @@ export default function ContractsPageContent() {
     error: connectionError,
     queryContract,
     executeContract,
+    subscribeEvents,
+    deployContract,
   } = useContractConnection(
     loadedContract ? loadedContract.type : null,
     loadedContract ? loadedContract.chainKey : null,
@@ -85,8 +92,41 @@ export default function ContractsPageContent() {
   const [eventLogs, setEventLogs] = useState<ContractEventLog[]>([]);
   const [isMonitoring, setIsMonitoring] = useState(false);
 
+  // ── Deploy State ──
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [deployError, setDeployError] = useState<string | null>(null);
+  const [deployedAddress, setDeployedAddress] = useState<string | null>(null);
+
   // ── Active Tab ──
   const [activeTab, setActiveTab] = useState<"interact" | "deploy">("interact");
+
+  // ── Event Subscription (with cleanup on unmount / dep change) ──
+  useEffect(() => {
+    if (!isMonitoring || !isConnected || !loadedContract) {
+      return;
+    }
+    const unsubscribe = subscribeEvents((event) => {
+      setEventLogs((prev) => [
+        {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          name: event.name,
+          args: event.args,
+          blockNumber: event.blockNumber,
+          timestamp: Date.now(),
+        },
+        ...prev,
+      ].slice(0, 100));
+    });
+    // Cleanup MUST run on unmount, contract switch, chain switch, or pause.
+    return () => {
+      unsubscribe();
+    };
+  }, [
+    isMonitoring,
+    isConnected,
+    loadedContract,
+    subscribeEvents,
+  ]);
 
   // ── Handlers ──
 
@@ -315,37 +355,93 @@ export default function ContractsPageContent() {
   );
 
   const handleDeploy = useCallback(
-    (
+    async (
       constructorName: string,
       args: Record<string, string>,
       codeHash: string,
       value?: bigint,
     ) => {
-      const chain = findContractChain(loadedContract?.chainKey ?? "");
-      if (chain && loadedContract) {
-        const deployMethod = loadedContract.constructors.find(
-          (c) => c.name === constructorName,
+      setDeployError(null);
+      setDeployedAddress(null);
+
+      if (!loadedContract) {
+        setDeployError("Load a contract first.");
+        return;
+      }
+      const chain = findContractChain(loadedContract.chainKey);
+      const deployMethod = loadedContract.constructors.find(
+        (c) => c.name === constructorName,
+      );
+      if (!chain || !deployMethod) {
+        setDeployError(`Constructor "${constructorName}" not found.`);
+        return;
+      }
+
+      // Always refresh the code snippet so users can copy a working example
+      // even when no wallet is connected.
+      const code = generateContractCode({
+        chainKey: loadedContract.chainKey,
+        chainWs: chain.ws,
+        contractAddress: codeHash || "0x...",
+        contractType: loadedContract.type,
+        methodName: constructorName,
+        method: deployMethod,
+        args,
+      });
+      setGeneratedCode(code);
+
+      if (!isWalletConnected) {
+        setDeployError(
+          "Connect a wallet to submit the deployment, or copy the generated code and run it locally.",
         );
-        if (deployMethod) {
-          const code = generateContractCode({
-            chainKey: loadedContract.chainKey,
-            chainWs: chain.ws,
-            contractAddress: codeHash || "0x...",
-            contractType: loadedContract.type,
-            methodName: constructorName,
-            method: deployMethod,
-            args,
-          });
-          setGeneratedCode(code);
-          setLastResult({
-            success: true,
-            decodedValue:
-              `Deployment code generated for constructor "${constructorName}".\nCopy the code from the right panel and run it with a wallet signer.`,
-          });
+        return;
+      }
+
+      setIsDeploying(true);
+      try {
+        const signer = await getSigner();
+        if (!signer) {
+          setDeployError("Wallet did not return a signer for the active account.");
+          return;
         }
+
+        // Marshal string args to primitive values in constructor order
+        const orderedArgs = deployMethod.args.map((a) => args[a.name] ?? "");
+
+        const result = await deployContract({
+          constructorName,
+          args: orderedArgs,
+          codeHashOrWasm: codeHash,
+          signer,
+          value,
+        });
+
+        if (!result.success) {
+          setDeployError(result.error ?? "Deployment failed");
+          setLastResult({
+            success: false,
+            error: result.error ?? "Deployment failed",
+          });
+          return;
+        }
+
+        setDeployedAddress(result.address ?? null);
+        setLastResult({
+          success: true,
+          decodedValue: result.address
+            ? `Contract deployed at ${result.address}`
+            : "Contract deployed successfully (address unavailable in result events).",
+        });
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : String(err);
+        setDeployError(message);
+        setLastResult({ success: false, error: message });
+      } finally {
+        setIsDeploying(false);
       }
     },
-    [loadedContract],
+    [loadedContract, deployContract, getSigner, isWalletConnected],
   );
 
   const handleCopyCode = useCallback(() => {
@@ -353,7 +449,9 @@ export default function ContractsPageContent() {
   }, [generatedCode]);
 
   const handleToggleMonitoring = useCallback(() => {
-    // TODO: Implement event subscription via contract client
+    // Actual subscription + cleanup lives in the useEffect above. This
+    // handler just flips the flag; the effect reacts to the change and
+    // subscribes / unsubscribes accordingly.
     setIsMonitoring((prev) => !prev);
   }, []);
 
@@ -444,6 +542,67 @@ export default function ContractsPageContent() {
         contractName={loadedContract?.name}
       />
 
+      {/* Error banners */}
+      {(connectionError || interactionError || uploadError) && (
+        <div className="px-4 pt-2 space-y-2 shrink-0">
+          {uploadError && (
+            <Alert
+              role="alert"
+              className="border-destructive text-destructive py-2"
+            >
+              <AlertDescription className="text-xs flex items-center justify-between gap-2">
+                <span>
+                  <strong className="font-semibold">Upload error:</strong>{" "}
+                  {uploadError}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => setUploadError(null)}
+                  aria-label="Dismiss upload error"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+          {connectionError && (
+            <Alert
+              role="alert"
+              className="border-destructive text-destructive py-2"
+            >
+              <AlertDescription className="text-xs">
+                <strong className="font-semibold">Connection error:</strong>{" "}
+                {connectionError}
+              </AlertDescription>
+            </Alert>
+          )}
+          {interactionError && (
+            <Alert
+              role="alert"
+              className="border-destructive text-destructive py-2"
+            >
+              <AlertDescription className="text-xs flex items-center justify-between gap-2">
+                <span>
+                  <strong className="font-semibold">Interaction error:</strong>{" "}
+                  {interactionError}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => setInteractionError(null)}
+                  aria-label="Dismiss interaction error"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Method List */}
@@ -476,6 +635,9 @@ export default function ContractsPageContent() {
               <DeployForm
                 constructors={loadedContract?.constructors ?? []}
                 onDeploy={handleDeploy}
+                isDeploying={isDeploying}
+                error={deployError}
+                deployedAddress={deployedAddress}
               />
             </TabsContent>
           </Tabs>
@@ -544,5 +706,13 @@ export default function ContractsPageContent() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ContractsPageContent() {
+  return (
+    <ContractsErrorBoundary>
+      <ContractsPageContentInner />
+    </ContractsErrorBoundary>
   );
 }

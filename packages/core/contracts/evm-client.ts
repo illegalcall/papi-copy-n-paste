@@ -293,4 +293,59 @@ export class EvmContractClient {
       )
       .map((item) => item.name!);
   }
+
+  /**
+   * Subscribe to EVM contract events by watching System.Events on the chain
+   * and filtering Ethereum.Log records whose address matches this contract.
+   *
+   * Returns an unsubscribe function. Callers MUST invoke it on unmount / dep
+   * change to avoid a subscription leak.
+   */
+  subscribeEvents(
+    callback: (event: {
+      name: string;
+      args: Record<string, unknown>;
+      blockNumber?: string;
+    }) => void,
+  ): () => void {
+    let disposed = false;
+    let inner: { unsubscribe: () => void } | null = null;
+    const target = this.address.toLowerCase();
+
+    try {
+      const watch =
+        (this.api as any)?.query?.System?.Events?.watchValue?.("best") ?? null;
+      if (watch && typeof watch.subscribe === "function") {
+        inner = watch.subscribe((records: any) => {
+          if (disposed || !Array.isArray(records)) return;
+          for (const record of records) {
+            const ev = record?.event ?? record;
+            const isEvmLog =
+              ev?.type === "EVM" || ev?.section === "evm" || ev?.type === "Ethereum";
+            if (!isEvmLog) continue;
+            const logAddress =
+              ev?.value?.value?.address ?? ev?.data?.address ?? null;
+            if (logAddress && String(logAddress).toLowerCase() !== target) continue;
+            callback({
+              name: ev?.value?.type ?? "Log",
+              args: (ev?.value?.value ?? {}) as Record<string, unknown>,
+              blockNumber: record?.blockNumber?.toString?.(),
+            });
+          }
+        });
+      }
+    } catch {
+      inner = null;
+    }
+
+    return () => {
+      disposed = true;
+      try {
+        inner?.unsubscribe();
+      } catch {
+        // swallow — cleanup must never throw
+      }
+      inner = null;
+    };
+  }
 }

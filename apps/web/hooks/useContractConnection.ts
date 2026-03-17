@@ -9,12 +9,23 @@ import { getWsProvider } from "polkadot-api/ws-provider/web";
 import { findContractChain } from "@workspace/core/contracts/chains";
 import { InkContractClient } from "@workspace/core/contracts/ink-client";
 import { EvmContractClient } from "@workspace/core/contracts/evm-client";
+import {
+  deployInkContract,
+  deployEvmContract,
+  type DeployResult,
+} from "@workspace/core/contracts/deploy";
 import type {
   ContractType,
   InkMetadata,
   EvmAbi,
   ContractCallResult,
 } from "@workspace/core/contracts/types";
+
+export interface ContractEventPayload {
+  name: string;
+  args: Record<string, unknown>;
+  blockNumber?: string;
+}
 
 interface ContractConnection {
   isConnected: boolean;
@@ -30,6 +41,19 @@ interface ContractConnection {
     args: unknown[],
     options?: { value?: bigint },
   ) => Promise<ContractCallResult>;
+  subscribeEvents: (
+    onEvent: (event: ContractEventPayload) => void,
+  ) => () => void;
+  deployContract: (params: {
+    constructorName: string;
+    args: unknown[];
+    codeHashOrWasm: string | Uint8Array;
+    signer: unknown;
+    value?: bigint;
+    gasLimit?: bigint;
+    salt?: Uint8Array;
+    bytecode?: string;
+  }) => Promise<DeployResult>;
   disconnect: () => void;
 }
 
@@ -46,6 +70,9 @@ export function useContractConnection(
   const clientRef = useRef<ReturnType<typeof createClient> | null>(null);
   const inkClientRef = useRef<InkContractClient | null>(null);
   const evmClientRef = useRef<EvmContractClient | null>(null);
+  const typedApiRef = useRef<any>(null);
+  const rawMetadataRef = useRef<InkMetadata | EvmAbi | null>(null);
+  const contractTypeRef = useRef<ContractType | null>(null);
 
   // Single effect: connect when params are present, disconnect + cleanup on
   // dependency change or unmount.  Merging into one effect avoids a race where
@@ -90,6 +117,9 @@ export function useContractConnection(
 
       // Get a generic typed API (no descriptor needed for contract calls)
       const typedApi = client.getUnsafeApi();
+      typedApiRef.current = typedApi;
+      rawMetadataRef.current = rawMetadata;
+      contractTypeRef.current = contractType;
 
       if (contractType === "ink") {
         inkClientRef.current = new InkContractClient(
@@ -128,6 +158,9 @@ export function useContractConnection(
       }
       inkClientRef.current = null;
       evmClientRef.current = null;
+      typedApiRef.current = null;
+      rawMetadataRef.current = null;
+      contractTypeRef.current = null;
       setIsConnected(false);
     };
   }, [contractType, chainKey, contractAddress, rawMetadata]);
@@ -202,12 +235,82 @@ export function useContractConnection(
     [],
   );
 
+  const deployContract = useCallback(
+    async (params: {
+      constructorName: string;
+      args: unknown[];
+      codeHashOrWasm: string | Uint8Array;
+      signer: unknown;
+      value?: bigint;
+      gasLimit?: bigint;
+      salt?: Uint8Array;
+      bytecode?: string;
+    }): Promise<DeployResult> => {
+      if (!typedApiRef.current || !rawMetadataRef.current) {
+        return {
+          success: false,
+          error: "No active contract connection. Load a contract first.",
+        };
+      }
+      if (contractTypeRef.current === "ink") {
+        return deployInkContract({
+          api: typedApiRef.current,
+          metadata: rawMetadataRef.current as InkMetadata,
+          constructorName: params.constructorName,
+          args: params.args,
+          codeHashOrWasm: params.codeHashOrWasm,
+          signer: params.signer,
+          options: {
+            value: params.value,
+            gasLimit: params.gasLimit,
+            salt: params.salt,
+          },
+        });
+      }
+      if (contractTypeRef.current === "evm") {
+        return deployEvmContract({
+          api: typedApiRef.current,
+          abi: rawMetadataRef.current as EvmAbi,
+          bytecode: params.bytecode ?? "",
+          args: params.args,
+          signer: params.signer,
+          options: {
+            value: params.value,
+            gasLimit: params.gasLimit,
+          },
+        });
+      }
+      return {
+        success: false,
+        error: "Unknown contract type",
+      };
+    },
+    [],
+  );
+
+  const subscribeEvents = useCallback(
+    (onEvent: (event: ContractEventPayload) => void): (() => void) => {
+      if (inkClientRef.current) {
+        return inkClientRef.current.subscribeEvents(onEvent);
+      }
+      if (evmClientRef.current) {
+        return evmClientRef.current.subscribeEvents(onEvent);
+      }
+      // No client connected — return a no-op cleanup so callers can always
+      // invoke it unconditionally from a useEffect cleanup.
+      return () => {};
+    },
+    [],
+  );
+
   return {
     isConnected,
     isConnecting,
     error,
     queryContract,
     executeContract,
+    subscribeEvents,
+    deployContract,
     disconnect,
   };
 }

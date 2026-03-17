@@ -378,4 +378,61 @@ export class InkContractClient {
       .filter((m) => m.mutates)
       .map((m) => m.label);
   }
+
+  /**
+   * Subscribe to contract events by watching System.Events on the chain and
+   * filtering records that belong to this contract (Contracts.ContractEmitted).
+   *
+   * Returns an unsubscribe function. Callers MUST invoke it on unmount / dep
+   * change to avoid a subscription leak.
+   */
+  subscribeEvents(
+    callback: (event: {
+      name: string;
+      args: Record<string, unknown>;
+      blockNumber?: string;
+    }) => void,
+  ): () => void {
+    let disposed = false;
+    let inner: { unsubscribe: () => void } | null = null;
+
+    try {
+      const watch =
+        (this.api as any)?.query?.System?.Events?.watchValue?.("best") ?? null;
+      if (watch && typeof watch.subscribe === "function") {
+        inner = watch.subscribe((records: any) => {
+          if (disposed || !Array.isArray(records)) return;
+          for (const record of records) {
+            const ev = record?.event ?? record;
+            // Filter for events emitted by this contract address
+            const isContractEmitted =
+              (ev?.type === "Contracts" && ev?.value?.type === "ContractEmitted") ||
+              ev?.section === "contracts";
+            if (!isContractEmitted) continue;
+            const contract =
+              ev?.value?.value?.contract ?? ev?.data?.contract ?? null;
+            if (contract && String(contract) !== this.address) continue;
+            callback({
+              name: ev?.value?.type ?? "ContractEmitted",
+              args: (ev?.value?.value ?? {}) as Record<string, unknown>,
+              blockNumber: record?.blockNumber?.toString?.(),
+            });
+          }
+        });
+      }
+    } catch {
+      // Subscription failed — caller still gets a no-op unsubscribe
+      inner = null;
+    }
+
+    return () => {
+      disposed = true;
+      try {
+        inner?.unsubscribe();
+      } catch {
+        // swallow — cleanup must never throw
+      }
+      inner = null;
+    };
+  }
 }
