@@ -9,7 +9,6 @@ import type { StorageParams } from "../types/forms";
 import { getStorageParameterInfo } from "./dynamicStorageDetection";
 import {
   generateStorageParamValues,
-  decodeStorageResult,
   generateCallParamValues,
 } from "./formatting-utils";
 import { getAllCallParameters } from "./callParameterDetection";
@@ -452,10 +451,11 @@ async function executeRawStorageQuery(
         case 'getValueAt':
           await executeGetValueAt(
             client,
-            undefined,
             palletName,
             storageName,
+            chainKey,
             logger,
+            storageParams,
           );
           break;
         case StorageQueryType.WATCH_VALUE:
@@ -598,49 +598,64 @@ async function executeRawGetValue(
   }
 }
 
-// Get value at specific blocks
+// Get value at finalized and best blocks using PAPI typed API
 async function executeGetValueAt(
   client: any,
-  storageKey: string | undefined,
   palletName: string,
   storageName: string,
+  chainKey: string,
   logger: any,
+  storageParams: StorageParams = {},
 ) {
   try {
-    if (!storageKey) {
-      logger.warning(`Storage key lookup not implemented for ${palletName}.${storageName}`);
+    const descriptorName = getDescriptorName(chainKey);
+    if (!descriptorName) {
+      logger.error(`Chain '${chainKey}' not supported for typed queries`);
       return;
     }
 
+    const descriptor = getDescriptorForChain(chainKey);
+    const typedApi = client.getTypedApi(descriptor);
+    const palletQueries = typedApi.query[palletName];
+
+    if (!palletQueries || !palletQueries[storageName]) {
+      logger.error(`Storage ${palletName}.${storageName} not found`);
+      return;
+    }
+
+    const storageFunction = palletQueries[storageName];
+    const paramInfo = getStorageParameters(chainKey, palletName, storageName);
+    const allParams = [...paramInfo.required, ...paramInfo.optional];
+
+    const providedParamKeys = Object.keys(storageParams).filter((key) => {
+      const value = storageParams[key];
+      return value !== undefined && value !== null && value !== '';
+    });
+
+    const paramValues = providedParamKeys.length > 0 && allParams.length > 0
+      ? generateStorageParamValues(storageParams, allParams)
+      : [];
+
     logger.info('Fetching values at finalized and best blocks');
 
-    // Get finalized block hash
-    const finalizedHash = await client._request("chain_getFinalizedHead", []);
-    const finalizedValue = await client._request("state_getStorage", [
-      storageKey,
-      finalizedHash,
-    ]);
+    const queryMethod =
+      typeof storageFunction === 'function'
+        ? storageFunction
+        : storageFunction.getValue || storageFunction.query;
 
-    // Get best block hash
-    const bestHash = await client._request("chain_getHead", []);
-    const bestValue = await client._request("state_getStorage", [
-      storageKey,
-      bestHash,
-    ]);
+    if (typeof queryMethod !== 'function') {
+      throw new Error(`Storage item ${palletName}.${storageName} is not callable`);
+    }
 
-    const decodedFinalized = finalizedValue
-      ? decodeStorageResult(finalizedValue, palletName, storageName)
-      : "null";
-    const decodedBest = bestValue
-      ? decodeStorageResult(bestValue, palletName, storageName)
-      : "null";
+    const finalizedResult = await queryMethod(...paramValues, { at: 'finalized' });
+    const bestResult = await queryMethod(...paramValues, { at: 'best' });
 
-    logger.result('At Finalized Block', decodedFinalized);
-    logger.result('At Best Block', decodedBest);
+    logger.result('At Finalized Block', serializeBigInt(finalizedResult));
+    logger.result('At Best Block', serializeBigInt(bestResult));
     logger.success('Successfully retrieved values at different blocks');
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    logger.error(`Get value at blocks failed: ${errorMessage}`);
+    logger.queryError(palletName, storageName, 'getValueAt', errorMessage);
   }
 }
 
