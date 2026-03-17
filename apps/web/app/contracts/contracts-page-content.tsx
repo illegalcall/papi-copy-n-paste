@@ -22,6 +22,7 @@ import { ResultPanel } from "./components/result-panel";
 import { EventMonitor, type ContractEventLog } from "./components/event-monitor";
 import { DeployForm } from "./components/deploy-form";
 import { ExampleContracts } from "./components/example-contracts";
+import { ContractsErrorBoundary } from "./components/error-boundary";
 import type { ExampleContract } from "./data/example-contracts";
 
 import {
@@ -43,7 +44,7 @@ import type {
   EvmAbi,
 } from "@workspace/core/contracts/types";
 
-export default function ContractsPageContent() {
+function ContractsPageContentInner() {
   const { theme, setTheme } = useTheme();
 
   // ── Contract Selection State ──
@@ -575,5 +576,13 @@ export default function ContractsPageContent() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ContractsPageContent() {
+  return (
+    <ContractsErrorBoundary>
+      <ContractsPageContentInner />
+    </ContractsErrorBoundary>
   );
 }
