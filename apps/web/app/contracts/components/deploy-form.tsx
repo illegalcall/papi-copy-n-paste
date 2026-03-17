@@ -5,7 +5,7 @@ import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Button } from "@workspace/ui/components/button";
 import { Alert, AlertDescription } from "@workspace/ui/components/alert";
-import { Loader2, Rocket } from "lucide-react";
+import { Loader2, Rocket, CheckCircle2 } from "lucide-react";
 import type { UnifiedMethod } from "@workspace/core/contracts/types";
 
 interface DeployFormProps {
@@ -18,6 +18,7 @@ interface DeployFormProps {
   ) => void;
   isDeploying?: boolean;
   error?: string | null;
+  deployedAddress?: string | null;
 }
 
 export const DeployForm = memo(function DeployForm({
@@ -25,6 +26,7 @@ export const DeployForm = memo(function DeployForm({
   onDeploy,
   isDeploying,
   error,
+  deployedAddress,
 }: DeployFormProps) {
   const [selectedConstructor, setSelectedConstructor] = useState(
     constructors[0]?.name ?? "",
@@ -136,8 +138,19 @@ export const DeployForm = memo(function DeployForm({
       )}
 
       {error && (
-        <Alert className="border-destructive text-destructive">
+        <Alert className="border-destructive text-destructive" role="alert">
           <AlertDescription className="text-xs">{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {deployedAddress && (
+        <Alert className="border-green-600 text-green-700" role="status">
+          <AlertDescription className="text-xs flex items-start gap-2">
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+            <span>
+              Deployed at <code className="font-mono break-all">{deployedAddress}</code>
+            </span>
+          </AlertDescription>
         </Alert>
       )}
 

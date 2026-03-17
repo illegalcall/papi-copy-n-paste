@@ -37,6 +37,7 @@ import { generateContractCode, generateContractExample } from "@/utils/contractC
 import { getDefaultTestnet, findContractChain } from "@workspace/core/contracts/chains";
 import { MAX_METADATA_FILE_SIZE, isValidEvmAddress, isValidSs58Address } from "@workspace/core/contracts/utils";
 import { useContractConnection } from "@/hooks/useContractConnection";
+import { useWallet } from "@/hooks/useWallet";
 import type {
   ContractType,
   LoadedContract,
@@ -48,6 +49,7 @@ import type {
 
 function ContractsPageContentInner() {
   const { theme, setTheme } = useTheme();
+  const { getSigner, isConnected: isWalletConnected } = useWallet();
 
   // ── Contract Selection State ──
   const [contractType, setContractType] = useState<ContractType>("ink");
@@ -72,6 +74,7 @@ function ContractsPageContentInner() {
     queryContract,
     executeContract,
     subscribeEvents,
+    deployContract,
   } = useContractConnection(
     loadedContract ? loadedContract.type : null,
     loadedContract ? loadedContract.chainKey : null,
@@ -88,6 +91,11 @@ function ContractsPageContentInner() {
   // ── Event State ──
   const [eventLogs, setEventLogs] = useState<ContractEventLog[]>([]);
   const [isMonitoring, setIsMonitoring] = useState(false);
+
+  // ── Deploy State ──
+  const [isDeploying, setIsDeploying] = useState(false);
+  const [deployError, setDeployError] = useState<string | null>(null);
+  const [deployedAddress, setDeployedAddress] = useState<string | null>(null);
 
   // ── Active Tab ──
   const [activeTab, setActiveTab] = useState<"interact" | "deploy">("interact");
@@ -347,37 +355,93 @@ function ContractsPageContentInner() {
   );
 
   const handleDeploy = useCallback(
-    (
+    async (
       constructorName: string,
       args: Record<string, string>,
       codeHash: string,
       value?: bigint,
     ) => {
-      const chain = findContractChain(loadedContract?.chainKey ?? "");
-      if (chain && loadedContract) {
-        const deployMethod = loadedContract.constructors.find(
-          (c) => c.name === constructorName,
+      setDeployError(null);
+      setDeployedAddress(null);
+
+      if (!loadedContract) {
+        setDeployError("Load a contract first.");
+        return;
+      }
+      const chain = findContractChain(loadedContract.chainKey);
+      const deployMethod = loadedContract.constructors.find(
+        (c) => c.name === constructorName,
+      );
+      if (!chain || !deployMethod) {
+        setDeployError(`Constructor "${constructorName}" not found.`);
+        return;
+      }
+
+      // Always refresh the code snippet so users can copy a working example
+      // even when no wallet is connected.
+      const code = generateContractCode({
+        chainKey: loadedContract.chainKey,
+        chainWs: chain.ws,
+        contractAddress: codeHash || "0x...",
+        contractType: loadedContract.type,
+        methodName: constructorName,
+        method: deployMethod,
+        args,
+      });
+      setGeneratedCode(code);
+
+      if (!isWalletConnected) {
+        setDeployError(
+          "Connect a wallet to submit the deployment, or copy the generated code and run it locally.",
         );
-        if (deployMethod) {
-          const code = generateContractCode({
-            chainKey: loadedContract.chainKey,
-            chainWs: chain.ws,
-            contractAddress: codeHash || "0x...",
-            contractType: loadedContract.type,
-            methodName: constructorName,
-            method: deployMethod,
-            args,
-          });
-          setGeneratedCode(code);
-          setLastResult({
-            success: true,
-            decodedValue:
-              `Deployment code generated for constructor "${constructorName}".\nCopy the code from the right panel and run it with a wallet signer.`,
-          });
+        return;
+      }
+
+      setIsDeploying(true);
+      try {
+        const signer = await getSigner();
+        if (!signer) {
+          setDeployError("Wallet did not return a signer for the active account.");
+          return;
         }
+
+        // Marshal string args to primitive values in constructor order
+        const orderedArgs = deployMethod.args.map((a) => args[a.name] ?? "");
+
+        const result = await deployContract({
+          constructorName,
+          args: orderedArgs,
+          codeHashOrWasm: codeHash,
+          signer,
+          value,
+        });
+
+        if (!result.success) {
+          setDeployError(result.error ?? "Deployment failed");
+          setLastResult({
+            success: false,
+            error: result.error ?? "Deployment failed",
+          });
+          return;
+        }
+
+        setDeployedAddress(result.address ?? null);
+        setLastResult({
+          success: true,
+          decodedValue: result.address
+            ? `Contract deployed at ${result.address}`
+            : "Contract deployed successfully (address unavailable in result events).",
+        });
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : String(err);
+        setDeployError(message);
+        setLastResult({ success: false, error: message });
+      } finally {
+        setIsDeploying(false);
       }
     },
-    [loadedContract],
+    [loadedContract, deployContract, getSigner, isWalletConnected],
   );
 
   const handleCopyCode = useCallback(() => {
@@ -571,6 +635,9 @@ function ContractsPageContentInner() {
               <DeployForm
                 constructors={loadedContract?.constructors ?? []}
                 onDeploy={handleDeploy}
+                isDeploying={isDeploying}
+                error={deployError}
+                deployedAddress={deployedAddress}
               />
             </TabsContent>
           </Tabs>
