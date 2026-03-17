@@ -1301,53 +1301,25 @@ export function generateEventCode(
 
     // Generate event listening examples
     const eventListeningExamples = `
-  // Method 1: Listen to all events from this pallet
-  const allPalletEvents$ = typedApi.event.${pallet}.*$
-  allPalletEvents$.subscribe({
-    next: (event) => {
-      if (event.type === '${event.name}') {
-        console.log('Caught ${pallet}.${event.name} event:', event.value)
-        // Handle the event data here
-      }
-    },
-    error: (error) => console.error('Event subscription error:', error)
-  })
-
-  // Method 2: Listen specifically to ${pallet}.${event.name} events
-  const ${event.name.toLowerCase()}Events$ = typedApi.event.${pallet}.${event.name}$
-  ${event.name.toLowerCase()}Events$.subscribe({
-    next: (eventData) => {
-      console.log('${pallet}.${event.name} event received:', eventData)
-      ${event.args && event.args.length > 0
-        ? `
-      // Access event data:
-${event.args.map((arg: any) => `      // eventData.${arg.name} - ${arg.type}`).join('\n')}`
-        : '      // This event has no data'
-      }
-    },
-    error: (error) => console.error('${event.name} event error:', error)
-  })
-
-  // Method 3: Filter events from all pallets (for comprehensive monitoring)
-  const allEvents$ = client.finalizedBlock$.pipe(
-    switchMap(block => block.events$),
-    filter(event => event.pallet === '${pallet}' && event.name === '${event.name}')
-  )
-
-  allEvents$.subscribe({
-    next: (event) => {
-      console.log('Filtered ${pallet}.${event.name} event:', {
-        blockHash: event.blockHash,
-        blockNumber: event.blockNumber,
-        eventData: event.value
-      })
-    }
-  })`;
+  // Subscribe to ${pallet}.${event.name} events
+  const ${event.name.toLowerCase()}Subscription = typedApi.event.${pallet}.${event.name}
+    .watch()
+    .subscribe({
+      next: (eventData) => {
+        console.log('${pallet}.${event.name} event received:', eventData)
+        ${event.args && event.args.length > 0
+          ? `
+        // Access event data:
+${event.args.map((arg: any) => `        // eventData.${arg.name} - ${arg.type}`).join('\n')}`
+          : '        // This event has no data'
+        }
+      },
+      error: (error) => console.error('${event.name} event error:', error),
+    })`;
 
     return `import { createClient } from "polkadot-api"
 ${descriptorImport}
 ${connectionInfo.imports}
-import { switchMap, filter } from 'rxjs'
 
 // Event listening for ${pallet}.${event.name}
 async function listen${pallet}${event.name}Events() {

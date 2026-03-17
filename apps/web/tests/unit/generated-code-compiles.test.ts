@@ -282,10 +282,7 @@ describe("generated-code compile check: generateErrorCode", () => {
 });
 
 describe("generated-code compile check: generateEventCode", () => {
-  // NOTE: generateEventCode currently emits `typedApi.event.Balances.*$` which
-  // is invalid JavaScript syntax (the `*` on an identifier). Flagged in the
-  // test-coverage report; skipping here until the generator is fixed.
-  it.skip("polkadot Balances.Transfer is clean (BROKEN: emits literal `.*$`)", () => {
+  it("polkadot Balances.Transfer is clean", () => {
     const code = generateEventCode(
       "polkadot",
       "smoldot",
@@ -301,23 +298,6 @@ describe("generated-code compile check: generateEventCode", () => {
       },
     );
     assertClean("polkadot Balances.Transfer", code);
-  });
-
-  it("generateEventCode output passes the hallucination blacklist even though TS syntax is broken", () => {
-    const code = generateEventCode(
-      "polkadot",
-      "smoldot",
-      "Balances",
-      {
-        name: "Transfer",
-        args: [
-          { name: "from", type: "AccountId32" },
-          { name: "to", type: "AccountId32" },
-          { name: "amount", type: "u128" },
-        ],
-        docs: [],
-      },
-    );
     assertNoHallucinations("generateEventCode Balances.Transfer", code);
   });
 });
