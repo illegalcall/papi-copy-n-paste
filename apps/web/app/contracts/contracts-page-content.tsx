@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
@@ -68,6 +68,7 @@ export default function ContractsPageContent() {
     error: connectionError,
     queryContract,
     executeContract,
+    subscribeEvents,
   } = useContractConnection(
     loadedContract ? loadedContract.type : null,
     loadedContract ? loadedContract.chainKey : null,
@@ -87,6 +88,34 @@ export default function ContractsPageContent() {
 
   // ── Active Tab ──
   const [activeTab, setActiveTab] = useState<"interact" | "deploy">("interact");
+
+  // ── Event Subscription (with cleanup on unmount / dep change) ──
+  useEffect(() => {
+    if (!isMonitoring || !isConnected || !loadedContract) {
+      return;
+    }
+    const unsubscribe = subscribeEvents((event) => {
+      setEventLogs((prev) => [
+        {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          name: event.name,
+          args: event.args,
+          blockNumber: event.blockNumber,
+          timestamp: Date.now(),
+        },
+        ...prev,
+      ].slice(0, 100));
+    });
+    // Cleanup MUST run on unmount, contract switch, chain switch, or pause.
+    return () => {
+      unsubscribe();
+    };
+  }, [
+    isMonitoring,
+    isConnected,
+    loadedContract,
+    subscribeEvents,
+  ]);
 
   // ── Handlers ──
 
@@ -353,7 +382,9 @@ export default function ContractsPageContent() {
   }, [generatedCode]);
 
   const handleToggleMonitoring = useCallback(() => {
-    // TODO: Implement event subscription via contract client
+    // Actual subscription + cleanup lives in the useEffect above. This
+    // handler just flips the flag; the effect reacts to the change and
+    // subscribes / unsubscribes accordingly.
     setIsMonitoring((prev) => !prev);
   }, []);
 

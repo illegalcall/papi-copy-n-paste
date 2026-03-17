@@ -16,6 +16,12 @@ import type {
   ContractCallResult,
 } from "@workspace/core/contracts/types";
 
+export interface ContractEventPayload {
+  name: string;
+  args: Record<string, unknown>;
+  blockNumber?: string;
+}
+
 interface ContractConnection {
   isConnected: boolean;
   isConnecting: boolean;
@@ -30,6 +36,9 @@ interface ContractConnection {
     args: unknown[],
     options?: { value?: bigint },
   ) => Promise<ContractCallResult>;
+  subscribeEvents: (
+    onEvent: (event: ContractEventPayload) => void,
+  ) => () => void;
   disconnect: () => void;
 }
 
@@ -202,12 +211,28 @@ export function useContractConnection(
     [],
   );
 
+  const subscribeEvents = useCallback(
+    (onEvent: (event: ContractEventPayload) => void): (() => void) => {
+      if (inkClientRef.current) {
+        return inkClientRef.current.subscribeEvents(onEvent);
+      }
+      if (evmClientRef.current) {
+        return evmClientRef.current.subscribeEvents(onEvent);
+      }
+      // No client connected — return a no-op cleanup so callers can always
+      // invoke it unconditionally from a useEffect cleanup.
+      return () => {};
+    },
+    [],
+  );
+
   return {
     isConnected,
     isConnecting,
     error,
     queryContract,
     executeContract,
+    subscribeEvents,
     disconnect,
   };
 }
