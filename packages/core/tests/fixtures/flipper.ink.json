@@ -1,0 +1,58 @@
+{
+  "source": {
+    "hash": "0xabc123",
+    "language": "ink! 5.0.0",
+    "compiler": "rustc 1.77.0"
+  },
+  "contract": {
+    "name": "flipper",
+    "version": "1.0.0",
+    "authors": ["Test Author <t@example.com>"]
+  },
+  "spec": {
+    "constructors": [
+      {
+        "label": "new",
+        "selector": "0x9bae9d5e",
+        "args": [
+          { "label": "init_value", "type": { "type": 0, "displayName": ["bool"] } }
+        ],
+        "returnType": { "type": 1, "displayName": ["Self"] },
+        "mutates": true,
+        "payable": false,
+        "docs": ["Creates a new flipper with an initial boolean."]
+      }
+    ],
+    "messages": [
+      {
+        "label": "flip",
+        "selector": "0x633aa551",
+        "args": [],
+        "mutates": true,
+        "payable": false,
+        "docs": ["Flips the stored value."]
+      },
+      {
+        "label": "get",
+        "selector": "0x2f865bd9",
+        "args": [],
+        "returnType": { "type": 0, "displayName": ["bool"] },
+        "mutates": false,
+        "payable": false,
+        "docs": ["Returns the current value."]
+      }
+    ],
+    "events": []
+  },
+  "storage": {
+    "root": {
+      "root_key": "0x00000000",
+      "layout": {}
+    }
+  },
+  "types": [
+    { "id": 0, "type": { "def": { "primitive": "bool" }, "path": [] } },
+    { "id": 1, "type": { "def": { "composite": { "fields": [] } }, "path": ["flipper", "flipper", "Flipper"] } }
+  ],
+  "version": "5"
+}
