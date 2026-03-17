@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
+import { Alert, AlertDescription } from "@workspace/ui/components/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 import {
   Moon,
@@ -12,6 +13,7 @@ import {
   BookOpen,
   FileCode,
   ArrowLeft,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -475,6 +477,67 @@ function ContractsPageContentInner() {
         uploadError={uploadError}
         contractName={loadedContract?.name}
       />
+
+      {/* Error banners */}
+      {(connectionError || interactionError || uploadError) && (
+        <div className="px-4 pt-2 space-y-2 shrink-0">
+          {uploadError && (
+            <Alert
+              role="alert"
+              className="border-destructive text-destructive py-2"
+            >
+              <AlertDescription className="text-xs flex items-center justify-between gap-2">
+                <span>
+                  <strong className="font-semibold">Upload error:</strong>{" "}
+                  {uploadError}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => setUploadError(null)}
+                  aria-label="Dismiss upload error"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+          {connectionError && (
+            <Alert
+              role="alert"
+              className="border-destructive text-destructive py-2"
+            >
+              <AlertDescription className="text-xs">
+                <strong className="font-semibold">Connection error:</strong>{" "}
+                {connectionError}
+              </AlertDescription>
+            </Alert>
+          )}
+          {interactionError && (
+            <Alert
+              role="alert"
+              className="border-destructive text-destructive py-2"
+            >
+              <AlertDescription className="text-xs flex items-center justify-between gap-2">
+                <span>
+                  <strong className="font-semibold">Interaction error:</strong>{" "}
+                  {interactionError}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => setInteractionError(null)}
+                  aria-label="Dismiss interaction error"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
