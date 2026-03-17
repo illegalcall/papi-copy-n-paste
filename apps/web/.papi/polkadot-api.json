@@ -6,15 +6,19 @@
       "wsUrl": "wss://hydration-rpc.n.dwellir.com",
       "metadata": ".papi/metadata/hydration.scale",
       "genesis": "0xafdc188f45c71dacbaa0b62e16a91f726c7b8699a9748cdf715459de6b7f366d",
-      "codeHash": "0x5b3789c70537a0508cf6065fcd09ba930a24918afc8f00a49c7e6474eb643af6"
+      "codeHash": "0x2f6a2cb13c332138ef922626e53b73db95748528ef1d94bddcd5aa93292d071a"
     },
     "polkadot_asset_hub": {
       "wsUrl": "wss://polkadot-asset-hub-rpc.polkadot.io",
-      "metadata": ".papi/metadata/polkadot_asset_hub.scale"
+      "metadata": ".papi/metadata/polkadot_asset_hub.scale",
+      "genesis": "0x68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f",
+      "codeHash": "0x04fa38c2fb117fbd73302c23b339ef18c4f3a200a0b487803208bf279161f1d7"
     },
     "polkadot_people": {
       "wsUrl": "wss://polkadot-people-rpc.polkadot.io",
-      "metadata": ".papi/metadata/polkadot_people.scale"
+      "metadata": ".papi/metadata/polkadot_people.scale",
+      "genesis": "0x67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008",
+      "codeHash": "0xd7c36a7e033a490726c28d29ff83c192001ba8ade2e39d04940354cf15245a10"
     }
   }
 }

@@ -32,15 +32,14 @@ test.describe("Contract IDE", () => {
     // Step 3: Click the Flipper example to load its metadata
     await flipperCard.click();
 
-    // Step 4: The method list should show Flipper's messages (flip, get) and
-    // constructor (new). Read/Write/Deploy are group headings in MethodList.
+    // Step 4: On the Interact tab, the method list should show Flipper's
+    // messages (flip + get). Constructors live under the Deploy tab as
+    // options of a <select>, not buttons.
     const flipMethod = page.getByRole("button", { name: /^flip\b/ }).first();
     const getMethod = page.getByRole("button", { name: /^get\b/ }).first();
-    const newCtor = page.getByRole("button", { name: /^new\b/ }).first();
 
     await expect(flipMethod).toBeVisible({ timeout: 10_000 });
     await expect(getMethod).toBeVisible();
-    await expect(newCtor).toBeVisible();
 
     // Step 5: Select the read-only `get` method (no form fields required,
     // keeps the test deterministic — no wallet, no RPC).

@@ -151,6 +151,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@polkadot-api/descriptors':
+        specifier: file:../../apps/web/.papi/descriptors
+        version: file:apps/web/.papi/descriptors(polkadot-api@1.14.1(jiti@2.4.2)(postcss@8.5.6)(rxjs@7.8.2)(tsx@4.20.5))
       '@polkadot-api/metadata-builders':
         specifier: ^0.12.2
         version: 0.12.2
