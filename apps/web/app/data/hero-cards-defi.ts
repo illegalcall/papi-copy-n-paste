@@ -3,14 +3,8 @@
  *
  * Hydration is the omnipool DEX + money-market on Polkadot. Bifrost is the LST
  * hub (vDOT, vKSM, ...). Both are WebSocket parachains with descriptors named
- * `hydration` and `bifrost` in `utils/chainConfig.ts`.
- *
- * NOTE ON EXTRINSIC NAMES: Hydration's `Router.sell` and Bifrost's
- * `VtokenMinting.mint` / `Tokens.Accounts` field shapes below are based on
- * publicly documented runtime metadata as of 2025. Fields marked TODO should
- * be verified against the current on-chain metadata before shipping to
- * production. Do not fabricate field names — regenerate from metadata if in
- * doubt.
+ * `hydration` and `bifrost` in `utils/chainConfig.ts`. Field shapes below are
+ * verified against generated PAPI descriptors — do not fabricate field names.
  */
 
 import type { HeroCard } from "./hero-cards";
@@ -35,7 +29,6 @@ const typedApi = client.getTypedApi(hydration)
 
 // Swap 1 HDX (12 decimals) for DOT via Hydration's Router pallet.
 // Asset IDs on Hydration: 0 = HDX, 5 = DOT (verify on-chain before production).
-// TODO: verify field names on current Hydration Router.sell metadata.
 const tx = typedApi.tx.Router.sell({
   asset_in: 0,  // HDX
   asset_out: 5, // DOT
@@ -96,7 +89,7 @@ const BIFROST_MINT_VDOT: HeroCard = {
   target: "mint",
   kind: "tx",
   tags: ["defi", "lst", "bifrost", "vdot"],
-  code: `import { createClient } from "polkadot-api"
+  code: `import { Binary, createClient } from "polkadot-api"
 import { getWsProvider } from "polkadot-api/ws-provider/web"
 import { bifrost } from "@polkadot-api/descriptors"
 
@@ -105,12 +98,12 @@ const typedApi = client.getTypedApi(bifrost)
 
 // Bifrost token enum: DOT is represented as { type: "Token2", value: 0 } on
 // current runtimes (DOT is Token2#0). vDOT is minted ~1:1 against DOT.
-// TODO: verify the Token/Token2 variant index on current Bifrost metadata.
+// \`remark\` is a required Binary field (pass empty for no-op); \`channel_id\`
+// is optional and omitted here.
 const tx = typedApi.tx.VtokenMinting.mint({
   currency_id: { type: "Token2", value: 0 }, // DOT
   currency_amount: 10_000_000_000n,           // 1 DOT (10 decimals)
-  remark: undefined,
-  channel_id: undefined,
+  remark: Binary.fromText(""),
 })
 
 const fee = await tx.getEstimatedFees(senderAddress)
@@ -144,7 +137,6 @@ const typedApi = client.getTypedApi(bifrost)
 const accountId = "15j4dg5GzsL1bw2U2AWgeyAk6QTxq43V7ZPbXdAmbVLjvDCK"
 
 // vDOT is a Bifrost-side Tokens asset: { type: "VToken2", value: 0 }.
-// TODO: verify VToken2 index for vDOT on current Bifrost metadata.
 const vdot = { type: "VToken2" as const, value: 0 }
 
 const account = await typedApi.query.Tokens.Accounts.getValue(accountId, vdot)
