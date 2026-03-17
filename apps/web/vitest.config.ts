@@ -14,6 +14,14 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./tests/setup.ts"],
     include: ["tests/unit/**/*.test.{ts,tsx}"],
+    // Defensive: keep Playwright .spec.ts files and node_modules out even if
+    // someone adds a misnamed file under tests/unit/.
+    exclude: [
+      "**/node_modules/**",
+      "**/*.spec.ts",
+      "**/*.spec.tsx",
+      "tests/*.spec.ts",
+    ],
   },
   resolve: {
     alias: [
