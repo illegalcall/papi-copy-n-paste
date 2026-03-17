@@ -38,10 +38,15 @@ export interface HeroCard {
 }
 
 import { MIGRATION_HERO_CARDS } from "./hero-cards-migration";
+import { DEFI_HERO_CARDS } from "./hero-cards-defi";
 
 export { MIGRATION_HERO_CARDS } from "./hero-cards-migration";
+export { DEFI_HERO_CARDS } from "./hero-cards-defi";
 
-export const HERO_CARDS: HeroCard[] = [...MIGRATION_HERO_CARDS];
+export const HERO_CARDS: HeroCard[] = [
+  ...MIGRATION_HERO_CARDS,
+  ...DEFI_HERO_CARDS,
+];
 
 /** Get cards filtered by category. */
 export function getHeroCardsByCategory(category: HeroCardCategory): HeroCard[] {
