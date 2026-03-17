@@ -48,6 +48,32 @@ test.describe("PAPI Copy-n-Paste Smoke Tests", () => {
     console.log("✅ Basic UI elements are present");
   });
 
+  test("renders hero cards quick-start panel in empty state", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
+
+    // Panel title should appear in the empty-state area.
+    await expect(
+      page.getByText("Quick-start examples", { exact: true }),
+    ).toBeVisible({ timeout: 15_000 });
+
+    // Both category tabs should be present.
+    await expect(
+      page.getByRole("button", { name: /Asset Hub Migration/ }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /^DeFi$/ }),
+    ).toBeVisible();
+
+    // Switch to DeFi and confirm at least one known card renders.
+    await page.getByRole("button", { name: /^DeFi$/ }).click();
+    await expect(
+      page.getByText(/Swap on Hydration omnipool/i),
+    ).toBeVisible();
+  });
+
   test("should not have obvious JavaScript errors", async ({ page }) => {
     const consoleErrors: string[] = [];
 

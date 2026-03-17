@@ -34,6 +34,7 @@ import {
   executeStorageQuery,
   stopWatchValue,
 } from "../utils/transactionHelpers";
+import { getDefaultProvider } from "@workspace/core/network-providers";
 
 interface TransactionResult {
   hash: string;
@@ -1148,6 +1149,10 @@ export default function PageContent() {
             storageQueue={storageQueue}
             storageQueryType={storageQueryType}
             storageParams={storageParams}
+            onChainSelect={(chainKey) => {
+              const provider = getDefaultProvider(chainKey);
+              if (provider) onNetworkChange(chainKey, provider.id);
+            }}
           />
         </div>
 

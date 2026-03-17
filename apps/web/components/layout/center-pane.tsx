@@ -18,6 +18,7 @@ import { ConstantForm } from "@/components/forms/constant-form";
 import { StorageQueryType } from "../../types/enums";
 import { ErrorForm } from "@/components/forms/error-form";
 import { EventForm } from "@/components/forms/event-form";
+import { HeroCardsPanel } from "@/components/hero-cards-panel";
 import { PalletCall, PalletConstant, PalletError, PalletEvent } from "@workspace/core";
 
 interface CenterPaneProps {
@@ -67,6 +68,7 @@ interface CenterPaneProps {
   onStorageQueryTypeChange?: (queryType: StorageQueryType | string) => void;
   onStorageParamsChange?: (params: Record<string, any>) => void;
   onStorageValidationChange?: (isValid: boolean, errors: Record<string, string>) => void;
+  onChainSelect?: (chainKey: string) => void;
 }
 
 
@@ -101,6 +103,7 @@ export function CenterPane({
   onStorageQueryTypeChange = () => {},
   onStorageParamsChange = () => {},
   onStorageValidationChange,
+  onChainSelect,
 }: CenterPaneProps) {
   const { isConnected: isWalletConnected } = useWallet();
 
@@ -294,22 +297,25 @@ export function CenterPane({
           chainKey={selectedChain}
         />
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>Select a Pallet Item</CardTitle>
-            <CardDescription>
-              Choose a call (to execute transactions), storage item (to query
-              data), constant (to get fixed values), or error (to see error details) from the left panel
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center text-muted-foreground py-8">
-              {chainStatus === "ready"
-                ? "Select a chain and explore the available pallets"
-                : "Connecting to chain..."}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Select a Pallet Item</CardTitle>
+              <CardDescription>
+                Choose a call (to execute transactions), storage item (to query
+                data), constant (to get fixed values), or error (to see error details) from the left panel
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center text-muted-foreground py-4">
+                {chainStatus === "ready"
+                  ? "Select a chain and explore the available pallets"
+                  : "Connecting to chain..."}
+              </div>
+            </CardContent>
+          </Card>
+          <HeroCardsPanel onChainSelect={onChainSelect} />
+        </div>
       )}
 
       <div className="fixed bottom-4 inset-x-4 lg:relative lg:bottom-auto lg:inset-x-auto lg:mt-6">
