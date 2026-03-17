@@ -74,6 +74,49 @@ test.describe("PAPI Copy-n-Paste Smoke Tests", () => {
     ).toBeVisible();
   });
 
+  test("clicking a hero card copies code and switches chain", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
+
+    await expect(
+      page.getByText("Quick-start examples", { exact: true }),
+    ).toBeVisible({ timeout: 15_000 });
+
+    // Switch to DeFi, click the Hydration swap card.
+    await page.getByRole("button", { name: /^DeFi$/ }).click();
+    const hydrationCard = page
+      .getByRole("button", { name: /Swap on Hydration omnipool/i })
+      .first();
+    await hydrationCard.click();
+
+    // Toast confirms the chain switch + copy.
+    await expect(
+      page.getByText(/Copied Router\.sell.*hydration/i),
+    ).toBeVisible({ timeout: 5_000 });
+
+    // Clipboard should contain the real PAPI snippet.
+    const clipboardText = await page.evaluate(() =>
+      navigator.clipboard.readText(),
+    );
+    expect(clipboardText).toContain("polkadot-api");
+    expect(clipboardText).toContain("Router.sell");
+    expect(clipboardText).toContain("getWsProvider");
+    // Must not contain any PAPI hallucination traps.
+    expect(clipboardText).not.toMatch(/@polkadot\/api/);
+    expect(clipboardText).not.toContain("signAndSend");
+    expect(clipboardText).not.toContain("ApiPromise.create");
+
+    // Header network selector should now reflect Hydration.
+    await expect(
+      page.getByText(/Hydration|hydration/).first(),
+    ).toBeVisible({ timeout: 10_000 });
+  });
+
   test("should not have obvious JavaScript errors", async ({ page }) => {
     const consoleErrors: string[] = [];
 
