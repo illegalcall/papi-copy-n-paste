@@ -655,6 +655,7 @@ function ContractsPageContentInner() {
                   onExecute={handleExecute}
                   isRunning={isRunning}
                   error={interactionError}
+                  previewOnly={!contractAddress.trim()}
                 />
               ) : loadedContract ? (
                 <div className="flex items-center justify-center h-full">

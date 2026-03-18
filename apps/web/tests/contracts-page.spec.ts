@@ -68,14 +68,53 @@ test.describe("Contract IDE", () => {
     await page.goto("/contracts");
     await page.waitForLoadState("domcontentloaded");
 
-    // Switch to EVM contract type
-    const evmToggle = page.getByRole("button", { name: /^EVM$/ }).first();
-    if (await evmToggle.isVisible({ timeout: 5_000 })) {
-      await evmToggle.click();
+    // Switch to EVM contract type (Radix Tabs → role=tab)
+    const evmToggle = page.getByRole("tab", { name: /^EVM$/ }).first();
+    await expect(evmToggle).toBeVisible({ timeout: 15_000 });
+    await evmToggle.click();
 
-      // EVM hero cards: ERC-20, ERC-721, WGLMR
-      const erc20Card = page.getByRole("button", { name: /ERC-20/i }).first();
-      await expect(erc20Card).toBeVisible({ timeout: 10_000 });
-    }
+    // EVM hero cards: ERC-20, ERC-721, WGLMR
+    const erc20Card = page.getByRole("button", { name: /ERC-20/i }).first();
+    await expect(erc20Card).toBeVisible({ timeout: 10_000 });
+
+    // Curated live XC-20 cards
+    await expect(
+      page.getByRole("button", { name: /xcDOT/i }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /xcUSDC/i }).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /xcUSDT/i }).first(),
+    ).toBeVisible();
+  });
+
+  test("clicking xcDOT loads the live Moonbeam precompile address", async ({
+    page,
+  }) => {
+    await page.goto("/contracts");
+    await page.waitForLoadState("domcontentloaded");
+
+    const evmToggle = page.getByRole("tab", { name: /^EVM$/ }).first();
+    await expect(evmToggle).toBeVisible({ timeout: 15_000 });
+    await evmToggle.click();
+
+    const xcdotCard = page.getByRole("button", { name: /xcDOT/i }).first();
+    await expect(xcdotCard).toBeVisible({ timeout: 15_000 });
+    await xcdotCard.click();
+
+    // The Moonbeam XC-20 precompile address should populate the address field.
+    await expect(
+      page
+        .locator(
+          'input[value="0xFfFFfFff1FcaCBd218EDc0EbA20Fc2308C778080" i]',
+        )
+        .first(),
+    ).toBeVisible({ timeout: 15_000 });
+
+    // Standard ERC-20 methods should surface from the ABI.
+    await expect(
+      page.getByRole("button", { name: /^balanceOf\b/ }).first(),
+    ).toBeVisible({ timeout: 15_000 });
   });
 });

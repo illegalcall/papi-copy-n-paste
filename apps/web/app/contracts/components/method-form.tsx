@@ -21,6 +21,7 @@ interface MethodFormProps {
   onExecute: (args: Record<string, string>, value?: bigint) => void;
   isRunning?: boolean;
   error?: string | null;
+  previewOnly?: boolean;
 }
 
 export const MethodForm = memo(function MethodForm({
@@ -29,6 +30,7 @@ export const MethodForm = memo(function MethodForm({
   onExecute,
   isRunning,
   error,
+  previewOnly,
 }: MethodFormProps) {
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [payableValue, setPayableValue] = useState("");
@@ -152,6 +154,16 @@ export const MethodForm = memo(function MethodForm({
         </div>
       )}
 
+      {/* Preview-only banner (example with no live address) */}
+      {previewOnly && (
+        <Alert className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400">
+          <AlertDescription className="text-xs">
+            Preview only — this example has no live address. Enter a deployed
+            contract address above to query on-chain.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Error */}
       {error && (
         <Alert className="border-destructive text-destructive">
@@ -169,7 +181,11 @@ export const MethodForm = memo(function MethodForm({
       {/* Submit Button */}
       <Button
         onClick={handleSubmit}
-        disabled={isRunning || (method.args.length > 0 && !isFormValid)}
+        disabled={
+          isRunning ||
+          previewOnly ||
+          (method.args.length > 0 && !isFormValid)
+        }
         className="w-full"
         variant={method.isReadOnly ? "outline" : "default"}
       >

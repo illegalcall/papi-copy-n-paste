@@ -27,6 +27,9 @@ const EXAMPLE_ICONS: Record<string, React.ReactNode> = {
   "evm-erc20": <Coins className="h-5 w-5" />,
   "evm-erc721": <Image className="h-5 w-5" />,
   "evm-weth": <Droplets className="h-5 w-5" />,
+  "evm-xcdot": <Coins className="h-5 w-5" />,
+  "evm-xcusdc": <Coins className="h-5 w-5" />,
+  "evm-xcusdt": <Coins className="h-5 w-5" />,
 };
 
 const ACCENT_COLORS: Record<string, string> = {
@@ -36,6 +39,9 @@ const ACCENT_COLORS: Record<string, string> = {
   "evm-weth": "from-purple-500/20 to-purple-600/5 border-purple-500/30",
   "evm-erc20": "from-cyan-500/20 to-cyan-600/5 border-cyan-500/30",
   "evm-erc721": "from-pink-500/20 to-pink-600/5 border-pink-500/30",
+  "evm-xcdot": "from-rose-500/20 to-rose-600/5 border-rose-500/30",
+  "evm-xcusdc": "from-sky-500/20 to-sky-600/5 border-sky-500/30",
+  "evm-xcusdt": "from-emerald-500/20 to-emerald-600/5 border-emerald-500/30",
 };
 
 const ICON_COLORS: Record<string, string> = {
@@ -45,6 +51,9 @@ const ICON_COLORS: Record<string, string> = {
   "evm-weth": "bg-purple-500/15 text-purple-500",
   "evm-erc20": "bg-cyan-500/15 text-cyan-500",
   "evm-erc721": "bg-pink-500/15 text-pink-500",
+  "evm-xcdot": "bg-rose-500/15 text-rose-500",
+  "evm-xcusdc": "bg-sky-500/15 text-sky-500",
+  "evm-xcusdt": "bg-emerald-500/15 text-emerald-500",
 };
 
 export const ExampleContracts = memo(function ExampleContracts({
